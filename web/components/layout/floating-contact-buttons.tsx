@@ -24,49 +24,83 @@ export function FloatingContactButtons({ data }: FloatingContactButtonsProps) {
   if (!whatsapp && !email) return null
 
   return (
-    <div className="fixed right-6 bottom-32 z-[60] flex flex-col gap-3">
+    <div className="fixed right-6 top-1/2 mt-10 z-[60] flex flex-col gap-3">
       {whatsapp?.linkUrl && (
-        <a
-          href={`https://wa.me/${whatsapp.linkUrl.replace(/\D/g, '')}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={cn(
-            'group flex items-center justify-center w-12 h-12 rounded-full',
-            'bg-brand-secondary shadow-lg',
-            'transition-all duration-300 ease-out',
-            'hover:scale-110 hover:shadow-xl',
-            'active:scale-95'
-          )}
-          title={whatsapp.title || 'WhatsApp'}
-        >
-          <IconifyIcon
-            name="mdi:whatsapp"
-            size={24}
-            color="white"
-            className="transition-transform duration-300 group-hover:rotate-12"
-          />
-        </a>
+        <div className="relative group">
+          <a
+            href={`https://wa.me/${whatsapp.linkUrl.replace(/\D/g, '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              'flex items-center justify-center w-12 h-12 rounded-full',
+              'bg-brand-secondary shadow-lg',
+              'transition-all duration-300 ease-out',
+              'hover:scale-110 hover:shadow-xl',
+              'active:scale-95'
+            )}
+          >
+            <IconifyIcon
+              name="mdi:whatsapp"
+              size={24}
+              color="white"
+              className="transition-transform duration-300 group-hover:rotate-12"
+            />
+          </a>
+          {/* Tooltip */}
+          <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <div
+              className={cn(
+                'relative bg-gray-900 text-white text-sm font-medium px-3 py-1.5 rounded-lg whitespace-nowrap',
+                'opacity-0 invisible group-hover:opacity-100 group-hover:visible',
+                'transition-all duration-200 ease-out',
+                'shadow-lg',
+                'translate-x-2 group-hover:translate-x-0'
+              )}
+            >
+              WhatsApp
+              {/* Arrow */}
+              <span className="absolute top-1/2 -right-[3px] -translate-y-1/2 w-[6px] h-[6px] bg-gray-900 rotate-45" />
+            </div>
+          </div>
+        </div>
       )}
 
       {email?.linkUrl && (
-        <a
-          href={email.linkUrl.startsWith('mailto:') ? email.linkUrl : `mailto:${email.linkUrl}`}
-          className={cn(
-            'group flex items-center justify-center w-12 h-12 rounded-full',
-            'bg-brand-secondary shadow-lg',
-            'transition-all duration-300 ease-out',
-            'hover:scale-110 hover:shadow-xl',
-            'active:scale-95'
-          )}
-          title={email.title || 'Email'}
-        >
-          <IconifyIcon
-            name="mdi:email"
-            size={24}
-            color="white"
-            className="transition-transform duration-300 group-hover:rotate-12"
-          />
-        </a>
+        <div className="relative group">
+          <a
+            href={email.linkUrl.startsWith('mailto:') ? email.linkUrl : `mailto:${email.linkUrl}`}
+            className={cn(
+              'flex items-center justify-center w-12 h-12 rounded-full',
+              'bg-brand-secondary shadow-lg',
+              'transition-all duration-300 ease-out',
+              'hover:scale-110 hover:shadow-xl',
+              'active:scale-95'
+            )}
+          >
+            <IconifyIcon
+              name="mdi:email"
+              size={24}
+              color="white"
+              className="transition-transform duration-300 group-hover:rotate-12"
+            />
+          </a>
+          {/* Tooltip */}
+          <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <div
+              className={cn(
+                'relative bg-gray-900 text-white text-sm font-medium px-3 py-1.5 rounded-lg whitespace-nowrap',
+                'opacity-0 invisible group-hover:opacity-100 group-hover:visible',
+                'transition-all duration-200 ease-out',
+                'shadow-lg',
+                'translate-x-2 group-hover:translate-x-0'
+              )}
+            >
+              Email
+              {/* Arrow */}
+              <span className="absolute top-1/2 -right-[3px] -translate-y-1/2 w-[6px] h-[6px] bg-gray-900 rotate-45" />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

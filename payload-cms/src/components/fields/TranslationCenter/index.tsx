@@ -649,10 +649,13 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
             dataToSave[arrName] = mergedArray
           }
 
-          // Fill required fields for products
+          // Fill required fields to prevent hooks from regenerating them
           if (collectionSlug === 'products') {
             if (!dataToSave.name && sourceData.name) dataToSave.name = sourceData.name
             if (sourceData.slug) dataToSave.slug = sourceData.slug
+          }
+          if (collectionSlug === 'faq-items' && sourceData.slug) {
+            dataToSave.slug = sourceData.slug
           }
         }
 

@@ -1,0 +1,125 @@
+.application-image-picker {
+  border: 1px solid var(--theme-elevation-300);
+  border-radius: 4px;
+  padding: 1rem;
+  background: var(--theme-elevation-50);
+
+  &__label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--theme-elevation-800);
+  }
+
+  &__mode-selector {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    button {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border: 2px solid var(--theme-elevation-400);
+      background: var(--theme-elevation-0);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--theme-elevation-100);
+        border-color: var(--theme-elevation-500);
+      }
+
+      &.active {
+        background: var(--theme-success-500);
+        color: white;
+        border-color: var(--theme-success-600);
+      }
+    }
+  }
+
+  &__manual {
+    .media-picker__label {
+      display: none;
+    }
+  }
+
+  &__application {
+    .application-image-picker__select-wrapper {
+      select {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--theme-elevation-300);
+        border-radius: 4px;
+        font-size: 14px;
+        background: var(--theme-elevation-0);
+        cursor: pointer;
+        transition: border-color 0.2s;
+
+        &:focus {
+          outline: none;
+          border-color: var(--theme-success-500);
+          box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+        }
+      }
+    }
+  }
+
+  &__hint {
+    font-size: 12px;
+    color: var(--theme-elevation-600);
+    margin: 0.5rem 0 0;
+  }
+
+  &__preview {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--theme-elevation-300);
+
+    h5 {
+      margin: 0 0 0.75rem 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--theme-elevation-800);
+    }
+  }
+
+  &__loading,
+  &__empty {
+    padding: 2rem;
+    text-align: center;
+    color: var(--theme-elevation-600);
+    background: var(--theme-elevation-100);
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  &__preview-item {
+    display: inline-block;
+    background: var(--theme-elevation-0);
+    border: 1px solid var(--theme-elevation-300);
+    border-radius: 4px;
+    overflow: hidden;
+    max-width: 200px;
+
+    img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+    }
+
+    p {
+      padding: 0.5rem;
+      margin: 0;
+      font-size: 11px;
+      color: var(--theme-elevation-700);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

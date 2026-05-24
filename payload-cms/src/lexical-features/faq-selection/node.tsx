@@ -17,12 +17,12 @@ const FaqSelectionComponent = React.lazy(() => import('./component.client').then
 
 export type FaqSelectionData = {
   categories: {
-    category: string | any
+    category: string | { id: string | number; adminLabel?: string }
     icon?: string
     image?: string | any
     gallery?: string | any
     questions: {
-      faqItem: string | any
+      faqItem: string | { id: string | number; adminLabel?: string }
       image?: string | any
       gallery?: string | any
     }[]

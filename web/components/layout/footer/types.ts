@@ -2,6 +2,7 @@ import type { Locale } from "@/i18n.config";
 
 export interface FooterApiData {
   formConfigName?: string;
+  backgroundImage?: string | null;
   contact: {
     title: string;
     emailLabel: string;

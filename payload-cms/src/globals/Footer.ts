@@ -30,6 +30,18 @@ export const Footer: GlobalConfig = {
     read: () => true,
     update: ({ req: { user } }) => !!user,
   },
+  hooks: {
+    afterRead: [
+      async ({ doc, req: { payload } }) => {
+        const { getApplicationImage } = await import('@/utilities/getApplicationImage')
+        const image = await getApplicationImage(payload, doc.backgroundImage)
+        return {
+          ...doc,
+          backgroundImageResolved: image,
+        }
+      },
+    ],
+  },
   fields: [
     // Translation Center
     {
@@ -39,6 +51,24 @@ export const Footer: GlobalConfig = {
         position: 'sidebar',
         components: {
           Field: '@/components/fields/GlobalTranslationCenter',
+        },
+      },
+    },
+    // Background Image
+    {
+      name: 'backgroundImage',
+      type: 'json',
+      label: {
+        en: 'Background Image',
+        zh: '背景图片',
+      },
+      admin: {
+        components: {
+          Field: '@/components/fields/ApplicationImagePicker',
+        },
+        description: {
+          en: 'Footer background image. Choose manually from media or randomly from a case gallery (Application). If not set, the default image will be used.',
+          zh: '页脚背景图片。可手动从媒体库选择，或从案例图集中随机选择。如果不设置，将使用默认图片。',
         },
       },
     },

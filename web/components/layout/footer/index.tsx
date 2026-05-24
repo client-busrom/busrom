@@ -115,7 +115,11 @@ export default function Footer({
       >
         <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url(/BusromFooterBg.webp)" }}
+          style={{
+            backgroundImage: footerData?.backgroundImage
+              ? `url(${footerData.backgroundImage})`
+              : "url(/BusromFooterBg.webp)",
+          }}
           aria-hidden="true"
         />
 

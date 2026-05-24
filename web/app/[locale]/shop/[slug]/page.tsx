@@ -1,10 +1,12 @@
 import type { Locale } from "@/i18n.config"
 import { ProductDetailClient } from "./ProductDetailClient"
+import { ShopPageClient } from "../ShopPageClient"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { getNonHomePageSeo, buildMetadata } from "@/lib/api/seo-settings"
 import { getAlternateLanguages } from "@/lib/seo-utils"
 import { getProductBySlug } from "@/lib/api/products"
+import { getCategoryBySlug } from "@/lib/api/categories"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 
@@ -16,8 +18,23 @@ export async function generateMetadata({
   const { locale, slug } = await params
   const path = `/shop/${slug}`
 
+  // First check if this slug is a category
+  const category = await getCategoryBySlug(slug, locale)
+  if (category) {
+    // It's a category page - use category name for title
+    const categoryName = category.name?.[locale] || category.name?.en || category.name || slug
+    return {
+      title: `${categoryName} | Busrom`,
+      description: `Browse ${categoryName} products from Busrom`,
+      alternates: {
+        languages: getAlternateLanguages(path),
+      },
+    }
+  }
+
+  // Not a category, try as product
   const product = await getProductBySlug(slug, locale)
-  
+
   // SEO Protection: If not translated in current locale, set to noindex
   let robots: any = undefined
   if (locale !== 'en') {
@@ -53,7 +70,7 @@ export async function generateMetadata({
   return buildMetadata(setting, defaultMetadata, 'https://www.busromhouse.com', path)
 }
 
-export default async function ProductDetailPage({
+export default async function ShopSlugPage({
   params,
 }: {
   params: Promise<{ locale: Locale; slug: string }>
@@ -61,12 +78,33 @@ export default async function ProductDetailPage({
   const { locale, slug } = await params
   const path = `/shop/${slug}`
 
+  // First check if this slug is a category
+  const category = await getCategoryBySlug(slug, locale)
+
+  if (category) {
+    // Render as shop list page with category pre-selected
+    return (
+      <>
+        <PageScripts path={path} pageType="shop_list" position="header" />
+        <PageScripts path={path} pageType="shop_list" position="body_start" />
+        <PageSeoInjector path={path} pageType="shop_list" locale={locale} />
+        <ShopPageClient
+          locale={locale}
+          searchParams={{ category: slug }}
+          slugMode={true}
+        />
+        <PageScripts path={path} pageType="shop_list" position="footer" />
+      </>
+    )
+  }
+
+  // Not a category, render as product detail
   const productData = await getProductBySlug(slug, locale)
 
   if (!productData) {
     notFound()
   }
-  
+
   // Load localized messages for SSR
   const messages = (await import(`@/messages/${locale}.json`)).default
   const footerHint = messages.shop?.inquiryFooterHint

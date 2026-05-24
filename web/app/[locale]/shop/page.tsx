@@ -35,7 +35,7 @@ export default async function ShopPage({
       <PageScripts path="/shop" pageType="shop_list" position="header" />
       <PageScripts path="/shop" pageType="shop_list" position="body_start" />
       <PageSeoInjector path="/shop" pageType="shop_list" locale={locale} />
-      <ShopPageClient locale={locale} searchParams={resolvedSearchParams} />
+      <ShopPageClient locale={locale} searchParams={resolvedSearchParams} slugMode={false} />
       <PageScripts path="/shop" pageType="shop_list" position="footer" />
     </>
   )

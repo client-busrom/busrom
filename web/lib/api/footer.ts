@@ -30,8 +30,40 @@ export async function getFooterData(locale: string = 'en') {
     const data = await footerRes.json();
     const socialData = socialRes.ok ? await socialRes.json() : { socialLinks: [] };
 
+    // Resolve background image
+    let backgroundImage: string | null = null
+    const bgConfig = data.backgroundImage
+    if (bgConfig) {
+      if (bgConfig.mode === 'manual' && bgConfig.manualImage?.url) {
+        backgroundImage = bgConfig.manualImage.sizes?.desktop?.url || bgConfig.manualImage.url
+      } else if (bgConfig.mode === 'application' && bgConfig.applicationId) {
+        try {
+          const appRes = await fetch(`${CMS_URL}/api/applications/${bgConfig.applicationId}?depth=1`, {
+            headers: { 'Content-Type': 'application/json' },
+            next: { revalidate: 3600 },
+          })
+          if (appRes.ok) {
+            const app = await appRes.json()
+            const allImages = (app.sceneGallery || []).flatMap((scene: any) => scene.images || [])
+            const uniqueImages = Array.from(new Map(allImages.map((img: any) => [img.id, img])).values())
+            if (uniqueImages.length > 0) {
+              const randomIndex = Math.floor(Math.random() * uniqueImages.length)
+              const img = uniqueImages[randomIndex] as any
+              backgroundImage = img.sizes?.desktop?.url || img.url || null
+            }
+          }
+        } catch (e) {
+          console.error('[Footer API Helper] Failed to resolve application image:', e)
+        }
+      }
+      if (!backgroundImage && bgConfig.url) {
+        backgroundImage = bgConfig.url
+      }
+    }
+
     return {
       formConfigName: data.formConfig?.name || 'footer-form',
+      backgroundImage,
       contact: {
         title: data.contactInfoGroup?.contactTitle || 'Contact Us',
         emailLabel: data.contactInfoGroup?.contactEmailLabel || 'Email: ',

@@ -22,6 +22,7 @@ const fetcher = (url: string) => fetch(url).then(res => res.json())
 interface ShopPageClientProps {
   locale: Locale
   searchParams: { [key: string]: string | string[] | undefined }
+  slugMode?: boolean
 }
 
 // Helper to normalize slugs in the UI
@@ -35,7 +36,7 @@ function toUrlSlug(s: string): string {
     .replace(/[^a-z0-9-]/g, '')
 }
 
-export function ShopPageClient({ locale }: ShopPageClientProps) {
+export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps) {
   const router = useRouter()
   const searchParamsDict = useSearchParams()
   const pathname = usePathname()
@@ -43,7 +44,15 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
   // ============================================================
   // URL is the SINGLE SOURCE OF TRUTH (Always normalized)
   // ============================================================
-  const rawCategory = searchParamsDict.get('category') || ""
+  // In slugMode, the category comes from the URL path /shop/[slug]
+  // Otherwise it comes from ?category=xxx query param
+  const pathSlug = useMemo(() => {
+    if (!slugMode) return ""
+    const match = pathname.match(/\/shop\/([^/?]+)/)
+    return match ? toUrlSlug(match[1]) : ""
+  }, [pathname, slugMode])
+
+  const rawCategory = slugMode ? pathSlug : (searchParamsDict.get('category') || "")
   const selectedCategory = useMemo(() => toUrlSlug(rawCategory), [rawCategory])
   const sortBy = (searchParamsDict.get('sortBy') || 'shopOrder') as ProductSortField
   const sortDirection = (searchParamsDict.get('sortDir') || 'DESC') as ProductSortDirection
@@ -168,6 +177,20 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
   // Navigation helpers — ALL URL updates go through one function
   // ============================================================
   const updateUrl = useCallback((updates: Record<string, string | null>) => {
+    // Category changes always navigate to /[locale]/shop/[slug] for clean URLs
+    if ('category' in updates) {
+      const newSlug = updates.category
+      // pathname already includes locale, e.g. /en/shop or /en/shop/bathroom-glass-clip
+      const basePath = pathname.replace(/\/shop\/.*$/, '/shop')
+      if (newSlug) {
+        router.push(`${basePath}/${newSlug}`, { scroll: false })
+      } else {
+        // "All" tab clicked → go to /[locale]/shop
+        router.push(basePath, { scroll: false })
+      }
+      return
+    }
+
     const params = new URLSearchParams(searchParamsDict.toString())
     Object.entries(updates).forEach(([key, value]) => {
       if (value === null || value === "") {
@@ -176,13 +199,13 @@ export function ShopPageClient({ locale }: ShopPageClientProps) {
         params.set(key, value)
       }
     })
-    
+
     // Remove page from URL just in case some old links have it
     params.delete('page')
-    
+
     const queryString = params.toString()
     router.push(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false })
-  }, [pathname, router, searchParamsDict])
+  }, [pathname, router, searchParamsDict, slugMode, locale])
 
   const handleCategoryChange = useCallback((slug: string) => {
     updateUrl({ category: slug || null })

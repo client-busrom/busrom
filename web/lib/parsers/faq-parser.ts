@@ -62,6 +62,24 @@ function getNodeTotalText(node: any): string {
   return "";
 }
 
+/**
+ * Filter out horizontal rule and signature from FAQ answer content.
+ * Stops at the first horizontalrule node, removing it and everything after.
+ */
+function filterAnswerContent(content: any): any {
+  if (!content || !content.root || !content.root.children) return content;
+  const children = content.root.children;
+  const hrIndex = children.findIndex((n: any) => n.type === "horizontalrule");
+  if (hrIndex === -1) return content;
+  return {
+    ...content,
+    root: {
+      ...content.root,
+      children: children.slice(0, hrIndex),
+    },
+  };
+}
+
 function extractAfterMarker(children: any[], markerId: string): any[] {
   let foundMarker = false;
   const result: any[] = [];
@@ -271,7 +289,7 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
           return {
             id: s.id || `pop-${i}`,
             question: s.question ? { root: { children: [{ type: 'paragraph', children: [{ type: 'text', text: s.question }] }] } } : null,
-            answer: s.contentTranslation || s.answer || { root: { children: [] } },
+            answer: filterAnswerContent(s.contentTranslation || s.answer || { root: { children: [] } }),
             image1: resolveMedia(item.image || item.image1),
             image2: resolveMedia(allItems[(i + 1) % allItems.length]?.image || allItems[(i + 1) % allItems.length]?.image1),
             image3: resolveMedia(allItems[(i + 2) % allItems.length]?.image || allItems[(i + 2) % allItems.length]?.image1),
@@ -291,7 +309,7 @@ export function parseFaqData(locale: string, rawData: any): FaqData {
           return {
             id: f.id || `faq-${i}-${j}`,
             question: f.question || "",
-            answer: f.contentTranslation || { root: { children: [] } },
+            answer: filterAnswerContent(f.contentTranslation || { root: { children: [] } }),
             image: resolveQuestionImage(q),
           };
         }),

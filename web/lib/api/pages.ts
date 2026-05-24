@@ -76,6 +76,8 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
     const seriesIds: string[] = [];
     const appIds: string[] = [];
     const uniqueFormIdsSet = new Set<string>();
+    const faqCategoryIds: string[] = [];
+    const faqItemIds: string[] = [];
 
     const isFormMarker = (node: any) => {
       if (node.type !== 'paragraph') return false;
@@ -99,7 +101,11 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
       // FAQ categories
       if (node.type === 'faqSelection') {
         (node.data?.categories || []).forEach((cat: any) => {
+          const catId = typeof cat.category === 'object' ? cat.category?.id : cat.category;
+          if (catId) faqCategoryIds.push(String(catId));
           (cat.questions || []).forEach((q: any) => {
+            const faqId = typeof q.faqItem === 'object' ? q.faqItem?.id : q.faqItem;
+            if (faqId) faqItemIds.push(String(faqId));
             if (q.gallery) {
               const gid = typeof q.gallery === 'object' ? q.gallery.id : q.gallery;
               if (gid) appIds.push(String(gid));
@@ -179,6 +185,22 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
       fetchPromises.push(Promise.resolve(null));
     }
 
+    // FAQ Categories Fetch
+    const fcIdsSet = Array.from(new Set(faqCategoryIds));
+    let faqCategoriesPromise: Promise<any[]> = Promise.resolve([]);
+    if (fcIdsSet.length > 0) {
+      const catUrl = `${cmsUrl}/api/categories?locale=${locale}${fallbackParam}&where[id][in]=${fcIdsSet.join(',')}&depth=0&limit=100`;
+      faqCategoriesPromise = fetch(catUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json().then(d => d.docs || []) : []);
+    }
+
+    // FAQ Items Fetch
+    const fiIdsSet = Array.from(new Set(faqItemIds));
+    let faqItemsPromise: Promise<any[]> = Promise.resolve([]);
+    if (fiIdsSet.length > 0) {
+      const itemUrl = `${cmsUrl}/api/faq-items?locale=${locale}${fallbackParam}&where[id][in]=${fiIdsSet.join(',')}&depth=0&limit=100`;
+      faqItemsPromise = fetch(itemUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json().then(d => d.docs || []) : []);
+    }
+
     // Form Configs Fetch (Parallel inside Parallel)
     const uniqueFormIds = Array.from(uniqueFormIdsSet);
     const formConfigsMap: Record<string, any> = {};
@@ -195,12 +217,19 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
     }
 
     // Wait for all enrichment data
-    const [seriesResult, productsResult, applicationsResult, formsMap] = await Promise.all(fetchPromises);
+    const [[seriesResult, productsResult, applicationsResult, formsMap], faqCategoriesResult, faqItemsResult] = await Promise.all([
+      Promise.all(fetchPromises),
+      faqCategoriesPromise,
+      faqItemsPromise,
+    ]);
 
     series = (seriesResult?.docs || []).map(normalizeMediaObject);
     products = (productsResult?.docs || []).map(normalizeMediaObject);
     applications = (applicationsResult?.docs || []).map(normalizeMediaObject);
     formConfig = Object.values(formsMap)[0] || null;
+
+    const faqCategoryMap = new Map((faqCategoriesResult || []).map((c: any) => [String(c.id), c]));
+    const faqItemMap = new Map((faqItemsResult || []).map((f: any) => [String(f.id), f]));
 
     // 4. Parallel Media Resolution for Enriched Data
     const mediaResolutionPromises: Promise<any>[] = [];
@@ -257,6 +286,22 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
             return appsMap.get(String(appId)) || id;
           });
         }
+      }
+
+      // Hydrate FAQ Selection
+      if (node.type === 'faqSelection') {
+        (node.data?.categories || []).forEach((cat: any) => {
+          const catId = typeof cat.category === 'object' ? cat.category?.id : cat.category;
+          if (catId && faqCategoryMap.has(String(catId))) {
+            cat.category = faqCategoryMap.get(String(catId));
+          }
+          (cat.questions || []).forEach((q: any) => {
+            const faqId = typeof q.faqItem === 'object' ? q.faqItem?.id : q.faqItem;
+            if (faqId && faqItemMap.has(String(faqId))) {
+              q.faqItem = faqItemMap.get(String(faqId));
+            }
+          });
+        });
       }
 
       // Hydrate Form Blocks

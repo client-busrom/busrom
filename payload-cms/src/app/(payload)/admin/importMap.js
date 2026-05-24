@@ -70,6 +70,7 @@ import { default as default_127e3c011c444cd50caa9cd70efd6d8a } from '@/component
 import { default as default_95e57a5ac5a413f5bf54496a51c39a80 } from '@/components/fields/SmtpTestButton'
 import { default as default_79a16e2feb59e0ddbd84b47988cd4403 } from '@/components/fields/SmtpFormConfigPicker'
 import { default as default_bdc26dd478f73cf7016343f3a0586504 } from '@/components/fields/GlobalTranslationCenter'
+import { default as default_35c54f4c34cbc438e04ddcc4e8815bff } from '@/components/fields/ApplicationImagePicker'
 import { InfoBox as InfoBox_b22e71a418305e9daff93fec26c20e4b } from '@/components/fields/InfoBox'
 import { default as default_8ac62ba4e71f0c3c16a780b7cf6afb1f } from '@/components/fields/MaintenancePanel'
 import { default as default_eb0ce37e649ba467d7e7865b5c4d2aa0 } from '@/components/fields/ContactLinkField'
@@ -162,6 +163,7 @@ export const importMap = {
   "@/components/fields/SmtpTestButton#default": default_95e57a5ac5a413f5bf54496a51c39a80,
   "@/components/fields/SmtpFormConfigPicker#default": default_79a16e2feb59e0ddbd84b47988cd4403,
   "@/components/fields/GlobalTranslationCenter#default": default_bdc26dd478f73cf7016343f3a0586504,
+  "@/components/fields/ApplicationImagePicker#default": default_35c54f4c34cbc438e04ddcc4e8815bff,
   "@/components/fields/InfoBox#InfoBox": InfoBox_b22e71a418305e9daff93fec26c20e4b,
   "@/components/fields/MaintenancePanel#default": default_8ac62ba4e71f0c3c16a780b7cf6afb1f,
   "@/components/fields/ContactLinkField#default": default_eb0ce37e649ba467d7e7865b5c4d2aa0,

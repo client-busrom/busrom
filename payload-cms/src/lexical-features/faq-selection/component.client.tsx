@@ -242,11 +242,11 @@ export const FaqSelectionComponent: React.FC<{ nodeKey: string; data: FaqSelecti
     const newCats = [...localData.categories]
     const cat = newCats[catIdx]
     const questions = [...(cat.questions || [])]
-    
+
     faqItems.forEach(item => {
-      questions.push({ faqItem: item })
+      questions.push({ faqItem: { id: item.id, adminLabel: item.adminLabel } })
     })
-    
+
     newCats[catIdx] = { ...cat, questions }
     const updated = { categories: newCats }
     setLocalData(updated)
@@ -515,12 +515,12 @@ export const FaqSelectionComponent: React.FC<{ nodeKey: string; data: FaqSelecti
             const currentIds = localData.categories.map(c => typeof c.category === 'object' ? c.category.id : c.category)
             const newItems = items.filter(it => !currentIds.includes(it.id))
             if (newItems.length > 0) {
-              const updated = { 
-                categories: [...localData.categories, ...newItems.map(it => ({ 
-                  category: it, 
+              const updated = {
+                categories: [...localData.categories, ...newItems.map(it => ({
+                  category: { id: it.id, adminLabel: it.adminLabel },
                   questions: [],
                   cta: { label: 'SEE ALL', url: '' }
-                }))] 
+                }))]
               }
               setLocalData(updated)
               updateNodeData(updated)
