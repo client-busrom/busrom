@@ -291,40 +291,28 @@ export function ProductOverviewHeroSection({
               <Link
                 href={data.cta.url}
                 target={data.cta.openInNewTab ? "_blank" : undefined}
-                className="group relative inline-flex items-center transition-transform duration-500"
+                className="group relative inline-flex items-center rounded-full border-[1.5px] border-[#756F3F] transition-all duration-500 hover:bg-[#756F3F]"
+                style={{ padding: `${vw(0)} ${vw(0)} ${vw(0)} ${vw(21)}`, gap: vw(10) }}
               >
-                <svg
-                  style={{ width: vw(284), height: vw(92) }}
-                  viewBox="0 0 284 92"
-                  fill="none"
-                >
-                  <rect
-                    x="1"
-                    y="1"
-                    width="282"
-                    height="90"
-                    rx="45"
-                    fill="none"
-                    stroke="#756F3F"
-                    strokeWidth="1.5"
-                    className="transition-colors duration-500 group-hover:fill-[#756F3F]"
-                  />
-                  <g transform="translate(196.5, 7.5)">
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M17.9353 5.88882C35.8602 -5.38303 59.5289 0.0103798 70.8008 17.9353C82.0727 35.8602 76.6794 59.5289 58.7544 70.8008C40.8294 82.0727 17.1607 76.6794 5.88882 58.7544C-5.38299 40.8294 0.0102997 17.1607 17.9353 5.88882ZM49.4602 27.6917L49.4269 27.6881L34.4336 26.4551C33.4521 26.3745 32.5921 27.1049 32.5123 28.0866L32.5097 28.116C32.4469 29.0854 33.1734 29.931 34.1451 30.0111L45.135 30.9148L26.7966 46.4845C26.1703 47.0162 26.0937 47.9561 26.6259 48.583L26.761 48.742C27.2961 49.3514 28.2225 49.4211 28.8425 48.8948L47.1819 33.3253L46.291 44.3161C46.2114 45.2978 46.9424 46.1589 47.9239 46.2397C48.9056 46.3205 49.7664 45.5902 49.8461 44.6084L51.0618 29.6121L51.064 29.5806C51.0706 29.4754 51.0677 29.3698 51.0557 29.2652L51.0528 29.2385L51.0527 29.2434C51.031 28.9264 50.9081 28.6243 50.702 28.3823L50.5835 28.2431L50.5685 28.2257C50.3695 27.998 50.106 27.8358 49.8127 27.762L49.8004 27.7592C49.6895 27.7256 49.5755 27.7033 49.4602 27.6917Z"
-                      fill="#756F3F"
-                      className="transition-colors duration-500 group-hover:fill-white"
-                    />
-                  </g>
-                </svg>
                 <span
-                  className="absolute text-[#756F3F] font-josefin-sans font-medium tracking-wider transition-colors duration-500 group-hover:text-white"
-                  style={{ left: vw(30), fontSize: vw(29) }}
+                  className="text-[#756F3F] font-josefin-sans font-medium tracking-wider transition-colors duration-500 group-hover:text-white"
+                  style={{ fontSize: vw(29) }}
                 >
                   {data.cta.title}
                 </span>
+                <svg
+                  style={{ width: vw(76), height: vw(76), flexShrink: 0 }}
+                  viewBox="-6 -6 94 94"
+                  fill="none"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M17.9353 5.88882C35.8602 -5.38303 59.5289 0.0103798 70.8008 17.9353C82.0727 35.8602 76.6794 59.5289 58.7544 70.8008C40.8294 82.0727 17.1607 76.6794 5.88882 58.7544C-5.38299 40.8294 0.0102997 17.1607 17.9353 5.88882ZM49.4602 27.6917L49.4269 27.6881L34.4336 26.4551C33.4521 26.3745 32.5921 27.1049 32.5123 28.0866L32.5097 28.116C32.4469 29.0854 33.1734 29.931 34.1451 30.0111L45.135 30.9148L26.7966 46.4845C26.1703 47.0162 26.0937 47.9561 26.6259 48.583L26.761 48.742C27.2961 49.3514 28.2225 49.4211 28.8425 48.8948L47.1819 33.3253L46.291 44.3161C46.2114 45.2978 46.9424 46.1589 47.9239 46.2397C48.9056 46.3205 49.7664 45.5902 49.8461 44.6084L51.0618 29.6121L51.064 29.5806C51.0706 29.4754 51.0677 29.3698 51.0557 29.2652L51.0528 29.2385L51.0527 29.2434C51.031 28.9264 50.9081 28.6243 50.702 28.3823L50.5835 28.2431L50.5685 28.2257C50.3695 27.998 50.106 27.8358 49.8127 27.762L49.8004 27.7592C49.6895 27.7256 49.5755 27.7033 49.4602 27.6917Z"
+                    fill="#756F3F"
+                    className="transition-colors duration-500 group-hover:fill-white"
+                  />
+                </svg>
               </Link>
             </motion.div>
           </div>

@@ -42,8 +42,261 @@
   }
 
   &__manual {
-    .media-picker__label {
-      display: none;
+    // Inline media picker (no nested useField)
+    .media-picker-inline {
+      &__selected {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: var(--theme-elevation-0);
+        border: 1px solid var(--theme-elevation-300);
+        border-radius: 4px;
+        margin-bottom: 0.75rem;
+
+        img {
+          width: 60px;
+          height: 60px;
+          object-fit: cover;
+          border-radius: 4px;
+          flex-shrink: 0;
+        }
+      }
+
+      &__info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        flex: 1;
+        min-width: 0;
+
+        .filename {
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--theme-elevation-800);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .dimensions {
+          font-size: 11px;
+          color: var(--theme-elevation-600);
+        }
+      }
+
+      &__remove {
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: var(--theme-error-500);
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        &:hover {
+          background: var(--theme-error-600);
+        }
+      }
+
+      &__add {
+        padding: 0.6rem 1rem;
+        border: 2px dashed var(--theme-elevation-400);
+        background: var(--theme-elevation-0);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--theme-elevation-700);
+        width: 100%;
+        transition: all 0.2s;
+
+        &:hover {
+          border-color: var(--theme-success-500);
+          color: var(--theme-success-600);
+          background: var(--theme-success-50);
+        }
+      }
+    }
+
+    // Media picker modal
+    .media-picker-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+
+      &__content {
+        background: var(--theme-elevation-0);
+        border-radius: 8px;
+        width: 100%;
+        max-width: 800px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--theme-elevation-200);
+
+        h3 {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 600;
+        }
+      }
+
+      &__close {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: var(--theme-elevation-100);
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        color: var(--theme-elevation-700);
+
+        &:hover {
+          background: var(--theme-elevation-200);
+        }
+      }
+
+      &__search {
+        padding: 0.75rem 1.25rem;
+        border-bottom: 1px solid var(--theme-elevation-200);
+
+        input {
+          width: 100%;
+          padding: 0.5rem 0.75rem;
+          border: 1px solid var(--theme-elevation-300);
+          border-radius: 4px;
+          font-size: 14px;
+
+          &:focus {
+            outline: none;
+            border-color: var(--theme-success-500);
+          }
+        }
+      }
+
+      &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+        overflow-y: auto;
+        flex: 1;
+
+        > p {
+          grid-column: 1 / -1;
+          text-align: center;
+          padding: 2rem;
+          color: var(--theme-elevation-600);
+        }
+      }
+
+      &__item {
+        position: relative;
+        border: 2px solid var(--theme-elevation-200);
+        border-radius: 6px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: var(--theme-elevation-50);
+
+        &:hover {
+          border-color: var(--theme-success-400);
+        }
+
+        &.selected {
+          border-color: var(--theme-success-500);
+          box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        }
+
+        img {
+          width: 100%;
+          height: 100px;
+          object-fit: cover;
+          display: block;
+        }
+
+        &-name {
+          display: block;
+          padding: 0.4rem 0.5rem;
+          font-size: 11px;
+          color: var(--theme-elevation-700);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          background: var(--theme-elevation-0);
+        }
+      }
+
+      &__check {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 22px;
+        height: 22px;
+        background: var(--theme-success-500);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      &__pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        border-top: 1px solid var(--theme-elevation-200);
+
+        button {
+          padding: 0.4rem 0.75rem;
+          border: 1px solid var(--theme-elevation-300);
+          background: var(--theme-elevation-0);
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+
+          &:hover:not(:disabled) {
+            background: var(--theme-elevation-100);
+          }
+        }
+
+        span {
+          font-size: 12px;
+          color: var(--theme-elevation-600);
+          padding: 0 0.5rem;
+        }
+      }
     }
   }
 

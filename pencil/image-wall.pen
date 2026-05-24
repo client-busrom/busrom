@@ -1,0 +1,557 @@
+{
+  "version": "2.11",
+  "children": [
+    {
+      "type": "frame",
+      "id": "cbisD",
+      "x": 0,
+      "y": 28,
+      "name": "Desktop",
+      "width": 1920,
+      "height": 968,
+      "fill": [
+        "#ffffffff",
+        "#ebe6d8ff"
+      ],
+      "stroke": {
+        "align": "inside",
+        "thickness": 1
+      },
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "s6eGp",
+          "x": 448,
+          "y": 0,
+          "name": "Box",
+          "clip": true,
+          "width": 1024,
+          "height": 968,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "gL3u0",
+              "x": 44,
+              "y": 369,
+              "name": "Layer1",
+              "clip": true,
+              "width": 300,
+              "height": 200,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "AsS9t",
+              "x": 211,
+              "y": 616,
+              "name": "Layer2",
+              "clip": true,
+              "width": 279,
+              "height": 186,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "bFkRf",
+              "x": 673,
+              "y": 203,
+              "name": "Layer3",
+              "clip": true,
+              "width": 207.85714721679688,
+              "height": 138.57142639160156,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "gLgvp",
+              "x": 565,
+              "y": 313,
+              "name": "Layer4",
+              "clip": true,
+              "width": 197.5,
+              "height": 263.75,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "Bc0k8",
+              "x": 644,
+              "y": 453,
+              "name": "Layer5",
+              "clip": true,
+              "width": 250,
+              "height": 166.42857360839844,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "TTnQG",
+              "x": 224,
+              "y": 154,
+              "name": "Layer6",
+              "clip": true,
+              "width": 351,
+              "height": 234,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "BzsBi",
+              "x": 366,
+              "y": 279,
+              "name": "Layer7",
+              "clip": true,
+              "width": 248,
+              "height": 441,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "S8hl5",
+      "x": 2025,
+      "y": 28,
+      "name": "Tablet",
+      "width": 768,
+      "height": 1024,
+      "fill": [
+        "#ffffffff",
+        "#ebe6d8ff"
+      ],
+      "stroke": {
+        "align": "inside",
+        "thickness": 1
+      },
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "T97P9C",
+          "x": 0,
+          "y": 128,
+          "name": "Box",
+          "clip": true,
+          "width": 768,
+          "height": 768,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "GgYqK",
+              "x": 32,
+              "y": 290,
+              "name": "Layer1",
+              "clip": true,
+              "width": 280,
+              "height": 187,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "cOXcL",
+              "x": 133,
+              "y": 521,
+              "name": "Layer2",
+              "clip": true,
+              "width": 262,
+              "height": 174,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "xJjWA",
+              "x": 446,
+              "y": 126,
+              "name": "Layer3",
+              "clip": true,
+              "width": 205,
+              "height": 137.14285278320312,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "wTYGE",
+              "x": 467,
+              "y": 243,
+              "name": "Layer4",
+              "clip": true,
+              "width": 167.5,
+              "height": 223.75,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "PaaGF",
+              "x": 335,
+              "y": 446,
+              "name": "Layer5",
+              "clip": true,
+              "width": 233.57142639160156,
+              "height": 155.71429443359375,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "LDDwt",
+              "x": 114,
+              "y": 77,
+              "name": "Layer6",
+              "clip": true,
+              "width": 299,
+              "height": 199,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "N7jnq",
+              "x": 292,
+              "y": 201,
+              "name": "Layer7",
+              "clip": true,
+              "width": 206,
+              "height": 365,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "duv9k",
+      "x": 2866,
+      "y": 28,
+      "name": "Mobile",
+      "width": 390,
+      "height": 884,
+      "fill": [
+        "#ffffffff",
+        "#ebe6d8ff"
+      ],
+      "stroke": {
+        "align": "inside",
+        "thickness": 1
+      },
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "bby0W",
+          "x": 0,
+          "y": 212,
+          "name": "Box",
+          "clip": true,
+          "width": 390,
+          "height": 460,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "D56K7q",
+              "x": 44,
+              "y": 197,
+              "name": "Layer1",
+              "clip": true,
+              "width": 166,
+              "height": 110,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "ejsy4",
+              "x": 56,
+              "y": 336,
+              "name": "Layer2",
+              "clip": true,
+              "width": 154,
+              "height": 103,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "N6XyJ",
+              "x": 179,
+              "y": 271,
+              "name": "Layer3",
+              "clip": true,
+              "width": 139.2857208251953,
+              "height": 92.85714721679688,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "G5Jjem",
+              "x": 150,
+              "y": 11,
+              "name": "Layer4",
+              "clip": true,
+              "width": 121.42857360839844,
+              "height": 81.42857360839844,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "gR6oL",
+              "x": 252,
+              "y": 102,
+              "name": "Layer5",
+              "clip": true,
+              "width": 120,
+              "height": 160,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "fill"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "sOL42",
+              "x": 19,
+              "y": 66,
+              "name": "Layer6",
+              "clip": true,
+              "width": 176,
+              "height": 117,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            },
+            {
+              "type": "frame",
+              "id": "o4uIEo",
+              "x": 127,
+              "y": 78,
+              "name": "Layer7",
+              "clip": true,
+              "width": 135,
+              "height": 239,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "",
+                "mode": "stretch"
+              },
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

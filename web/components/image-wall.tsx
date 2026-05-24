@@ -1,13 +1,31 @@
+"use client"
+
 import { useEffect, useRef, useState } from "react"
 import gsap from "gsap"
 import type { ImageWallItem } from "@/lib/api/preloader-config"
 
-const BASE_WIDTH = 256; // 设置一个基础宽度（像素），对应 w-64
+// Predefined layout from design specification (image-wall.pen)
+const LAYOUT_CLASSES = [
+  // Layer 1
+  "left-[44px] top-[197px] w-[166px] h-[110px] md:left-[32px] md:top-[290px] md:w-[280px] md:h-[187px] lg:left-[44px] lg:top-[369px] lg:w-[300px] lg:h-[200px]",
+  // Layer 2
+  "left-[56px] top-[336px] w-[154px] h-[103px] md:left-[133px] md:top-[521px] md:w-[262px] md:h-[174px] lg:left-[211px] lg:top-[616px] lg:w-[279px] lg:h-[186px]",
+  // Layer 3
+  "left-[179px] top-[271px] w-[139.3px] h-[92.9px] md:left-[446px] md:top-[126px] md:w-[205px] md:h-[137.1px] lg:left-[673px] lg:top-[203px] lg:w-[207.9px] lg:h-[138.6px]",
+  // Layer 4
+  "left-[150px] top-[11px] w-[121.4px] h-[81.4px] md:left-[467px] md:top-[243px] md:w-[167.5px] md:h-[223.8px] lg:left-[565px] lg:top-[313px] lg:w-[197.5px] lg:h-[263.8px]",
+  // Layer 5
+  "left-[252px] top-[102px] w-[120px] h-[160px] md:left-[335px] md:top-[446px] md:w-[233.6px] md:h-[155.7px] lg:left-[644px] lg:top-[453px] lg:w-[250px] lg:h-[166.4px]",
+  // Layer 6
+  "left-[19px] top-[66px] w-[176px] h-[117px] md:left-[114px] md:top-[77px] md:w-[299px] md:h-[199px] lg:left-[224px] lg:top-[154px] lg:w-[351px] lg:h-[234px]",
+  // Layer 7
+  "left-[127px] top-[78px] w-[135px] h-[239px] md:left-[292px] md:top-[201px] md:w-[206px] md:h-[365px] lg:left-[366px] lg:top-[279px] lg:w-[248px] lg:h-[441px]"
+];
 
 interface ImageWallProps {
   isActive: boolean;
   onComplete: () => void;
-  images: ImageWallItem[];
+  images: (ImageWallItem | null)[];
   backgroundColor?: string;
   duration?: number;
   stagger?: number;
@@ -25,15 +43,19 @@ export function ImageWall({
   const [loadedCount, setLoadedCount] = useState(0)
   const [allImagesReady, setAllImagesReady] = useState(false)
 
+  // Use up to 7 images matching the layout slots
+  const displayImages = images.slice(0, 7);
+  const activeImagesCount = displayImages.filter(item => item !== null).length;
+
   // 当所有图片加载完成时标记为 ready
   // 如果没有图片，直接标记为 ready
   useEffect(() => {
-    if (images.length === 0) {
+    if (activeImagesCount === 0) {
       setAllImagesReady(true)
-    } else if (loadedCount >= images.length) {
+    } else if (loadedCount >= activeImagesCount) {
       setAllImagesReady(true)
     }
-  }, [loadedCount, images.length])
+  }, [loadedCount, activeImagesCount])
 
   // 处理图片加载完成或失败
   const handleImageLoad = () => {
@@ -105,36 +127,33 @@ export function ImageWall({
   return (
     <div
       ref={containerRef}
-      className={`fixed inset-0 z-40 pointer-events-none ${isActive ? 'opacity-100' : 'opacity-0'}`}
+      className={`fixed inset-0 z-40 pointer-events-none flex items-center justify-center ${isActive ? 'opacity-100' : 'opacity-0'}`}
       style={{ 
         backgroundColor,
       }}
     >
-      {images.map((item, index) => {
-        const width = BASE_WIDTH * item.widthScale;
+      <div className="relative w-[390px] h-[460px] md:w-[768px] md:h-[768px] lg:w-[1024px] lg:h-[968px]">
+        {displayImages.map((item, index) => {
+          if (!item) return null;
 
-        return (
-          <div
-            key={`${item.src}-${index}`}
-            className="image-item absolute overflow-hidden shadow-lg -translate-x-1/2 -translate-y-1/2 opacity-0 scale-0"
-            style={{
-              top: item.position.top,
-              left: item.position.left,
-              width: `${width}px`,
-              aspectRatio: item.aspectRatio,
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={item.src}
-              alt={`Gallery image ${index + 1}`}
-              className="absolute inset-0 w-full h-full object-cover"
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-            />
-          </div>
-        )
-      })}
+          return (
+            <div
+              key={`${item.src}-${index}`}
+              className={`image-item absolute overflow-hidden shadow-lg opacity-0 scale-0 origin-center ${LAYOUT_CLASSES[index]}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.src}
+                alt={`Gallery image ${index + 1}`}
+                className="absolute inset-0 w-full h-full object-cover"
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+              />
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
+

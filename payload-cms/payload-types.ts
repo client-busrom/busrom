@@ -83,6 +83,7 @@ export interface Config {
     'hero-banner-items': HeroBannerItem;
     'series-intro-items': SeriesIntroItem;
     'navigation-menus': NavigationMenu;
+    'image-wall-items': ImageWallItem;
     authors: Author;
     pages: Page;
     blogs: Blog;
@@ -145,6 +146,7 @@ export interface Config {
     'hero-banner-items': HeroBannerItemsSelect<false> | HeroBannerItemsSelect<true>;
     'series-intro-items': SeriesIntroItemsSelect<false> | SeriesIntroItemsSelect<true>;
     'navigation-menus': NavigationMenusSelect<false> | NavigationMenusSelect<true>;
+    'image-wall-items': ImageWallItemsSelect<false> | ImageWallItemsSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     blogs: BlogsSelect<false> | BlogsSelect<true>;
@@ -1575,6 +1577,35 @@ export interface NavigationMenu {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "image-wall-items".
+ */
+export interface ImageWallItem {
+  id: number;
+  /**
+   * e.g., Layer 1 (Top Left), Layer 7 (Center Main)
+   */
+  name: string;
+  /**
+   * Display order in the image wall (1-7)
+   */
+  order?: number | null;
+  /**
+   * Choose manually from media or randomly from a case gallery (Application).
+   */
+  image?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Manage subpages - includes template pages and freeform landing pages
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2389,6 +2420,10 @@ export interface PayloadLockedDocument {
         value: number | NavigationMenu;
       } | null)
     | ({
+        relationTo: 'image-wall-items';
+        value: number | ImageWallItem;
+      } | null)
+    | ({
         relationTo: 'authors';
         value: number | Author;
       } | null)
@@ -2869,6 +2904,17 @@ export interface NavigationMenusSelect<T extends boolean = true> {
   visible?: T;
   User?: T;
   Operation?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "image-wall-items_select".
+ */
+export interface ImageWallItemsSelect<T extends boolean = true> {
+  name?: T;
+  order?: T;
+  image?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3587,30 +3633,9 @@ export interface PreloaderConfig {
    */
   imageWallEnabled?: boolean | null;
   /**
-   * Add images for the image wall animation. Each image can have custom position and size.
+   * Select image wall items in display order. Create items in Image Wall Items collection first.
    */
-  images?:
-    | {
-        /**
-         * Select an image from media library
-         */
-        image: number | Media;
-        /**
-         * 0-100%
-         */
-        positionTop?: number | null;
-        /**
-         * 0-100%
-         */
-        positionLeft?: number | null;
-        aspectRatio?: ('9 / 16' | '9 / 12' | '9 / 6' | '1 / 1' | '16 / 9') | null;
-        /**
-         * 0.5 - 2.0
-         */
-        widthScale?: number | null;
-        id?: string | null;
-      }[]
-    | null;
+  imageWallItems?: (number | ImageWallItem)[] | null;
   /**
    * How long the 0-100% progress takes
    */
@@ -4523,16 +4548,7 @@ export interface PreloaderConfigSelect<T extends boolean = true> {
   textColor?: T;
   highlightColor?: T;
   imageWallEnabled?: T;
-  images?:
-    | T
-    | {
-        image?: T;
-        positionTop?: T;
-        positionLeft?: T;
-        aspectRatio?: T;
-        widthScale?: T;
-        id?: T;
-      };
+  imageWallItems?: T;
   loadingDuration?: T;
   logoAnimationDuration?: T;
   imageWallDuration?: T;

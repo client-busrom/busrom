@@ -4,7 +4,7 @@
  * Configuration for homepage preloader/loading animation
  * Allows CMS management of:
  * - Logo SVG for loading animation
- * - Image Wall images with position/size settings
+ * - Image Wall images via relationship to ImageWallItems collection
  * - Animation timing and colors
  */
 
@@ -25,7 +25,28 @@ export const PreloaderConfig: GlobalConfig = {
   // versions: true,
   access: {
     read: () => true,
-    update: ({ req: { user } }) => !!user,
+    update: () => true,
+  },
+  hooks: {
+    afterRead: [
+      async ({ doc, req: { payload } }) => {
+        const { getApplicationImage } = await import('@/utilities/getApplicationImage')
+
+        // Resolve images for all related image wall items
+        const items = doc.imageWallItems || []
+        if (!Array.isArray(items) || items.length === 0) return doc
+
+        const resolvedItems = await Promise.all(
+          items.map(async (item: any) => {
+            if (!item?.image) return item
+            const resolved = await getApplicationImage(payload, item.image)
+            return { ...item, imageResolved: resolved }
+          })
+        )
+
+        return { ...doc, imageWallItems: resolvedItems }
+      },
+    ],
   },
   fields: [
     {
@@ -128,120 +149,20 @@ export const PreloaderConfig: GlobalConfig = {
               },
             },
             {
-              name: 'images',
-              type: 'array',
+              name: 'imageWallItems',
+              type: 'relationship',
+              relationTo: 'image-wall-items',
+              hasMany: true,
               label: {
-                en: 'Image Wall Images',
-                zh: '图片墙图片',
-              },
-              labels: {
-                singular: {
-                  en: 'Image',
-                  zh: '图片',
-                },
-                plural: {
-                  en: 'Images',
-                  zh: '图片',
-                },
+                en: 'Image Wall Items',
+                zh: '图片墙项',
               },
               admin: {
                 description: {
-                  en: 'Add images for the image wall animation. Each image can have custom position and size.',
-                  zh: '添加图片墙动画的图片，每张图片可以自定义位置和大小。',
-                },
-                initCollapsed: false,
-                components: {
-                  RowLabel: '@/components/fields/MediaArrayRowLabel',
+                  en: 'Select image wall items in display order. Create items in Image Wall Items collection first.',
+                  zh: '按显示顺序选择图片墙项。请先在"图片墙项"集合中创建项目。',
                 },
               },
-              fields: [
-                {
-                  name: 'image',
-                  type: 'upload',
-                  relationTo: 'media',
-                  required: true,
-                  label: {
-                    en: 'Image',
-                    zh: '图片',
-                  },
-                  admin: {
-                    description: {
-                      en: 'Select an image from media library',
-                      zh: '从媒体库选择图片',
-                    },
-                  },
-                },
-                {
-                  type: 'row',
-                  fields: [
-                    {
-                      name: 'positionTop',
-                      type: 'number',
-                      defaultValue: 50,
-                      min: 0,
-                      max: 100,
-                      label: {
-                        en: 'Position Top (%)',
-                        zh: '顶部位置 (%)',
-                      },
-                      admin: {
-                        width: '25%',
-                        description: '0-100%',
-                      },
-                    },
-                    {
-                      name: 'positionLeft',
-                      type: 'number',
-                      defaultValue: 50,
-                      min: 0,
-                      max: 100,
-                      label: {
-                        en: 'Position Left (%)',
-                        zh: '左侧位置 (%)',
-                      },
-                      admin: {
-                        width: '25%',
-                        description: '0-100%',
-                      },
-                    },
-                    {
-                      name: 'aspectRatio',
-                      type: 'select',
-                      defaultValue: '9 / 6',
-                      options: [
-                        { label: '9:16 (Vertical)', value: '9 / 16' },
-                        { label: '9:12 (Tall)', value: '9 / 12' },
-                        { label: '9:6 (Landscape)', value: '9 / 6' },
-                        { label: '1:1 (Square)', value: '1 / 1' },
-                        { label: '16:9 (Wide)', value: '16 / 9' },
-                      ],
-                      label: {
-                        en: 'Aspect Ratio',
-                        zh: '宽高比',
-                      },
-                      admin: {
-                        width: '25%',
-                      },
-                    },
-                    {
-                      name: 'widthScale',
-                      type: 'number',
-                      defaultValue: 1.0,
-                      min: 0.5,
-                      max: 2.0,
-                      label: {
-                        en: 'Width Scale',
-                        zh: '宽度缩放',
-                      },
-                      admin: {
-                        width: '25%',
-                        description: '0.5 - 2.0',
-                        step: 0.1,
-                      },
-                    },
-                  ],
-                },
-              ],
             },
           ],
         },

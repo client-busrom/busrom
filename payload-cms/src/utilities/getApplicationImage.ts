@@ -19,7 +19,8 @@ interface ImageConfig {
  */
 export async function getApplicationImage(
   payload: Payload,
-  config: ImageConfig
+  config: ImageConfig,
+  req?: any
 ): Promise<any | null> {
   if (!config) {
     return null
@@ -32,11 +33,17 @@ export async function getApplicationImage(
     }
 
     try {
+      // If Payload already populated the relationship, extract the ID
+      const mediaId = typeof config.manualImage === 'object' && config.manualImage !== null
+        ? (config.manualImage as any).id
+        : config.manualImage
+
       const result = await payload.find({
         collection: 'media',
+        req,
         where: {
           id: {
-            equals: config.manualImage,
+            equals: mediaId,
           },
         },
         limit: 1,
@@ -56,9 +63,15 @@ export async function getApplicationImage(
     }
 
     try {
+      // If Payload already populated the relationship, extract the ID
+      const appId = typeof config.applicationId === 'object' && config.applicationId !== null
+        ? (config.applicationId as any).id
+        : config.applicationId
+
       const app = await payload.findByID({
         collection: 'applications',
-        id: config.applicationId,
+        id: appId,
+        req,
         depth: 1,
       })
 

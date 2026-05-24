@@ -4,9 +4,8 @@ import { NotFoundClient } from "./NotFoundClient";
 export default async function NotFound() {
   const config = await getPreloaderConfig();
 
-  // Extract image URLs, preferring smaller sizes if available
   const preloaderImages =
-    config?.images?.map((item) => item.src).filter(Boolean) || [];
+    config?.images?.filter((item): item is NonNullable<typeof item> => item !== null).map((item) => item.src) || [];
 
   return <NotFoundClient preloaderImages={preloaderImages} />;
 }

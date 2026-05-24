@@ -217,6 +217,7 @@ import { SeriesReusableBlocks } from './src/collections/SeriesReusableBlocks'
 import { HeroBannerItems } from './src/collections/HeroBannerItems'
 import { SeriesIntroItems } from './src/collections/SeriesIntroItems'
 import { NavigationMenus } from './src/collections/NavigationMenus'
+import { ImageWallItems } from './src/collections/ImageWallItems'
 // Users & Access Control
 import { Roles } from './src/collections/Roles'
 import { Permissions } from './src/collections/Permissions'
@@ -392,6 +393,7 @@ export default buildConfig({
     SeriesIntroItems,
     // Site Structure
     NavigationMenus,
+    ImageWallItems,
     // Content Management
     Authors,
     Pages,

@@ -120,7 +120,6 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
 
     // --- 图片加载进度跟踪 ---
     let imagesLoaded = 0;
-    const totalImages = config.images.length;
     const realProgress = { value: 0 };
     let allImagesLoaded = false;
     let fontAndLogoReady = false;
@@ -190,6 +189,9 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
 
     // 加载图片并跟踪进度
     const loadImagesWithProgress = () => {
+      const validImages = config.images.filter(img => img !== null);
+      const totalImages = validImages.length;
+
       if (totalImages === 0) {
         allImagesLoaded = true;
         checkAndStartEndAnimation();
@@ -204,7 +206,8 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
         onUpdate: updatePercentageDisplay,
       });
 
-      config.images.forEach((img) => {
+      validImages.forEach((img) => {
+        if (!img) return;
         const image = new Image();
         const handleLoad = () => {
           imagesLoaded++;
