@@ -1537,9 +1537,17 @@ export interface NavigationMenu {
   type: 'standard' | 'product_cards' | 'submenu';
   icon?: string | null;
   /**
-   * Select tags to filter images for menu card display
+   * Menu card image. Choose manually from media or randomly from a case gallery (Application).
    */
-  mediaTags?: (number | MediaTag)[] | null;
+  cardImage?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   /**
    * Leave empty for top-level menu
    */
@@ -2852,7 +2860,7 @@ export interface NavigationMenusSelect<T extends boolean = true> {
   name?: T;
   type?: T;
   icon?: T;
-  mediaTags?: T;
+  cardImage?: T;
   parent?: T;
   link?: T;
   inquiryLink?: T;

@@ -43,6 +43,20 @@ export const NavigationMenus: CollectionConfig = {
     },
   },
 
+  hooks: {
+    afterRead: [
+      async ({ doc, req: { payload } }) => {
+        if (!doc.cardImage) return doc
+        const { getApplicationImage } = await import('@/utilities/getApplicationImage')
+        const image = await getApplicationImage(payload, doc.cardImage)
+        return {
+          ...doc,
+          cardImageResolved: image,
+        }
+      },
+    ],
+  },
+
   // 版本控制 - 保留修改历史
   // versions: {
 
@@ -115,20 +129,21 @@ export const NavigationMenus: CollectionConfig = {
         condition: (data) => data?.type === 'submenu' || data?.parent != null,
       },
     },
-    // Media Tags (for menu items that need images)
+    // Card Image (for menu items that need images)
     {
-      name: 'mediaTags',
-      type: 'relationship',
-      relationTo: 'media-tags',
-      hasMany: true,
+      name: 'cardImage',
+      type: 'json',
       label: {
-        en: 'Media Tags',
-        zh: '媒体标签',
+        en: 'Card Image',
+        zh: '卡片图片',
       },
       admin: {
+        components: {
+          Field: '@/components/fields/ApplicationImagePicker',
+        },
         description: {
-          en: 'Select tags to filter images for menu card display',
-          zh: '选择标签筛选图片，用于菜单卡片显示',
+          en: 'Menu card image. Choose manually from media or randomly from a case gallery (Application).',
+          zh: '菜单卡片图片。可手动从媒体库选择，或从案例图集中随机选择。',
         },
         // 显示条件：自身是 product_cards 类型，或者有父级菜单（子菜单）
         condition: (data) => data?.type === 'product_cards' || data?.parent,

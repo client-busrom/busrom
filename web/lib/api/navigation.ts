@@ -7,6 +7,12 @@ const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || proces
 /**
  * Payload CMS 导航菜单数据类型
  */
+interface CardImageConfig {
+  mode: 'manual' | 'application';
+  manualImage?: number | null;
+  applicationId?: string | number | null;
+}
+
 interface PayloadNavMenu {
   id: string;
   name: string;
@@ -16,63 +22,129 @@ interface PayloadNavMenu {
   inquiryLink?: string;
   order: number;
   parent?: { id: string } | string | null;
-  mediaTags?: Array<{
-    id: string;
-    name: string;
-  }>;
+  cardImage?: CardImageConfig;
+  cardImageResolved?: {
+    url: string;
+    filename: string;
+    sizes?: any;
+  } | null;
+}
+
+function normalizeResolvedImage(media: any): { url: string; filename: string; sizes?: any } | null {
+  if (!media) return null;
+  if (typeof media === 'object' && media.url) {
+    const transformedSizes: any = {};
+    if (media.sizes) {
+      Object.entries(media.sizes).forEach(([key, value]: [string, any]) => {
+        if (value?.url) {
+          transformedSizes[key] = {
+            ...(value as any),
+            url: convertToCDNUrl((value as any).url),
+          };
+        }
+      });
+    }
+    return {
+      url: convertToCDNUrl(media.url),
+      filename: media.filename || 'image',
+      sizes: transformedSizes,
+    };
+  }
+  return null;
 }
 
 /**
- * 从媒体标签获取图片（确定性选择，基于菜单ID）
- * 注意：不使用随机选择，以确保图片URL稳定，便于浏览器缓存
+ * Resolve card image from cardImage config (manual or application mode)
  */
-async function getImageFromMediaTags(
-  mediaTags: Array<{ id: string; name: string }>,
-  locale: string,
-  menuId: string
+async function resolveCardImage(
+  config: CardImageConfig | undefined,
+  locale: string
 ): Promise<{ url: string; filename: string; sizes?: any } | null> {
-  if (!mediaTags || mediaTags.length === 0) return null;
+  if (!config) return null;
 
-  try {
-    const tagId = mediaTags[0].id;
-    const response = await fetch(
-      `${CMS_URL}/api/media?where[tags][in]=${tagId}&where[primaryCategory][equals]=2&limit=20&locale=${locale}`,
-      {
-        headers: { 'Content-Type': 'application/json' },
-        next: { revalidate: 300 },
-      }
-    );
+  // Manual mode: fetch the selected media directly
+  if (config.mode === 'manual' && config.manualImage) {
+    try {
+      const response = await fetch(
+        `${CMS_URL}/api/media/${config.manualImage}?locale=${locale}`,
+        {
+          headers: { 'Content-Type': 'application/json' },
+          next: { revalidate: 300 },
+        }
+      );
+      if (!response.ok) return null;
+      const media = await response.json();
+      if (!media) return null;
 
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    if (data.docs && data.docs.length > 0) {
-      // 基于菜单ID确定性选择图片（相同菜单始终返回相同图片）
-      const menuIdStr = String(menuId || '');
-      const hash = menuIdStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const index = hash % data.docs.length;
-      const media = data.docs[index];
-      // Transform sizes
-      const transformedSizes: any = {}
+      const transformedSizes: any = {};
       if (media.sizes) {
         Object.entries(media.sizes).forEach(([key, value]: [string, any]) => {
           if (value?.url) {
             transformedSizes[key] = {
               ...(value as any),
               url: convertToCDNUrl((value as any).url)
-            }
+            };
           }
-        })
+        });
       }
 
-      return { 
-        url: convertToCDNUrl(media.url), 
+      return {
+        url: convertToCDNUrl(media.url),
         filename: media.filename,
-        sizes: transformedSizes
+        sizes: transformedSizes,
       };
+    } catch (error) {
+      console.error('[getNavigation] Error fetching manual image:', error);
+      return null;
     }
-  } catch (error) {
-    console.error('[getNavigation] Error fetching media:', error);
+  }
+
+  // Application mode: randomly pick one image from the application's scene gallery
+  if (config.mode === 'application' && config.applicationId) {
+    try {
+      const response = await fetch(
+        `${CMS_URL}/api/applications/${config.applicationId}?locale=${locale}&depth=1`,
+        {
+          headers: { 'Content-Type': 'application/json' },
+          next: { revalidate: 300 },
+        }
+      );
+      if (!response.ok) return null;
+      const app = await response.json();
+      if (!app || !app.sceneGallery || app.sceneGallery.length === 0) return null;
+
+      const allImages = (app.sceneGallery as any[]).flatMap((scene: any) => scene.images || []);
+      if (allImages.length === 0) return null;
+
+      // De-duplicate
+      const uniqueImages = Array.from(new Map(allImages.map((img: any) => [img.id || img, img])).values());
+
+      // Randomly pick one
+      const randomIndex = Math.floor(Math.random() * uniqueImages.length);
+      const media = uniqueImages[randomIndex];
+      if (!media) return null;
+
+      const transformedSizes: any = {};
+      if (media.sizes) {
+        Object.entries(media.sizes).forEach(([key, value]: [string, any]) => {
+          if (value?.url) {
+            transformedSizes[key] = {
+              ...(value as any),
+              url: convertToCDNUrl((value as any).url)
+            };
+          }
+        });
+      }
+
+      return {
+        url: convertToCDNUrl(media.url),
+        filename: media.filename,
+        sizes: transformedSizes,
+      };
+    } catch (error) {
+      console.error('[getNavigation] Error fetching application image:', error);
+      return null;
+    }
   }
 
   return null;
@@ -116,10 +188,16 @@ async function transformNavigationItem(
 
   const shouldFetchImage = item.type === 'product_cards' || parentType === 'product_cards';
 
-  if (shouldFetchImage && item.mediaTags && item.mediaTags.length > 0) {
-    const image = await getImageFromMediaTags(item.mediaTags, locale, item.id);
-    if (image) {
-      result.image = image;
+  if (shouldFetchImage) {
+    // Prefer pre-resolved image from CMS afterRead hook
+    const resolved = normalizeResolvedImage(item.cardImageResolved);
+    if (resolved) {
+      result.image = resolved;
+    } else if (item.cardImage) {
+      const image = await resolveCardImage(item.cardImage, locale);
+      if (image) {
+        result.image = image;
+      }
     }
   }
 
