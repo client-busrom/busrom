@@ -3525,18 +3525,6 @@ export interface HomeContent {
 export interface Footer {
   id: number;
   /**
-   * Footer background image. Choose manually from media or randomly from a case gallery (Application). If not set, the default image will be used.
-   */
-  backgroundImage?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  /**
    * Select a form configuration (recommended: "footer-form"). All form settings (fields, button text, etc.) are configured in FormConfig.
    */
   formConfig?: (number | null) | FormConfig;
@@ -3580,6 +3568,18 @@ export interface Footer {
         url: string;
         id?: string | null;
       }[]
+    | null;
+  /**
+   * Footer background image. Choose manually from media or randomly from a case gallery (Application). If not set, the default image will be used.
+   */
+  backgroundImage?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
     | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -4540,7 +4540,6 @@ export interface HomeContentSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
-  backgroundImage?: T;
   formConfig?: T;
   contactInfoGroup?:
     | T
@@ -4575,6 +4574,7 @@ export interface FooterSelect<T extends boolean = true> {
         url?: T;
         id?: T;
       };
+  backgroundImage?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

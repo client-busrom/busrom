@@ -46,6 +46,27 @@ interface MultiLocaleRichTextFieldProps {
  * Switching locale tabs will change the page locale (requires reload).
  * This preserves all Payload rich text features (slash commands, toolbar, etc.)
  */
+
+const i18nDict = {
+  editing: { en: 'Editing:', zh: '正在编辑：' },
+  hide: { en: 'Hide', zh: '收起面板' },
+  showCopyPanel: { en: 'Copy to Locales', zh: '复制 / 翻译' },
+  translateFrom: { en: 'Translate from', zh: '翻译从' },
+  copyFrom: { en: 'Copy from', zh: '复制从' },
+  to: { en: 'to:', zh: '到：' },
+  all: { en: 'All', zh: '全部' },
+  empty: { en: 'Empty', zh: '空值' },
+  clear: { en: 'Clear', zh: '清除' },
+  modeTranslate: { en: '🌐 Translate', zh: '🌐 AI翻译' },
+  modeCopy: { en: '📋 Copy', zh: '📋 仅复制' },
+  overwriteExisting: { en: 'Overwrite existing', zh: '覆盖已有内容' },
+  translating: { en: 'Translating...', zh: '正在翻译...' },
+  btnTranslate: (count: number) => ({ en: `🌐 Translate to ${count} locale(s)`, zh: `🌐 翻译到 ${count} 个语言` }),
+  btnCopy: (count: number) => ({ en: `Copy to ${count} locale(s)`, zh: `复制到 ${count} 个语言` }),
+  successAll: (count: number) => ({ en: `✓ ${count} locale(s) translated successfully`, zh: `✓ 成功翻译 ${count} 个语言` }),
+  partialSuccess: (success: number, fail: number, fails: string) => ({ en: `✓ ${success} succeeded, ✗ ${fail} failed (${fails})`, zh: `✓ 成功 ${success} 个, ✗ 失败 ${fail} 个 (${fails})` })
+}
+
 export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> = ({
   path,
   field,
@@ -54,6 +75,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
   const currentLocale = useLocale()
   const { i18n } = useTranslation()
   const adminLang = i18n.language // Admin UI language (from account settings)
+  const t = (obj: { en: string; zh: string }) => adminLang === 'zh' ? obj.zh : obj.en
   const { id, collectionSlug, globalSlug } = useDocumentInfo()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -547,7 +569,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
             className="ml-btn ml-btn--secondary"
             onClick={() => setShowCopyPanel(!showCopyPanel)}
           >
-            {showCopyPanel ? 'Hide' : 'Copy to Locales'}
+            {showCopyPanel ? t(i18nDict.hide) : t(i18nDict.showCopyPanel)}
           </button>
         </div>
       </div>
@@ -585,12 +607,12 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
         <div className="ml-richtext-field__copy-panel">
           <div className="copy-panel__header">
             <span>
-              {translateMode === 'translate' ? 'Translate' : 'Copy'} from <LocaleFlag localeCode={activeLocale} className="inline-flag" /> {activeLocale.toUpperCase()} to:
+              {translateMode === 'translate' ? t(i18nDict.translateFrom) : t(i18nDict.copyFrom)} <LocaleFlag localeCode={activeLocale} className="inline-flag" /> {activeLocale.toUpperCase()} {t(i18nDict.to)}
             </span>
             <div className="copy-panel__quick-select">
-              <button type="button" className="ml-btn ml-btn--text" onClick={handleSelectAllTargets}>All</button>
-              <button type="button" className="ml-btn ml-btn--text" onClick={handleSelectEmptyTargets}>Empty</button>
-              <button type="button" className="ml-btn ml-btn--text" onClick={() => setTargetLocales([])}>Clear</button>
+              <button type="button" className="ml-btn ml-btn--text" onClick={handleSelectAllTargets}>{t(i18nDict.all)}</button>
+              <button type="button" className="ml-btn ml-btn--text" onClick={handleSelectEmptyTargets}>{t(i18nDict.empty)}</button>
+              <button type="button" className="ml-btn ml-btn--text" onClick={() => setTargetLocales([])}>{t(i18nDict.clear)}</button>
             </div>
           </div>
 
@@ -601,14 +623,14 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
               className={`mode-btn ${translateMode === 'translate' ? 'mode-btn--active' : ''}`}
               onClick={() => setTranslateMode('translate')}
             >
-              🌐 Translate
+              {t(i18nDict.modeTranslate)}
             </button>
             <button
               type="button"
               className={`mode-btn ${translateMode === 'copy' ? 'mode-btn--active' : ''}`}
               onClick={() => setTranslateMode('copy')}
             >
-              📋 Copy
+              {t(i18nDict.modeCopy)}
             </button>
           </div>
 
@@ -650,7 +672,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
                 disabled={isTranslating}
                 onChange={(e) => setOverwriteExisting(e.target.checked)}
               />
-              Overwrite existing
+              {t(i18nDict.overwriteExisting)}
             </label>
             <button
               type="button"
@@ -663,12 +685,12 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
                   <span className="spinner"></span>
                   {translationProgress
                     ? `${translationProgress.completed}/${translationProgress.total} ${translationProgress.currentLocale ? `(${translationProgress.currentLocale.toUpperCase()})` : ''}`
-                    : 'Translating...'}
+                    : t(i18nDict.translating)}
                 </>
               ) : translateMode === 'translate' ? (
-                `🌐 Translate to ${targetLocales.length} locale(s)`
+                t(i18nDict.btnTranslate(targetLocales.length))
               ) : (
-                `Copy to ${targetLocales.length} locale(s)`
+                t(i18nDict.btnCopy(targetLocales.length))
               )}
             </button>
           </div>
@@ -688,12 +710,12 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
                     const successCount = translationProgress.results.filter(r => r.success).length
                     const failCount = translationProgress.results.filter(r => !r.success).length
                     if (failCount === 0) {
-                      return <span className="progress-result--success">✓ {successCount} locale(s) translated successfully</span>
+                      return <span className="progress-result--success">{t(i18nDict.successAll(successCount))}</span>
                     }
+                    const fails = translationProgress.results.filter(r => !r.success).map(r => r.locale.toUpperCase()).join(', ')
                     return (
                       <span className="progress-result--partial">
-                        ✓ {successCount} succeeded, ✗ {failCount} failed
-                        ({translationProgress.results.filter(r => !r.success).map(r => r.locale.toUpperCase()).join(', ')})
+                        {t(i18nDict.partialSuccess(successCount, failCount, fails))}
                       </span>
                     )
                   })()}
@@ -707,7 +729,7 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
       {/* Current editing locale indicator */}
       <div className="ml-richtext-field__editing-indicator">
         <LocaleFlag localeCode={activeLocale} className="editing-flag" />
-        <span>Editing: <strong>{activeLocaleInfo?.label}</strong></span>
+        <span>{t(i18nDict.editing)} <strong>{activeLocaleInfo?.label}</strong></span>
       </div>
     </div>
   )

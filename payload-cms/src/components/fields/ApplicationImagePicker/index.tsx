@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { useField } from '@payloadcms/ui'
+import { useField, useTranslation } from '@payloadcms/ui'
 import MediaPicker from '../MediaPicker'
 import './styles.scss'
 
@@ -19,8 +19,29 @@ interface StoredValue {
   applicationId?: string | number | null
 }
 
+const i18n = {
+  manualSelect: { en: 'Manual Select', zh: '手动选择' },
+  randomFromApp: { en: 'Random from Application', zh: '案例图集随机' },
+  selectImage: { en: 'Select Image', zh: '选择图片' },
+  selectApp: { en: '-- Select an Application --', zh: '-- 选择一个案例图集 --' },
+  searchPlaceholder: { en: 'Search slug or name...', zh: '搜索 slug 或名称...' },
+  noMatch: { en: 'No matching results', zh: '无匹配结果' },
+  noApps: { en: 'No applications found', zh: '暂无案例图集' },
+  loading: { en: 'Loading...', zh: '加载中...' },
+  loadMore: { en: 'Scroll to load more', zh: '滚动加载更多' },
+  totalPrefix: { en: 'Total ', zh: '共 ' },
+  totalSuffix: { en: ' items', zh: ' 条' },
+  hint1: { en: 'The system will randomly select an image from the scenes of the selected application gallery each time.', zh: '系统将每次从所选案例图集的场景中随机选择一张图片。' },
+  previewTitle: { en: 'Preview (Random Example)', zh: '预览（随机示例）' },
+  selectToPreview: { en: 'Please select an application gallery to view preview', zh: '请选择一个案例图集以查看预览' },
+  noImages: { en: 'No images available in this application gallery', zh: '该案例图集暂无图片' },
+  hint2: { en: 'Note: The preview is a random example, the actual display will re-select randomly each time.', zh: '注：预览为随机示例，实际展示时每次都会重新随机选择。' },
+}
+
 export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ path, field }) => {
   const { value, setValue } = useField<StoredValue>({ path })
+  const { i18n: { language } } = useTranslation()
+  const t = (obj: { en: string; zh: string }) => language === 'zh' ? obj.zh : obj.en
 
   const [mode, setMode] = useState<'manual' | 'application'>(value?.mode || 'manual')
   const [selectedImage, setSelectedImage] = useState<number | null>(value?.manualImage || null)
@@ -206,7 +227,7 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
 
   const getLabel = () => {
     if (typeof field.label === 'object') {
-      const lang = Object.keys(field.label)[0]
+      const lang = language;
       return field.label[lang] || 'Image'
     }
     if (typeof field.label === 'string') return field.label
@@ -238,14 +259,14 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
           className={mode === 'manual' ? 'active' : ''}
           onClick={() => setMode('manual')}
         >
-          手动选择
+          {t(i18n.manualSelect)}
         </button>
         <button
           type="button"
           className={mode === 'application' ? 'active' : ''}
           onClick={() => setMode('application')}
         >
-          案例图集随机
+          {t(i18n.randomFromApp)}
         </button>
       </div>
 
@@ -256,7 +277,7 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
             path={`${path}.manualImage`}
             field={{
               name: 'manualImage',
-              label: '选择图片',
+              label: t(i18n.selectImage),
               hasMany: false,
               relationTo: 'media',
             }}
@@ -280,10 +301,10 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
               }}
             >
               <span className={selectedApp ? '' : 'placeholder'}>
-                {selectedApp ? selectedApp.slug : '-- 选择一个案例图集 --'}
+                {selectedApp ? selectedApp.slug : t(i18n.selectApp)}
               </span>
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={isDropdownOpen ? 'open' : ''}>
-                <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
 
@@ -293,7 +314,7 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
                   <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder="搜索 slug 或名称..."
+                    placeholder={t(i18n.searchPlaceholder)}
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value)
@@ -311,7 +332,7 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
                 >
                   {applications.length === 0 && !isSearching ? (
                     <div className="application-image-picker__dropdown-empty">
-                      {searchQuery ? '无匹配结果' : '暂无案例图集'}
+                      {searchQuery ? t(i18n.noMatch) : t(i18n.noApps)}
                     </div>
                   ) : (
                     <>
@@ -336,17 +357,17 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
                         </div>
                       ))}
                       {isSearching && (
-                        <div className="application-image-picker__dropdown-loading">加载中...</div>
+                        <div className="application-image-picker__dropdown-loading">{t(i18n.loading)}</div>
                       )}
                       {!isSearching && hasMore && (
-                        <div className="application-image-picker__dropdown-more">滚动加载更多</div>
+                        <div className="application-image-picker__dropdown-more">{t(i18n.loadMore)}</div>
                       )}
                     </>
                   )}
                 </div>
                 {totalDocs > 0 && (
                   <div className="application-image-picker__dropdown-footer">
-                    共 {totalDocs} 条
+                    {t(i18n.totalPrefix)}{totalDocs}{t(i18n.totalSuffix)}
                   </div>
                 )}
               </div>
@@ -354,16 +375,16 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
           </div>
 
           <p className="application-image-picker__hint">
-            系统将每次从所选案例图集的场景中随机选择一张图片。
+            {t(i18n.hint1)}
           </p>
 
           {/* Preview */}
           <div className="application-image-picker__preview">
-            <h5>预览（随机示例）</h5>
+            <h5>{t(i18n.previewTitle)}</h5>
             {isLoadingPreview ? (
-              <p className="application-image-picker__loading">加载中...</p>
+              <p className="application-image-picker__loading">{t(i18n.loading)}</p>
             ) : !selectedApplication ? (
-              <p className="application-image-picker__empty">请选择一个案例图集以查看预览</p>
+              <p className="application-image-picker__empty">{t(i18n.selectToPreview)}</p>
             ) : previewImage ? (
               <div className="application-image-picker__preview-item">
                 <img
@@ -373,10 +394,10 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
                 <p>{previewImage.filename}</p>
               </div>
             ) : (
-              <p className="application-image-picker__empty">该案例图集暂无图片</p>
+              <p className="application-image-picker__empty">{t(i18n.noImages)}</p>
             )}
             <p className="application-image-picker__hint">
-              注：预览为随机示例，实际展示时每次都会重新随机选择。
+              {t(i18n.hint2)}
             </p>
           </div>
         </div>
