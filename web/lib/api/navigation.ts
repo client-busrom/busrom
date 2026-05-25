@@ -22,6 +22,7 @@ interface PayloadNavMenu {
   inquiryLink?: string;
   order: number;
   parent?: { id: string } | string | null;
+  gridSpan?: number;
   cardImage?: CardImageConfig;
   cardImageResolved?: {
     url: string;
@@ -184,6 +185,10 @@ async function transformNavigationItem(
 
   if (item.inquiryLink) {
     result.inquiryLink = item.inquiryLink;
+  }
+
+  if (item.gridSpan && item.gridSpan > 1) {
+    result.gridSpan = item.gridSpan;
   }
 
   const shouldFetchImage = item.type === 'product_cards' || parentType === 'product_cards';

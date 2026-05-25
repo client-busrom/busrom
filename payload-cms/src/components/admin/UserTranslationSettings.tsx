@@ -9,6 +9,7 @@
  */
 
 import React, { useState, useEffect } from 'react'
+import { useCustomTranslation } from '@/hooks/useCustomTranslation'
 
 const STORAGE_KEY = 'busrom-translation-settings'
 
@@ -62,6 +63,7 @@ export function getTranslationHeaders(): Record<string, string> {
 }
 
 export const UserTranslationSettings: React.FC = () => {
+  const { t } = useCustomTranslation()
   const [settings, setSettings] = useState<TranslationSettings>(defaultSettings)
   const [loading, setLoading] = useState(true)
   const [testing, setTesting] = useState(false)
@@ -122,13 +124,13 @@ export const UserTranslationSettings: React.FC = () => {
       setTestResult({
         success: data.success,
         message: data.success
-          ? `Test successful! "${data.originalText}" -> "${data.translatedText}"`
-          : data.error || 'Test failed',
+          ? `${t('translationSettings.testSuccess')} "${data.originalText}" -> "${data.translatedText}"`
+          : data.error || t('translationSettings.testFailed'),
       })
     } catch (err) {
       setTestResult({
         success: false,
-        message: 'Failed to test connection',
+        message: t('translationSettings.connectionFailed'),
       })
     } finally {
       setTesting(false)
@@ -138,9 +140,18 @@ export const UserTranslationSettings: React.FC = () => {
   if (loading) {
     return (
       <div style={{ padding: '20px' }}>
-        <p>Loading...</p>
+        <p>{t('translationSettings.loading')}</p>
       </div>
     )
+  }
+
+  const getApiKeyHint = () => {
+    switch (settings.service) {
+      case 'google': return t('translationSettings.apiKeyHintGoogle')
+      case 'deepl': return t('translationSettings.apiKeyHintDeepL')
+      case 'azure': return t('translationSettings.apiKeyHintAzure')
+      default: return ''
+    }
   }
 
   return (
@@ -161,16 +172,15 @@ export const UserTranslationSettings: React.FC = () => {
           marginBottom: '20px',
         }}
       >
-        ← Back
+        ← {t('translationSettings.back')}
       </button>
 
       <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>
-        My Translation Settings
+        {t('translationSettings.title')}
       </h2>
 
       <p style={{ marginBottom: '20px', color: '#666' }}>
-        Configure your personal translation API settings. These settings are stored locally in your browser,
-        so each team member can use their own API key to avoid rate limiting.
+        {t('translationSettings.description')}
       </p>
 
       <div style={{
@@ -180,14 +190,13 @@ export const UserTranslationSettings: React.FC = () => {
         borderRadius: '4px',
         marginBottom: '20px',
       }}>
-        <strong>Note:</strong> Settings are stored in your browser's localStorage.
-        If you clear browser data or use a different browser/device, you'll need to configure again.
+        <strong>{t('translationSettings.note').split(':')[0]}:</strong>{t('translationSettings.note').split(':').slice(1).join(':')}
       </div>
 
       {/* Service Selection */}
       <div style={{ marginBottom: '20px' }}>
         <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-          Translation Service
+          {t('translationSettings.service')}
         </label>
         <select
           value={settings.service}
@@ -200,22 +209,22 @@ export const UserTranslationSettings: React.FC = () => {
             fontSize: '14px',
           }}
         >
-          <option value="google">Google Translate</option>
-          <option value="deepl">DeepL</option>
-          <option value="azure">Azure Translator</option>
+          <option value="google">{t('translationSettings.serviceGoogle')}</option>
+          <option value="deepl">{t('translationSettings.serviceDeepL')}</option>
+          <option value="azure">{t('translationSettings.serviceAzure')}</option>
         </select>
       </div>
 
       {/* API Key */}
       <div style={{ marginBottom: '20px' }}>
         <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-          API Key
+          {t('translationSettings.apiKey')}
         </label>
         <input
           type="password"
           value={settings.apiKey}
           onChange={(e) => setSettings({ ...settings, apiKey: e.target.value })}
-          placeholder="Enter your API key"
+          placeholder={t('translationSettings.apiKey')}
           style={{
             width: '100%',
             padding: '10px 12px',
@@ -225,9 +234,7 @@ export const UserTranslationSettings: React.FC = () => {
           }}
         />
         <p style={{ marginTop: '4px', color: '#999', fontSize: '12px' }}>
-          {settings.service === 'google' && 'Get your API key from Google Cloud Console'}
-          {settings.service === 'deepl' && 'Get your API key from DeepL Pro account'}
-          {settings.service === 'azure' && 'Get your API key from Azure Portal'}
+          {getApiKeyHint()}
         </p>
       </div>
 
@@ -235,13 +242,13 @@ export const UserTranslationSettings: React.FC = () => {
       {settings.service === 'azure' && (
         <div style={{ marginBottom: '20px' }}>
           <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-            Custom Endpoint (Optional)
+            {t('translationSettings.endpoint')}
           </label>
           <input
             type="text"
             value={settings.apiEndpoint}
             onChange={(e) => setSettings({ ...settings, apiEndpoint: e.target.value })}
-            placeholder="https://api.cognitive.microsofttranslator.com"
+            placeholder={t('translationSettings.endpointPlaceholder')}
             style={{
               width: '100%',
               padding: '10px 12px',
@@ -262,10 +269,10 @@ export const UserTranslationSettings: React.FC = () => {
             onChange={(e) => setSettings({ ...settings, isEnabled: e.target.checked })}
             style={{ marginRight: '8px', width: '18px', height: '18px' }}
           />
-          <span style={{ fontWeight: '500' }}>Enable My Personal Settings</span>
+          <span style={{ fontWeight: '500' }}>{t('translationSettings.enabled')}</span>
         </label>
         <p style={{ marginTop: '4px', color: '#999', fontSize: '12px', marginLeft: '26px' }}>
-          When enabled, your personal API key will be used instead of the global settings
+          {t('translationSettings.enabledHint')}
         </p>
       </div>
 
@@ -293,7 +300,7 @@ export const UserTranslationSettings: React.FC = () => {
           marginBottom: '20px',
           color: '#155724',
         }}>
-          Settings saved successfully!
+          {t('translationSettings.saved')}
         </div>
       )}
 
@@ -312,7 +319,7 @@ export const UserTranslationSettings: React.FC = () => {
             cursor: 'pointer',
           }}
         >
-          Save Settings
+          {t('translationSettings.save')}
         </button>
 
         <button
@@ -330,7 +337,7 @@ export const UserTranslationSettings: React.FC = () => {
             opacity: (testing || !settings.apiKey) ? 0.7 : 1,
           }}
         >
-          {testing ? 'Testing...' : 'Test Connection'}
+          {testing ? t('translationSettings.testing') : t('translationSettings.test')}
         </button>
 
         <button
@@ -346,13 +353,13 @@ export const UserTranslationSettings: React.FC = () => {
             cursor: 'pointer',
           }}
         >
-          Clear Settings
+          {t('translationSettings.clear')}
         </button>
       </div>
 
       {!settings.apiKey && (
         <p style={{ marginTop: '12px', color: '#999', fontSize: '12px' }}>
-          Enter your API key first to test the connection
+          {t('translationSettings.enterKeyFirst')}
         </p>
       )}
     </div>

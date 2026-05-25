@@ -149,6 +149,25 @@ export const NavigationMenus: CollectionConfig = {
         condition: (data) => data?.type === 'product_cards' || data?.parent,
       },
     },
+    // Grid Span (for product_cards children)
+    {
+      name: 'gridSpan',
+      type: 'number',
+      label: {
+        en: 'Grid Span',
+        zh: '网格跨度',
+      },
+      defaultValue: 1,
+      min: 1,
+      max: 4,
+      admin: {
+        description: {
+          en: 'How many columns this card occupies in the dropdown grid (1-4). Only applies to PRODUCT_CARDS children.',
+          zh: '该卡片在下拉网格中占据几列（1-4）。仅对 PRODUCT_CARDS 子菜单有效。',
+        },
+        condition: (data) => data?.parent != null,
+      },
+    },
     // Hierarchical Structure
     {
       name: 'parent',

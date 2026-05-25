@@ -1551,6 +1551,10 @@ export interface NavigationMenu {
     | boolean
     | null;
   /**
+   * How many columns this card occupies in the dropdown grid (1-4). Only applies to PRODUCT_CARDS children.
+   */
+  gridSpan?: number | null;
+  /**
    * Leave empty for top-level menu
    */
   parent?: (number | null) | NavigationMenu;
@@ -2896,6 +2900,7 @@ export interface NavigationMenusSelect<T extends boolean = true> {
   type?: T;
   icon?: T;
   cardImage?: T;
+  gridSpan?: T;
   parent?: T;
   link?: T;
   inquiryLink?: T;

@@ -27,6 +27,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { useCustomTranslation } from '@/hooks/useCustomTranslation'
 import './styles.scss'
 
 interface NavigationMenuItem {
@@ -34,9 +35,10 @@ interface NavigationMenuItem {
   slug: string
   name: string
   type: string
-  parent?: { id: string } | null
+  parent?: { id: string; type?: string } | null
   order: number
   visible: boolean
+  gridSpan?: number
 }
 
 interface SortableItemProps {
@@ -45,25 +47,9 @@ interface SortableItemProps {
   isDragOverlay?: boolean
 }
 
-// Text labels (avoiding Payload's strict translation type checking)
-const labels = {
-  noName: '(No Name)',
-  hidden: 'Hidden',
-  edit: 'Edit',
-  loadFailed: 'Failed to load menus',
-  sameLevelOnly: 'Can only reorder within same level',
-  orderSaved: 'Order saved successfully',
-  saveFailed: 'Failed to save order',
-  title: 'Navigation Menu Manager',
-  description: 'Drag and drop to reorder menu items. Items can only be reordered within the same parent level.',
-  loading: 'Loading...',
-  noMenus: 'No menus found. Create one to get started.',
-  backToList: '← Back to List',
-  createNew: '+ Create New Menu',
-}
-
 // Sortable Item Component
 const SortableItem: React.FC<SortableItemProps> = ({ item, level, isDragOverlay }) => {
+  const { t } = useCustomTranslation()
   const {
     attributes,
     listeners,
@@ -99,13 +85,16 @@ const SortableItem: React.FC<SortableItemProps> = ({ item, level, isDragOverlay 
 
       <div className="nav-menu-sortable__content">
         <span className="nav-menu-sortable__slug">{item.slug}</span>
-        <span className="nav-menu-sortable__name">{item.name || labels.noName}</span>
+        <span className="nav-menu-sortable__name">{item.name || t('navManager.noName')}</span>
         <span className={`nav-menu-sortable__type nav-menu-sortable__type--${item.type}`}>
           {item.type}
         </span>
+        {item.parent?.type === 'product_cards' && typeof item.gridSpan === 'number' && (
+          <span className="nav-menu-sortable__grid-span">{t('navManager.span')}{item.gridSpan}</span>
+        )}
         <span className="nav-menu-sortable__order">#{item.order}</span>
         {!item.visible && (
-          <span className="nav-menu-sortable__hidden">{labels.hidden}</span>
+          <span className="nav-menu-sortable__hidden">{t('navManager.hidden')}</span>
         )}
       </div>
 
@@ -114,13 +103,14 @@ const SortableItem: React.FC<SortableItemProps> = ({ item, level, isDragOverlay 
         className="nav-menu-sortable__edit-link"
         onClick={(e) => e.stopPropagation()}
       >
-        {labels.edit}
+        {t('navManager.edit')}
       </a>
     </div>
   )
 }
 
 export const NavigationMenuSortable: React.FC = () => {
+  const { t } = useCustomTranslation()
   const [menus, setMenus] = useState<NavigationMenuItem[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -143,12 +133,12 @@ export const NavigationMenuSortable: React.FC = () => {
   const fetchMenus = useCallback(async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/navigation-menus?limit=100&sort=order')
+      const response = await fetch('/api/navigation-menus?limit=100&sort=order&depth=1')
       if (!response.ok) throw new Error('Failed to fetch menus')
       const data = await response.json()
       setMenus(data.docs || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : labels.loadFailed)
+      setError(err instanceof Error ? err.message : t('navManager.loadFailed'))
     } finally {
       setLoading(false)
     }
@@ -212,7 +202,7 @@ export const NavigationMenuSortable: React.FC = () => {
     const overParentId = overItem.parent?.id || 'root'
 
     if (activeParentId !== overParentId) {
-      setError(labels.sameLevelOnly)
+      setError(t('navManager.sameLevelOnly'))
       setTimeout(() => setError(null), 3000)
       return
     }
@@ -252,10 +242,10 @@ export const NavigationMenuSortable: React.FC = () => {
         )
       )
 
-      setSuccessMessage(labels.orderSaved)
+      setSuccessMessage(t('navManager.orderSaved'))
       setTimeout(() => setSuccessMessage(null), 2000)
     } catch (err) {
-      setError(labels.saveFailed)
+      setError(t('navManager.saveFailed'))
       await fetchMenus() // Revert on error
     } finally {
       setSaving(false)
@@ -296,9 +286,9 @@ export const NavigationMenuSortable: React.FC = () => {
   return (
     <div className="nav-menu-sortable">
       <div className="nav-menu-sortable__header">
-        <h1>{labels.title}</h1>
+        <h1>{t('navManager.title')}</h1>
         <p className="nav-menu-sortable__description">
-          {labels.description}
+          {t('navManager.description')}
         </p>
       </div>
 
@@ -315,7 +305,7 @@ export const NavigationMenuSortable: React.FC = () => {
       )}
 
       {loading ? (
-        <div className="nav-menu-sortable__loading">{labels.loading}</div>
+        <div className="nav-menu-sortable__loading">{t('navManager.loading')}</div>
       ) : (
         <DndContext
           sensors={sensors}
@@ -328,7 +318,7 @@ export const NavigationMenuSortable: React.FC = () => {
               renderMenuTree()
             ) : (
               <div className="nav-menu-sortable__empty">
-                {labels.noMenus}
+                {t('navManager.noMenus')}
               </div>
             )}
           </div>
@@ -347,10 +337,10 @@ export const NavigationMenuSortable: React.FC = () => {
 
       <div className="nav-menu-sortable__footer">
         <a href="/admin/collections/navigation-menus" className="nav-menu-sortable__back-link">
-          {labels.backToList}
+          {t('navManager.backToList')}
         </a>
         <a href="/admin/collections/navigation-menus/create" className="nav-menu-sortable__create-link">
-          {labels.createNew}
+          {t('navManager.createNew')}
         </a>
       </div>
     </div>

@@ -36,6 +36,7 @@ export interface NavItem {
   order: number;
   image?: NavigationImage;          // 子菜单可能有图片
   inquiryLink?: string;             // 询单链接（仅用于 PRODUCT_CARDS 类型）
+  gridSpan?: number;                // 网格跨度 (1-4)
   childMenus?: NavItem[];           // 子菜单
 }
 

@@ -288,23 +288,21 @@ export function DesktopNavigation({
                   {(() => {
                     // PRODUCT_CARDS 类型 - 产品卡片网格
                     if (activeItem.type === "PRODUCT_CARDS") {
-                      const isProductMenu = activeItem.url === "/products";
-                      const isShopMenu = activeItem.url === "/shop";
-
                       return (
                         <div className="grid gap-2.5 grid-cols-1 lg:grid-cols-4">
                           {activeItem.childMenus.map((child, index) => {
-                            const isProductFirstRow =
-                              isProductMenu && index < 2;
-                            const isShopFirstCard = isShopMenu && index === 0;
+                            const span = child.gridSpan || 1;
+                            const colSpanClass =
+                              span === 4 ? "lg:col-span-4" :
+                              span === 3 ? "lg:col-span-3" :
+                              span === 2 ? "lg:col-span-2" : "";
 
                             return (
                               <div
                                 key={child.id}
                                 className={cn(
                                   "group relative w-full h-[360px] overflow-hidden rounded-lg bg-muted cursor-pointer",
-                                  isProductFirstRow && "lg:col-span-2",
-                                  isShopFirstCard && "lg:col-span-2",
+                                  colSpanClass,
                                 )}
                               >
                                 <div className="absolute inset-0 overflow-hidden bg-white">
@@ -312,7 +310,7 @@ export function DesktopNavigation({
                                     <OptimizedImage
                                       image={child.image as any}
                                       alt={child.label}
-                                      size="medium"
+                                      size={span > 1 ? "large" : "medium"}
                                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                       priority={index < 4}
                                     />

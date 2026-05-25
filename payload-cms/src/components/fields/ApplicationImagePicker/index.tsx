@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useField } from '@payloadcms/ui'
 import MediaPicker from '../MediaPicker'
 import './styles.scss'
@@ -25,24 +25,134 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
   const [mode, setMode] = useState<'manual' | 'application'>(value?.mode || 'manual')
   const [selectedImage, setSelectedImage] = useState<number | null>(value?.manualImage || null)
   const [selectedApplication, setSelectedApplication] = useState<string | number | null>(value?.applicationId || null)
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('')
   const [applications, setApplications] = useState<any[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalDocs, setTotalDocs] = useState(0)
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const [previewImage, setPreviewImage] = useState<any | null>(null)
   const [isLoadingPreview, setIsLoadingPreview] = useState(false)
 
-  // Load applications list
-  useEffect(() => {
-    const loadApplications = async () => {
-      try {
-        const res = await fetch('/api/applications?limit=200&depth=0&where[status][equals]=published')
-        if (res.ok) {
-          const data = await res.json()
-          setApplications(data.docs || [])
+  // Search applications via API
+  const searchApplications = useCallback(async (query: string, pageNum: number = 1, append: boolean = false) => {
+    setIsSearching(true)
+    try {
+      const whereClauses: string[] = ['where[status][equals]=published']
+
+      if (query.trim()) {
+        // Use 'or' to search slug or name
+        whereClauses.push(
+          `where[or][0][slug][contains]=${encodeURIComponent(query)}`,
+          `where[or][1][name][contains]=${encodeURIComponent(query)}`
+        )
+      }
+
+      const res = await fetch(
+        `/api/applications?limit=20&page=${pageNum}&depth=0&${whereClauses.join('&')}`
+      )
+      if (res.ok) {
+        const data = await res.json()
+        const docs = data.docs || []
+        setTotalDocs(data.totalDocs || 0)
+        setHasMore(data.hasNextPage || false)
+
+        if (append) {
+          setApplications(prev => {
+            const existingIds = new Set(prev.map(a => a.id))
+            const newDocs = docs.filter((d: any) => !existingIds.has(d.id))
+            return [...prev, ...newDocs]
+          })
+        } else {
+          setApplications(docs)
         }
-      } catch (error) {
-        console.error('Error loading applications:', error)
+      }
+    } catch (error) {
+      console.error('Error searching applications:', error)
+    } finally {
+      setIsSearching(false)
+    }
+  }, [])
+
+  // Debounced search
+  const debouncedSearch = useCallback((query: string) => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      setPage(1)
+      searchApplications(query, 1, false)
+    }, 300)
+  }, [searchApplications])
+
+  // Load when dropdown opens - always refresh on open
+  const wasOpenRef = useRef(false)
+  useEffect(() => {
+    if (isDropdownOpen && !wasOpenRef.current) {
+      wasOpenRef.current = true
+      // Keep selected app, load fresh data around it
+      searchApplications(searchQuery, 1, false)
+    } else if (!isDropdownOpen) {
+      wasOpenRef.current = false
+    }
+  }, [isDropdownOpen, searchApplications])
+
+  // Load selected application info for display
+  useEffect(() => {
+    if (selectedApplication && !applications.find(a => String(a.id) === String(selectedApplication))) {
+      // Fetch the selected app to show its name
+      const loadSelected = async () => {
+        try {
+          const res = await fetch(`/api/applications/${selectedApplication}?depth=0`)
+          if (res.ok) {
+            const app = await res.json()
+            setApplications(prev => {
+              if (prev.find(a => a.id === app.id)) return prev
+              return [app, ...prev]
+            })
+          }
+        } catch (e) {
+          console.error('Error loading selected application:', e)
+        }
+      }
+      loadSelected()
+    }
+  }, [selectedApplication, applications])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false)
+        setSearchQuery('')
+        // Keep selected app in list, clear the rest
+        setApplications(prev => {
+          const selected = prev.find(a => String(a.id) === String(selectedApplication))
+          return selected ? [selected] : []
+        })
+        setPage(1)
+        setHasMore(false)
       }
     }
-    loadApplications()
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [selectedApplication])
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+    }
   }, [])
 
   // Sync form value when state changes
@@ -103,6 +213,18 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
     return 'Image'
   }
 
+  const selectedApp = applications.find((app) => String(app.id) === String(selectedApplication))
+
+  // Handle scroll to load more
+  const handleListScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 20 && hasMore && !isSearching) {
+      const nextPage = page + 1
+      setPage(nextPage)
+      searchApplications(searchQuery, nextPage, true)
+    }
+  }, [hasMore, isSearching, page, searchQuery, searchApplications])
+
   return (
     <div className="application-image-picker">
       <label className="application-image-picker__label">
@@ -147,18 +269,88 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
       {/* Application mode: select from applications */}
       {mode === 'application' && (
         <div className="application-image-picker__application">
-          <div className="application-image-picker__select-wrapper">
-            <select
-              value={selectedApplication || ''}
-              onChange={(e) => setSelectedApplication(e.target.value || null)}
+          <div className="application-image-picker__select-wrapper" ref={dropdownRef}>
+            <div
+              className="application-image-picker__dropdown-trigger"
+              onClick={() => {
+                setIsDropdownOpen(!isDropdownOpen)
+                if (!isDropdownOpen) {
+                  setTimeout(() => searchInputRef.current?.focus(), 50)
+                }
+              }}
             >
-              <option value="">-- 选择一个案例图集 --</option>
-              {applications.map((app) => (
-                <option key={app.id} value={app.id}>
-                  {app.slug}
-                </option>
-              ))}
-            </select>
+              <span className={selectedApp ? '' : 'placeholder'}>
+                {selectedApp ? selectedApp.slug : '-- 选择一个案例图集 --'}
+              </span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={isDropdownOpen ? 'open' : ''}>
+                <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+
+            {isDropdownOpen && (
+              <div className="application-image-picker__dropdown-menu">
+                <div className="application-image-picker__dropdown-search">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="搜索 slug 或名称..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value)
+                      debouncedSearch(e.target.value)
+                    }}
+                    autoFocus
+                  />
+                  {isSearching && (
+                    <span className="application-image-picker__search-spinner" />
+                  )}
+                </div>
+                <div
+                  className="application-image-picker__dropdown-list"
+                  onScroll={handleListScroll}
+                >
+                  {applications.length === 0 && !isSearching ? (
+                    <div className="application-image-picker__dropdown-empty">
+                      {searchQuery ? '无匹配结果' : '暂无案例图集'}
+                    </div>
+                  ) : (
+                    <>
+                      {applications.map((app) => (
+                        <div
+                          key={app.id}
+                          className={`application-image-picker__dropdown-item ${String(app.id) === String(selectedApplication) ? 'selected' : ''}`}
+                          onClick={() => {
+                            setSelectedApplication(app.id)
+                            setIsDropdownOpen(false)
+                            setSearchQuery('')
+                            // Keep selected app in list for next open
+                            setApplications([app])
+                            setPage(1)
+                            setHasMore(false)
+                          }}
+                        >
+                          <span className="application-image-picker__dropdown-item-slug">{app.slug}</span>
+                          {app.name && app.name !== app.slug && (
+                            <span className="application-image-picker__dropdown-item-name">{app.name}</span>
+                          )}
+                        </div>
+                      ))}
+                      {isSearching && (
+                        <div className="application-image-picker__dropdown-loading">加载中...</div>
+                      )}
+                      {!isSearching && hasMore && (
+                        <div className="application-image-picker__dropdown-more">滚动加载更多</div>
+                      )}
+                    </>
+                  )}
+                </div>
+                {totalDocs > 0 && (
+                  <div className="application-image-picker__dropdown-footer">
+                    共 {totalDocs} 条
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <p className="application-image-picker__hint">
