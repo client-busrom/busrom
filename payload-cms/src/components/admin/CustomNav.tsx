@@ -368,6 +368,7 @@ export const CustomNav: React.FC = () => {
           {/* 其他子页 - 使用与首页内容相同的样式 */}
           <SubGroupLinkItem href="/admin/collections/pages" labelKey="subpages" />
           <NavItem href="/admin/globals/shop-page-config" labelKey="shopPageConfig" />
+          <NavItem href="/admin/collections/not-found-pages" labelKey="notFoundPages" />
         </CollapsibleGroup>
 
         {/* Media Library */}

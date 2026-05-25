@@ -91,6 +91,7 @@ export function FraudNoticeTemplate({ locale, data }: FraudNoticeTemplateProps) 
           bgImage={contactForm.bgImage}
           displayImage={contactForm.displayImage}
           richText={contactForm.richText}
+          descriptionRichText={contactForm.descriptionRichText}
           formId={contactForm.formId}
           formConfig={contactForm.formConfig}
         />

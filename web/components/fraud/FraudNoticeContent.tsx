@@ -1,11 +1,7 @@
 "use client";
 
-import React, { useLayoutEffect, useRef } from "react";
+import React from "react";
 import { RichText } from "@payloadcms/richtext-lexical/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface FraudNoticeContentProps {
   content: any;
@@ -16,39 +12,6 @@ export function FraudNoticeContent({
   content,
   fraudConverters,
 }: FraudNoticeContentProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const stickyRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    if (!content.block || !containerRef.current || !stickyRef.current) return;
-
-    let ctx = gsap.context(() => {
-      // 获取标题相对于容器顶部的初始偏移量 (通常是 40px 左右)
-      const initialOffset = stickyRef.current?.offsetTop || 0;
-      // 目标：标题在视口 102px 处开始吸附
-      // 公式：容器顶部位置 = 102px - 初始偏移
-      const triggerStart = 102 - initialOffset;
-
-      ScrollTrigger.create({
-        // 使用父容器作为触发器更稳定
-        trigger: containerRef.current,
-        start: `top ${triggerStart}px`,
-        // 结束参照
-        endTrigger: containerRef.current,
-        // 精确对齐底部：当容器底部到达 (Pin位置 102px + 标题真实高度) 时停止
-        end: () => `bottom ${102 + (stickyRef.current?.offsetHeight || 0)}px`,
-        pin: stickyRef.current,
-        pinSpacing: false,
-        scrub: true,
-        invalidateOnRefresh: true,
-        anticipatePin: 1,
-        refreshPriority: 1,
-      });
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, [content]);
-
   if (!content) return null;
 
   return (
@@ -64,7 +27,6 @@ export function FraudNoticeContent({
 
           {content.block && (
             <div
-              ref={containerRef}
               className={`grid grid-cols-1 ${
                 content.block.columnRatio === "1:2"
                   ? "md:grid-cols-[1fr_2fr]"
@@ -79,21 +41,19 @@ export function FraudNoticeContent({
                     : "gap-16"
               } items-start`}
             >
-              <div className="relative">
-                <div ref={stickyRef} className="z-10 w-full">
-                  <div className="font-montserrat font-black text-[#060C14] text-[32px] leading-tight m-0 p-0">
-                    <RichText
-                      data={{ root: { children: content.block.title } } as any}
-                      converters={{
-                        ...fraudConverters,
-                        heading: ({ node, nodesToJSX }: any) => (
-                          <h2 className="text-[32px] font-black text-[#060C14] leading-tight m-0">
-                            {nodesToJSX({ nodes: node.children })}
-                          </h2>
-                        )
-                      }}
-                    />
-                  </div>
+              <div className="sticky top-[102px] z-10 w-full self-start">
+                <div className="font-montserrat font-black text-[#060C14] text-[32px] leading-tight m-0 p-0">
+                  <RichText
+                    data={{ root: { children: content.block.title } } as any}
+                    converters={{
+                      ...fraudConverters,
+                      heading: ({ node, nodesToJSX }: any) => (
+                        <h2 className="text-[32px] font-black text-[#060C14] leading-tight m-0">
+                          {nodesToJSX({ nodes: node.children })}
+                        </h2>
+                      )
+                    }}
+                  />
                 </div>
               </div>
               <div className="prose text-gray-600 leading-loose">

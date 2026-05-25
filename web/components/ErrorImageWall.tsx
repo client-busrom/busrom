@@ -65,22 +65,24 @@ export function ErrorImageWall({ customImages }: ErrorImageWallProps = {}) {
   } as const;
 
   return (
-    <div className="relative w-full h-[500px] lg:h-full lg:w-[800px] max-w-full pointer-events-none overflow-visible lg:-translate-y-12">
-      {images.map((img, imageIndex) => {
-        const positionIndex = positions.indexOf(imageIndex);
-        if (positionIndex === -1) return null;
+    <div className="relative w-full max-w-[800px] pointer-events-none overflow-visible lg:-translate-y-12 mt-10 lg:mt-0">
+      <div className="w-full pb-[100%]"></div>
+      <div className="absolute inset-0">
+        {images.map((img, imageIndex) => {
+          const positionIndex = positions.indexOf(imageIndex);
+          if (positionIndex === -1) return null;
 
-        const isMain = positionIndex === 0;
-        const pos = getPositionStyle(positionIndex);
-        const isHovered = hoveredIndex === positionIndex;
+          const isMain = positionIndex === 0;
+          const pos = getPositionStyle(positionIndex);
+          const isHovered = hoveredIndex === positionIndex;
 
-        const animateProps: any = {
-          left: `${(pos.x / DESIGN_SIZE) * 100}%`,
-          top: `${(pos.y / DESIGN_SIZE) * 100}%`,
-          width: `${(pos.w / DESIGN_SIZE) * 100}%`,
-          height: `${(pos.h / DESIGN_SIZE) * 100}%`,
-          x: "0%",
-          y: "0%",
+          const animateProps: any = {
+            left: `${(pos.x / DESIGN_SIZE) * 100}%`,
+            top: `${(pos.y / DESIGN_SIZE) * 100}%`,
+            width: `${(pos.w / DESIGN_SIZE) * 100}%`,
+            height: `${(pos.h / DESIGN_SIZE) * 100}%`,
+            x: "0%",
+            y: "0%",
           scale: 1,
           rotate: 0,
           zIndex: pos.zIndex,
@@ -123,6 +125,7 @@ export function ErrorImageWall({ customImages }: ErrorImageWallProps = {}) {
           <motion.div
             key={`img-${imageIndex}`}
             className="absolute bg-white rounded-[20px] lg:rounded-[30px] shadow-2xl pointer-events-auto flex items-center justify-center overflow-hidden cursor-pointer"
+            style={{ aspectRatio: `${pos.w} / ${pos.h}` }}
             animate={animateProps}
             transition={springTransition}
             onHoverStart={() => setHoveredIndex(positionIndex)}
@@ -140,6 +143,7 @@ export function ErrorImageWall({ customImages }: ErrorImageWallProps = {}) {
           </motion.div>
         );
       })}
+      </div>
     </div>
   );
 }

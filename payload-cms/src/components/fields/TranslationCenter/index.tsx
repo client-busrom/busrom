@@ -143,6 +143,10 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
   'template-categories': [
     { name: 'name', labelKey: 'custom:fields:name', type: 'textarea' },
   ],
+  'not-found-pages': [
+    { name: 'text', labelKey: 'custom:translationCenter:text', type: 'textarea' },
+    { name: 'buttonText', labelKey: 'custom:translationCenter:ctaButtonText', type: 'textarea' },
+  ],
   'document-templates': [
     { name: 'name', labelKey: 'custom:fields:name', type: 'textarea' },
     { name: 'description', labelKey: 'custom:fields:description', type: 'textarea' },

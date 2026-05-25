@@ -60,6 +60,10 @@ const RESOURCES = [
   { value: 'TRANSLATION_CONFIG', label: { en: 'Translation Settings', zh: '翻译配置（全局）' } },
   { value: 'SHOP_PAGE_CONFIG', label: { en: 'Shop Preview', zh: 'Shop 列表页管理' } },
   { value: 'PRELOADER_CONFIG', label: { en: 'Preloader Config', zh: '加载动画配置' } },
+  { value: 'NOT_FOUND_PAGE', label: { en: '404 Pages Config', zh: '404 页面配置' } },
+  { value: 'SYSTEM_SETTING', label: { en: 'System Settings', zh: '系统全局配置' } },
+  { value: 'INDEXING_LOG', label: { en: 'Indexing Logs', zh: 'SEO 收录日志' } },
+  { value: 'IMAGE_WALL_ITEM', label: { en: 'Image Wall', zh: '图片墙配置' } },
 ] as const
 
 // Available actions with i18n labels

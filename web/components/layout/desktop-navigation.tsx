@@ -355,30 +355,30 @@ export function DesktopNavigation({
                     // SUBMENU 类型 - 带图标的菜单
                     if (activeItem.type === "SUBMENU") {
                       return (
-                        <div className="grid grid-cols-4 gap-x-12 gap-y-8 max-w-7xl mx-auto">
+                        <div className="grid grid-cols-4 gap-x-6 gap-y-8 max-w-[1400px] mx-auto justify-items-center">
                           {activeItem.childMenus.map((child) => (
                             <Link
                               key={child.id}
                               href={child.url}
-                              className="group flex flex-col items-center justify-center gap-4 p-6 rounded-lg transition-colors hover:bg-white/5"
+                              className="group flex flex-col items-center justify-center gap-4 py-6 w-[330px] rounded-lg transition-colors hover:bg-white/5"
                               onClick={() => setActiveMenuId(null)}
                             >
                               <div className="text-muted-foreground group-hover:text-brand-accent-gold transition-colors">
                                 {child.icon ? (
                                   <IconifyIcon
                                     name={child.icon}
-                                    size={28}
+                                    size={40}
                                     color="currentColor"
                                   />
                                 ) : (
                                   <IconifyIcon
                                     name="lucide:arrow-right"
-                                    size={28}
+                                    size={40}
                                     color="currentColor"
                                   />
                                 )}
                               </div>
-                              <span className="text-lg font-montserrat font-bold text-muted-foreground group-hover:text-brand-accent-gold text-center transition-colors">
+                              <span className="text-lg font-montserrat font-bold text-muted-foreground group-hover:text-brand-accent-gold text-center transition-colors whitespace-nowrap">
                                 {child.label}
                               </span>
                             </Link>

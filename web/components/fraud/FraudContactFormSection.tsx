@@ -40,6 +40,7 @@ interface Props {
   displayImage?: string;
   logoImage?: string;
   richText?: RichTextSegment[];
+  descriptionRichText?: RichTextSegment[];
   formId?: string;
   formConfig?: any;
 }
@@ -173,6 +174,7 @@ export function FraudContactFormSection({
   bgImage,
   displayImage,
   richText,
+  descriptionRichText,
   formId,
   formConfig: propFormConfig,
 }: Props) {
@@ -301,7 +303,7 @@ export function FraudContactFormSection({
       return (
         <span
           key={idx}
-          className="text-[#D6CD88] font-cherry-bomb not-italic text-[1.12em] tracking-tight inline whitespace-pre-line"
+          className="text-[#D6CD88] font-josefin-sans not-italic text-[1.12em] tracking-tight inline whitespace-pre-line"
           style={{
             WebkitTextStroke: `1.5px #514a0d`,
             paintOrder: "stroke fill",
@@ -312,7 +314,7 @@ export function FraudContactFormSection({
       );
     }
     return (
-      <span key={idx} className="font-cherry-bomb inline whitespace-pre-line">
+      <span key={idx} className="font-josefin-sans inline whitespace-pre-line">
         {segment.text}
       </span>
     );
@@ -452,7 +454,7 @@ export function FraudContactFormSection({
             className="w-full font-medium text-[#463B17] placeholder:text-[#9E9474] outline-none resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             spellCheck="false"
             style={{
-              height: isMobile ? "120px" : "91px",
+              height: isMobile ? "120px" : "200px",
               backgroundColor: "#D4CBAF",
               borderRadius: "10px",
               fontSize: "16px",
@@ -604,8 +606,8 @@ export function FraudContactFormSection({
           }}
         >
           <div
-            className="font-cherry-bomb font-black text-[#1D1A02] leading-[1.4] whitespace-pre-line block"
-            style={{ fontSize: isMobile ? "20px" : "24px", width: "100%" }}
+            className="font-josefin-sans font-black text-[#1D1A02] leading-[1.4] whitespace-pre-line block"
+            style={{ fontSize: isMobile ? "24px" : "32px", width: "100%" }}
           >
             {(() => {
               // Filter out the marker text if it's accidentally included in segments
@@ -632,6 +634,27 @@ export function FraudContactFormSection({
                   Or Innovative Customization.
                 </span>
               );
+            })()}
+          </div>
+
+          <div
+            className="font-josefin-sans font-medium text-[#1D1A02] leading-[1.6] whitespace-pre-line block opacity-80"
+            style={{ fontSize: isMobile ? "15px" : "18px", width: "100%", marginTop: isMobile ? "12px" : "16px" }}
+          >
+            {(() => {
+              const displaySegments = (descriptionRichText || []).filter(
+                (s) =>
+                  s.text &&
+                  s.text.trim().toLowerCase() !== "contact-form-description",
+              );
+
+              if (
+                displaySegments.length > 0 &&
+                displaySegments.some((s) => s.text && s.text.trim())
+              ) {
+                return displaySegments.map((segment, i) => renderSegment(segment, i));
+              }
+              return null;
             })()}
           </div>
 

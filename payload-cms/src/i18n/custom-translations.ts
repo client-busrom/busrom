@@ -465,6 +465,7 @@ export const customTranslationsEn = {
       systemSettings: 'System Settings',
       systemNotifications: 'Notification Center',
       systemManagement: 'System Management',
+      notFoundPages: '404 Pages Config',
     },
   },
   'nested-docs': {
@@ -931,6 +932,7 @@ export const customTranslationsZh = {
       systemManagement: '系统管理',
       systemNotifications: '系统通知中心',
       systemSettings: '系统全局配置',
+      notFoundPages: '404 页面配置',
     },
   },
   'nested-docs': {

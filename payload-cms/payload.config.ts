@@ -79,7 +79,7 @@ const augmentTrackedCollections = (collections: CollectionConfig[]): CollectionC
     'series-templates', 'series-reusable-blocks',
     'categories', 'faq-items', 'navigation-menus',
     'hero-banner-items', 'series-intro-items', 'reusable-blocks',
-    'document-templates', 'seo-settings', 'custom-scripts'
+    'document-templates', 'seo-settings', 'custom-scripts', 'not-found-pages'
   ]
 
   const augmentFields = (fields: any[], shouldLocalizeStatus: boolean): any[] => {
@@ -239,6 +239,7 @@ import { FormConfigs } from './src/collections/FormConfigs'
 import { FormSubmissions } from './src/collections/FormSubmissions'
 import { SmtpConfigs } from './src/collections/SmtpConfigs'
 import { IndexingLogs } from './src/collections/IndexingLogs'
+import { NotFoundPages } from './src/collections/NotFoundPages'
 
 import type { CollectionConfig } from 'payload'
 
@@ -413,6 +414,7 @@ export default buildConfig({
     FormSubmissions,
     SmtpConfigs,
     IndexingLogs,
+    NotFoundPages,
   ]),
 
   // ==================================================================
@@ -683,7 +685,7 @@ export default buildConfig({
           'series-templates', 'series-reusable-blocks',
           'categories', 'faq-items', 'navigation-menus',
           'hero-banner-items', 'series-intro-items', 'reusable-blocks',
-          'document-templates', 'seo-settings', 'custom-scripts'
+          'document-templates', 'seo-settings', 'custom-scripts', 'not-found-pages'
         ].map(slug => ({
           slug,
           hooks: {

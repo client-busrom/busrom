@@ -100,6 +100,7 @@ export interface Config {
     'form-submissions': FormSubmission;
     'smtp-configs': SmtpConfig;
     'indexing-logs': IndexingLog;
+    'not-found-pages': NotFoundPage;
     audit_logs: AuditLog;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -163,6 +164,7 @@ export interface Config {
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     'smtp-configs': SmtpConfigsSelect<false> | SmtpConfigsSelect<true>;
     'indexing-logs': IndexingLogsSelect<false> | IndexingLogsSelect<true>;
+    'not-found-pages': NotFoundPagesSelect<false> | NotFoundPagesSelect<true>;
     audit_logs: AuditLogsSelect<false> | AuditLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -388,6 +390,9 @@ export interface User {
           | '/admin/globals/seo-setting'
           | '/admin/collections/indexing-logs'
           | '/admin/globals/site-config'
+          | '/admin/globals/system-settings'
+          | '/admin/collections/not-found-pages'
+          | '/admin/collections/image-wall-items'
           | '/admin/globals/footer'
           | '/admin/globals/translation-config'
           | '/admin/collections/users';
@@ -525,7 +530,11 @@ export interface Permission {
     | 'SOCIAL_CONFIG'
     | 'TRANSLATION_CONFIG'
     | 'SHOP_PAGE_CONFIG'
-    | 'PRELOADER_CONFIG';
+    | 'PRELOADER_CONFIG'
+    | 'NOT_FOUND_PAGE'
+    | 'SYSTEM_SETTING'
+    | 'INDEXING_LOG'
+    | 'IMAGE_WALL_ITEM';
   /**
    * The action allowed on the resource
    */
@@ -2229,6 +2238,30 @@ export interface IndexingLog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "not-found-pages".
+ */
+export interface NotFoundPage {
+  id: number;
+  /**
+   * Which 404 scenario this configuration applies to.
+   */
+  pageType: 'other' | 'product_details' | 'product_links' | 'knowledge_base';
+  text: string;
+  buttonText: string;
+  buttonLink: string;
+  mediaSelection: 'manual' | 'random';
+  manualMedia?: (number | Media)[] | null;
+  /**
+   * Randomly select media from these Applications.
+   */
+  applications?: (number | Application)[] | null;
+  User?: (number | null) | User;
+  Operation?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit_logs".
  */
 export interface AuditLog {
@@ -2498,6 +2531,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'indexing-logs';
         value: number | IndexingLog;
+      } | null)
+    | ({
+        relationTo: 'not-found-pages';
+        value: number | NotFoundPage;
       } | null)
     | ({
         relationTo: 'audit_logs';
@@ -3340,6 +3377,23 @@ export interface IndexingLogsSelect<T extends boolean = true> {
   status?: T;
   triggerUser?: T;
   rawResponse?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "not-found-pages_select".
+ */
+export interface NotFoundPagesSelect<T extends boolean = true> {
+  pageType?: T;
+  text?: T;
+  buttonText?: T;
+  buttonLink?: T;
+  mediaSelection?: T;
+  manualMedia?: T;
+  applications?: T;
+  User?: T;
+  Operation?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -218,6 +218,23 @@ const PERMISSIONS = [
   { resource: 'SHOP_PAGE_CONFIG', action: 'UPDATE', name: '更新Shop 列表页管理', category: 'WEBSITE_PAGES' },
   { resource: 'PRELOADER_CONFIG', action: 'READ', name: '查看加载动画配置', category: 'WEBSITE_SETTINGS' },
   { resource: 'PRELOADER_CONFIG', action: 'UPDATE', name: '更新加载动画配置', category: 'WEBSITE_SETTINGS' },
+
+  { resource: 'IMAGE_WALL_ITEM', action: 'CREATE', name: '创建图片墙配置', category: 'WEBSITE_PAGES' },
+  { resource: 'IMAGE_WALL_ITEM', action: 'READ', name: '查看图片墙配置', category: 'WEBSITE_PAGES' },
+  { resource: 'IMAGE_WALL_ITEM', action: 'UPDATE', name: '更新图片墙配置', category: 'WEBSITE_PAGES' },
+  { resource: 'IMAGE_WALL_ITEM', action: 'DELETE', name: '删除图片墙配置', category: 'WEBSITE_PAGES' },
+
+  { resource: 'INDEXING_LOG', action: 'READ', name: '查看SEO收录日志', category: 'ADVANCED' },
+  { resource: 'INDEXING_LOG', action: 'UPDATE', name: '更新SEO收录日志', category: 'ADVANCED' },
+  { resource: 'INDEXING_LOG', action: 'DELETE', name: '删除SEO收录日志', category: 'ADVANCED' },
+
+  { resource: 'NOT_FOUND_PAGE', action: 'CREATE', name: '创建404页面配置', category: 'WEBSITE_PAGES' },
+  { resource: 'NOT_FOUND_PAGE', action: 'READ', name: '查看404页面配置', category: 'WEBSITE_PAGES' },
+  { resource: 'NOT_FOUND_PAGE', action: 'UPDATE', name: '更新404页面配置', category: 'WEBSITE_PAGES' },
+  { resource: 'NOT_FOUND_PAGE', action: 'DELETE', name: '删除404页面配置', category: 'WEBSITE_PAGES' },
+
+  { resource: 'SYSTEM_SETTING', action: 'READ', name: '查看系统全局配置', category: 'CMS_SETTINGS' },
+  { resource: 'SYSTEM_SETTING', action: 'UPDATE', name: '更新系统全局配置', category: 'CMS_SETTINGS' },
 ]
 
 /**
@@ -262,6 +279,8 @@ const ROLES = [
       'TEMPLATE_CATEGORY_CREATE', 'TEMPLATE_CATEGORY_READ', 'TEMPLATE_CATEGORY_UPDATE', 'TEMPLATE_CATEGORY_DELETE',
       'NAVIGATION_MENU_READ', 'NAVIGATION_MENU_UPDATE',
       'HERO_BANNER_ITEM_CREATE', 'HERO_BANNER_ITEM_READ', 'HERO_BANNER_ITEM_UPDATE',
+      'IMAGE_WALL_ITEM_CREATE', 'IMAGE_WALL_ITEM_READ', 'IMAGE_WALL_ITEM_UPDATE', 'IMAGE_WALL_ITEM_DELETE',
+      'NOT_FOUND_PAGE_CREATE', 'NOT_FOUND_PAGE_READ', 'NOT_FOUND_PAGE_UPDATE', 'NOT_FOUND_PAGE_DELETE',
       // Media - Full access
       'MEDIA_CREATE', 'MEDIA_READ', 'MEDIA_UPDATE', 'MEDIA_DELETE',
       'MEDIA_CATEGORY_READ',
@@ -322,6 +341,7 @@ const ROLES = [
       // SEO - Full access
       'SEO_SETTING_CREATE', 'SEO_SETTING_READ', 'SEO_SETTING_UPDATE', 'SEO_SETTING_DELETE',
       'CUSTOM_SCRIPT_CREATE', 'CUSTOM_SCRIPT_READ', 'CUSTOM_SCRIPT_UPDATE', 'CUSTOM_SCRIPT_DELETE',
+      'INDEXING_LOG_READ', 'INDEXING_LOG_UPDATE', 'INDEXING_LOG_DELETE',
       // Content - Read only (for SEO context)
       'PRODUCT_READ',
       'PRODUCT_SERIES_READ',

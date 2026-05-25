@@ -34,6 +34,7 @@ export interface FraudNoticeData {
     bgImage?: string;
     displayImage?: string;
     richText: { text: string; bold?: boolean }[];
+    descriptionRichText?: { text: string; bold?: boolean }[];
     formId?: string;
     formConfig?: any;
   };
@@ -198,6 +199,7 @@ export function parseFraudNoticeData(locale: string, rawData: any): FraudNoticeD
       bgImage: findImgUrlByMarker("contact-form-bg-image"),
       displayImage: findImgUrlByMarker("contact-form-image") || findImgUrlByMarker("contact-form-display-image"),
       richText: findRichTextByMarker("contact-form-title"),
+      descriptionRichText: findRichTextByMarker("contact-form-description"),
       formConfig: formNode?.data?.formConfig
     },
     quoteGuide

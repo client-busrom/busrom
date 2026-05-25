@@ -1,19 +1,16 @@
 import { getPreloaderConfig } from "@/lib/api/preloader-config";
 import { getNotFoundPageConfig } from "@/lib/api/not-found-pages";
-import { NotFoundClient } from "./NotFoundClient";
+import { NotFoundClient } from "../NotFoundClient";
 import { defaultLocale } from "@/i18n.config";
 
 export default async function NotFound() {
-  // Locale is not available in not-found, so we fallback to defaultLocale
-  // Usually the root not-found uses the default locale.
   const locale = defaultLocale; 
   
   const [config, notFoundConfig] = await Promise.all([
     getPreloaderConfig(),
-    getNotFoundPageConfig(locale, "other")
+    getNotFoundPageConfig(locale, "knowledge_base")
   ]);
 
-  // Use CMS images if provided, fallback to preloader images
   const customImages = notFoundConfig?.extractedImages?.length 
     ? notFoundConfig.extractedImages 
     : config?.images?.filter((item): item is NonNullable<typeof item> => item !== null).map((item) => item.src) || [];
