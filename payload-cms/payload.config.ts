@@ -273,6 +273,7 @@ import { Footer } from './src/globals/Footer'
 import { SiteConfig } from './src/globals/SiteConfig'
 import { ContactPopup } from './src/globals/ContactPopup'
 import { PreloaderConfig } from './src/globals/PreloaderConfig'
+import { WaterfallConfig } from './src/globals/WaterfallConfig'
 import { SocialConfig } from './src/globals/SocialConfig'
 import { ShopPageConfig } from './src/globals/ShopPageConfig'
 import { KnowledgeBaseSettings } from './src/globals/KnowledgeBaseSettings'
@@ -424,6 +425,7 @@ export default buildConfig({
     SiteConfig,
     ContactPopup,
     PreloaderConfig,
+    WaterfallConfig,
     SocialConfig,
     ShopPageConfig,
     KnowledgeBaseSettings,

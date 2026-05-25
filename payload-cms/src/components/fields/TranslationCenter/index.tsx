@@ -44,8 +44,8 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
   ],
   pages: [
     { name: 'title', labelKey: 'custom:fields:pageTitle', type: 'textarea' },
-    { name: 'heroText', labelKey: 'custom:translationCenter:heroText', type: 'textarea' },
-    { name: 'heroSubtitle', labelKey: 'custom:translationCenter:heroSubtitle', type: 'textarea' },
+    { name: 'waterfallTitle', labelKey: 'custom:translationCenter:waterfallTitle', type: 'textarea' },
+    { name: 'waterfallSubtitle', labelKey: 'custom:translationCenter:waterfallSubtitle', type: 'textarea' },
   ],
     blogs: [
       { name: 'title', labelKey: 'custom:fields:blogTitle', type: 'textarea' },

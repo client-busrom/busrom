@@ -15,6 +15,7 @@ export { ContactPopup } from './ContactPopup'
 export { ShopPageConfig } from './ShopPageConfig'
 export { KnowledgeBaseSettings } from './KnowledgeBaseSettings'
 export { PreloaderConfig } from './PreloaderConfig'
+export { WaterfallConfig } from './WaterfallConfig'
 
 // Homepage Sections (按前端 HomePageClient.tsx 顺序排列)
 // Note: HeroBanner (1) and SeriesIntro (6) are Collections, not Globals

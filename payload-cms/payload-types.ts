@@ -235,6 +235,7 @@ export interface Config {
     'site-config': SiteConfig;
     'contact-popup': ContactPopup;
     'preloader-config': PreloaderConfig;
+    'waterfall-config': WaterfallConfig;
     'social-config': SocialConfig;
     'shop-page-config': ShopPageConfig;
     'knowledge-base-settings': KnowledgeBaseSetting;
@@ -261,6 +262,7 @@ export interface Config {
     'site-config': SiteConfigSelect<false> | SiteConfigSelect<true>;
     'contact-popup': ContactPopupSelect<false> | ContactPopupSelect<true>;
     'preloader-config': PreloaderConfigSelect<false> | PreloaderConfigSelect<true>;
+    'waterfall-config': WaterfallConfigSelect<false> | WaterfallConfigSelect<true>;
     'social-config': SocialConfigSelect<false> | SocialConfigSelect<true>;
     'shop-page-config': ShopPageConfigSelect<false> | ShopPageConfigSelect<true>;
     'knowledge-base-settings': KnowledgeBaseSettingsSelect<false> | KnowledgeBaseSettingsSelect<true>;
@@ -1663,12 +1665,18 @@ export interface Page {
     };
     [k: string]: unknown;
   } | null;
+  enableWaterfall?: boolean | null;
+  waterfallTitle?: string | null;
+  waterfallSubtitle?: string | null;
+  waterfallImageMode?: ('manual' | 'randomFromCases') | null;
   /**
-   * Select media tags for hero waterfall animation
+   * Select up to 5 images for the waterfall
    */
-  heroMediaTags?: (number | MediaTag)[] | null;
-  heroText?: string | null;
-  heroSubtitle?: string | null;
+  waterfallMedia?: (number | Media)[] | null;
+  /**
+   * Select cases to randomly pick 5 images from
+   */
+  waterfallApplications?: (number | Application)[] | null;
   User?: (number | null) | User;
   Operation?: string | null;
   updatedAt: string;
@@ -2959,9 +2967,12 @@ export interface PagesSelect<T extends boolean = true> {
   author?: T;
   order?: T;
   contentTranslation?: T;
-  heroMediaTags?: T;
-  heroText?: T;
-  heroSubtitle?: T;
+  enableWaterfall?: T;
+  waterfallTitle?: T;
+  waterfallSubtitle?: T;
+  waterfallImageMode?: T;
+  waterfallMedia?: T;
+  waterfallApplications?: T;
   User?: T;
   Operation?: T;
   updatedAt?: T;
@@ -3657,6 +3668,20 @@ export interface PreloaderConfig {
    * Delay between each image appearing
    */
   imageWallStagger?: number | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "waterfall-config".
+ */
+export interface WaterfallConfig {
+  id: number;
+  imageStaggerDelay?: number | null;
+  imageAnimationDuration?: number | null;
+  imageHoldDuration?: number | null;
+  textAnimationDuration?: number | null;
+  textHoldDuration?: number | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -4558,6 +4583,20 @@ export interface PreloaderConfigSelect<T extends boolean = true> {
   logoAnimationDuration?: T;
   imageWallDuration?: T;
   imageWallStagger?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "waterfall-config_select".
+ */
+export interface WaterfallConfigSelect<T extends boolean = true> {
+  imageStaggerDelay?: T;
+  imageAnimationDuration?: T;
+  imageHoldDuration?: T;
+  textAnimationDuration?: T;
+  textHoldDuration?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

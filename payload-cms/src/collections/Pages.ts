@@ -303,39 +303,85 @@ export const Pages: CollectionConfig = {
           },
           fields: [
             {
-              name: 'heroMediaTags',
+              name: 'enableWaterfall',
+              type: 'checkbox',
+              defaultValue: true,
+              label: {
+                en: 'Enable Waterfall Animation',
+                zh: '启用瀑布流',
+              },
+            },
+            {
+              name: 'waterfallTitle',
+              type: 'textarea',
+              label: {
+                en: 'Waterfall Title',
+                zh: '瀑布流标题',
+              },
+              localized: true,
+            },
+            {
+              name: 'waterfallSubtitle',
+              type: 'textarea',
+              label: {
+                en: 'Waterfall Subtitle',
+                zh: '瀑布流副标题',
+              },
+              localized: true,
+            },
+            {
+              name: 'waterfallImageMode',
+              type: 'radio',
+              defaultValue: 'manual',
+              label: {
+                en: 'Image Selection Mode',
+                zh: '图片选择模式',
+              },
+              options: [
+                {
+                  label: { en: 'Manual Selection', zh: '手动' },
+                  value: 'manual',
+                },
+                {
+                  label: { en: 'Random from Case Studies', zh: '案例图集随机' },
+                  value: 'randomFromCases',
+                },
+              ],
+            },
+            {
+              name: 'waterfallMedia',
               type: 'relationship',
-              relationTo: 'media-tags',
+              relationTo: 'media',
               hasMany: true,
               label: {
-                en: 'Hero Media Tags',
-                zh: '顶部图片标签',
+                en: 'Waterfall Media',
+                zh: '瀑布流媒体',
               },
               admin: {
+                condition: (data) => data.waterfallImageMode === 'manual',
                 description: {
-                  en: 'Select media tags for hero waterfall animation',
-                  zh: '选择用于顶部瀑布动画的媒体标签',
+                  en: 'Select up to 5 images for the waterfall',
+                  zh: '选择最多5张图片用于瀑布流',
                 },
               },
             },
             {
-              name: 'heroText',
-              type: 'textarea',
+              name: 'waterfallApplications',
+              type: 'relationship',
+              relationTo: 'applications',
+              hasMany: true,
               label: {
-                en: 'Hero Text Overlay',
-                zh: '顶部叠加文字',
+                en: 'Applications / Case Studies',
+                zh: '应用案例',
               },
-              localized: true,
-            },
-            {
-              name: 'heroSubtitle',
-              type: 'textarea',
-              label: {
-                en: 'Hero Subtitle',
-                zh: '顶部副标题',
+              admin: {
+                condition: (data) => data.waterfallImageMode === 'randomFromCases',
+                description: {
+                  en: 'Select cases to randomly pick 5 images from',
+                  zh: '选择案例，将从中随机获取5张图片',
+                },
               },
-              localized: true,
-            },
+            }
           ],
         },
       ],

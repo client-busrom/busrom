@@ -426,6 +426,7 @@ export const CustomNav: React.FC = () => {
           <NavItem href="/admin/globals/site-config" labelKey="siteConfigItem" />
           <NavItem href="/admin/globals/contact-popup" labelKey="contactPopup" />
           <NavItem href="/admin/globals/preloader-config" labelKey="preloaderConfig" />
+          <NavItem href="/admin/globals/waterfall-config" labelKey="waterfallConfig" />
           <NavItem href="/admin/globals/social-config" labelKey="socialConfig" />
         </CollapsibleGroup>
 

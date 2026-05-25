@@ -70,6 +70,8 @@ export const customTranslationsEn = {
       // Additional field labels for pages
       heroText: 'Hero Text',
       heroSubtitle: 'Hero Subtitle',
+      waterfallTitle: 'Waterfall Title',
+      waterfallSubtitle: 'Waterfall Subtitle',
       excerpt: 'Excerpt',
       subtitle: 'Subtitle',
       ctaText: 'CTA Text',
@@ -455,6 +457,7 @@ export const customTranslationsEn = {
       homeContent: 'Home Content',
       contactPopup: 'Contact Popup',
       preloaderConfig: 'Preloader Config',
+      waterfallConfig: 'Waterfall Config',
       socialConfig: 'Social Config',
       emailConfig: 'Email Config',
       translationConfig: 'Translation Config (Global)',
@@ -532,6 +535,8 @@ export const customTranslationsZh = {
       // Additional field labels for pages
       heroText: '顶部文字',
       heroSubtitle: '顶部副标题',
+      waterfallTitle: '瀑布流标题',
+      waterfallSubtitle: '瀑布流副标题',
       excerpt: '摘要',
       subtitle: '副标题',
       ctaText: '按钮文字',
@@ -917,6 +922,7 @@ export const customTranslationsZh = {
       homeContent: '首页内容配置',
       contactPopup: '联系弹窗',
       preloaderConfig: '加载动画配置',
+      waterfallConfig: '瀑布流配置',
       socialConfig: '社交配置',
       emailConfig: '邮件配置',
       translationConfig: '翻译配置（全局）',
