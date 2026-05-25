@@ -28,7 +28,8 @@ const PRELOADER_SHOWN_KEY = 'busrom_preloader_shown';
 
 // 判断是否为首页路径（支持所有语言前缀）
 // "/", "/en", "/zh", "/fr" 等都算首页
-function isHomePage(pathname: string): boolean {
+function isHomePage(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
   // 去掉语言前缀后判断是否为根路径
   const withoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
   return withoutLocale === '/';
@@ -47,15 +48,11 @@ let globalPreloaderShown = false;
 export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutWrapperProps) {
   const pathname = usePathname();
 
-  // 初始状态：优先从内存和 sessionStorage 恢复，彻底杜绝重复播放
+  // 初始状态：服务端渲染和客户端初始渲染必须完全一致，以防止 Hydration Mismatch
   const [loadingStage, setLoadingStage] = useState<LoadingStage>(() => {
-    // 服务端渲染时直接返回 done
-    if (typeof window === 'undefined') return preloaderConfig.enabled ? "loading" : "done";
-    // 客户端初始化时立即检查 sessionStorage
     if (!preloaderConfig.enabled) return "done";
-    if (globalPreloaderShown || sessionStorage.getItem(PRELOADER_SHOWN_KEY) === 'true') return "done";
     if (!isHomePage(pathname)) return "done";
-    return "loading";
+    return "loading"; // 首页始终以 loading 作为初始状态，客户端再通过 useEffect 快速跳转
   });
   const [isMounted, setIsMounted] = useState(false);
 
@@ -157,7 +154,7 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
       )}
 
       {/* 主内容 - 加载完成后显示 */}
-      <div style={{ visibility: (isLoading || !isMounted) ? 'hidden' : 'visible' }}>
+      <div style={{ visibility: isLoading ? 'hidden' : 'visible' }}>
         {children}
       </div>
     </SWRConfig>

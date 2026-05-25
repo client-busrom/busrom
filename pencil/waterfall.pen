@@ -1,0 +1,1033 @@
+{
+  "version": "2.11",
+  "children": [
+    {
+      "type": "frame",
+      "id": "s4QVjB",
+      "x": -206,
+      "y": -227,
+      "name": "Desktop",
+      "clip": true,
+      "width": 1920,
+      "height": 968,
+      "fill": "#ffffffff",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1
+      },
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "i1i9w",
+          "x": 0,
+          "y": 46,
+          "name": "Box",
+          "clip": true,
+          "width": 1920,
+          "height": 500,
+          "fill": "#f6f4edff",
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "JZwsr",
+              "x": 448,
+              "y": 0,
+              "name": "Image Animation Area",
+              "width": 1024,
+              "height": 500,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "zddwD",
+                  "x": 259,
+                  "y": 85,
+                  "name": "Layer1",
+                  "clip": true,
+                  "width": 236,
+                  "height": 157,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "V5cyW6",
+                  "x": 227,
+                  "y": 259,
+                  "name": "Layer2",
+                  "clip": true,
+                  "width": 228,
+                  "height": 150,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "OnMg3",
+                  "x": 561,
+                  "y": 51,
+                  "name": "Layer3",
+                  "clip": true,
+                  "width": 216,
+                  "height": 260,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "tzdiY",
+                  "x": 466,
+                  "y": 290,
+                  "name": "Layer4",
+                  "clip": true,
+                  "width": 212,
+                  "height": 142,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "RgNPy",
+                  "x": 360,
+                  "y": 163,
+                  "name": "Layer5",
+                  "clip": true,
+                  "width": 243,
+                  "height": 155,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 4
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000040",
+                    "offset": {
+                      "x": 0,
+                      "y": 25
+                    },
+                    "blur": 43.75,
+                    "spread": -12
+                  },
+                  "layout": "none"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "CCNaI",
+              "x": 448,
+              "y": 161,
+              "name": "Text Animation Area",
+              "enabled": false,
+              "width": 1024,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Q2iOaZ",
+                  "name": "Heading 1",
+                  "width": "fill_container",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "layout": "vertical",
+                  "gap": 24,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "soqVU",
+                      "name": "Elevating Commercial Spaces",
+                      "fill": "#756f3fff",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Elevating Commercial Spaces",
+                      "lineHeight": 1.2000000476837158,
+                      "textAlign": "center",
+                      "textAlignVertical": "middle",
+                      "fontFamily": "Josefin Sans",
+                      "fontSize": 56,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "yNdpk",
+                      "name": "Subtitle Elevating Commercial Spaces Globally",
+                      "fill": "#383838ff",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Subtitle Elevating Commercial Spaces GloballySubtitle Elevating Commercial Spaces GloballySubtitle Elevating Commercial Spaces GloballySubtitle Elevating Commercial Spaces Globally",
+                      "lineHeight": 1.2000000476837158,
+                      "textAlign": "center",
+                      "textAlignVertical": "middle",
+                      "fontFamily": "Josefin Sans",
+                      "fontSize": 24,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "rUtqW",
+          "x": 0,
+          "y": 0,
+          "name": "header",
+          "fill": "#d9d9d9ff",
+          "width": 1920,
+          "height": 46,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "lExQL",
+      "x": 1754,
+      "y": -227,
+      "name": "Tablet",
+      "clip": true,
+      "width": 768,
+      "height": 1024,
+      "fill": "#ffffffff",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1
+      },
+      "layout": "none",
+      "children": [
+        {
+          "type": "rectangle",
+          "id": "GTa63",
+          "x": 0,
+          "y": 0,
+          "name": "header",
+          "fill": "#d9d9d9ff",
+          "width": 768,
+          "height": 46,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          }
+        },
+        {
+          "type": "frame",
+          "id": "MlL5e",
+          "x": 0,
+          "y": 46,
+          "name": "Box",
+          "clip": true,
+          "width": 768,
+          "height": 500,
+          "fill": "#f6f4edff",
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "E6eSJ",
+              "x": 0,
+              "y": 0,
+              "name": "Image Animation Area",
+              "width": 768,
+              "height": 500,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "tgF0l",
+                  "x": 175,
+                  "y": 131,
+                  "name": "Layer1",
+                  "clip": true,
+                  "width": 216,
+                  "height": 136,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "q3K6i0",
+                  "x": 155,
+                  "y": 296,
+                  "name": "Layer2",
+                  "clip": true,
+                  "width": 177,
+                  "height": 112,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "DL85g",
+                  "x": 407,
+                  "y": 68,
+                  "name": "Layer3",
+                  "clip": true,
+                  "width": 190,
+                  "height": 236,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "TJS4R",
+                  "x": 353,
+                  "y": 251,
+                  "name": "Layer4",
+                  "clip": true,
+                  "width": 196,
+                  "height": 124,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "lqbmH",
+                  "x": 261.10566771454705,
+                  "y": 192.85314313114299,
+                  "name": "Layer5",
+                  "rotation": -0.08173393854711027,
+                  "clip": true,
+                  "width": 206,
+                  "height": 148,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 4
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000040",
+                    "offset": {
+                      "x": 0,
+                      "y": 25
+                    },
+                    "blur": 43.75,
+                    "spread": -12
+                  },
+                  "layout": "none"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "t9uSe",
+              "x": 84,
+              "y": 188.5,
+              "name": "Text Animation Area",
+              "enabled": false,
+              "width": 600,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Sbbwm",
+                  "name": "Heading 1",
+                  "width": "fill_container",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "layout": "vertical",
+                  "gap": 24,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "w2T9rX",
+                      "name": "Elevating Commercial Spaces",
+                      "fill": "#756f3fff",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Elevating Commercial Spaces",
+                      "lineHeight": 1.2000000476837158,
+                      "textAlign": "center",
+                      "textAlignVertical": "middle",
+                      "fontFamily": "Josefin Sans",
+                      "fontSize": 36,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "iqf2m",
+                      "name": "Subtitle Elevating Commercial Spaces Globally",
+                      "fill": "#383838ff",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Subtitle Elevating Commercial Spaces GloballySubtitle Elevating Commercial Spaces GloballySubtitle Elevating Commercial Spaces GloballySubtitle Elevating Commercial Spaces Globally",
+                      "lineHeight": 1.2000000476837158,
+                      "textAlign": "center",
+                      "textAlignVertical": "middle",
+                      "fontFamily": "Josefin Sans",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "sz6Pv",
+      "x": 2562,
+      "y": -227,
+      "name": "Mobile",
+      "clip": true,
+      "width": 390,
+      "height": 884,
+      "fill": "#ffffffff",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1
+      },
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "MMGdU",
+          "x": 0,
+          "y": 46,
+          "name": "Box",
+          "clip": true,
+          "width": 390,
+          "height": 265,
+          "fill": "#f6f4edff",
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "EV2Yd",
+              "x": 0,
+              "y": 0,
+              "name": "Image Animation Area",
+              "width": 390,
+              "height": 265,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "XwHlV",
+                  "x": 74,
+                  "y": 66,
+                  "name": "Layer1",
+                  "clip": true,
+                  "width": 111,
+                  "height": 84,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "CAlBd",
+                  "x": 82,
+                  "y": 164,
+                  "name": "Layer2",
+                  "clip": true,
+                  "width": 95,
+                  "height": 65,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "xwVVv",
+                  "x": 213,
+                  "y": 36,
+                  "name": "Layer3",
+                  "clip": true,
+                  "width": 103,
+                  "height": 133,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "Avylo",
+                  "x": 185,
+                  "y": 150,
+                  "name": "Layer4",
+                  "clip": true,
+                  "width": 106,
+                  "height": 70,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 8
+                      },
+                      "blur": 8.75,
+                      "spread": -6
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#0000001a",
+                      "offset": {
+                        "x": 0,
+                        "y": 20
+                      },
+                      "blur": 21.875,
+                      "spread": -5
+                    }
+                  ],
+                  "layout": "none"
+                },
+                {
+                  "type": "frame",
+                  "id": "W9N9UU",
+                  "x": 130,
+                  "y": 96,
+                  "name": "Layer5",
+                  "clip": true,
+                  "width": 122,
+                  "height": 84,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "",
+                    "mode": "stretch"
+                  },
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 4
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#00000040",
+                    "offset": {
+                      "x": 0,
+                      "y": 25
+                    },
+                    "blur": 43.75,
+                    "spread": -12
+                  },
+                  "layout": "none"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Tnh57",
+              "x": 15,
+              "y": 58,
+              "name": "Text Animation Area",
+              "enabled": false,
+              "width": 360,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "GNZ0B",
+                  "name": "Heading 1",
+                  "width": "fill_container",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1
+                  },
+                  "layout": "vertical",
+                  "gap": 24,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "hcIAE",
+                      "name": "Elevating Commercial Spaces",
+                      "fill": "#756f3fff",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Elevating Commercial Spaces",
+                      "lineHeight": 1.2000000476837158,
+                      "textAlign": "center",
+                      "textAlignVertical": "middle",
+                      "fontFamily": "Josefin Sans",
+                      "fontSize": 24,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "rJQvi",
+                      "name": "Subtitle Elevating Commercial Spaces Globally",
+                      "fill": "#383838ff",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Subtitle Elevating Commercial Spaces GloballySubtitle Elevating Commercial Spaces GloballySubtitle Elevating Commercial Spaces GloballySubtitle Elevating Commercial Spaces Globally",
+                      "lineHeight": 1.2000000476837158,
+                      "textAlign": "center",
+                      "textAlignVertical": "middle",
+                      "fontFamily": "Josefin Sans",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "p7ewqH",
+          "x": 0,
+          "y": 0,
+          "name": "header",
+          "fill": "#d9d9d9ff",
+          "width": 390,
+          "height": 46,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -27,5 +27,9 @@ export async function TemplatePage({ locale, slug, template: initialTemplate }: 
     template: pageContent.template || initialTemplate
   }
 
-  return <TemplateSwitcher locale={locale} rawData={rawData} />
+  return (
+    <>
+      <TemplateSwitcher locale={locale} rawData={rawData} />
+    </>
+  )
 }
