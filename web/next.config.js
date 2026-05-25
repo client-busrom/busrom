@@ -251,7 +251,7 @@ const nextConfig = {
       // Styles: self + inline (Tailwind/styled-jsx 需要) + Google Fonts + Tawk.to
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tawk.to",
       // Images: self + data + blob + CDN + unpkg (Globe textures) + Iconify API
-      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://unpkg.com https://api.iconify.design http://localhost:* http://127.0.0.1:* https://www.google-analytics.com https://www.googletagmanager.com https://*.tawk.to",
+      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://unpkg.com https://api.iconify.design http://localhost:* http://127.0.0.1:* https://www.google-analytics.com https://www.googletagmanager.com https://*.tawk.to https://tawk.link https://cdn.jsdelivr.net",
       // Fonts: self + CDN + Google Fonts + Tawk.to
       "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com https://*.tawk.to",
       // Connect: self + API + CDN + Cloudflare Turnstile + jsdelivr (Three.js fonts) + WebSocket (HMR)

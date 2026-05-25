@@ -11,11 +11,11 @@ const LAYOUT_CLASSES = [
   // Layer 2
   "left-[56px] top-[336px] w-[154px] h-[103px] md:left-[133px] md:top-[521px] md:w-[262px] md:h-[174px] lg:left-[211px] lg:top-[616px] lg:w-[279px] lg:h-[186px]",
   // Layer 3
-  "left-[179px] top-[271px] w-[139.3px] h-[92.9px] md:left-[446px] md:top-[126px] md:w-[205px] md:h-[137.1px] lg:left-[673px] lg:top-[203px] lg:w-[207.9px] lg:h-[138.6px]",
+  "left-[179px] top-[271px] w-[195px] h-[130px] md:left-[446px] md:top-[126px] md:w-[287px] md:h-[192px] lg:left-[673px] lg:top-[203px] lg:w-[291px] lg:h-[194px]",
   // Layer 4
-  "left-[150px] top-[11px] w-[121.4px] h-[81.4px] md:left-[467px] md:top-[243px] md:w-[167.5px] md:h-[223.8px] lg:left-[565px] lg:top-[313px] lg:w-[197.5px] lg:h-[263.8px]",
+  "left-[150px] top-[11px] w-[170px] h-[114px] md:left-[467px] md:top-[243px] md:w-[134px] md:h-[179px] lg:left-[565px] lg:top-[313px] lg:w-[158px] lg:h-[211px]",
   // Layer 5
-  "left-[252px] top-[102px] w-[120px] h-[160px] md:left-[335px] md:top-[446px] md:w-[233.6px] md:h-[155.7px] lg:left-[644px] lg:top-[453px] lg:w-[250px] lg:h-[166.4px]",
+  "left-[252px] top-[102px] w-[96px] h-[128px] md:left-[335px] md:top-[446px] md:w-[327px] md:h-[218px] lg:left-[644px] lg:top-[453px] lg:w-[350px] lg:h-[233px]",
   // Layer 6
   "left-[19px] top-[66px] w-[176px] h-[117px] md:left-[114px] md:top-[77px] md:w-[299px] md:h-[199px] lg:left-[224px] lg:top-[154px] lg:w-[351px] lg:h-[234px]",
   // Layer 7
