@@ -192,7 +192,7 @@ export function ContactPopup({ data, isOpen, onClose, onChatClick }: ContactPopu
               </button>
 
               {/* Scrollable Content */}
-              <div className="overflow-y-auto w-full h-full">
+              <div className="overflow-y-auto w-full h-full" data-lenis-prevent>
                 <div className="px-6 pt-16 pb-8 flex flex-col gap-sm">
                   {/* Title */}
                   <h2 className="text-[32px] md:text-[40px] font-bold text-center text-[#1A1A1A] max-w-[90%] mx-auto break-words leading-[1.15]">
