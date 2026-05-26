@@ -138,7 +138,7 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
       const sIdsSet = Array.from(new Set(seriesIds));
       // Only select necessary fields for list/overview, exclude heavy contentTemplate
       const seriesSelect = 'name,slug,category,featuredImage,order,isFeatured,description';
-      let seriesUrl = `${cmsUrl}/api/product-series?locale=${locale}${fallbackParam}&limit=100&depth=2`;
+      let seriesUrl = `${cmsUrl}/api/product-series?locale=${locale}${fallbackParam}&limit=100&depth=1`;
       if (seriesSelect) {
         const fields = seriesSelect.split(',');
         fields.forEach(field => {
@@ -157,7 +157,7 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
     if (mIdsSet.length > 0 || sIdsSetForProds.length > 0) {
       // CRITICAL: Exclude heavy contentTemplate (rich text) and linkedForm for performance
       const productSelect = 'name,title,slug,sku,showImage,mainImage,series,category,attributePage,shortDescription,productAttributes';
-      let productUrl = `${cmsUrl}/api/products?locale=${locale}${fallbackParam}&limit=100&depth=2`;
+      let productUrl = `${cmsUrl}/api/products?locale=${locale}${fallbackParam}&limit=100&depth=1`;
       if (productSelect) {
         const fields = productSelect.split(',');
         fields.forEach(field => {
