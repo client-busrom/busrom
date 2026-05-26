@@ -213,7 +213,7 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
                           viewBox="0 0 391 361"
                           preserveAspectRatio="none"
                         >
-                          <path d="M300.447 0C318.599 0.000263884 333.314 14.7153 333.314 32.8672V37.1211C333.315 52.9239 346.125 65.7342 361.928 65.7344C377.731 65.7344 390.542 78.5456 390.542 94.3486V320.382C390.542 342.473 372.633 360.382 350.542 360.382H40C17.9087 360.382 0.000214435 342.473 0 320.382V40C0 17.9086 17.9086 0 40 0H300.447Z" fill="white"/>
+                          <path d="M300.447 0C318.599 0.000263884 333.314 14.7153 333.314 32.8672V37.1211C333.315 52.9239 346.125 65.7342 361.928 65.7344C377.731 65.7344 390.542 78.5456 390.542 94.3486V320.382C390.542 342.473 372.633 360.382 350.542 360.382H40C17.9087 360.382 0.000214435 342.473 0 320.382V40C0 17.9086 17.9086 0 40 0H300.447Z" fill="white" />
                         </svg>
                       </div>
                       {/* SVG clip path for card shape */}
@@ -228,7 +228,7 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
                             <path d="M300.447 0C318.599 0.000263884 333.314 14.7153 333.314 32.8672V37.1211C333.315 52.9239 346.125 65.7342 361.928 65.7344C377.731 65.7344 390.542 78.5456 390.542 94.3486V320.382C390.542 342.473 372.633 360.382 350.542 360.382H40C17.9087 360.382 0.000214435 342.473 0 320.382V40C0 17.9086 17.9086 0 40 0H300.447Z" />
                           </clipPath>
                         </defs>
-                        <path d="M300.447 0C318.599 0.000263884 333.314 14.7153 333.314 32.8672V37.1211C333.315 52.9239 346.125 65.7342 361.928 65.7344C377.731 65.7344 390.542 78.5456 390.542 94.3486V320.382C390.542 342.473 372.633 360.382 350.542 360.382H40C17.9087 360.382 0.000214435 342.473 0 320.382V40C0 17.9086 17.9086 0 40 0H300.447Z" fill="white"/>
+                        <path d="M300.447 0C318.599 0.000263884 333.314 14.7153 333.314 32.8672V37.1211C333.315 52.9239 346.125 65.7342 361.928 65.7344C377.731 65.7344 390.542 78.5456 390.542 94.3486V320.382C390.542 342.473 372.633 360.382 350.542 360.382H40C17.9087 360.382 0.000214435 342.473 0 320.382V40C0 17.9086 17.9086 0 40 0H300.447Z" fill="white" />
                       </svg>
 
                       {/* Image with clip path */}
@@ -254,18 +254,23 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
                       )}
 
                       {/* Card title */}
-                      <span
-                        className="absolute font-anaheim font-bold group-hover:font-extrabold text-black transition-all duration-300 max-md:!left-6 max-md:!top-6 max-md:!text-2xl max-md:!max-w-[60vw]"
+                      <div
+                        className="absolute font-anaheim font-bold group-hover:font-extrabold text-black transition-all duration-300 max-md:!left-6 max-md:!top-6 max-md:!text-2xl max-md:!max-w-[60vw] max-md:!max-h-[6rem] overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden pointer-events-auto cursor-grab active:cursor-grabbing whitespace-pre-wrap break-words"
+                        data-lenis-prevent
                         style={{
                           left: vw(44),
                           top: vw(31),
                           fontSize: vw(32),
                           lineHeight: vw(36),
                           maxWidth: vw(260),
+                          maxHeight: vw(76), // 3 lines (36 * 3)
+                          msOverflowStyle: 'none',
+                          scrollbarWidth: 'none',
+                          overscrollBehavior: 'contain',
                         }}
                       >
                         {item.name}
-                      </span>
+                      </div>
                     </div>
 
                     {/* Arrow button - white circle with arrow, variants driven by motion */}
@@ -273,12 +278,12 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
                     <motion.div
                       className="absolute rounded-full overflow-hidden flex items-center justify-center max-md:!w-10 max-md:!h-10 max-md:!right-4 max-md:!top-4"
                       variants={{
-                        rest: { 
+                        rest: {
                           backgroundColor: "#FFFFFF",
                           x: 10,
                           y: -5,
                         },
-                        hover: { 
+                        hover: {
                           backgroundColor: "#564E16",
                           x: [10, 20, 10],
                           y: [-5, -15, -5],
@@ -338,8 +343,8 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
           viewBox="0 0 83 82"
           fill="none"
         >
-          <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="none"/>
-          <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="#464010"/>
+          <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="none" />
+          <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="#464010" />
         </svg>
         {/* 悬停状态 - 实心圆 + 白色箭头 */}
         <svg
@@ -347,8 +352,8 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
           viewBox="0 0 83 82"
           fill="none"
         >
-          <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="#756F3F"/>
-          <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="white"/>
+          <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="#756F3F" />
+          <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="white" />
         </svg>
       </button>
 
@@ -370,8 +375,8 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
           viewBox="0 0 83 82"
           fill="none"
         >
-          <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="none"/>
-          <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="#464010"/>
+          <ellipse cx="41.5" cy="41" rx="40" ry="40" stroke="#464010" strokeWidth="2" fill="none" />
+          <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="#464010" />
         </svg>
         {/* 悬停状态 - 实心圆 + 白色箭头 */}
         <svg
@@ -379,8 +384,8 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
           viewBox="0 0 83 82"
           fill="none"
         >
-          <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="#756F3F"/>
-          <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="white"/>
+          <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="#756F3F" />
+          <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="white" />
         </svg>
       </button>
 

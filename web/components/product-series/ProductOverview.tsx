@@ -172,31 +172,54 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
             </div>
           )}
 
-          {/* Title */}
-          <h2 className="font-josefin-sans font-bold text-[#706933] text-3xl leading-tight mb-4">
-            {titleLines.map((line, index) => (
-              <span key={index}>
-                {line}
-                {index < titleLines.length - 1 && <br />}
-              </span>
-            ))}
-          </h2>
+          {/* Title & Subtitle Scrollable Wrapper - Mobile */}
+          <div
+            className="pointer-events-auto overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden flex flex-col mb-6"
+            data-lenis-prevent
+            style={{
+              maxHeight: '35vh',
+              overscrollBehavior: 'contain',
+              msOverflowStyle: 'none',
+              scrollbarWidth: 'none',
+            }}
+          >
+            {/* Title */}
+            <h2 className="font-josefin-sans font-bold text-[#706933] text-3xl leading-tight mb-2">
+              {titleLines.map((line, index) => (
+                <span key={index}>
+                  {line}
+                  {index < titleLines.length - 1 && <br />}
+                </span>
+              ))}
+            </h2>
 
-          {/* Subtitle */}
-          <h3 className="font-josefin-sans font-semibold text-black text-xl mb-6">
-            {subtitleLines.map((line, index) => (
-              <span key={index}>
-                {line}
-                {index < subtitleLines.length - 1 && <br />}
-              </span>
-            ))}
-          </h3>
+            {/* Subtitle */}
+            <h3 className="font-josefin-sans font-semibold text-black text-xl mb-2">
+              {subtitleLines.map((line, index) => (
+                <span key={index}>
+                  {line}
+                  {index < subtitleLines.length - 1 && <br />}
+                </span>
+              ))}
+            </h3>
+          </div>
 
           {/* Description */}
-          <p className="font-josefin-sans text-base leading-relaxed mb-8 max-w-xl">
-            <span className="text-[#FFAA2B] font-bold text-lg mr-1">{brandName}</span>
-            <span className="text-black whitespace-pre-line">{description}</span>
-          </p>
+          <div
+            className="pointer-events-auto overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden mb-8 max-w-xl"
+            data-lenis-prevent
+            style={{
+              maxHeight: '30vh',
+              overscrollBehavior: 'contain',
+              msOverflowStyle: 'none',
+              scrollbarWidth: 'none',
+            }}
+          >
+            <p className="font-josefin-sans text-base leading-relaxed break-words">
+              <span className="text-[#FFAA2B] font-bold text-lg mr-1">{brandName}</span>
+              <span className="text-black whitespace-pre-line">{description}</span>
+            </p>
+          </div>
 
           {/* CTA Button - Mobile */}
           {ctaButton && (
@@ -216,185 +239,233 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
         className={cn("hidden lg:block relative w-full bg-[#F6F4ED] overflow-hidden", className)}
         style={{ aspectRatio: `${DESIGN_WIDTH} / ${DESIGN_HEIGHT}` }}
       >
-      {/* Decorative background circle - bouncing animation */}
-      <div
-        className="absolute rounded-full bg-[#F7F1DB]"
-        style={{
-          left: `${(544 / DESIGN_WIDTH) * 100}%`,
-          top: `${(312 / DESIGN_HEIGHT) * 100}%`,
-          width: `${(177 / DESIGN_WIDTH) * 100}vw`,
-          height: `${(177 / DESIGN_WIDTH) * 100}vw`,
-          animation: 'bounceAround 20s linear infinite',
-        }}
-      />
-
-      {/* Left Content - using absolute positioning for each element */}
-      {/* Main Title (96px, olive green) - y:134 relative to section */}
-      <h2
-        className="absolute font-josefin-sans font-bold text-[#706933]"
-        style={{
-          left: `${(180 / DESIGN_WIDTH) * 100}%`,
-          top: `${(134 / DESIGN_HEIGHT) * 100}%`,
-          fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
-          lineHeight: `${101 / 96}`,
-        }}
-      >
-        {titleLines.map((line, index) => (
-          <span key={index}>
-            {line}
-            {index < titleLines.length - 1 && <br />}
-          </span>
-        ))}
-      </h2>
-
-      {/* Subtitle (48px, black) - y:349 relative to section */}
-      <h3
-        className="absolute font-josefin-sans font-semibold text-black"
-        style={{
-          left: `${(180 / DESIGN_WIDTH) * 100}%`,
-          top: `${(349 / DESIGN_HEIGHT) * 100}%`,
-          fontSize: `${(48 / DESIGN_WIDTH) * 100}vw`,
-          lineHeight: `${57 / 48}`,
-        }}
-      >
-        {subtitleLines.map((line, index) => (
-          <span key={index}>
-            {line}
-            {index < subtitleLines.length - 1 && <br />}
-          </span>
-        ))}
-      </h3>
-
-      {/* Description - y:526 relative to section */}
-      <div
-        className="absolute"
-        style={{
-          left: `${(180 / DESIGN_WIDTH) * 100}%`,
-          top: `${(526 / DESIGN_HEIGHT) * 100}%`,
-          width: `${(581 / DESIGN_WIDTH) * 100}vw`,
-          maxWidth: '581px',
-          minWidth: '460px',
-        }}
-      >
-        <p
-          className="font-josefin-sans"
+        {/* Decorative background circle - bouncing animation */}
+        <div
+          className="absolute rounded-full bg-[#F7F1DB]"
           style={{
-            lineHeight: `${32 / 24}`,
+            left: `${(544 / DESIGN_WIDTH) * 100}%`,
+            top: `${(312 / DESIGN_HEIGHT) * 100}%`,
+            width: `${(177 / DESIGN_WIDTH) * 100}vw`,
+            height: `${(177 / DESIGN_WIDTH) * 100}vw`,
+            animation: 'bounceAround 20s linear infinite',
+          }}
+        />
+
+        {/* Left Content - using absolute positioning for each element */}
+        {/* Title & Subtitle Scrollable Wrapper - Desktop */}
+        <div
+          className="absolute pointer-events-auto overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden flex flex-col"
+          data-lenis-prevent
+          style={{
+            left: `${(180 / DESIGN_WIDTH) * 100}%`,
+            top: `${(134 / DESIGN_HEIGHT) * 100}%`,
+            maxHeight: `${(370 / DESIGN_WIDTH) * 100}vw`,
+            overscrollBehavior: 'contain',
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
           }}
         >
-          <span
-            className="text-[#FFAA2B] font-bold mr-2"
+          {/* Main Title (96px, olive green) */}
+          <h2
+            className="font-josefin-sans font-bold text-[#706933] break-words"
             style={{
-              fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
-              lineHeight: `${32 / 32}`,
+              fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
+              lineHeight: `${101 / 96}`,
+              marginBottom: `${(13 / DESIGN_WIDTH) * 100}vw`,
+              maxWidth: `${(900 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
-            {brandName}
-          </span>
-          <span
-            className="text-black font-normal whitespace-pre-line"
+            {titleLines.map((line, index) => (
+              <span key={index}>
+                {line}
+                {index < titleLines.length - 1 && <br />}
+              </span>
+            ))}
+          </h2>
+
+          {/* Subtitle (48px, black) */}
+          <h3
+            className="font-josefin-sans font-semibold text-black break-words"
             style={{
-              fontSize: `${(24 / DESIGN_WIDTH) * 100}vw`,
+              fontSize: `${(48 / DESIGN_WIDTH) * 100}vw`,
+              lineHeight: `${57 / 48}`,
+              maxWidth: `${(900 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
-            {description}
-          </span>
-        </p>
-      </div>
+            {subtitleLines.map((line, index) => (
+              <span key={index}>
+                {line}
+                {index < subtitleLines.length - 1 && <br />}
+              </span>
+            ))}
+          </h3>
+        </div>
 
-      {/* Right Side - Stacked Images with Framer Motion Spring Repulsion Engine */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none">
-        {/* All images - each tracks its own position and animates between positions */}
-        {images.slice(0, 5).map((img, imageIndex) => {
-          if (!img) return null
+        {/* Description - y:526 relative to section */}
+        <div
+          className="absolute pointer-events-auto overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
+          data-lenis-prevent
+          style={{
+            left: `${(180 / DESIGN_WIDTH) * 100}%`,
+            top: `${(526 / DESIGN_HEIGHT) * 100}%`,
+            width: `${(581 / DESIGN_WIDTH) * 100}vw`,
+            maxWidth: `${(581 / DESIGN_WIDTH) * 100}vw`,
+            minWidth: `${(460 / DESIGN_WIDTH) * 100}vw`,
+            maxHeight: `${(320 / DESIGN_WIDTH) * 100}vw`,
+            overscrollBehavior: 'contain',
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+          }}
+        >
+          <p
+            className="font-josefin-sans break-words"
+            style={{
+              lineHeight: `${32 / 24}`,
+            }}
+          >
+            <span
+              className="text-[#FFAA2B] font-bold mr-2"
+              style={{
+                fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
+                lineHeight: `${32 / 32}`,
+              }}
+            >
+              {brandName}
+            </span>
+            <span
+              className="text-black font-normal whitespace-pre-line"
+              style={{
+                fontSize: `${(24 / DESIGN_WIDTH) * 100}vw`,
+              }}
+            >
+              {description}
+            </span>
+          </p>
+        </div>
 
-          // Find which position this image is currently at
-          const positionIndex = positions.indexOf(imageIndex)
-          if (positionIndex === -1) return null
+        {/* Right Side - Stacked Images with Framer Motion Spring Repulsion Engine */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none">
+          {/* All images - each tracks its own position and animates between positions */}
+          {images.slice(0, 5).map((img, imageIndex) => {
+            if (!img) return null
 
-          const isMain = positionIndex === 0
-          const pos = getPositionStyle(positionIndex)
-          const isHovered = hoveredIndex === positionIndex
+            // Find which position this image is currently at
+            const positionIndex = positions.indexOf(imageIndex)
+            if (positionIndex === -1) return null
 
-          // 计算 Framer Motion 的动态推开与位置飞行双重动效属性 (animate)
-          const animateProps: {
-            left: string
-            top: string
-            width: string
-            height: string
-            x: string
-            y: string
-            scale: number
-            rotate: number
-            zIndex: number
-            opacity: number
-          } = {
-            left: `${(pos.x / DESIGN_WIDTH) * 100}%`,
-            top: `${(pos.y / DESIGN_HEIGHT) * 100}%`,
-            width: `${(pos.w / DESIGN_WIDTH) * 100}vw`,
-            height: `${(pos.h / DESIGN_WIDTH) * 100}vw`,
-            x: "0vw",
-            y: "0vw",
-            scale: 1,
-            rotate: 0,
-            zIndex: pos.zIndex,
-            opacity: pos.opacity || 1,
-          }
+            const isMain = positionIndex === 0
+            const pos = getPositionStyle(positionIndex)
+            const isHovered = hoveredIndex === positionIndex
 
-          if (hoveredIndex !== null) {
-            if (isHovered) {
-              // 当前正在悬浮的卡片：放大浮出，置于顶层预览
-              animateProps.scale = 1.08
-              animateProps.zIndex = 30
-              animateProps.opacity = 1
-            } else if (isMain) {
-              // 主卡片：极其丝滑地向左上方避让推开
-              animateProps.x = "-8vw"
-              animateProps.y = "-4vw"
-              animateProps.scale = 0.95
-              animateProps.rotate = -3
-              animateProps.opacity = 0.9
-            } else {
-              // 其他背景卡片：根据各自位置向外侧水波纹散开
-              if (positionIndex === 1) {
-                // bg[0] (layer2) -> 向左下方推开
-                animateProps.x = "-4vw"
-                animateProps.y = "4vw"
-                animateProps.rotate = -2
-              } else if (positionIndex === 2) {
-                // bg[1] (layer3) -> 向右上方推开
-                animateProps.x = "5vw"
-                animateProps.y = "-3vw"
-                animateProps.rotate = 3
-              } else if (positionIndex === 3) {
-                // bg[2] (layer4) -> 向左上方推开
-                animateProps.x = "-5vw"
-                animateProps.y = "-5vw"
-                animateProps.rotate = -4
-              } else if (positionIndex === 4) {
-                // bg[3] (layer5) -> 向右侧推开
-                animateProps.x = "6vw"
-                animateProps.y = "2vw"
-                animateProps.rotate = 4
+            // 计算 Framer Motion 的动态推开与位置飞行双重动效属性 (animate)
+            const animateProps: {
+              left: string
+              top: string
+              width: string
+              height: string
+              x: string
+              y: string
+              scale: number
+              rotate: number
+              zIndex: number
+              opacity: number
+            } = {
+              left: `${(pos.x / DESIGN_WIDTH) * 100}%`,
+              top: `${(pos.y / DESIGN_HEIGHT) * 100}%`,
+              width: `${(pos.w / DESIGN_WIDTH) * 100}vw`,
+              height: `${(pos.h / DESIGN_WIDTH) * 100}vw`,
+              x: "0vw",
+              y: "0vw",
+              scale: 1,
+              rotate: 0,
+              zIndex: pos.zIndex,
+              opacity: pos.opacity || 1,
+            }
+
+            if (hoveredIndex !== null) {
+              if (isHovered) {
+                // 当前正在悬浮的卡片：放大浮出，置于顶层预览
+                animateProps.scale = 1.08
+                animateProps.zIndex = 30
+                animateProps.opacity = 1
+              } else if (isMain) {
+                // 主卡片：极其丝滑地向左上方避让推开
+                animateProps.x = "-8vw"
+                animateProps.y = "-4vw"
+                animateProps.scale = 0.95
+                animateProps.rotate = -3
+                animateProps.opacity = 0.9
+              } else {
+                // 其他背景卡片：根据各自位置向外侧水波纹散开
+                if (positionIndex === 1) {
+                  // bg[0] (layer2) -> 向左下方推开
+                  animateProps.x = "-4vw"
+                  animateProps.y = "4vw"
+                  animateProps.rotate = -2
+                } else if (positionIndex === 2) {
+                  // bg[1] (layer3) -> 向右上方推开
+                  animateProps.x = "5vw"
+                  animateProps.y = "-3vw"
+                  animateProps.rotate = 3
+                } else if (positionIndex === 3) {
+                  // bg[2] (layer4) -> 向左上方推开
+                  animateProps.x = "-5vw"
+                  animateProps.y = "-5vw"
+                  animateProps.rotate = -4
+                } else if (positionIndex === 4) {
+                  // bg[3] (layer5) -> 向右侧推开
+                  animateProps.x = "6vw"
+                  animateProps.y = "2vw"
+                  animateProps.rotate = 4
+                }
               }
             }
-          }
 
-          const springTransition = { type: "spring", stiffness: 120, damping: 15, mass: 1 } as const
+            const springTransition = { type: "spring", stiffness: 120, damping: 15, mass: 1 } as const
 
-          if (isMain) {
-            // Render as main card with white background and inner circle image
+            if (isMain) {
+              // Render as main card with white background and inner circle image
+              return (
+                <motion.div
+                  key={`img-${imageIndex}`}
+                  className="absolute bg-white rounded-[30px] shadow-2xl pointer-events-auto flex items-center justify-center overflow-hidden cursor-pointer"
+                  style={{ boxShadow: '0 4px 60px rgba(0, 0, 0, 0.25)' }}
+                  animate={animateProps}
+                  transition={springTransition}
+                  onHoverStart={() => setHoveredIndex(0)}
+                  onHoverEnd={() => setHoveredIndex(null)}
+                >
+                  <motion.div
+                    className="relative rounded-[20px] overflow-hidden"
+                    animate={{
+                      width: `${(pos.innerW / DESIGN_WIDTH) * 100}vw`,
+                      height: `${(pos.innerH / DESIGN_WIDTH) * 100}vw`,
+                    }}
+                    transition={springTransition}
+                  >
+                    <OptimizedImage
+                      image={img}
+                      alt=""
+                      size="medium"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </motion.div>
+                </motion.div>
+              )
+            }
+
+            // Render as background image card with white background and inner circle image
             return (
               <motion.div
                 key={`img-${imageIndex}`}
-                className="absolute bg-white rounded-[30px] shadow-2xl pointer-events-auto flex items-center justify-center overflow-hidden cursor-pointer"
-                style={{ boxShadow: '0 4px 60px rgba(0, 0, 0, 0.25)' }}
+                className="absolute bg-white/90 rounded-[30px] cursor-pointer pointer-events-auto flex items-center justify-center shadow-lg overflow-hidden"
                 animate={animateProps}
                 transition={springTransition}
-                onHoverStart={() => setHoveredIndex(0)}
+                onHoverStart={() => setHoveredIndex(positionIndex)}
                 onHoverEnd={() => setHoveredIndex(null)}
+                onClick={() => handleImageClick(positionIndex)}
               >
-                <motion.div 
+                <motion.div
                   className="relative rounded-[20px] overflow-hidden"
                   animate={{
                     width: `${(pos.innerW / DESIGN_WIDTH) * 100}vw`,
@@ -405,132 +476,102 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
                   <OptimizedImage
                     image={img}
                     alt=""
-                    size="medium"
+                    size="small"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 </motion.div>
               </motion.div>
             )
-          }
+          })}
+        </div>
 
-          // Render as background image card with white background and inner circle image
+        {/* CTA Button - Get A Solution */}
+        {ctaButton && (() => {
+          const circleSize = (70 / DESIGN_WIDTH) * 100
+          const dotSize = (12 / DESIGN_WIDTH) * 100
+          const fontSize = (24 / DESIGN_WIDTH) * 100
+          const dotGap = (8 / DESIGN_WIDTH) * 100 // 文字距离黄点的间距
+          // 文字起始位置 = 圆心位置 + 黄点半径 + 间距 = circleSize/2 + dotSize/2 + dotGap
+          const textMarginLeft = circleSize / 2 + dotSize / 2 + dotGap
+
           return (
-            <motion.div
-              key={`img-${imageIndex}`}
-              className="absolute bg-white/90 rounded-[30px] cursor-pointer pointer-events-auto flex items-center justify-center shadow-lg overflow-hidden"
-              animate={animateProps}
-              transition={springTransition}
-              onHoverStart={() => setHoveredIndex(positionIndex)}
-              onHoverEnd={() => setHoveredIndex(null)}
-              onClick={() => handleImageClick(positionIndex)}
-            >
-              <motion.div 
-                className="relative rounded-[20px] overflow-hidden"
-                animate={{
-                  width: `${(pos.innerW / DESIGN_WIDTH) * 100}vw`,
-                  height: `${(pos.innerH / DESIGN_WIDTH) * 100}vw`,
-                }}
-                transition={springTransition}
-              >
-                <OptimizedImage
-                  image={img}
-                  alt=""
-                  size="small"
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </motion.div>
-            </motion.div>
-          )
-        })}
-      </div>
-
-      {/* CTA Button - Get A Solution */}
-      {ctaButton && (() => {
-        const circleSize = (70 / DESIGN_WIDTH) * 100
-        const dotSize = (12 / DESIGN_WIDTH) * 100
-        const fontSize = (24 / DESIGN_WIDTH) * 100
-        const dotGap = (8 / DESIGN_WIDTH) * 100 // 文字距离黄点的间距
-        // 文字起始位置 = 圆心位置 + 黄点半径 + 间距 = circleSize/2 + dotSize/2 + dotGap
-        const textMarginLeft = circleSize / 2 + dotSize / 2 + dotGap
-
-        return (
-          <Link
-            href={ctaButton.url}
-            className="absolute flex items-center group pointer-events-auto"
-            style={{
-              left: `${(1529 / DESIGN_WIDTH) * 100}%`,
-              top: `${(120 / DESIGN_HEIGHT) * 100}%`,
-              zIndex: 20,
-            }}
-          >
-            {/* Circle border - visible in default state, hidden on hover */}
-            <div
-              className="relative border-2 border-[#756F3F] transition-all duration-500 ease-out group-hover:opacity-0"
+            <Link
+              href={ctaButton.url}
+              className="absolute flex items-center group pointer-events-auto"
               style={{
-                width: `${circleSize}vw`,
-                height: `${circleSize}vw`,
-                borderRadius: `${circleSize / 2}vw`,
+                left: `${(1529 / DESIGN_WIDTH) * 100}%`,
+                top: `${(120 / DESIGN_HEIGHT) * 100}%`,
+                zIndex: 20,
               }}
             >
-              {/* Orbit container - rotates around center */}
+              {/* Circle border - visible in default state, hidden on hover */}
               <div
-                className="absolute inset-0 flex items-center justify-center"
+                className="relative border-2 border-[#756F3F] transition-all duration-500 ease-out group-hover:opacity-0"
                 style={{
-                  animation: 'orbitSpin 4s linear infinite',
+                  width: `${circleSize}vw`,
+                  height: `${circleSize}vw`,
+                  borderRadius: `${circleSize / 2}vw`,
                 }}
               >
-                {/* Radius container - moves dot from center to edge */}
+                {/* Orbit container - rotates around center */}
                 <div
+                  className="absolute inset-0 flex items-center justify-center"
                   style={{
-                    animation: 'orbitRadius 4s ease-in-out infinite',
+                    animation: 'orbitSpin 4s linear infinite',
                   }}
                 >
-                  {/* Yellow dot */}
+                  {/* Radius container - moves dot from center to edge */}
                   <div
-                    className="rounded-full bg-[#FFCC4A]"
                     style={{
-                      width: `${dotSize}vw`,
-                      height: `${dotSize}vw`,
+                      animation: 'orbitRadius 4s ease-in-out infinite',
                     }}
-                  />
+                  >
+                    {/* Yellow dot */}
+                    <div
+                      className="rounded-full bg-[#FFCC4A]"
+                      style={{
+                        width: `${dotSize}vw`,
+                        height: `${dotSize}vw`,
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Text - positioned 8px right of the yellow dot (at center), breathing effect */}
-            <span
-              className="absolute font-anaheim font-medium text-[#756F3F] whitespace-nowrap transition-all duration-500 group-hover:opacity-0 cta-text-breathe"
-              style={{
-                fontSize: `${fontSize}vw`,
-                left: `${textMarginLeft}vw`,
-                animation: 'breathe 2s ease-in-out infinite',
-              }}
-            >
-              {ctaButton.text}
-            </span>
-
-            {/* Hover state: expanding capsule from left edge */}
-            <div
-              className="absolute left-0 top-0 border-2 border-[#756F3F] bg-[#756F3F] transition-all duration-500 ease-out pointer-events-none opacity-0 group-hover:opacity-100 flex items-center cta-capsule-breathe"
-              style={{
-                height: `${circleSize}vw`,
-                borderRadius: `${circleSize / 2}vw`,
-                paddingLeft: `${textMarginLeft}vw`,
-                paddingRight: `${circleSize / 2}vw`,
-              }}
-            >
+              {/* Text - positioned 8px right of the yellow dot (at center), breathing effect */}
               <span
-                className="font-anaheim font-medium text-white whitespace-nowrap"
+                className="absolute font-anaheim font-medium text-[#756F3F] whitespace-nowrap transition-all duration-500 group-hover:opacity-0 cta-text-breathe"
                 style={{
                   fontSize: `${fontSize}vw`,
+                  left: `${textMarginLeft}vw`,
+                  animation: 'breathe 2s ease-in-out infinite',
                 }}
               >
                 {ctaButton.text}
               </span>
-            </div>
-          </Link>
-        )
-      })()}
+
+              {/* Hover state: expanding capsule from left edge */}
+              <div
+                className="absolute left-0 top-0 border-2 border-[#756F3F] bg-[#756F3F] transition-all duration-500 ease-out pointer-events-none opacity-0 group-hover:opacity-100 flex items-center cta-capsule-breathe"
+                style={{
+                  height: `${circleSize}vw`,
+                  borderRadius: `${circleSize / 2}vw`,
+                  paddingLeft: `${textMarginLeft}vw`,
+                  paddingRight: `${circleSize / 2}vw`,
+                }}
+              >
+                <span
+                  className="font-anaheim font-medium text-white whitespace-nowrap"
+                  style={{
+                    fontSize: `${fontSize}vw`,
+                  }}
+                >
+                  {ctaButton.text}
+                </span>
+              </div>
+            </Link>
+          )
+        })()}
 
       </section>
     </>

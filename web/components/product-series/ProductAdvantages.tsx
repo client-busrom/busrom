@@ -141,6 +141,84 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
 
   const colorCfg = getSeriesColorConfig(seriesName || currentSlug)
 
+  const currentCategoryData = advantagesCategories[currentCategory] || { title: '', cards: [] }
+  const currentImage = advantagesImages[currentCategory] || ''
+
+  // Performance Optimization: Memoize the heavy Framer Motion character spans
+  // so they don't re-render and cause lag when interacting with cards (expandedCardIndex changes).
+  const desktopAnimatedTitle = React.useMemo(() => {
+    return currentCategoryData.title.split('').map((char, index) => (
+      <motion.span
+        key={index}
+        style={{ display: 'inline-block', whiteSpace: 'pre' }}
+        variants={{
+          initial: { y: 0 },
+          animate: {
+            y: [0, -12, 0],
+            transition: { duration: 0.5, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }
+          }
+        }}
+      >
+        {char}
+      </motion.span>
+    ))
+  }, [currentCategoryData.title])
+
+  const mobileAnimatedTitle = React.useMemo(() => {
+    return currentCategoryData.title.split('').map((char, index) => (
+      <motion.span
+        key={index}
+        style={{ display: 'inline-block', whiteSpace: 'pre' }}
+        variants={{
+          initial: { y: 0 },
+          animate: {
+            y: [0, -8, 0],
+            transition: { duration: 0.5, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }
+          }
+        }}
+      >
+        {char}
+      </motion.span>
+    ))
+  }, [currentCategoryData.title])
+
+  const titleRef = React.useRef<HTMLHeadingElement>(null)
+  const [dynamicTitleSize, setDynamicTitleSize] = React.useState(96)
+
+  React.useEffect(() => {
+    const el = titleRef.current
+    if (!el) return
+
+    const adjustSize = () => {
+      let size = 96
+      el.style.fontSize = `${(size / DESIGN_WIDTH) * 100}vw`
+      
+      let loopCount = 0
+      while (loopCount < 30) {
+        const fontSizePx = (size / DESIGN_WIDTH) * window.innerWidth
+        const lineHeightPx = fontSizePx * (101 / 96)
+        
+        // If actual height exceeds ~3.2 times the current line height,
+        // it means the text has wrapped to 4 or more lines.
+        if (el.clientHeight > lineHeightPx * 3.2 && size > 24) {
+          size -= 2
+          el.style.fontSize = `${(size / DESIGN_WIDTH) * 100}vw`
+          loopCount++
+        } else {
+          break
+        }
+      }
+      setDynamicTitleSize(size)
+    }
+
+    const timer = setTimeout(adjustSize, 50)
+    window.addEventListener("resize", adjustSize)
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener("resize", adjustSize)
+    }
+  }, [advantagesTitle])
+
   // Drag and Wheel Scroll Refs
   const listRef = React.useRef<HTMLDivElement>(null)
   const isDragging = React.useRef(false)
@@ -172,9 +250,6 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
     isDragging.current = false
   }
 
-  const currentCategoryData = advantagesCategories[currentCategory] || { title: '', cards: [] }
-  const currentImage = advantagesImages[currentCategory] || ''
-
   const goToPrevCategory = () => {
     setCurrentCategory((prev) => (prev > 0 ? prev - 1 : advantagesCategories.length - 1))
     setExpandedCardIndex(0)
@@ -203,12 +278,13 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
 
           {/* Advantages Title (behind image) */}
           <motion.h3
-            className="absolute font-josefin-sans font-bold"
+            ref={titleRef}
+            className="absolute font-josefin-sans font-bold break-words whitespace-pre-wrap"
             style={{
               left: `${(153 / DESIGN_WIDTH) * 100}%`,
               top: `${(221 / DESIGN_HEIGHT) * 100}%`,
               width: `${(717 / DESIGN_WIDTH) * 100}%`,
-              fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
+              fontSize: `${(dynamicTitleSize / DESIGN_WIDTH) * 100}vw`,
               lineHeight: `${101 / 96}`,
               color: colorCfg.dark,
               willChange: "transform",
@@ -245,12 +321,12 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
               <OptimizedImage image={currentImage} alt="" size="medium" className="absolute inset-0 w-full h-full object-cover" />
               {/* White title overlay on image */}
               <div
-                className="absolute font-josefin-sans font-bold text-white pointer-events-none"
+                className="absolute font-josefin-sans font-bold text-white pointer-events-none break-words whitespace-pre-wrap"
                 style={{
                   left: `${((153 - 468) / 518) * 100}%`,
                   top: `${((221 - 150) / 605) * 100}%`,
                   width: `${(717 / 518) * 100}%`,
-                  fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
+                  fontSize: `${(dynamicTitleSize / DESIGN_WIDTH) * 100}vw`,
                   lineHeight: `${101 / 96}`,
                   WebkitBackfaceVisibility: "hidden",
                   backfaceVisibility: "hidden",
@@ -287,15 +363,15 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
                     viewBox="0 0 148 61"
                     fill="none"
                   >
-                    <path d="M43.6943 28.2695H126.695V32.7559H43.6943V37.2422L21.2627 30.5127L43.6943 23.7832V28.2695Z" fill={colorCfg.dark}/>
-                    <rect x="1" y="1" width="146" height="59" rx="29.5" stroke={colorCfg.dark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6"/>
+                    <path d="M43.6943 28.2695H126.695V32.7559H43.6943V37.2422L21.2627 30.5127L43.6943 23.7832V28.2695Z" fill={colorCfg.dark} />
+                    <rect x="1" y="1" width="146" height="59" rx="29.5" stroke={colorCfg.dark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6" />
                   </svg>
                   <svg
                     className="absolute inset-0 w-full h-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
                     viewBox="0 0 146 58"
                     fill="none"
                   >
-                    <path d="M29 0C12.9837 1.35295e-06 0 12.9837 0 29C0 45.0163 12.9837 58 29 58H117C133.016 58 146 45.0163 146 29C146 12.9837 133.016 1.77172e-07 117 0H29ZM42.422 27.2812H125.423V31.7676H42.422V36.2539L19.99 29.5244L42.422 22.7949V27.2812Z" fill={colorCfg.dark}/>
+                    <path d="M29 0C12.9837 1.35295e-06 0 12.9837 0 29C0 45.0163 12.9837 58 29 58H117C133.016 58 146 45.0163 146 29C146 12.9837 133.016 1.77172e-07 117 0H29ZM42.422 27.2812H125.423V31.7676H42.422V36.2539L19.99 29.5244L42.422 22.7949V27.2812Z" fill={colorCfg.dark} />
                   </svg>
                 </button>
 
@@ -314,15 +390,15 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
                     viewBox="0 0 148 61"
                     fill="none"
                   >
-                    <path d="M104.306 28.2695H21.3047V32.7559H104.306V37.2422L126.737 30.5127L104.306 23.7832V28.2695Z" fill={colorCfg.dark}/>
-                    <rect x="1" y="1" width="146" height="59" rx="29.5" stroke={colorCfg.dark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6"/>
+                    <path d="M104.306 28.2695H21.3047V32.7559H104.306V37.2422L126.737 30.5127L104.306 23.7832V28.2695Z" fill={colorCfg.dark} />
+                    <rect x="1" y="1" width="146" height="59" rx="29.5" stroke={colorCfg.dark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6" />
                   </svg>
                   <svg
                     className="absolute inset-0 w-full h-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
                     viewBox="0 0 146 58"
                     fill="none"
                   >
-                    <path d="M117 0C133.016 1.35295e-06 146 12.9837 146 29C146 45.0163 133.016 58 117 58H29C12.9837 58 0 45.0163 0 29C0 12.9837 12.9837 1.77172e-07 29 0H117ZM103.578 27.2812H20.5771V31.7676H103.578V36.2539L126.01 29.5244L103.578 22.7949V27.2812Z" fill={colorCfg.dark}/>
+                    <path d="M117 0C133.016 1.35295e-06 146 12.9837 146 29C146 45.0163 133.016 58 117 58H29C12.9837 58 0 45.0163 0 29C0 12.9837 12.9837 1.77172e-07 29 0H117ZM103.578 27.2812H20.5771V31.7676H103.578V36.2539L126.01 29.5244L103.578 22.7949V27.2812Z" fill={colorCfg.dark} />
                   </svg>
                 </button>
               </>
@@ -339,17 +415,30 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
               height: `${(650 / DESIGN_HEIGHT) * 100}%`,
             }}
           >
-            {/* Category Title (Elegant automatic wrapping) */}
-            <h4
-              className="font-jomhuria font-bold break-words mb-6 animate-pulse-scale"
-              style={{
-                fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
-                lineHeight: 0.95,
-                color: colorCfg.dark,
-              }}
+            {/* Category Title (Elegant horizontal scroll with jumping characters) */}
+            <div
+              className="w-full overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden pointer-events-auto cursor-grab active:cursor-grabbing mb-6 px-2"
+              data-lenis-prevent
+              style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
             >
-              {currentCategoryData.title}
-            </h4>
+              <motion.h4
+                key={currentCategoryData.title}
+                className="font-jomhuria font-bold whitespace-nowrap px-4 w-max"
+                style={{
+                  fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
+                  lineHeight: 0.95,
+                  color: colorCfg.dark,
+                  paddingBottom: '0.1em',
+                }}
+                initial="initial"
+                animate="animate"
+                variants={{
+                  animate: { transition: { staggerChildren: 0.05 } }
+                }}
+              >
+                {desktopAnimatedTitle}
+              </motion.h4>
+            </div>
 
             {/* Scrollable Cards List Container (Supports Wheel & Drag Scroll, absolutely hidden scrollbar to prevent transition flash) */}
             <div
@@ -358,6 +447,7 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
               style={{
                 msOverflowStyle: 'none',
                 scrollbarWidth: 'none',
+                overscrollBehavior: 'contain',
               }}
               onWheel={handleWheel}
               onMouseDown={handleMouseDown}
@@ -403,7 +493,7 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
                         }}
                       >
                         <svg className="w-full h-full" viewBox="0 0 32 32" fill="none">
-                          <path d="M32 16C32 7.16344 24.8366 3.13124e-07 16 6.99382e-07C7.16344 1.08564e-06 -1.08564e-06 7.16345 -6.99382e-07 16C-3.13124e-07 24.8366 7.16344 32 16 32C24.8366 32 32 24.8366 32 16ZM21.4863 19L16.2041 13.75L10.9229 19L10 18.1055L16.2041 11.8613L22.4082 18.1055L21.4863 19Z" fill={colorCfg.dark}/>
+                          <path d="M32 16C32 7.16344 24.8366 3.13124e-07 16 6.99382e-07C7.16344 1.08564e-06 -1.08564e-06 7.16345 -6.99382e-07 16C-3.13124e-07 24.8366 7.16344 32 16 32C24.8366 32 32 24.8366 32 16ZM21.4863 19L16.2041 13.75L10.9229 19L10 18.1055L16.2041 11.8613L22.4082 18.1055L21.4863 19Z" fill={colorCfg.dark} />
                         </svg>
                       </div>
                     </div>
@@ -429,8 +519,8 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
       </div>
 
       {/* ===== MOBILE LAYOUT (below lg, premium flowing flex layout) ===== */}
-      <div 
-        className="block lg:hidden w-full relative overflow-hidden py-12 px-4" 
+      <div
+        className="block lg:hidden w-full relative overflow-hidden py-12 px-4"
         style={{ background: `linear-gradient(180deg, ${colorCfg.rgba} 0%, ${colorCfg.rgbaTransparent} 100%)` }}
       >
         {/* Mobile Main Title */}
@@ -451,7 +541,7 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
         )}
 
         {/* Mobile Category Navigation Bar */}
-        <div 
+        <div
           className="w-full max-w-xl mx-auto my-8 border-2 rounded-[2rem] p-2 flex items-center justify-between gap-3 shadow-lg"
           style={{ borderColor: colorCfg.dark, backgroundColor: colorCfg.lightBg }}
         >
@@ -462,13 +552,27 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
             aria-label="Previous Category"
           >
             <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m15 18-6-6 6-6"/>
+              <path d="m15 18-6-6 6-6" />
             </svg>
           </button>
 
-          <h4 className="font-jomhuria text-4xl sm:text-5xl font-bold text-black px-2 py-1 select-none flex-1 text-center leading-none break-words">
-            {currentCategoryData.title}
-          </h4>
+          <div
+            className="flex-1 overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden pointer-events-auto mx-2"
+            data-lenis-prevent
+            style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+          >
+            <motion.h4 
+              key={currentCategoryData.title}
+              className="font-jomhuria text-4xl sm:text-5xl font-bold text-black py-1 select-none text-center leading-none whitespace-nowrap w-max mx-auto px-4"
+              initial="initial"
+              animate="animate"
+              variants={{
+                animate: { transition: { staggerChildren: 0.05 } }
+              }}
+            >
+              {mobileAnimatedTitle}
+            </motion.h4>
+          </div>
 
           <button
             className="w-12 h-12 rounded-full text-white flex items-center justify-center active:scale-95 transition-all shadow-md flex-shrink-0"
@@ -477,7 +581,7 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
             aria-label="Next Category"
           >
             <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m9 18 6-6-6-6"/>
+              <path d="m9 18 6-6-6-6" />
             </svg>
           </button>
         </div>
@@ -511,7 +615,7 @@ export function ProductAdvantages({ data, seriesName, currentSlug, className }: 
                     style={{ backgroundColor: colorCfg.dark }}
                   >
                     <svg className="w-5 h-5" viewBox="0 0 32 32" fill="none">
-                      <path d="M21.4863 19L16.2041 13.75L10.9229 19L10 18.1055L16.2041 11.8613L22.4082 18.1055L21.4863 19Z" fill="white"/>
+                      <path d="M21.4863 19L16.2041 13.75L10.9229 19L10 18.1055L16.2041 11.8613L22.4082 18.1055L21.4863 19Z" fill="white" />
                     </svg>
                   </div>
                 </div>

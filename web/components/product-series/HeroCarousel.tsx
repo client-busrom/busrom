@@ -263,30 +263,41 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
       <div className="relative z-10 h-full w-full hidden lg:block">
         {/* Title Section (centered) */}
         <div
-          className="absolute left-0 right-0 text-center z-30 pointer-events-none"
+          className="absolute left-0 right-0 flex justify-center z-30 pointer-events-none px-4"
           style={{
             top: `${(139 / DESIGN_HEIGHT) * 100}%`,
           }}
         >
-          {currentData.title.map((line, lineIndex) => (
-            <h1
-              key={lineIndex}
-              className={cn(
-                "font-josefin-sans text-white",
-                lineIndex === 0
-                  ? "font-medium"
-                  : "font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent"
-              )}
-              style={{
-                fontSize: lineIndex === 0
-                  ? `${(84 / DESIGN_WIDTH) * 100}vw`
-                  : `${(96 / DESIGN_WIDTH) * 100}vw`,
-                lineHeight: 1,
-              }}
-            >
-              {line}
-            </h1>
-          ))}
+          <div
+            className="pointer-events-auto overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden text-center"
+            data-lenis-prevent
+            style={{
+              maxHeight: `${(270 / DESIGN_WIDTH) * 100}vw`,
+              overscrollBehavior: 'contain',
+              msOverflowStyle: 'none',
+              scrollbarWidth: 'none',
+            }}
+          >
+            {currentData.title.map((line, lineIndex) => (
+              <h1
+                key={lineIndex}
+                className={cn(
+                  "font-josefin-sans text-white",
+                  lineIndex === 0
+                    ? "font-medium"
+                    : "font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent"
+                )}
+                style={{
+                  fontSize: lineIndex === 0
+                    ? `${(84 / DESIGN_WIDTH) * 100}vw`
+                    : `${(96 / DESIGN_WIDTH) * 100}vw`,
+                  lineHeight: 1,
+                }}
+              >
+                {line}
+              </h1>
+            ))}
+          </div>
         </div>
 
         {/* Left Content - Description + Button (flex layout) */}
@@ -300,10 +311,15 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
           }}
         >
           <p
-            className="font-josefin-sans text-white"
+            className="font-josefin-sans text-white overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
+            data-lenis-prevent
             style={{
               fontSize: `${(36 / DESIGN_WIDTH) * 100}vw`,
               lineHeight: 1.52,
+              maxHeight: `${(220 / DESIGN_WIDTH) * 100}vw`,
+              overscrollBehavior: 'contain',
+              msOverflowStyle: 'none',
+              scrollbarWidth: 'none',
             }}
           >
             {currentData.description}
@@ -406,8 +422,8 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
                       transform: dragStartX !== null ? `translateX(${dragOffset * 0.5}px)` : "translateX(0px)",
                       // 当卡片处于视口外入场位 [4] 或被隐藏重置时，取消 transition 实现无缝瞬移归位
                       // 保留 all 0.6s 确保位置与 z-index 完美过渡，同时单点覆盖 opacity 0s 实现 0ms 瞬间显示托底！
-                      transition: (dragStartX !== null || queuePos === 4 || isHidden) 
-                        ? "none" 
+                      transition: (dragStartX !== null || queuePos === 4 || isHidden)
+                        ? "none"
                         : "all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0s",
                     }}
                     onClick={(e) => {
@@ -456,8 +472,8 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
             viewBox="0 0 83 82"
             fill="none"
           >
-            <path d="M41.5 0.5C18.8506 0.5 0.5 18.6382 0.5 41C0.5 63.3618 18.8506 81.5 41.5 81.5C64.1494 81.5 82.5 63.3618 82.5 41C82.5 18.6382 64.1494 0.5 41.5 0.5Z" stroke="white"/>
-            <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="white"/>
+            <path d="M41.5 0.5C18.8506 0.5 0.5 18.6382 0.5 41C0.5 63.3618 18.8506 81.5 41.5 81.5C64.1494 81.5 82.5 63.3618 82.5 41C82.5 18.6382 64.1494 0.5 41.5 0.5Z" stroke="white" />
+            <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="white" />
           </svg>
           {/* Hover state - filled circle with left arrow */}
           <svg
@@ -465,8 +481,8 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
             viewBox="0 0 83 82"
             fill="none"
           >
-            <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="white"/>
-            <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="black"/>
+            <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="white" />
+            <path d="M50.9281 27.5226L48.6081 25.1592L32.4131 41.057L48.608 56.9547L50.9281 54.5914L37.3117 41.057L50.9281 27.5226Z" fill="black" />
           </svg>
         </button>
 
@@ -487,8 +503,8 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
             viewBox="0 0 83 82"
             fill="none"
           >
-            <path d="M41.5 0.5C64.1494 0.5 82.5 18.6382 82.5 41C82.5 63.3618 64.1494 81.5 41.5 81.5C18.8506 81.5 0.5 63.3618 0.5 41C0.5 18.6382 18.8506 0.5 41.5 0.5Z" stroke="white"/>
-            <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="white"/>
+            <path d="M41.5 0.5C64.1494 0.5 82.5 18.6382 82.5 41C82.5 63.3618 64.1494 81.5 41.5 81.5C18.8506 81.5 0.5 63.3618 0.5 41C0.5 18.6382 18.8506 0.5 41.5 0.5Z" stroke="white" />
+            <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="white" />
           </svg>
           {/* Hover state - filled circle with right arrow */}
           <svg
@@ -496,8 +512,8 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
             viewBox="0 0 83 82"
             fill="none"
           >
-            <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="white"/>
-            <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="black"/>
+            <ellipse cx="41.5" cy="41" rx="41.5" ry="41" fill="white" />
+            <path d="M32.0719 27.5226L34.3919 25.1592L50.5869 41.057L34.392 56.9547L32.0719 54.5914L45.6883 41.057L32.0719 27.5226Z" fill="black" />
           </svg>
         </button>
 
@@ -543,7 +559,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
         </div>
 
         {/* 中央大图展示区 (支持原生手势左右滑动切换) */}
-        <div 
+        <div
           className="w-full aspect-[16/9] sm:aspect-[16/9] rounded-2xl overflow-hidden shadow-2xl relative mb-3 bg-gray-800/50 border border-white/10"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
@@ -604,7 +620,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
             aria-label="Previous slide"
           >
             <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-              <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+              <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
             </svg>
           </button>
 
@@ -622,7 +638,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
             aria-label="Next slide"
           >
             <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
             </svg>
           </button>
         </div>

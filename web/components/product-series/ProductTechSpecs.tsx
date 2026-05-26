@@ -186,7 +186,7 @@ export function ProductTechSpecs({ data, seriesName, currentSlug, className }: P
   const titleLines = title.split(/\/n|\\n|\n/).map(line => line.trim()).filter(Boolean)
 
   return (
-    <div 
+    <div
       className={cn("w-full", className)}
       style={{
         '--series-dark': colorCfg.dark,
@@ -219,7 +219,7 @@ export function ProductTechSpecs({ data, seriesName, currentSlug, className }: P
               zIndex: 1,
             }}
           >
-            <div 
+            <div
               className="flex select-none h-full"
               style={{ gap: `${(16 / DESIGN_WIDTH) * 100}vw` }}
             >
@@ -239,25 +239,36 @@ export function ProductTechSpecs({ data, seriesName, currentSlug, className }: P
             </div>
           </div>
 
-          {/* Main Title (above images) */}
-          <h2
-            className="absolute font-anaheim font-extrabold gradient-text-shine-white select-none"
+          {/* Main Title Wrapper (above images) - Scrollable to prevent multi-line overlap */}
+          <div
+            className="absolute pointer-events-auto overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
+            data-lenis-prevent
             style={{
               left: `${(153 / DESIGN_WIDTH) * 100}%`,
               top: `${(100 / DESIGN_HEIGHT) * 100}%`,
-              width: `${(700 / DESIGN_WIDTH) * 100}%`,
-              fontSize: `${(86 / DESIGN_WIDTH) * 100}vw`,
-              lineHeight: `${80 / 86}`,
+              width: `${(700 / DESIGN_WIDTH) * 100}vw`,
+              maxHeight: `${(280 / DESIGN_WIDTH) * 100}vw`,
               zIndex: 2,
+              overscrollBehavior: 'contain',
+              msOverflowStyle: 'none',
+              scrollbarWidth: 'none',
             }}
           >
-            {titleLines.map((line, index) => (
-              <React.Fragment key={index}>
-                {line}
-                {index < titleLines.length - 1 && <br />}
-              </React.Fragment>
-            ))}
-          </h2>
+            <h2
+              className="font-anaheim font-extrabold gradient-text-shine-white select-none break-words"
+              style={{
+                fontSize: `${(86 / DESIGN_WIDTH) * 100}vw`,
+                lineHeight: `${80 / 86}`,
+              }}
+            >
+              {titleLines.map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  {index < titleLines.length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </h2>
+          </div>
 
           {/* ===== TECH SPEC AREA ===== */}
           <div
@@ -298,6 +309,7 @@ export function ProductTechSpecs({ data, seriesName, currentSlug, className }: P
                 data-lenis-prevent="true"
                 style={{
                   height: `${(360 / DESIGN_WIDTH) * 100}vw`,
+                  overscrollBehavior: 'contain',
                 }}
                 onMouseDown={handleSpecsMouseDown}
                 onMouseMove={handleSpecsMouseMove}
@@ -415,8 +427,8 @@ export function ProductTechSpecs({ data, seriesName, currentSlug, className }: P
       </div>
 
       {/* ===== MOBILE LAYOUT (below lg, premium flowing flex layout) ===== */}
-      <div 
-        className="block lg:hidden w-full relative overflow-hidden py-12 px-4" 
+      <div
+        className="block lg:hidden w-full relative overflow-hidden py-12 px-4"
         style={{ background: `linear-gradient(180deg, ${colorCfg.rgb} 0%, ${colorCfg.rgba} 100%)` }}
       >
         {/* Mobile Main Title */}
@@ -467,11 +479,11 @@ export function ProductTechSpecs({ data, seriesName, currentSlug, className }: P
         )}
 
         {/* Mobile Tech Specs Flowing Card */}
-        <div 
+        <div
           className="w-full rounded-3xl p-6 sm:p-8 shadow-xl mt-6"
           style={{ backgroundColor: colorCfg.lightBg }}
         >
-          <h3 
+          <h3
             className="font-lilita-one text-2xl sm:text-3xl mb-6 text-center"
             style={{ color: colorCfg.dark }}
           >

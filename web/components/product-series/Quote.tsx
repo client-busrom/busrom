@@ -126,46 +126,69 @@ export function Quote({ data, className }: QuoteProps) {
         </Link>
 
         {/* Quote Left - white text at bottom left */}
-        <p
-          className="absolute font-josefin-sans text-white"
+        <div
+          className="absolute overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden pointer-events-auto cursor-grab active:cursor-grabbing"
+          data-lenis-prevent
           style={{
             left: `${(59 / DESIGN_WIDTH) * 100}%`,
             top: `${(698 / DESIGN_WIDTH) * 100}vw`,
             width: `${(597 / DESIGN_WIDTH) * 100}vw`,
-            fontSize: `${(36 / DESIGN_WIDTH) * 100}vw`,
-            lineHeight: `${(58 / DESIGN_WIDTH) * 100}vw`,
+            maxHeight: `${(232 / DESIGN_WIDTH) * 100}vw`, // 4 lines (58vw * 4)
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+            overscrollBehavior: 'contain',
           }}
         >
-          {quoteLeft || "Choosing Busrom Bathroom Glass Clips To Bring Professional Quality And Aesthetics To Your Project"}
-        </p>
+          <p
+            className="font-josefin-sans text-white whitespace-pre-line break-words"
+            style={{
+              fontSize: `${(36 / DESIGN_WIDTH) * 100}vw`,
+              lineHeight: `${(58 / DESIGN_WIDTH) * 100}vw`,
+            }}
+          >
+            {quoteLeft || "Choosing Busrom Bathroom Glass Clips To Bring Professional Quality And Aesthetics To Your Project"}
+          </p>
+        </div>
 
         {/* Quote Right - dark text at top right */}
-        <p
-          className="absolute font-josefin-sans"
+        <div
+          className="absolute overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden pointer-events-auto cursor-grab active:cursor-grabbing"
+          data-lenis-prevent
           style={{
             left: `${(1369 / DESIGN_WIDTH) * 100}%`,
             top: `${(132 / DESIGN_WIDTH) * 100}vw`,
             width: `${(400 / DESIGN_WIDTH) * 100}vw`,
-            fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
-            lineHeight: `${(58 / DESIGN_WIDTH) * 100}vw`,
-            color: "#46400F",
+            maxHeight: `${(232 / DESIGN_WIDTH) * 100}vw`, // 4 lines (58vw * 4)
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+            overscrollBehavior: 'contain',
           }}
         >
-          {quoteRight || "Making Every Piece Of Glass Safe, Secure And Premium"}
-        </p>
+          <p
+            className="font-josefin-sans whitespace-pre-line break-words"
+            style={{
+              fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
+              lineHeight: `${(58 / DESIGN_WIDTH) * 100}vw`,
+              color: "#46400F",
+            }}
+          >
+            {quoteRight || "Making Every Piece Of Glass Safe, Secure And Premium"}
+          </p>
+        </div>
 
         {/* CTA Button - 纯净悬停反色 (Hover Inversion) */}
         <Link
           href={ctaLink || "#"}
-          className="absolute flex items-center justify-between group cursor-pointer transition-colors duration-300 bg-[#FEF07D] hover:bg-[#564E16] z-20"
+          className="absolute flex items-center group cursor-pointer transition-colors duration-300 bg-[#FEF07D] hover:bg-[#564E16] z-20"
           style={{
-            left: `${(1139 / DESIGN_WIDTH) * 100}%`,
+            right: `${(318 / DESIGN_WIDTH) * 100}%`,
             top: `${(796 / DESIGN_WIDTH) * 100}vw`,
-            width: `${(463 / DESIGN_WIDTH) * 100}vw`,
+            width: "max-content",
             height: `${(99 / DESIGN_WIDTH) * 100}vw`,
             borderRadius: `${(49.5 / DESIGN_WIDTH) * 100}vw`,
             paddingLeft: `${(41 / DESIGN_WIDTH) * 100}vw`,
             paddingRight: `${(9 / DESIGN_WIDTH) * 100}vw`,
+            gap: `${(20 / DESIGN_WIDTH) * 100}vw`,
             // 保留 GPU 抗锯齿平滑边缘
             transform: "translateZ(0)",
             willChange: "transform",
@@ -215,7 +238,7 @@ export function Quote({ data, className }: QuoteProps) {
       {/* 专为移动端打造的自适应流式排版，完美解决小屏文字重叠与容器溢出问题 */}
       <div className="md:hidden relative w-full flex flex-col items-center px-6 pt-12 pb-20 z-20">
         {/* 1. 顶部引言 (Quote Right) */}
-        <p className="font-josefin-sans text-[#46400F] text-xl font-bold text-center leading-snug mb-8 max-w-[90%]">
+        <p className="font-josefin-sans text-[#46400F] text-xl font-bold text-center leading-snug mb-8 max-w-[90%] whitespace-pre-line break-words">
           {quoteRight || "Making Every Piece Of Glass Safe, Secure And Premium"}
         </p>
 
@@ -260,14 +283,14 @@ export function Quote({ data, className }: QuoteProps) {
         </div>
 
         {/* 3. 底部引言正文 (Quote Left) */}
-        <p className="font-josefin-sans text-white text-base leading-relaxed text-center mb-10 max-w-[95%] opacity-95">
+        <p className="font-josefin-sans text-white text-base leading-relaxed text-center mb-10 max-w-[95%] opacity-95 whitespace-pre-line break-words">
           {quoteLeft || "Choosing Busrom Bathroom Glass Clips To Bring Professional Quality And Aesthetics To Your Project"}
         </p>
 
         {/* 4. 底部 CTA 按钮 - 移动端专属饱满触控尺寸，继承纯净悬停反色 */}
         <Link
           href={ctaLink || "#"}
-          className="w-full max-w-[320px] h-16 flex items-center justify-between group cursor-pointer transition-colors duration-300 bg-[#FEF07D] hover:bg-[#564E16] rounded-full pl-8 pr-2 shadow-xl active:scale-95 z-20"
+          className="w-max max-w-full h-16 flex items-center group cursor-pointer transition-colors duration-300 bg-[#FEF07D] hover:bg-[#564E16] rounded-full pl-8 pr-2 gap-4 shadow-xl active:scale-95 z-20"
           style={{
             transform: "translateZ(0)",
             willChange: "transform",

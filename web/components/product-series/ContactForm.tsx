@@ -331,9 +331,9 @@ export function ContactForm({ data, className }: ContactFormProps) {
     ) {
       setError(
         formConfig?.errorRequiredFields ||
-          (locale === "zh"
-            ? "请填写必填字段"
-            : "Please fill in required fields"),
+        (locale === "zh"
+          ? "请填写必填字段"
+          : "Please fill in required fields"),
       );
       return;
     }
@@ -401,19 +401,19 @@ export function ContactForm({ data, className }: ContactFormProps) {
         const errorData = await res.json();
         setError(
           errorData.error ||
-            formConfig?.errorNetworkMessage ||
-            (locale === "zh"
-              ? "提交失败，请重试"
-              : "Failed to submit form. Please try again."),
+          formConfig?.errorNetworkMessage ||
+          (locale === "zh"
+            ? "提交失败，请重试"
+            : "Failed to submit form. Please try again."),
         );
       }
     } catch (err) {
       console.error("Submission error:", err);
       setError(
         formConfig?.errorNetworkMessage ||
-          (locale === "zh"
-            ? "网络错误，请稍后重试"
-            : "An unexpected error occurred. Please try again."),
+        (locale === "zh"
+          ? "网络错误，请稍后重试"
+          : "An unexpected error occurred. Please try again."),
       );
     } finally {
       setIsSubmitting(false);
@@ -433,6 +433,48 @@ export function ContactForm({ data, className }: ContactFormProps) {
   // Input style constants
   const inputBg = "rgba(255, 250, 203, 0.25)";
   const inputBorder = "1px solid rgba(255, 255, 255, 0.34)";
+
+  // Performance Optimization: Memoize the jumping characters for helperTitle
+  const animatedHelperTitle = React.useMemo(() => {
+    // Split into words and whitespace to preserve word boundaries for wrapping
+    const tokens = helperTitle.match(/(\S+|\s+)/g) || [];
+    let globalCharIndex = 0;
+    
+    return tokens.map((token, tokenIndex) => {
+      // If it's whitespace, render normally to allow line breaks
+      if (/\s+/.test(token)) {
+        return <span key={`ws-${tokenIndex}`} style={{ whiteSpace: 'pre-wrap' }}>{token}</span>;
+      }
+      
+      // If it's a word, wrap in an inline-block so it doesn't break mid-word
+      return (
+        <span key={`word-${tokenIndex}`} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
+          {token.split('').map((char) => {
+            const index = globalCharIndex++;
+            return (
+              <motion.span
+                key={index}
+                style={{ display: 'inline-block' }}
+                initial={{ y: 0 }}
+                animate={{
+                  y: [0, -8, 0],
+                  transition: { 
+                    delay: index * 0.05,
+                    duration: 0.5, 
+                    repeat: Infinity, 
+                    repeatDelay: 3, 
+                    ease: "easeInOut" 
+                  }
+                }}
+              >
+                {char}
+              </motion.span>
+            );
+          })}
+        </span>
+      );
+    });
+  }, [helperTitle]);
 
   return (
     <section
@@ -523,36 +565,45 @@ export function ContactForm({ data, className }: ContactFormProps) {
       />
 
       {/* Title - "Contact Us Get A Quote" */}
-      <h2
+      <div
         className={cn(
-          "font-josefin-sans font-bold text-left",
-          isMobile
-            ? "relative z-10 w-full whitespace-pre-wrap"
-            : "absolute whitespace-pre",
+          isMobile ? "relative z-10 w-full" : "absolute overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden pointer-events-auto cursor-grab active:cursor-grabbing"
         )}
+        data-lenis-prevent
         style={{
           left: isMobile ? 0 : px(153 - SECTION_X_OFFSET),
           top: isMobile ? 0 : vw(80),
-          fontSize: isMobile ? mvw(28) : vw(86),
-          lineHeight: isMobile ? mvw(36) : vw(109),
-          padding: isMobile ? `${mvw(40)} ${mvw(24)} ${mvw(10)}` : 0,
-          minWidth: isMobile ? "auto" : "max-content",
+          maxWidth: isMobile ? "100%" : vw(1000),
+          msOverflowStyle: 'none',
+          scrollbarWidth: 'none',
         }}
       >
-        <span
-          className="absolute text-transparent"
+        <h2
+          className={cn(
+            "relative font-josefin-sans font-bold text-left",
+            isMobile ? "whitespace-pre-wrap" : "whitespace-nowrap w-max"
+          )}
           style={{
-            WebkitTextStroke: isMobile
-              ? `1px rgba(255, 255, 255, 0.6)`
-              : `2px rgba(255, 255, 255, 0.6)`,
-            top: isMobile ? mvw(41.5) : vw(4),
-            left: isMobile ? mvw(25.5) : vw(4),
+            fontSize: isMobile ? mvw(28) : vw(86),
+            lineHeight: isMobile ? mvw(36) : vw(109),
+            padding: isMobile ? `${mvw(40)} ${mvw(24)} ${mvw(10)}` : `0 ${vw(20)} 0 0`,
           }}
         >
-          {title}
-        </span>
-        <span className="relative text-shine">{title}</span>
-      </h2>
+          <span
+            className="absolute text-transparent pointer-events-none"
+            style={{
+              WebkitTextStroke: isMobile
+                ? `1px rgba(255, 255, 255, 0.6)`
+                : `2px rgba(255, 255, 255, 0.6)`,
+              top: isMobile ? mvw(41.5) : vw(4),
+              left: isMobile ? mvw(25.5) : vw(4),
+            }}
+          >
+            {title}
+          </span>
+          <span className="relative text-shine">{title}</span>
+        </h2>
+      </div>
 
       {/* Product Images - Hidden on Mobile to save space, perfectly aligned and downward adjusted on Desktop */}
       {!isMobile && (
@@ -640,47 +691,67 @@ export function ContactForm({ data, className }: ContactFormProps) {
         )}
       >
         {/* Helper Title */}
-        <h3
+        <div
           className={cn(
-            "font-inter font-semibold animate-pulse-scale whitespace-pre-line",
             isMobile
-              ? "relative mb-2 w-full max-w-[600px] text-left"
-              : "absolute",
+              ? "relative mb-2 w-full max-w-[600px]"
+              : "absolute overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden pointer-events-auto cursor-grab active:cursor-grabbing"
           )}
+          data-lenis-prevent
           style={{
             left: isMobile ? 0 : px(800 - SECTION_X_OFFSET),
             top: isMobile ? 0 : vw(304),
-            width: isMobile ? "100%" : px(391),
-            fontSize: isMobile ? mvw(18) : vw(40),
-            lineHeight: isMobile ? mvw(26) : vw(58),
-            color: "#FFFF95",
-            transformOrigin: "left center",
+            maxWidth: isMobile ? "100%" : vw(400),
+            maxHeight: isMobile ? "none" : vw(174), // ~3 lines based on vw(58) line-height
             zIndex: 10,
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+            overscrollBehavior: 'contain',
           }}
         >
-          {helperTitle}
-        </h3>
+          <motion.h3
+            key={helperTitle}
+            className="font-inter font-semibold whitespace-pre-line text-left"
+            style={{
+              fontSize: isMobile ? mvw(18) : vw(40),
+              lineHeight: isMobile ? mvw(26) : vw(58),
+              color: "#FFFF95",
+            }}
+          >
+            {animatedHelperTitle}
+          </motion.h3>
+        </div>
 
         {/* Helper Text */}
-        <p
+        <div
           className={cn(
-            "font-inter whitespace-pre-line",
             isMobile
-              ? "relative mb-8 w-full max-w-[600px] text-left"
-              : "absolute",
+              ? "relative mb-8 w-full max-w-[600px]"
+              : "absolute overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden pointer-events-auto cursor-grab active:cursor-grabbing"
           )}
+          data-lenis-prevent
           style={{
             left: isMobile ? 0 : px(800 - SECTION_X_OFFSET),
             top: isMobile ? 0 : vw(436),
-            width: isMobile ? "100%" : px(391),
-            fontSize: isMobile ? mvw(14) : vw(20),
-            lineHeight: isMobile ? mvw(22) : vw(33),
-            color: "#FFFF95",
+            maxWidth: isMobile ? "100%" : vw(400),
+            maxHeight: isMobile ? "none" : vw(165), // ~5 lines based on vw(33) line-height
             zIndex: 10,
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+            overscrollBehavior: 'contain',
           }}
         >
-          {helperText}
-        </p>
+          <p
+            className="font-inter whitespace-pre-line text-left break-words"
+            style={{
+              fontSize: isMobile ? mvw(14) : vw(20),
+              lineHeight: isMobile ? mvw(22) : vw(33),
+              color: "#FFFF95",
+            }}
+          >
+            {helperText}
+          </p>
+        </div>
 
         {/* Form Container */}
         <form
@@ -884,11 +955,10 @@ export function ContactForm({ data, className }: ContactFormProps) {
               onClick={() => handlePrivacyToggle(!privacyAccepted)}
             >
               <div
-                className={`flex-shrink-0 border flex items-center justify-center transition-all ${
-                  privacyAccepted
+                className={`flex-shrink-0 border flex items-center justify-center transition-all ${privacyAccepted
                     ? "bg-[#9C9032] border-[#9C9032]"
                     : "border-white/30 bg-transparent"
-                }`}
+                  }`}
                 style={{
                   marginTop: isMobile ? mvw(4) : vw(4),
                   width: isMobile ? mvw(20) : vw(20),
@@ -972,7 +1042,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
                   {file
                     ? file.name.substring(0, 15) + "..."
                     : getFieldConfig("attachment")?.placeholder ||
-                      (locale === "zh" ? "上传文件" : "Upload File")}
+                    (locale === "zh" ? "上传文件" : "Upload File")}
                 </span>
               </label>
             </div>
