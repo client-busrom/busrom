@@ -14,6 +14,63 @@ import {
   cn,
 } from "@/lib/utils";
 
+function MarqueeTitle({ text, className, style }: { text: string; className?: string; style?: React.CSSProperties }) {
+  const containerRef = useRef<HTMLHeadingElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (containerRef.current && textRef.current) {
+        setIsOverflowing(textRef.current.scrollWidth > containerRef.current.clientWidth);
+      }
+    };
+    checkOverflow();
+    const timeout = setTimeout(checkOverflow, 150);
+    window.addEventListener("resize", checkOverflow);
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener("resize", checkOverflow);
+    };
+  }, [text]);
+
+  return (
+    <h3
+      ref={containerRef}
+      className={cn("overflow-hidden whitespace-nowrap", className)}
+      style={{
+        ...style,
+        // Ensure padding doesn't affect the absolute positioning center
+        maskImage: isOverflowing ? "linear-gradient(to right, transparent, black 5%, black 95%, transparent)" : "none",
+        WebkitMaskImage: isOverflowing ? "linear-gradient(to right, transparent, black 5%, black 95%, transparent)" : "none"
+      }}
+    >
+      <motion.div
+        className="flex w-max"
+        animate={isOverflowing ? { x: ["0%", "-50%"] } : { x: "0%" }}
+        transition={
+          isOverflowing
+            ? { repeat: Infinity, ease: "linear", duration: Math.max(10, text.length * 0.3) }
+            : {}
+        }
+        style={{
+          width: isOverflowing ? "max-content" : "100%",
+          justifyContent: isOverflowing ? "flex-start" : "center",
+        }}
+      >
+        <div ref={textRef} className={cn("flex", isOverflowing && "pr-16")}>
+          {text}
+        </div>
+        {isOverflowing && (
+          <div className="flex pr-16">
+            {text}
+          </div>
+        )}
+      </motion.div>
+    </h3>
+  );
+}
+
 type Props = {
   data: HomeContent["productSeriesCarousel"];
   locale: Locale;
@@ -587,9 +644,11 @@ export default function ProductSeriesCarousel({
               }}
             >
               {/* 标题移入容器内部，利用 scale 属性实现真正的“共进退” */}
-              <h3
-                className={`absolute font-anaheim font-extrabold text-white whitespace-nowrap z-20 transition-opacity duration-300 ${isOnScreen ? "opacity-100" : "opacity-0"
-                  }`}
+              <MarqueeTitle
+                text={item.name}
+                className={`absolute font-anaheim font-extrabold text-white z-20 transition-opacity duration-300 ${
+                  isOnScreen ? "opacity-100" : "opacity-0"
+                }`}
                 style={{
                   top: `${(-62 / IMG_SIZE_DEFAULT) * 100}%`, // 距离顶部 62px
                   left: "50%",
@@ -597,10 +656,9 @@ export default function ProductSeriesCarousel({
                   fontWeight: 800,
                   lineHeight: 0.47,
                   fontSize: `${(TITLE_SIZE_DEFAULT / DESIGN_WIDTH) * 100}vw`,
+                  maxWidth: "130%", // 限制最大宽度，超过此宽度触发走马灯
                 }}
-              >
-                {item.name}
-              </h3>
+              />
 
               <Link
                 href={item.href}
