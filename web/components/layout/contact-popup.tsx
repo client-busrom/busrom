@@ -106,6 +106,7 @@ function ContactOptionCard({
         className="block w-full"
         target={option.openInNewTab ? "_blank" : undefined}
         rel={option.openInNewTab ? "noopener noreferrer" : undefined}
+        aria-label={option.title}
       >
         {cardContent}
       </Link>
@@ -118,6 +119,7 @@ function ContactOptionCard({
       className="block w-full"
       target={option.openInNewTab ? "_blank" : undefined}
       rel={option.openInNewTab ? "noopener noreferrer" : undefined}
+      aria-label={option.title}
     >
       {cardContent}
     </a>

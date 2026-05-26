@@ -121,6 +121,7 @@ export default function FooterContact({ footerData, content }: Props) {
                   styleClass
                 )}
                 title={social.customName || social.platform}
+                aria-label={social.customName || social.platform}
               >
                 {customIconUrl ? (
                   <img 
@@ -139,12 +140,12 @@ export default function FooterContact({ footerData, content }: Props) {
 
       {/* 官方声明 */}
       <div className="bg-brand-footer-emphasis-bg text-brand-footer-emphasis-text font-anaheim font-semibold px-6 py-4 md:px-8 md:py-5 lg:px-6 lg:py-6 xl:w-[90%] 2xl:w-[80%] my-6 md:my-8 lg:my-10">
-        <h4
+        <h3
           className="font-bold text-base md:text-lg lg:text-xl mb-2 pl-3 md:pl-4"
           style={{ lineHeight: 1 }}
         >
           {footerData?.notice?.title || content.notice.title}
-        </h4>
+        </h3>
         <ul
           className="text-xs md:text-sm lg:text-base"
           style={{ lineHeight: 1.8 }}
