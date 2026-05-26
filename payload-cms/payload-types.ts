@@ -1540,9 +1540,9 @@ export interface SeriesIntroItem {
 export interface NavigationMenu {
   id: number;
   /**
-   * Unique identifier, e.g.: product, service, about-us
+   * Internal label for CMS management only, not shown on the site
    */
-  slug: string;
+  adminLabel?: string | null;
   /**
    * Bilingual menu name
    */
@@ -1586,6 +1586,10 @@ export interface NavigationMenu {
    */
   isSystem?: boolean | null;
   visible?: boolean | null;
+  /**
+   * Auto-generated from Menu Name. Cannot be manually edited.
+   */
+  slug?: string | null;
   User?: (number | null) | User;
   Operation?: string | null;
   updatedAt: string;
@@ -2940,7 +2944,7 @@ export interface SeriesIntroItemsSelect<T extends boolean = true> {
  * via the `definition` "navigation-menus_select".
  */
 export interface NavigationMenusSelect<T extends boolean = true> {
-  slug?: T;
+  adminLabel?: T;
   name?: T;
   type?: T;
   icon?: T;
@@ -2952,6 +2956,7 @@ export interface NavigationMenusSelect<T extends boolean = true> {
   order?: T;
   isSystem?: T;
   visible?: T;
+  slug?: T;
   User?: T;
   Operation?: T;
   updatedAt?: T;

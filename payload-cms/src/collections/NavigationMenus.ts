@@ -8,6 +8,14 @@
  */
 
 import type { CollectionConfig } from 'payload'
+function slugify(val: string): string {
+  return val
+    .replace(/ /g, '-')
+    .replace(/[^\w-]+/g, '')
+    .toLowerCase()
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
 
 export const NavigationMenus: CollectionConfig = {
   slug: 'navigation-menus',
@@ -22,8 +30,8 @@ export const NavigationMenus: CollectionConfig = {
     },
   },
   admin: {
-    useAsTitle: 'slug',
-    defaultColumns: ['slug', 'type', 'parent', 'order', 'visible'],
+    useAsTitle: 'adminLabel',
+    defaultColumns: ['adminLabel', 'slug', 'type', 'parent', 'order', 'visible'],
     group: {
       en: 'Content',
       zh: '内容管理',
@@ -44,6 +52,21 @@ export const NavigationMenus: CollectionConfig = {
   },
 
   hooks: {
+    beforeChange: [
+      async ({ data, req }) => {
+        const isTranslation = req.context?.isTranslationSave || req.context?.isSyncing
+        if (isTranslation) return data
+
+        // Always regenerate slug from name (cannot be manually edited)
+        if (data.name) {
+          const name = typeof data.name === 'object' ? (data.name.en || data.name.zh || '') : String(data.name)
+          if (name) {
+            data.slug = slugify(name)
+          }
+        }
+        return data
+      },
+    ],
     afterRead: [
       async ({ doc, req: { payload } }) => {
         if (!doc.cardImage) return doc
@@ -67,18 +90,16 @@ export const NavigationMenus: CollectionConfig = {
   fields: [
     // Basic Information
     {
-      name: 'slug',
+      name: 'adminLabel',
       type: 'text',
       label: {
-        en: 'Slug',
-        zh: '唯一标识',
+        en: 'Admin Label',
+        zh: '内部管理标识',
       },
-      required: true,
-      unique: true,
       admin: {
         description: {
-          en: 'Unique identifier, e.g.: product, service, about-us',
-          zh: '唯一标识符，例如: product, service, about-us',
+          en: 'Internal label for CMS management only, not shown on the site',
+          zh: '仅用于 CMS 内部管理的标识，不会显示在网站上',
         },
       },
     },
@@ -259,6 +280,22 @@ export const NavigationMenus: CollectionConfig = {
         zh: '显示',
       },
       defaultValue: true,
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      label: {
+        en: 'Slug',
+        zh: 'URL 标识',
+      },
+      unique: true,
+      admin: {
+        readOnly: true,
+        description: {
+          en: 'Auto-generated from Menu Name. Cannot be manually edited.',
+          zh: '从菜单名称自动生成，不可手动修改。',
+        },
+      },
     },
     {
       name: 'translationCenter',
