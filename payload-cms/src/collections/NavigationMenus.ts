@@ -288,7 +288,6 @@ export const NavigationMenus: CollectionConfig = {
         en: 'Slug',
         zh: 'URL 标识',
       },
-      unique: true,
       admin: {
         readOnly: true,
         description: {
