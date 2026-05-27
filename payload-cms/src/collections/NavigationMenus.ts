@@ -57,11 +57,19 @@ export const NavigationMenus: CollectionConfig = {
         const isTranslation = req.context?.isTranslationSave || req.context?.isSyncing
         if (isTranslation) return data
 
-        // Always regenerate slug from name (cannot be manually edited)
+        // Only generate slug from English name. Prevent other locales from overwriting it.
         if (data.name) {
-          const name = typeof data.name === 'object' ? (data.name.en || data.name.zh || '') : String(data.name)
-          if (name) {
-            data.slug = slugify(name)
+          let nameToSlugify = '';
+          
+          if (typeof data.name === 'object' && data.name.en) {
+            nameToSlugify = data.name.en;
+          } else if (req.locale === 'en' || req.locale === 'all' || !req.locale) {
+            // If saving in English locale, data.name is the English string
+            nameToSlugify = typeof data.name === 'string' ? data.name : '';
+          }
+
+          if (nameToSlugify) {
+            data.slug = slugify(nameToSlugify);
           }
         }
         return data
