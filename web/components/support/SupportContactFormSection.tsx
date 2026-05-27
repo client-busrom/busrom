@@ -65,6 +65,8 @@ export function SupportContactFormSection({
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   const formRef = useRef<HTMLFormElement>(null);
+  const descRef = useRef<HTMLParagraphElement>(null);
+  const [decorPos, setDecorPos] = useState<{ left: number; top: number } | null>(null);
   const STORAGE_KEY = "busrom_privacy_consent";
 
   const [isMobile, setIsMobile] = useState(false);
@@ -156,6 +158,72 @@ export function SupportContactFormSection({
       ...fetchedFormConfig,
     };
   }, [formConfig, fetchedFormConfig]);
+
+  // Measure 4th line position for decorative SVG (relative to outer absolute container)
+  const textContainerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (isMobile || !descRef.current || !textContainerRef.current) return;
+
+    const measure = () => {
+      const el = descRef.current;
+      const container = textContainerRef.current;
+      if (!el || !container) return;
+
+      // Get the outer absolute container (the one with "absolute inset-0")
+      const outerContainer = container.parentElement;
+      if (!outerContainer) return;
+
+      const range = document.createRange();
+
+      // Find the last text node
+      let lastTextNode: Node | null = null;
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        lastTextNode = walker.currentNode;
+      }
+      if (!lastTextNode) return;
+
+      const text = lastTextNode.textContent || "";
+      // Split by newlines to find lines
+      const lines = text.split("\n");
+      // Find the 4th line, or the last line if fewer than 4
+      const targetLineIndex = Math.min(3, lines.length - 1);
+      let targetLine = "";
+      for (let i = targetLineIndex; i >= 0; i--) {
+        if (lines[i].trim()) {
+          targetLine = lines[i];
+          break;
+        }
+      }
+      if (!targetLine) return;
+
+      // Calculate offset: sum of lengths of all previous lines including \n
+      let offset = 0;
+      for (let i = 0; i < targetLineIndex; i++) {
+        offset += lines[i].length + 1; // +1 for \n
+      }
+
+      range.setStart(lastTextNode, offset);
+      range.setEnd(lastTextNode, offset + targetLine.length);
+
+      const rect = range.getBoundingClientRect();
+      const outerRect = outerContainer.getBoundingClientRect();
+
+      // Position relative to outer absolute container
+      setDecorPos({
+        left: rect.right - outerRect.left - 48,
+        top: rect.top - outerRect.top - 6,
+      });
+    };
+
+    // Delay to ensure fonts are loaded and layout is stable
+    const timer = setTimeout(measure, 500);
+    window.addEventListener("resize", measure);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", measure);
+    };
+  }, [isMobile, description, mergedConfig?.description, locale]);
 
   const validImages = useMemo(() => {
     return images.filter((img): img is MediaObject => !!img?.url);
@@ -353,6 +421,16 @@ export function SupportContactFormSection({
           color: white !important;
           fill: white !important;
         }
+        .desc-scroll-left::-webkit-scrollbar {
+          width: 4px;
+        }
+        .desc-scroll-left::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .desc-scroll-left::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 2px;
+        }
       `}</style>
       <div className={cn(
         "relative w-full mx-auto",
@@ -370,7 +448,7 @@ export function SupportContactFormSection({
               height: mvw(333),
             } : {
               left: vw(396),
-              top: vw(75),
+              top: vw(0),
               width: vw(771.21),
               height: vw(755.38),
               zIndex: 1
@@ -432,7 +510,7 @@ export function SupportContactFormSection({
                 className="absolute z-[10]"
                 style={{
                   left: vw(126),
-                  top: vw(260),
+                  top: vw(260 - 75),
                   width: vw(120),
                   height: vw(160),
                 }}
@@ -441,71 +519,103 @@ export function SupportContactFormSection({
                   <path d="M24.576 0c-3.02933 8.192-6.05867 16.384-9.088 24.576-2.98667 8.14933-5.99467 16.32-9.024 24.51201l-6.464 0c3.02933-8.192 6.03733-16.36267 9.024-24.51201 3.02933-8.192 6.05867-16.384 9.088-24.576l6.464 0z" fill="#FFE83C" />
                 </svg>
               </div>
-              <div
-                className="absolute"
-                style={{ left: vw(445), top: vw(620), width: vw(60), height: vw(90) }}
-              >
-                <svg width="100%" height="100%" viewBox="0 0 24.576 49.088" fill="none" preserveAspectRatio="none">
-                  <path d="M24.576 0c-3.02933 8.192-6.05867 16.384-9.088 24.576-2.98667 8.14933-5.99467 16.32-9.024 24.51201l-6.464 0c3.02933-8.192 6.03733-16.36267 9.024-24.51201 3.02933-8.192 6.05867-16.384 9.088-24.576l6.464 0z" fill="#FFE83C" fillOpacity="0.65" />
-                </svg>
-              </div>
+              {decorPos && (
+                <div
+                  className="absolute z-[10]"
+                  style={{
+                    left: `${decorPos.left}px`,
+                    top: `${decorPos.top}px`,
+                    width: vw(60),
+                    height: vw(90),
+                  }}
+                >
+                  <svg width="100%" height="100%" viewBox="0 0 24.576 49.088" fill="none" preserveAspectRatio="none">
+                    <path d="M24.576 0c-3.02933 8.192-6.05867 16.384-9.088 24.576-2.98667 8.14933-5.99467 16.32-9.024 24.51201l-6.464 0c3.02933-8.192 6.03733-16.36267 9.024-24.51201 3.02933-8.192 6.05867-16.384 9.088-24.576l6.464 0z" fill="#FFE83C" fillOpacity="0.5" />
+                  </svg>
+                </div>
+              )}
             </>
           )}
 
           {/* Top Layer: Text */}
           <div
+            ref={textContainerRef}
             className={cn(isMobile ? "relative mb-8 mx-auto" : "absolute pointer-events-auto")}
-            style={!isMobile ? { left: vw(153), top: vw(177), width: vw(863), zIndex: 10 } : { maxWidth: "640px" }}
+            style={!isMobile ? { left: vw(153), top: vw(102), width: vw(863), zIndex: 10 } : { maxWidth: "640px" }}
           >
-            <h2
-              className={cn("text-white font-normal", isMobile ? "text-center" : "text-left")}
+            <div
+              className={cn(isMobile ? "" : "overflow-y-auto")}
+              data-lenis-prevent
               style={{
-                fontFamily: "var(--font-kaushan-script), cursive",
-                fontSize: isMobile ? mvw(36) : vw(96),
-                lineHeight: 1.2,
-                textShadow: "0px 4px 10px rgba(0,0,0,0.3)",
-                whiteSpace: "pre-wrap",
-                maxWidth: isMobile ? "100%" : "none",
+                maxHeight: isMobile ? undefined : `calc(${vw(96)} * 1.4 * 2)`,
+                overscrollBehavior: "contain",
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
               }}
             >
-              {(() => {
-                const rawTitle = (
-                  getLocalizedString(mergedConfig?.displayName, locale) ||
-                  title ||
-                  ""
-                ).replace(/\\n/g, "\n");
-                return rawTitle.split("\n").map((line: string, i: number) => (
-                  <span
-                    key={i}
-                    style={{
-                      display: "block",
-                      paddingLeft: !isMobile && i > 0 ? "1em" : 0,
-                    }}
-                  >
-                    {line.replace(/ /g, "\u00A0")}
-                  </span>
-                ));
-              })()}
-            </h2>
-            <p
-              className={cn("text-white normal-case", isMobile ? "text-center" : "text-left")}
+              <h2
+                className={cn("text-white font-normal", isMobile ? "text-center" : "text-left")}
+                style={{
+                  fontFamily: "var(--font-kaushan-script), cursive",
+                  fontSize: isMobile ? mvw(36) : vw(96),
+                  lineHeight: 1.5,
+                  textShadow: "0px 4px 10px rgba(0,0,0,0.3)",
+                  whiteSpace: "pre-wrap",
+                  maxWidth: isMobile ? "100%" : "none",
+                }}
+              >
+                {(() => {
+                  const rawTitle = (
+                    getLocalizedString(mergedConfig?.displayName, locale) ||
+                    title ||
+                    ""
+                  ).replace(/\\n/g, "\n");
+                  return rawTitle.split("\n").map((line: string, i: number) => (
+                    <span
+                      key={i}
+                      style={{
+                        display: "block",
+                        paddingLeft: !isMobile && i > 0 ? "0.5em" : 0,
+                        marginTop: !isMobile && i > 0 ? vw(-20): 0
+                      }}
+                    >
+                      {line.replace(/ /g, "\u00A0")}
+                    </span>
+                  ));
+                })()}
+              </h2>
+            </div>
+            <div
+              className={cn(isMobile ? "" : "overflow-y-auto")}
+              data-lenis-prevent
               style={{
-                fontFamily: "var(--font-outfit), sans-serif",
-                fontSize: isMobile ? mvw(16) : vw(22.8),
-                lineHeight: 1.31,
                 marginTop: isMobile ? mvw(24) : vw(92),
-                maxWidth: isMobile ? "100%" : vw(658),
-                whiteSpace: "pre-wrap",
+                maxHeight: isMobile ? undefined : `calc(${vw(36)} * 1.31 * 4)`,
+                overscrollBehavior: "contain",
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
               }}
             >
-              {(
-                getLocalizedString(mergedConfig?.description, locale) ||
-                description ||
-                ""
-              )
-                .replace(/\\n/g, "\n")
-                .replace(/ /g, "\u00A0")}
-            </p>
+              <p
+                ref={descRef}
+                className={cn("text-white normal-case font-katibeh", isMobile ? "text-center" : "text-left")}
+                style={{
+                  fontSize: isMobile ? mvw(16) : vw(36),
+                  lineHeight: 1.31,
+                  maxWidth: isMobile ? "100%" : vw(658),
+                  whiteSpace: "pre-wrap",
+                  paddingLeft: !isMobile ? vw(20) : 0,
+                }}
+              >
+                {(
+                  getLocalizedString(mergedConfig?.description, locale) ||
+                  description ||
+                  ""
+                )
+                  .replace(/\\n/g, "\n")
+                  .replace(/ /g, "\u00A0")}
+              </p>
+            </div>
           </div>
         </div>
 

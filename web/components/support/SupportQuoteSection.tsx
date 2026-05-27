@@ -188,7 +188,7 @@ export const SupportQuoteSection: React.FC<SupportQuoteSectionProps> = ({
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20, position: "absolute", top: 0, left: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-                className="font-semibold leading-[1.5] text-[#756F3F] font-inter opacity-80"
+                className="font-semibold leading-[1.5] text-[#756F3F] font-josefin-sans opacity-80"
                 style={{ 
                   fontSize: vw(24),
                 }}

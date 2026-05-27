@@ -119,6 +119,7 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
                 if (index === 5) onNavigate?.("contact");
                 else {
                   const link = item.buttonLink || "";
+                  // Support both #faq-detail-<slug> and legacy #faq-<slug> formats
                   const slug = link.includes("#faq-") ? link.split("#faq-")[1] : item.id;
                   onNavigate?.("category", slug);
                 }
@@ -167,6 +168,7 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
                       if (index === 5) onNavigate?.("contact");
                       else {
                         const link = item.buttonLink || "";
+                        // Support both #faq-detail-<slug> and legacy #faq-<slug> formats
                         const slug = link.includes("#faq-") ? link.split("#faq-")[1] : item.id;
                         onNavigate?.("category", slug);
                       }

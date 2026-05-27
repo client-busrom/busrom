@@ -21,8 +21,27 @@ export function FaqTemplate({ locale, data }: FaqTemplateProps) {
     null,
   );
   const [activeFaqId, setActiveFaqId] = React.useState<string | null>(null);
+  const searchRef = React.useRef<HTMLDivElement>(null);
+  const guideRef = React.useRef<HTMLDivElement>(null);
+  const popularRef = React.useRef<HTMLDivElement>(null);
   const detailRef = React.useRef<HTMLDivElement>(null);
   const contactRef = React.useRef<HTMLDivElement>(null);
+  const quoteRef = React.useRef<HTMLDivElement>(null);
+
+  // Map section names to their refs for scroll navigation
+  const sectionRefs = React.useMemo(() => ({
+    search: searchRef,
+    guide: guideRef,
+    popular: popularRef,
+    detail: detailRef,
+    contact: contactRef,
+    quote: quoteRef,
+  }), []);
+
+  const scrollToSection = (sectionName: string) => {
+    const ref = sectionRefs[sectionName as keyof typeof sectionRefs];
+    ref?.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const handleNavigate = (type: "category" | "contact", idOrSlug?: string) => {
     if (type === "category" && idOrSlug) {
@@ -63,19 +82,54 @@ export function FaqTemplate({ locale, data }: FaqTemplateProps) {
     }, 100);
   };
 
-  // Global Hash Listener to sync Active Category
+  // Global Hash Listener to handle all FAQ page section navigation
   React.useEffect(() => {
     const syncHashWithState = () => {
       const hash = window.location.hash;
-      console.log("[FaqTemplate] Hash Change Detected:", hash);
+      if (!hash.startsWith("#faq-")) return;
 
-      if (hash.startsWith("#faq-") && detail?.items) {
-        const slug = hash.replace("#faq-", "");
-        console.log("[FaqTemplate] Searching for slug in hash:", slug);
+      const slug = hash.replace("#faq-", "");
 
+      // 1. Section-only navigation: #faq-search, #faq-guide, #faq-popular, #faq-contact, #faq-quote
+      const sectionNames = ["search", "guide", "popular", "contact", "quote"];
+      if (sectionNames.includes(slug)) {
+        scrollToSection(slug);
+        return;
+      }
+
+      // 2. Detail section with category: #faq-detail-<category-slug>
+      if (slug.startsWith("detail-") && detail?.items) {
+        const categorySlug = slug.replace("detail-", "");
         const items = detail.items;
         const matchIndex = items.findIndex((item: any) => {
-          // Generate a slug from title since the 'slug' field is missing after parsing
+          const titleSlug = (item.title || "")
+            .toLowerCase()
+            .replace(/ & /g, "-")
+            .replace(/\s+/g, "-")
+            .replace(/[^\w-]/g, "");
+
+          const cid = (item.id || item.category?.id) + "";
+          return titleSlug === categorySlug || cid === categorySlug;
+        });
+
+        if (matchIndex !== -1) {
+          const match = items[matchIndex];
+          const targetId = match.id || `cat-${matchIndex}`;
+          if (targetId !== activeCategoryId) {
+            setActiveCategoryId(targetId);
+          }
+          // Scroll to detail section after state update
+          setTimeout(() => {
+            detailRef.current?.scrollIntoView({ behavior: "smooth" });
+          }, 50);
+        }
+        return;
+      }
+
+      // 3. Legacy: #faq-<category-slug> (direct category match in detail section)
+      if (detail?.items) {
+        const items = detail.items;
+        const matchIndex = items.findIndex((item: any) => {
           const titleSlug = (item.title || "")
             .toLowerCase()
             .replace(/ & /g, "-")
@@ -108,29 +162,37 @@ export function FaqTemplate({ locale, data }: FaqTemplateProps) {
 
       {/* Search Section */}
       {search && (
-        <FaqSearchSection
-          data={search}
-          locale={locale}
-          detailData={detail}
-          onSearchSelect={handleSearchSelect}
-        />
+        <div ref={searchRef} id="faq-search">
+          <FaqSearchSection
+            data={search}
+            locale={locale}
+            detailData={detail}
+            onSearchSelect={handleSearchSelect}
+          />
+        </div>
       )}
 
       {/* Guide Section */}
       {guide && (
-        <FaqGuideSection
-          data={guide}
-          locale={locale}
-          onNavigate={handleNavigate}
-        />
+        <div ref={guideRef} id="faq-guide">
+          <FaqGuideSection
+            data={guide}
+            locale={locale}
+            onNavigate={handleNavigate}
+          />
+        </div>
       )}
 
       {/* Popular Section */}
-      {popular && <FaqPopularSection data={popular} locale={locale} />}
+      {popular && (
+        <div ref={popularRef} id="faq-popular">
+          <FaqPopularSection data={popular} locale={locale} />
+        </div>
+      )}
 
       {/* Detail Section */}
       {detail && (
-        <div ref={detailRef}>
+        <div ref={detailRef} id="faq-detail">
           <FaqDetailSection
             data={detail}
             locale={locale}
@@ -144,13 +206,17 @@ export function FaqTemplate({ locale, data }: FaqTemplateProps) {
 
       {/* Contact Section */}
       {contact && (
-        <div ref={contactRef}>
+        <div ref={contactRef} id="faq-contact">
           <FaqContactSection data={contact} locale={locale} />
         </div>
       )}
 
       {/* Quote Section */}
-      {quote && <FaqQuoteSection data={quote} locale={locale} />}
+      {quote && (
+        <div ref={quoteRef} id="faq-quote">
+          <FaqQuoteSection data={quote} locale={locale} />
+        </div>
+      )}
     </main>
   );
 }

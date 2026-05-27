@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 const DESIGN_WIDTH = 1920;
@@ -14,29 +14,55 @@ type AnimatedLinkButtonProps = {
   href?: string; // 链接地址
 };
 
-export function AnimatedLinkButton({ 
-  children, 
-  className, 
+export function AnimatedLinkButton({
+  children,
+  className,
   variant = "light",
   ballColor: customBallColor,
   style: externalStyle,
-  href
+  href,
 }: AnimatedLinkButtonProps) {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1025);
     check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
   }, []);
   const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
-  
+
   // Responsive defaults using clamp() or simple px for mobile
   const ballSize = isMobile ? "44px" : vw(60);
 
   const isDark = variant === "dark";
   const ballColor = customBallColor || (isDark ? "#5C5623" : "#ECE8D8");
   const textColorClass = isDark ? "text-[#C7BB5D]" : "text-brand-secondary";
+
+  // 文字缩放逻辑：超出容器时自动缩小
+  const [textScale, setTextScale] = useState(1);
+  const textRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const span = textRef.current;
+    if (!span) return;
+    const parent = span.parentElement;
+    if (!parent) return;
+
+    const checkOverflow = () => {
+      const parentWidth =
+        parent.clientWidth - (isMobile ? 40 : parseFloat(vw(64)));
+      const textWidth = span.scrollWidth;
+      if (textWidth > parentWidth && parentWidth > 0) {
+        setTextScale(parentWidth / textWidth);
+      } else {
+        setTextScale(1);
+      }
+    };
+
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [children, isMobile]);
 
   const content = (
     <>
@@ -50,7 +76,15 @@ export function AnimatedLinkButton({
           backgroundColor: ballColor,
         }}
       />
-      <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1">
+      <span
+        ref={textRef}
+        className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 whitespace-nowrap"
+        style={{
+          transform: `scale(${textScale})`,
+          transformOrigin: "center center",
+          display: "inline-block",
+        }}
+      >
         {children}
       </span>
     </>
@@ -59,7 +93,7 @@ export function AnimatedLinkButton({
   const buttonClass = cn(
     "group relative flex items-center justify-center font-anaheim font-medium bg-transparent overflow-visible",
     textColorClass,
-    className
+    className,
   );
 
   const buttonStyle = {
@@ -68,7 +102,7 @@ export function AnimatedLinkButton({
     paddingRight: isMobile ? "16px" : vw(24),
     fontSize: isMobile ? "18px" : vw(32),
     lineHeight: isMobile ? "1.2" : vw(30),
-    ...externalStyle
+    ...externalStyle,
   };
 
   if (href) {

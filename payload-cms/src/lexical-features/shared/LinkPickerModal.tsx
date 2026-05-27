@@ -59,9 +59,12 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
   const abortControllerRef = useRef<AbortController | null>(null)
   const prevItemsRef = useRef<any[]>([])
 
-  const activeCollections = selectedCollection === 'all'
-    ? collections
-    : collections.filter(c => c.value === selectedCollection)
+  const activeCollections = React.useMemo(() =>
+    selectedCollection === 'all'
+      ? collections
+      : collections.filter(c => c.value === selectedCollection),
+    [selectedCollection]
+  )
 
   const isAllMode = selectedCollection === 'all'
 
@@ -221,7 +224,7 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     if (config.categoryType) {
       const slugValue = item.slug || item.id
       if (config.isFaq) {
-        path = `${config.pathPrefix}#faq-${slugValue}`
+        path = `${config.pathPrefix}#faq-detail-${slugValue}`
       } else if (config.value === 'categories-product') {
         path = `${config.pathPrefix}/${slugValue}`
       } else {
@@ -250,7 +253,7 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     const slugValue = item.slug || item.id
     if (config.categoryType) {
       if (config.isFaq) {
-        return `${config.pathPrefix}#faq-${slugValue}`
+        return `${config.pathPrefix}#faq-detail-${slugValue}`
       }
       if (config.value === 'categories-product') {
         return `${config.pathPrefix}/${slugValue}`

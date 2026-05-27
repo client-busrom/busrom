@@ -307,7 +307,8 @@ export function FaqDetailSection({
             return (
               <button
                 key={cat.id}
-                id={slug ? `faq-${slug}` : undefined}
+                id={slug ? `faq-detail-${slug}` : undefined}
+                data-legacy-id={slug ? `faq-${slug}` : undefined}
                 onClick={() => setActiveId(cat.id)}
                 className={`flex items-center transition-all duration-500 relative shrink-0 ${
                   isActive ? "scale-105 z-20" : "opacity-80 hover:opacity-100 z-10"
