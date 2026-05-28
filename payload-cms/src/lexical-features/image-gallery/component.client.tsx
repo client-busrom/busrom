@@ -1904,15 +1904,31 @@ export const ImageGalleryComponent: React.FC<ImageGalleryComponentProps> = (prop
 
   // 添加 Application 源的图片
   const handleAddApplicationItems = (selectedIds: string[]) => {
-    const newItems = selectedIds.map(id => ({
-      sourceType: 'application' as const,
-      image: '',
-      application: id,
-      caption: '',
-    }))
+    // Keep non-application images, and only keep application images that are still selected
+    const remainingImages = formData.images.filter(img => {
+      if (img.sourceType !== 'application' || !img.application) return true
+      const id = typeof img.application === 'object' ? String(img.application.id) : String(img.application)
+      return selectedIds.includes(id)
+    })
+
+    // Find current application IDs
+    const currentAppIds = remainingImages
+      .filter(img => img.sourceType === 'application' && img.application)
+      .map(img => typeof img.application === 'object' ? String(img.application.id) : String(img.application))
+
+    // Create new items only for newly selected IDs
+    const newItems = selectedIds
+      .filter(id => !currentAppIds.includes(id))
+      .map(id => ({
+        sourceType: 'application' as const,
+        image: '',
+        application: id,
+        caption: '',
+      }))
+
     setFormData({
       ...formData,
-      images: [...formData.images, ...newItems],
+      images: [...remainingImages, ...newItems],
     })
     setShowAppPicker(false)
   }
