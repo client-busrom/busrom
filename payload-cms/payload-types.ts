@@ -1943,12 +1943,15 @@ export interface CustomScript {
         | 'product_series_detail'
         | 'shop_list'
         | 'shop_detail'
-        | 'blog_list'
+        | 'blog'
+        | 'blogs'
         | 'blog_detail'
-        | 'applications'
       )
     | null;
   exactPath?: string | null;
+  /**
+   * Supports wildcards: /products/* or /blog/**
+   */
   pathPattern?: string | null;
   isEnabled?: boolean | null;
   /**
@@ -1986,12 +1989,15 @@ export interface SeoSetting {
         | 'product_series_detail'
         | 'shop_list'
         | 'shop_detail'
-        | 'blog_list'
+        | 'blog'
+        | 'blogs'
         | 'blog_detail'
-        | 'applications'
       )
     | null;
   exactPath?: string | null;
+  /**
+   * Supports wildcards: /products/* or /blog/**
+   */
   pathPattern?: string | null;
   /**
    * If checked, this item will provide the Meta Title and Description for the page. Other matching items will only be used for hidden long-tail keywords.

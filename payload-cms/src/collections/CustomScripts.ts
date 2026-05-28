@@ -473,13 +473,13 @@ export const CustomScripts: CollectionConfig = {
       },
       options: [
         { label: { en: 'Home', zh: '首页' }, value: 'home' },
-        { label: { en: 'Product Series List', zh: '产品系列列表' }, value: 'product_series_list' },
-        { label: { en: 'Product Series Detail', zh: '产品系列详情' }, value: 'product_series_detail' },
-        { label: { en: 'Shop List', zh: '商城列表' }, value: 'shop_list' },
-        { label: { en: 'Shop Product Detail', zh: '商品详情' }, value: 'shop_detail' },
-        { label: { en: 'Blog List', zh: '博客列表' }, value: 'blog_list' },
-        { label: { en: 'Blog Detail', zh: '博客详情' }, value: 'blog_detail' },
-        { label: { en: 'Applications', zh: '应用场景' }, value: 'applications' },
+        { label: { en: 'Product Overview Page', zh: '产品概览页' }, value: 'product_series_list' },
+        { label: { en: 'Product Detail Page', zh: '产品详解页' }, value: 'product_series_detail' },
+        { label: { en: 'Shop List Page', zh: 'shop列表页' }, value: 'shop_list' },
+        { label: { en: 'Product Link Integration Page', zh: '产品链接整合页' }, value: 'shop_detail' },
+        { label: { en: 'Knowledge Base Overview', zh: '知识库概览页' }, value: 'blog' },
+        { label: { en: 'Knowledge Base List', zh: '知识库列表页' }, value: 'blogs' },
+        { label: { en: 'Knowledge Base Detail', zh: '知识库详情页' }, value: 'blog_detail' },
       ],
       admin: {
         condition: (data) => data.scope === 'page_type',
@@ -508,8 +508,9 @@ export const CustomScripts: CollectionConfig = {
       },
       admin: {
         condition: (data) => data.scope === 'path_pattern',
-        components: {
-          Field: '@/components/fields/PathSelector',
+        description: {
+          en: 'Supports wildcards: /products/* or /blog/**',
+          zh: '支持使用通配符，例如 /products/* 或 /blog/**',
         },
       },
     },
