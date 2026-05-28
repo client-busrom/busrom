@@ -62,6 +62,8 @@ import { default as default_a3a3aa8bfebcaf82c7d4953fe2175cbd } from '@/component
 import { default as default_35c54f4c34cbc438e04ddcc4e8815bff } from '@/components/fields/ApplicationImagePicker'
 import { SmartLinkField as SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8 } from '@/components/fields/SmartLinkField'
 import { default as default_f2f012c65168d1c448e59ecd59a1bae5 } from '@/components/admin/NavigationManagerLink'
+import { WaterfallMediaPicker as WaterfallMediaPicker_7e13d0a308cf20b5c3ca6a89aed5025a } from '@/fields/WaterfallMediaPicker.client'
+import { WaterfallApplicationPicker as WaterfallApplicationPicker_3c2cc04fa7dcaff3967d250cf3e4420d } from '@/fields/WaterfallApplicationPicker.client'
 import { default as default_a3e549dccdd3ea0f10d6ba87c5f4df9b } from '@/components/fields/PathSelector'
 import { default as default_27a145562c8e9424ddd39c471f5ea155 } from '@/components/fields/AutoDraft'
 import { default as default_542a7bec4aca3e00d6f3ee70f3087485 } from '@/components/fields/SeoConflictAnalysis'
@@ -154,6 +156,8 @@ export const importMap = {
   "@/components/fields/ApplicationImagePicker#default": default_35c54f4c34cbc438e04ddcc4e8815bff,
   "@/components/fields/SmartLinkField#SmartLinkField": SmartLinkField_e635f1e069dfeac8bac1a8b34ec70fb8,
   "@/components/admin/NavigationManagerLink#default": default_f2f012c65168d1c448e59ecd59a1bae5,
+  "@/fields/WaterfallMediaPicker.client#WaterfallMediaPicker": WaterfallMediaPicker_7e13d0a308cf20b5c3ca6a89aed5025a,
+  "@/fields/WaterfallApplicationPicker.client#WaterfallApplicationPicker": WaterfallApplicationPicker_3c2cc04fa7dcaff3967d250cf3e4420d,
   "@/components/fields/PathSelector#default": default_a3e549dccdd3ea0f10d6ba87c5f4df9b,
   "@/components/fields/AutoDraft#default": default_27a145562c8e9424ddd39c471f5ea155,
   "@/components/fields/SeoConflictAnalysis#default": default_542a7bec4aca3e00d6f3ee70f3087485,

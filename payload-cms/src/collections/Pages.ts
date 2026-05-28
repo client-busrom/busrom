@@ -359,6 +359,9 @@ export const Pages: CollectionConfig = {
               },
               admin: {
                 condition: (data) => data.waterfallImageMode === 'manual',
+                components: {
+                  Field: '@/fields/WaterfallMediaPicker.client#WaterfallMediaPicker',
+                },
                 description: {
                   en: 'Select up to 5 images for the waterfall',
                   zh: '选择最多5张图片用于瀑布流',
@@ -376,6 +379,9 @@ export const Pages: CollectionConfig = {
               },
               admin: {
                 condition: (data) => data.waterfallImageMode === 'randomFromCases',
+                components: {
+                  Field: '@/fields/WaterfallApplicationPicker.client#WaterfallApplicationPicker',
+                },
                 description: {
                   en: 'Select cases to randomly pick 5 images from',
                   zh: '选择案例，将从中随机获取5张图片',

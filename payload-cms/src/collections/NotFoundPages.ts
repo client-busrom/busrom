@@ -122,6 +122,9 @@ export const NotFoundPages: CollectionConfig = {
       },
       admin: {
         condition: (data) => data?.mediaSelection === 'manual',
+        components: {
+          Field: '@/fields/WaterfallMediaPicker.client#WaterfallMediaPicker',
+        },
       },
     },
     {
@@ -135,6 +138,9 @@ export const NotFoundPages: CollectionConfig = {
       },
       admin: {
         condition: (data) => data?.mediaSelection === 'random',
+        components: {
+          Field: '@/fields/WaterfallApplicationPicker.client#WaterfallApplicationPicker',
+        },
         description: {
           en: 'Randomly select media from these Applications.',
           zh: '将从这些关联的案例图集中随机提取配图。',

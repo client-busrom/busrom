@@ -222,7 +222,7 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
               onClick={() => setShowApplicationPicker(true)}
               style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: '#A08745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
             >
-              <Plus size={14} /> {i18n?.language === 'zh' ? '选择应用' : 'Select Applications'}
+              <Plus size={14} /> {i18n?.language === 'zh' ? '选择案例图集' : 'Select Applications'}
             </button>
           </div>
 
@@ -298,7 +298,7 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
 
             {applications.length === 0 && (
               <div style={{ gridColumn: 'span 3', padding: '32px', textAlign: 'center', color: '#6b7280', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px dashed #d1d5db' }}>
-                {i18n?.language === 'zh' ? '点击"选择应用"添加应用' : 'Click "Select Applications" to add applications'}
+                {i18n?.language === 'zh' ? '点击"选择案例图集"添加案例' : 'Click "Select Applications" to add applications'}
               </div>
             )}
           </div>
@@ -652,9 +652,9 @@ export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({
           backgroundColor: 'white',
           borderRadius: '8px',
           padding: '24px',
-          maxWidth: '800px',
-          width: '90%',
-          maxHeight: '80vh',
+          maxWidth: '1200px',
+          width: '95%',
+          maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -662,7 +662,7 @@ export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h3 style={{ margin: 0 }}>
-            {i18n?.language === 'zh' ? '选择应用' : 'Select Applications'}
+            {i18n?.language === 'zh' ? '选择案例图集' : 'Select Applications'}
           </h3>
           <button
             type="button"

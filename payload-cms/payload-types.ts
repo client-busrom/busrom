@@ -754,7 +754,7 @@ export interface Product {
   /**
    * URL-friendly identifier (auto-generated if empty)
    */
-  slug: string;
+  slug?: string | null;
   name: string;
   /**
    * Brief product description for listings
