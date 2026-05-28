@@ -96,8 +96,6 @@ export const Products: CollectionConfig = {
             {
               name: 'slug',
               type: 'text',
-              required: true,
-              unique: true,
               label: {
                 en: 'Slug',
                 zh: 'URL标识',
@@ -450,17 +448,29 @@ export const Products: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
-      async ({ data, operation }) => {
-        // Auto-generate slug from name if empty
-        if (operation === 'create' && !data?.slug && data?.name) {
-          const name = typeof data.name === 'string' ? data.name : data.name?.en || data.name?.zh || ''
-          data.slug = name
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, '-')
-            .replace(/[^a-z0-9-]/g, '')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '')
+      async ({ data, req }) => {
+        const isTranslation = req.context?.isTranslationSave || req.context?.isSyncing
+        if (isTranslation) return data
+
+        // Only generate slug from English name. Prevent other locales from overwriting it.
+        if (data.name) {
+          let nameToSlugify = '';
+          
+          if (typeof data.name === 'object' && data.name.en) {
+            nameToSlugify = data.name.en;
+          } else if (req.locale === 'en' || req.locale === 'all' || !req.locale) {
+            nameToSlugify = typeof data.name === 'string' ? data.name : '';
+          }
+
+          if (nameToSlugify) {
+            data.slug = nameToSlugify
+              .toLowerCase()
+              .trim()
+              .replace(/\s+/g, '-')
+              .replace(/[^a-z0-9-]/g, '')
+              .replace(/-+/g, '-')
+              .replace(/^-|-$/g, '');
+          }
         }
         return data
       },
