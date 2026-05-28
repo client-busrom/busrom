@@ -560,7 +560,7 @@ export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({
   const [hasNextPage, setHasNextPage] = useState(false)
 
   useEffect(() => {
-    setLocalSelectedIds(selectedIds)
+    setLocalSelectedIds(selectedIds.map(String))
   }, [selectedIds])
 
   useEffect(() => {
@@ -596,15 +596,16 @@ export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({
     fetchApplications()
   }, [isOpen, searchTerm, currentPage])
 
-  const toggleApplication = (id: string) => {
+  const toggleApplication = (id: string | number) => {
+    const strId = String(id)
     if (multiple) {
-      if (localSelectedIds.includes(id)) {
-        setLocalSelectedIds(localSelectedIds.filter((i) => i !== id))
+      if (localSelectedIds.includes(strId)) {
+        setLocalSelectedIds(localSelectedIds.filter((i) => i !== strId))
       } else {
-        setLocalSelectedIds([...localSelectedIds, id])
+        setLocalSelectedIds([...localSelectedIds, strId])
       }
     } else {
-      setLocalSelectedIds([id])
+      setLocalSelectedIds([strId])
     }
   }
 
@@ -714,7 +715,7 @@ export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({
           ) : allApplications.length > 0 ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
               {allApplications.map((app) => {
-                const isSelected = localSelectedIds.includes(app.id)
+                const isSelected = localSelectedIds.includes(String(app.id))
                 const previewImage = getPreviewImage(app)
 
                 return (
