@@ -751,10 +751,6 @@ export interface Product {
    * Product model code (e.g., "GDH-001")
    */
   sku: string;
-  /**
-   * URL-friendly identifier (auto-generated if empty)
-   */
-  slug?: string | null;
   name: string;
   /**
    * Brief product description for listings
@@ -808,6 +804,10 @@ export interface Product {
    * Primary sort key for Shop gallery. Higher number = appears first. Fallback order: Shop Weight > Global Order > Update Time.
    */
   shopOrder?: number | null;
+  /**
+   * This slug is generated from the English product name. Do not modify manually unless necessary.
+   */
+  slug?: string | null;
   User?: (number | null) | User;
   Operation?: string | null;
   updatedAt: string;
@@ -2767,7 +2767,6 @@ export interface PermissionsSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   sku?: T;
-  slug?: T;
   name?: T;
   shortDescription?: T;
   description?: T;
@@ -2785,6 +2784,7 @@ export interface ProductsSelect<T extends boolean = true> {
   isNew?: T;
   order?: T;
   shopOrder?: T;
+  slug?: T;
   User?: T;
   Operation?: T;
   updatedAt?: T;

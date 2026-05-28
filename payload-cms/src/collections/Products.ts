@@ -93,21 +93,7 @@ export const Products: CollectionConfig = {
               },
               index: true,
             },
-            {
-              name: 'slug',
-              type: 'text',
-              label: {
-                en: 'Slug',
-                zh: 'URL标识',
-              },
-              admin: {
-                description: {
-                  en: 'URL-friendly identifier (auto-generated if empty)',
-                  zh: 'URL友好标识符（留空时自动生成）',
-                },
-              },
-              index: true,
-            },
+
             {
               name: 'name',
               type: 'textarea',
@@ -444,6 +430,21 @@ export const Products: CollectionConfig = {
           },
         },
       ],
+    },
+    {
+      name: 'slug',
+      type: 'textarea',
+      label: {
+        en: 'Slug',
+        zh: 'URL标识',
+      },
+      admin: {
+        description: {
+          en: 'This slug is generated from the English product name. Do not modify manually unless necessary.',
+          zh: '这个 slug 由产品名称的英文(en)自动生成，非必要请不要手动修改。',
+        },
+      },
+      index: true,
     },
   ],
   hooks: {
