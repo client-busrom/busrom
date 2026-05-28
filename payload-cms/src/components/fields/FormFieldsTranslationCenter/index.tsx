@@ -82,30 +82,25 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
     setStatusMessage(null)
 
     try {
-      const res = await fetch(`/api/form-configs/${id}/all-locales`)
+      const res = await fetch(`/api/form-configs/${id}?locale=all&depth=0`)
       if (!res.ok) throw new Error('Failed to fetch')
 
       const data = await res.json()
+      const rawFields = data.fields || []
 
-      // Build locale data structure
+      // Build locale data structure by extracting strings for each locale
       const newLocaleData: LocaleData = {}
       for (const locale of SUPPORTED_LOCALES) {
         newLocaleData[locale.code] = {
-          fields: data.fields?.[locale.code] || data.fields || [],
-        }
-      }
-
-      // If data is not in locale-keyed format, it's the current locale only
-      // We need to fetch each locale separately
-      if (!data.fields?.[SUPPORTED_LOCALES[0].code]) {
-        for (const locale of SUPPORTED_LOCALES) {
-          const localeRes = await fetch(`/api/form-configs/${id}?locale=${locale.code}&depth=0`)
-          if (localeRes.ok) {
-            const localeDoc = await localeRes.json()
-            newLocaleData[locale.code] = {
-              fields: localeDoc.fields || [],
-            }
-          }
+          fields: rawFields.map((field: any) => ({
+            ...field,
+            label: typeof field.label === 'object' && field.label !== null ? (field.label[locale.code] || '') : (typeof field.label === 'string' ? field.label : ''),
+            placeholder: typeof field.placeholder === 'object' && field.placeholder !== null ? (field.placeholder[locale.code] || '') : (typeof field.placeholder === 'string' ? field.placeholder : ''),
+            options: (field.options || []).map((opt: any) => ({
+              ...opt,
+              label: typeof opt.label === 'object' && opt.label !== null ? (opt.label[locale.code] || '') : (typeof opt.label === 'string' ? opt.label : ''),
+            }))
+          }))
         }
       }
 
@@ -227,15 +222,15 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
     for (const locale of SUPPORTED_LOCALES) {
       if (locale.code === sourceLocale) continue
 
-      // Check if any field is empty
+      // Check if any field is empty (only if it has content in the source locale)
       let hasEmpty = false
       sourceFields.forEach((_, idx) => {
-        if (!getFieldValue(idx, 'label', locale.code)) hasEmpty = true
-        if (!getFieldValue(idx, 'placeholder', locale.code)) hasEmpty = true
+        if (getFieldValue(idx, 'label', sourceLocale) && !getFieldValue(idx, 'label', locale.code)) hasEmpty = true
+        if (getFieldValue(idx, 'placeholder', sourceLocale) && !getFieldValue(idx, 'placeholder', locale.code)) hasEmpty = true
 
-        const options = localeData[locale.code]?.fields?.[idx]?.options || []
+        const options = sourceFields[idx].options || []
         options.forEach((_, optIdx) => {
-          if (!getOptionLabel(idx, optIdx, locale.code)) hasEmpty = true
+          if (getOptionLabel(idx, optIdx, sourceLocale) && !getOptionLabel(idx, optIdx, locale.code)) hasEmpty = true
         })
       })
 
@@ -274,100 +269,80 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
       const sourceFields = localeData[sourceLocale]?.fields || []
       let totalTranslated = 0
 
+      // Get user's personal translation settings
+      const { getTranslationHeaders } = await import('@/lib/translation-client')
+      const personalHeaders = getTranslationHeaders()
+
+      // Gather all strings
+      interface TextItem {
+        fieldIdx: number
+        type: 'label' | 'placeholder' | 'option'
+        optIdx?: number
+        sourceValue: string
+      }
+
+      const itemsToTranslate: TextItem[] = []
+
       for (let fieldIdx = 0; fieldIdx < sourceFields.length; fieldIdx++) {
         const sourceField = sourceFields[fieldIdx]
 
-        // Translate label
-        // Get user's personal translation settings
-        const { getTranslationHeaders } = await import('@/lib/translation-client')
-        const personalHeaders = getTranslationHeaders()
-
         const sourceLabel = getFieldValue(fieldIdx, 'label', sourceLocale)
-        if (sourceLabel) {
-          const localesToTranslate = targetLocales.filter(locale => {
-            if (overwriteExisting) return true
-            return !getFieldValue(fieldIdx, 'label', locale)
-          })
+        if (sourceLabel) itemsToTranslate.push({ fieldIdx, type: 'label', sourceValue: sourceLabel })
 
-          if (localesToTranslate.length > 0) {
-            const res = await fetch('/api/translate', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', ...personalHeaders },
-              body: JSON.stringify({
-                text: sourceLabel,
-                sourceLang: sourceLocale,
-                targetLangs: localesToTranslate,
-              }),
-            })
-            const data = await res.json()
-
-            for (const locale of localesToTranslate) {
-              if (data.translations?.[locale]) {
-                updateFieldValue(fieldIdx, 'label', locale, data.translations[locale])
-                totalTranslated++
-              }
-            }
-          }
-        }
-
-        // Translate placeholder
         const sourcePlaceholder = getFieldValue(fieldIdx, 'placeholder', sourceLocale)
-        if (sourcePlaceholder) {
-          const localesToTranslate = targetLocales.filter(locale => {
-            if (overwriteExisting) return true
-            return !getFieldValue(fieldIdx, 'placeholder', locale)
-          })
+        if (sourcePlaceholder) itemsToTranslate.push({ fieldIdx, type: 'placeholder', sourceValue: sourcePlaceholder })
 
-          if (localesToTranslate.length > 0) {
-            const res = await fetch('/api/translate', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', ...personalHeaders },
-              body: JSON.stringify({
-                text: sourcePlaceholder,
-                sourceLang: sourceLocale,
-                targetLangs: localesToTranslate,
-              }),
-            })
-            const data = await res.json()
-
-            for (const locale of localesToTranslate) {
-              if (data.translations?.[locale]) {
-                updateFieldValue(fieldIdx, 'placeholder', locale, data.translations[locale])
-                totalTranslated++
-              }
-            }
-          }
-        }
-
-        // Translate options
         const sourceOptions = sourceField.options || []
         for (let optIdx = 0; optIdx < sourceOptions.length; optIdx++) {
           const sourceOptLabel = getOptionLabel(fieldIdx, optIdx, sourceLocale)
-          if (sourceOptLabel) {
-            const localesToTranslate = targetLocales.filter(locale => {
-              if (overwriteExisting) return true
-              return !getOptionLabel(fieldIdx, optIdx, locale)
-            })
+          if (sourceOptLabel) itemsToTranslate.push({ fieldIdx, type: 'option', optIdx, sourceValue: sourceOptLabel })
+        }
+      }
 
-            if (localesToTranslate.length > 0) {
-              const res = await fetch('/api/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...personalHeaders },
-                body: JSON.stringify({
-                  text: sourceOptLabel,
-                  sourceLang: sourceLocale,
-                  targetLangs: localesToTranslate,
-                }),
-              })
-              const data = await res.json()
+      for (const targetLang of targetLocales) {
+        // Filter items that need translation for THIS targetLang
+        const validItems = itemsToTranslate.filter(item => {
+          if (overwriteExisting) return true
+          if (item.type === 'label') return !getFieldValue(item.fieldIdx, 'label', targetLang)
+          if (item.type === 'placeholder') return !getFieldValue(item.fieldIdx, 'placeholder', targetLang)
+          if (item.type === 'option') return !getOptionLabel(item.fieldIdx, item.optIdx!, targetLang)
+          return false
+        })
 
-              for (const locale of localesToTranslate) {
-                if (data.translations?.[locale]) {
-                  updateOptionLabel(fieldIdx, optIdx, locale, data.translations[locale])
-                  totalTranslated++
-                }
-              }
+        if (validItems.length === 0) continue
+
+        const texts = validItems.map(i => i.sourceValue)
+
+        const res = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...personalHeaders },
+          body: JSON.stringify({
+            texts,
+            sourceLang: sourceLocale,
+            targetLang,
+          }),
+        })
+
+        if (!res.ok) throw new Error(`Translation to ${targetLang} failed`)
+
+        const data = await res.json()
+        const translations = data.translations as string[]
+
+        if (translations && Array.isArray(translations)) {
+          // Update the fields for this language
+          for (let i = 0; i < validItems.length; i++) {
+            const item = validItems[i]
+            const translatedText = translations[i]
+            if (!translatedText) continue
+
+            if (item.type === 'label') {
+              updateFieldValue(item.fieldIdx, 'label', targetLang, translatedText)
+            } else if (item.type === 'placeholder') {
+              updateFieldValue(item.fieldIdx, 'placeholder', targetLang, translatedText)
+            } else if (item.type === 'option') {
+              updateOptionLabel(item.fieldIdx, item.optIdx!, targetLang, translatedText)
             }
+            totalTranslated++
           }
         }
       }
@@ -544,10 +519,22 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                     <div className="fftc-targets-grid">
                       {SUPPORTED_LOCALES.filter(l => l.code !== sourceLocale).map(locale => {
                         const isSelected = targetLocales.includes(locale.code as LocaleCode)
+                        const sourceFields = localeData[sourceLocale]?.fields || []
+                        const allFilled = sourceFields.length > 0 && !sourceFields.some((_, idx) => {
+                          let empty = false
+                          if (getFieldValue(idx, 'label', sourceLocale) && !getFieldValue(idx, 'label', locale.code)) empty = true
+                          if (getFieldValue(idx, 'placeholder', sourceLocale) && !getFieldValue(idx, 'placeholder', locale.code)) empty = true
+                          const options = sourceFields[idx].options || []
+                          options.forEach((_, optIdx) => {
+                            if (getOptionLabel(idx, optIdx, sourceLocale) && !getOptionLabel(idx, optIdx, locale.code)) empty = true
+                          })
+                          return empty
+                        })
+
                         return (
                           <label
                             key={locale.code}
-                            className={`fftc-target-item ${isSelected ? 'fftc-target-item--selected' : ''}`}
+                            className={`fftc-target-item ${isSelected ? 'fftc-target-item--selected' : ''} ${allFilled ? 'fftc-target-item--filled' : ''}`}
                           >
                             <input
                               type="checkbox"
@@ -562,6 +549,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                             />
                             <LocaleFlag localeCode={locale.code} className="fftc-target-item__flag" />
                             <span className="fftc-target-item__code">{locale.code.toUpperCase()}</span>
+                            {allFilled && <span className="fftc-target-item__check">✓</span>}
                           </label>
                         )
                       })}
