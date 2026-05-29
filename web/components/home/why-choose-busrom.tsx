@@ -8,6 +8,7 @@ import { IconifyIcon } from "@/components/ui/IconifyIcon";
 import { cn } from "@/lib/utils";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { HollowText } from "@/components/common/HollowText";
+import { useOverflow } from "@/lib/hooks/useOverflow";
 
 type Props = {
   data: HomeContent["whyChooseBusrom"];
@@ -83,6 +84,7 @@ export default function WhyChooseBusrom({ data, headerTheme, className }: Props)
   const [isVisible, setIsVisible] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const { ref: titleRef, isOverflow: titleOverflow } = useOverflow<HTMLDivElement>();
 
   const reasonsLength = data?.reasons?.length || 0;
 
@@ -210,41 +212,55 @@ export default function WhyChooseBusrom({ data, headerTheme, className }: Props)
           }}
         >
           {/* 顶部区域 - Header */}
-          <div className="flex justify-between items-end">
-            {/* 左侧标题 */}
-            <h2
-              className="font-anaheim font-extrabold flex flex-wrap gap-x-4 items-baseline"
+          <div className="flex justify-between items-end gap-4">
+            {/* 左侧标题 - 60% 宽度，最多3行，超出内部滚动 */}
+            <div
+              ref={titleRef}
+              className={cn(titleOverflow && "overflow-y-auto")}
+              data-lenis-prevent={titleOverflow || undefined}
               style={{
-                fontSize: vw(LAYOUT.header.titleFontSize),
-                lineHeight: vw(LAYOUT.header.titleLineHeight),
+                width: '60%',
+                maxHeight: `calc(${vw(LAYOUT.header.titleLineHeight)} * 3)`,
+                overscrollBehavior: titleOverflow ? 'contain' : undefined,
+                msOverflowStyle: titleOverflow ? 'scrollbar' : undefined,
               }}
             >
-              <span
+              <h2
+                className="font-anaheim font-extrabold flex flex-wrap gap-x-4 items-baseline"
                 style={{
-                  color: '#000000',
-                  WebkitTextStroke: `calc(4 * var(--rpx)) #756f3f`,
-                  paintOrder: 'stroke fill',
+                  fontSize: vw(LAYOUT.header.titleFontSize),
+                  lineHeight: vw(LAYOUT.header.titleLineHeight),
                 }}
               >
-                {data.title}
-              </span>{' '}
-              <span className="animate-custom-float">
-                <HollowText
-                  strokeColor="#756f3f"
-                  strokeWidth={1.2}
+                <span
+                  style={{
+                    color: '#000000',
+                    WebkitTextStroke: `calc(4 * var(--rpx)) #756f3f`,
+                    paintOrder: 'stroke fill',
+                  }}
                 >
-                  {data.title2}
-                </HollowText>
-              </span>
-            </h2>
+                  {data.title}
+                </span>{' '}
+                <span className="animate-custom-float">
+                  <HollowText
+                    strokeColor="#756f3f"
+                    strokeWidth={1.2}
+                  >
+                    {data.title2}
+                  </HollowText>
+                </span>
+              </h2>
+            </div>
 
-            {/* 右侧 VIEW MORE */}
-            <AnimatedLinkButton href={data.viewMoreButtonUrl || '#'}>
-              {data.viewMoreButtonText || 'VIEW MORE INFORMATION'}
-              <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1">
-                »
-              </span>
-            </AnimatedLinkButton>
+            {/* 右侧 VIEW MORE - 40% 宽度 */}
+            <div style={{ width: '40%', display: 'flex', justifyContent: 'flex-end' }}>
+              <AnimatedLinkButton href={data.viewMoreButtonUrl || '#'}>
+                {data.viewMoreButtonText || 'VIEW MORE INFORMATION'}
+                <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1">
+                  »
+                </span>
+              </AnimatedLinkButton>
+            </div>
           </div>
 
           {/* 手风琴卡片区域 */}

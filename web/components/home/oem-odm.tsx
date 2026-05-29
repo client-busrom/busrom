@@ -244,28 +244,28 @@ export default function OemOdm({ data, headerTheme, className }: Props) {
 
           {/* OEM 描述文字 */}
           <motion.div
-            className="absolute text-white text-right group cursor-pointer"
+            className="absolute text-white text-right overflow-y-auto"
+            data-lenis-prevent
             style={{
               right: "61%",
               top: "21%",
               width: "clamp(180px, 23.8vw, 457px)",
               fontSize: "clamp(11px, 1.15vw, 22px)",
               lineHeight: "1.35",
+              maxHeight: "calc(clamp(11px, 1.15vw, 22px) * 1.35 * 5)",
+              overscrollBehavior: "contain",
+              msOverflowStyle: "scrollbar",
             }}
             variants={contentLeftVariants}
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            <p className="flex items-start justify-end transition-opacity duration-300 group-hover:opacity-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-white mt-[0.55em] mr-2 flex-shrink-0" />
-              <span>{OEM.description[0]}</span>
-            </p>
-            {OEM.description[1] && (
-              <p className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex items-start justify-end">
-                <span className="w-1.5 h-1.5 rounded-full bg-white mt-[0.55em] mr-2 flex-shrink-0" />
-                <span>{OEM.description[1]}</span>
+            {OEM.description.map((paragraph, index) => (
+              <p key={index} className="flex items-start mr-2 justify-end">
+                <span>{paragraph}</span>
+                {/* <span className="w-1.5 h-1.5 rounded-full bg-white mt-[0.55em] ml-2 flex-shrink-0" /> */}
               </p>
-            )}
+            ))}
           </motion.div>
 
           {/* OEM 产品图片 */}
@@ -330,13 +330,17 @@ export default function OemOdm({ data, headerTheme, className }: Props) {
 
           {/* ODM 描述文字 */}
           <motion.div
-            className="absolute text-white text-left space-y-2"
+            className="absolute text-white text-left overflow-y-auto"
+            data-lenis-prevent
             style={{
               left: "69.2%",
               top: "79%",
               width: "clamp(170px, 22.4vw, 431px)",
               fontSize: "clamp(12px, 1.25vw, 24px)",
               lineHeight: "1.35",
+              maxHeight: "calc(clamp(12px, 1.25vw, 24px) * 1.35 * 4)",
+              overscrollBehavior: "contain",
+              msOverflowStyle: "scrollbar",
             }}
             variants={contentRightVariants}
             initial="hidden"

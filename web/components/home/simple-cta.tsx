@@ -9,6 +9,7 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { motion } from "framer-motion";
 import { LexicalRenderer } from "@/components/lexical/LexicalRenderer";
 import { IconifyIcon } from "@/components/ui/IconifyIcon";
+import { useOverflow } from "@/lib/hooks/useOverflow";
 
 type Props = {
   data: HomeContent["simpleCta"];
@@ -149,7 +150,6 @@ const LAYOUT_CONFIG = {
       lineHeight: "leading-tight 2xl:leading-[27px]",
       color: "text-[#978350]",
       marginBottom: "mb-[77px]", // 86 × 0.9
-      noWrap: true, // 不换行
     },
 
     // 描述文字 - fontSize: 32 × 0.9 = 29
@@ -167,16 +167,14 @@ const LAYOUT_CONFIG = {
   button: {
     // 桌面端按钮尺寸: 372 × 0.9 = 335, 68 × 0.9 = 61, 32 × 0.9 = 29
     desktop: {
-      width: "w-[252px] lg:w-[288px] 2xl:w-[335px]",
-      height: "h-[47px] lg:h-[52px] 2xl:h-[61px]",
+      minHeight: "min-h-[47px] lg:min-h-[52px] 2xl:min-h-[61px]",
       fontSize: "text-base lg:text-lg 2xl:text-[29px]",
       borderRadius: "rounded-[31px]",
     },
 
     // 移动端按钮尺寸
     mobile: {
-      width: "w-[216px]",
-      height: "h-[43px]",
+      minHeight: "min-h-[43px]",
       fontSize: "text-sm",
       borderRadius: "rounded-[31px]",
     },
@@ -341,6 +339,9 @@ const ImagePlaceholder = ({
 export default function SimpleCta({ data, headerTheme, className }: Props) {
   const [mediaCache, setMediaCache] = React.useState<Record<string, any>>({});
   const cfg = LAYOUT_CONFIG;
+  const { ref: titleRef, isOverflow: titleOverflow } = useOverflow<HTMLDivElement>();
+  const { ref: subtitleRef, isOverflow: subtitleOverflow } = useOverflow<HTMLDivElement>();
+  const { ref: descRef, isOverflow: descOverflow } = useOverflow<HTMLDivElement>();
   const marqueeLinks = React.useMemo(() => extractMarqueeLinks(data?.marqueeContent), [data?.marqueeContent]);
 
   // 解析只有 ID 的图标
@@ -519,22 +520,58 @@ export default function SimpleCta({ data, headerTheme, className }: Props) {
 
           {/* 移动端文本区域 */}
           <div className="w-full text-left space-y-4 px-2 sm:px-4">
-            {firstLine && (
-              <h3 className="font-anaheim font-bold text-3xl text-brand-text-black leading-tight">
-                {firstLine}
-              </h3>
-            )}
-            {secondLine && (
-              <h3 className="font-anaheim font-bold text-4xl text-brand-text-black leading-none -mt-2">
-                {secondLine}
-              </h3>
-            )}
-            <h4 className="font-anaheim font-bold text-xl text-[#978350] leading-tight whitespace-nowrap">
-              {data.subtitle}
-            </h4>
-            <p className="font-montserrat font-normal text-base text-[#3C3C3C] leading-relaxed whitespace-pre-line">
-              {data.description}
-            </p>
+            {/* 标题区域 */}
+            <div
+              className="overflow-y-auto"
+              data-lenis-prevent
+              style={{
+                maxHeight: "240px",
+                overscrollBehavior: "contain",
+                msOverflowStyle: "scrollbar",
+              }}
+            >
+              {firstLine && (
+                <h3 className="font-anaheim font-bold text-3xl text-brand-text-black leading-tight">
+                  {firstLine}
+                </h3>
+              )}
+              {secondLine && (
+                <h3 className="font-anaheim font-bold text-4xl text-brand-text-black leading-none -mt-2">
+                  {secondLine}
+                </h3>
+              )}
+            </div>
+
+            {/* 副标题 */}
+            <div
+              className="overflow-y-auto"
+              data-lenis-prevent
+              style={{
+                maxHeight: "calc(3 * 1.25em)",
+                overscrollBehavior: "contain",
+                msOverflowStyle: "scrollbar",
+              }}
+            >
+              <h4 className="font-anaheim font-bold text-xl text-[#978350] leading-tight">
+                {data.subtitle}
+              </h4>
+            </div>
+
+            {/* 描述文字 */}
+            <div
+              className="overflow-y-auto"
+              data-lenis-prevent
+              style={{
+                maxHeight: "calc(4 * 1.625em)",
+                overscrollBehavior: "contain",
+                msOverflowStyle: "scrollbar",
+              }}
+            >
+              <p className="font-montserrat font-normal text-base text-[#3C3C3C] leading-relaxed whitespace-pre-line">
+                {data.description}
+              </p>
+            </div>
+
             <div className="pt-4">
               <Link href="/contact-us">
                 <motion.div
@@ -547,12 +584,12 @@ export default function SimpleCta({ data, headerTheme, className }: Props) {
                 >
                   <Button
                     className={cn(
-                      "font-anaheim font-semibold flex items-center justify-center transition-colors duration-300 hover:bg-[#5C5731]",
+                      "font-anaheim font-semibold flex items-center justify-center text-center transition-colors duration-300 hover:bg-[#5C5731] px-6",
                       cfg.button.mobile.borderRadius,
                       cfg.button.mobile.fontSize,
-                      cfg.button.mobile.width,
-                      cfg.button.mobile.height,
+                      cfg.button.mobile.minHeight,
                     )}
+                    style={{ height: "auto" }}
                   >
                     {data.ctaText}
                   </Button>
@@ -649,62 +686,99 @@ export default function SimpleCta({ data, headerTheme, className }: Props) {
             className="text-left shrink-0 mt-8"
             style={{ width: cfg.columns.rightWidth }}
           >
-            {/* 标题第一行 - Ready to Start */}
-            {firstLine && (
-              <h3
-                className={cn(
-                  "font-anaheim font-bold",
-                  cfg.text.title1.fontSize,
-                  cfg.text.title1.lineHeight,
-                  cfg.text.title1.color,
-                  cfg.text.title1.marginBottom,
-                )}
-              >
-                {firstLine}
-              </h3>
-            )}
+            {/* 标题区域 - 带内部滚动 */}
+            <div
+              ref={titleRef}
+              className={cn(titleOverflow && "overflow-y-auto", "mb-[41px]")}
+              data-lenis-prevent={titleOverflow || undefined}
+              style={{
+                maxHeight: "200px",
+                overscrollBehavior: titleOverflow ? "contain" : undefined,
+                msOverflowStyle: titleOverflow ? "scrollbar" : undefined,
+              }}
+            >
+              {/* 标题第一行 - Ready to Start */}
+              {firstLine && (
+                <h3
+                  className={cn(
+                    "font-anaheim font-bold",
+                    cfg.text.title1.fontSize,
+                    cfg.text.title1.lineHeight,
+                    cfg.text.title1.color,
+                    cfg.text.title1.marginBottom,
+                  )}
+                >
+                  {firstLine}
+                </h3>
+              )}
 
-            {/* 标题第二行 - Your Project? */}
-            {secondLine && (
-              <h3
-                className={cn(
-                  "font-anaheim font-bold whitespace-nowrap",
-                  cfg.text.title2.fontSize,
-                  cfg.text.title2.lineHeight,
-                  cfg.text.title2.color,
-                  cfg.text.title2.marginBottom,
-                )}
-              >
-                {secondLine}
-              </h3>
-            )}
+              {/* 标题第二行 - Your Project? */}
+              {secondLine && (
+                <h3
+                  className={cn(
+                    "font-anaheim font-bold",
+                    cfg.text.title2.fontSize,
+                    cfg.text.title2.lineHeight,
+                    cfg.text.title2.color,
+                  )}
+                >
+                  {secondLine}
+                </h3>
+              )}
+            </div>
 
             {/* 副标题 - Let's Build Something Exceptional! */}
-            <h4
+            <div
+              ref={subtitleRef}
               className={cn(
-                "font-anaheim font-bold whitespace-nowrap",
-                cfg.text.subtitle.fontSize,
-                cfg.text.subtitle.lineHeight,
-                cfg.text.subtitle.color,
+                subtitleOverflow && "overflow-y-auto",
                 cfg.text.subtitle.marginBottom,
               )}
+              data-lenis-prevent={subtitleOverflow || undefined}
+              style={{
+                maxHeight: "calc(3 * 2em)",
+                overscrollBehavior: subtitleOverflow ? "contain" : undefined,
+                msOverflowStyle: subtitleOverflow ? "scrollbar" : undefined,
+              }}
             >
-              {data.subtitle}
-            </h4>
+              <h4
+                className={cn(
+                  "font-anaheim font-bold",
+                  cfg.text.subtitle.fontSize,
+                  cfg.text.subtitle.lineHeight,
+                  cfg.text.subtitle.color,
+                )}
+              >
+                {data.subtitle}
+              </h4>
+            </div>
 
             {/* 描述文字 */}
-            <p
+            <div
+              ref={descRef}
               className={cn(
-                "font-montserrat font-normal whitespace-pre-line",
-                cfg.text.description.fontSize,
-                cfg.text.description.lineHeight,
-                cfg.text.description.maxWidth,
-                cfg.text.description.color,
+                descOverflow && "overflow-y-auto",
                 cfg.text.description.marginBottom,
               )}
+              data-lenis-prevent={descOverflow || undefined}
+              style={{
+                maxHeight: "288px",
+                overscrollBehavior: descOverflow ? "contain" : undefined,
+                msOverflowStyle: descOverflow ? "scrollbar" : undefined,
+              }}
             >
-              {data.description}
-            </p>
+              <p
+                className={cn(
+                  "font-montserrat font-normal whitespace-pre-line",
+                  cfg.text.description.fontSize,
+                  cfg.text.description.lineHeight,
+                  cfg.text.description.maxWidth,
+                  cfg.text.description.color,
+                )}
+              >
+                {data.description}
+              </p>
+            </div>
 
             {/* CTA 按钮 */}
             <div>
@@ -730,12 +804,15 @@ export default function SimpleCta({ data, headerTheme, className }: Props) {
                 >
                   <Button
                     className={cn(
-                      "font-anaheim font-semibold flex items-center justify-center transition-colors duration-300 hover:bg-[#5C5731]",
+                      "font-anaheim font-semibold flex items-center justify-center text-center transition-colors duration-300 hover:bg-[#5C5731] px-6 lg:px-8 2xl:px-10",
                       cfg.button.desktop.borderRadius,
                       cfg.button.desktop.fontSize,
-                      cfg.button.desktop.width,
-                      cfg.button.desktop.height,
+                      cfg.button.desktop.minHeight,
                     )}
+                    style={{
+                      maxWidth: cfg.columns.rightWidth,
+                      height: "auto",
+                    }}
                   >
                     {data.ctaText}
                   </Button>

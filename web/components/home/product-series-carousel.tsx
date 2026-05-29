@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect, useLayoutEffect } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 import { Link } from "@/lib/navigation";
 import type { HomeContent } from "@/lib/content-data";
@@ -14,59 +14,67 @@ import {
   cn,
 } from "@/lib/utils";
 
-function MarqueeTitle({ text, className, style }: { text: string; className?: string; style?: React.CSSProperties }) {
+function ShrinkableTitle({ text, className, style }: { text: string; className?: string; style?: React.CSSProperties }) {
   const containerRef = useRef<HTMLHeadingElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
-  const [isOverflowing, setIsOverflowing] = useState(false);
+  const [dynamicFontSize, setDynamicFontSize] = useState(TITLE_SIZE_DEFAULT);
 
-  useEffect(() => {
-    const checkOverflow = () => {
-      if (containerRef.current && textRef.current) {
-        setIsOverflowing(textRef.current.scrollWidth > containerRef.current.clientWidth);
+  useLayoutEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const adjustFontSize = () => {
+      const base = DESIGN_WIDTH;
+      let size = TITLE_SIZE_DEFAULT;
+
+      el.style.fontSize = `${(size / base) * 100}vw`;
+
+      if (el.offsetHeight === 0) {
+        return;
       }
+
+      // Line height is 1.1 of font size
+      const lineH = size * 1.1;
+      const maxHeight = (lineH * 3.1 / base) * window.innerWidth;
+
+      // Gradually shrink if height exceeds 3 lines
+      while (el.offsetHeight > maxHeight && size > 20) {
+        size -= 2;
+        el.style.fontSize = `${(size / base) * 100}vw`;
+      }
+      setDynamicFontSize(size);
     };
-    checkOverflow();
-    const timeout = setTimeout(checkOverflow, 150);
-    window.addEventListener("resize", checkOverflow);
+
+    adjustFontSize();
+    window.addEventListener("resize", adjustFontSize);
+
+    // 用 MutationObserver 监听控制台直接修改 DOM 节点的文本
+    const observer = new MutationObserver(() => {
+      adjustFontSize();
+    });
+    observer.observe(el, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+
     return () => {
-      clearTimeout(timeout);
-      window.removeEventListener("resize", checkOverflow);
+      window.removeEventListener("resize", adjustFontSize);
+      observer.disconnect();
     };
   }, [text]);
 
   return (
     <h3
       ref={containerRef}
-      className={cn("overflow-hidden whitespace-nowrap", className)}
+      className={cn("text-center whitespace-normal break-words", className)}
       style={{
         ...style,
-        // Ensure padding doesn't affect the absolute positioning center
-        maskImage: isOverflowing ? "linear-gradient(to right, transparent, black 5%, black 95%, transparent)" : "none",
-        WebkitMaskImage: isOverflowing ? "linear-gradient(to right, transparent, black 5%, black 95%, transparent)" : "none"
+        lineHeight: 1.1,
+        width: "41.67vw", // 相当于设计稿的 800px (800/1920*100)，使用稳定的 vw 宽度，不依赖父容器宽度的百分比解析
+        fontSize: `${(dynamicFontSize / DESIGN_WIDTH) * 100}vw`,
       }}
     >
-      <motion.div
-        className="flex w-max"
-        animate={isOverflowing ? { x: ["0%", "-50%"] } : { x: "0%" }}
-        transition={
-          isOverflowing
-            ? { repeat: Infinity, ease: "linear", duration: Math.max(10, text.length * 0.3) }
-            : {}
-        }
-        style={{
-          width: isOverflowing ? "max-content" : "100%",
-          justifyContent: isOverflowing ? "flex-start" : "center",
-        }}
-      >
-        <div ref={textRef} className={cn("flex", isOverflowing && "pr-16")}>
-          {text}
-        </div>
-        {isOverflowing && (
-          <div className="flex pr-16">
-            {text}
-          </div>
-        )}
-      </motion.div>
+      {text}
     </h3>
   );
 }
@@ -644,19 +652,16 @@ export default function ProductSeriesCarousel({
               }}
             >
               {/* 标题移入容器内部，利用 scale 属性实现真正的“共进退” */}
-              <MarqueeTitle
+              <ShrinkableTitle
                 text={item.name}
-                className={`absolute font-anaheim font-extrabold text-white z-20 transition-opacity duration-300 ${
-                  isOnScreen ? "opacity-100" : "opacity-0"
-                }`}
+                className={`absolute font-anaheim font-extrabold text-white z-20 transition-opacity duration-300 ${isOnScreen ? "opacity-100" : "opacity-0"
+                  }`}
                 style={{
                   top: `${(-62 / IMG_SIZE_DEFAULT) * 100}%`, // 距离顶部 62px
                   left: "50%",
                   transform: "translate(-50%, -50%)",
                   fontWeight: 800,
-                  lineHeight: 0.47,
                   fontSize: `${(TITLE_SIZE_DEFAULT / DESIGN_WIDTH) * 100}vw`,
-                  maxWidth: "130%", // 限制最大宽度，超过此宽度触发走马灯
                 }}
               />
 

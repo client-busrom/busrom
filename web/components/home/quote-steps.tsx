@@ -156,6 +156,7 @@ export default function QuoteSteps({ data, headerTheme, className }: Props) {
           style={{
             left: `${(160 / DESIGN_WIDTH) * 100}%`,
             top: `${(PADDING_TOP / DESIGN_HEIGHT) * 100}%`,
+            maxWidth: `${((1200 - 160) / DESIGN_WIDTH) * 100}vw`,
           }}
         >
           {/* 副标题 "Design Project Solutions" - y=0 */}
@@ -163,17 +164,19 @@ export default function QuoteSteps({ data, headerTheme, className }: Props) {
             className="font-anaheim font-bold text-stroke-black"
             style={{
               fontSize: `${(48 / DESIGN_WIDTH) * 100}vw`,
-              lineHeight: `${(106 / DESIGN_WIDTH) * 100}vw`,
+              lineHeight: `${(48 / DESIGN_WIDTH) * 100}vw`,
+              marginBottom: `${(10 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
             {data.headerTitle}
           </h3>
           {/* 主标题 "Just Easy 5 Steps" - y=82 */}
           <h2
-            className="font-anaheim font-extrabold text-brand-text-black flex items-baseline"
+            className="font-anaheim font-extrabold text-brand-text-black"
             style={{
               fontSize: `${(96 / DESIGN_WIDTH) * 100}vw`,
-              lineHeight: `${(106 / DESIGN_WIDTH) * 100}vw`,
+              lineHeight: `${(96 / DESIGN_WIDTH) * 100}vw`,
+              marginBottom: `${(10 / DESIGN_WIDTH) * 100}vw`,
             }}
           >
             {parts.map((part, index) => {
@@ -212,7 +215,7 @@ export default function QuoteSteps({ data, headerTheme, className }: Props) {
           className="absolute bg-[#ECE8D8] rounded-full z-0"
           style={{
             left: `${(1303 / DESIGN_WIDTH) * 100}%`,
-            top: `${((42 + PADDING_TOP) / DESIGN_HEIGHT) * 100}%`,
+            top: `${((16 + PADDING_TOP) / DESIGN_HEIGHT) * 100}%`,
             width: `${(71 / DESIGN_WIDTH) * 100}vw`,
             height: `${(71 / DESIGN_WIDTH) * 100}vw`,
           }}
@@ -220,11 +223,15 @@ export default function QuoteSteps({ data, headerTheme, className }: Props) {
 
         {/* 描述文字 - 右侧 x=1339, y=68 (10821-10753) + padding */}
         <div
-          className="absolute"
+          className="absolute overflow-y-auto"
+          data-lenis-prevent
           style={{
             left: `${(1339 / DESIGN_WIDTH) * 100}%`,
-            top: `${((68 + PADDING_TOP) / DESIGN_HEIGHT) * 100}%`,
+            top: `${((40 + PADDING_TOP) / DESIGN_HEIGHT) * 100}%`,
             width: `${(428 / DESIGN_WIDTH) * 100}vw`,
+            maxHeight: `calc(${(30 / DESIGN_WIDTH) * 100}vw * 6)`,
+            overscrollBehavior: "contain",
+            msOverflowStyle: "scrollbar",
           }}
         >
           <p
@@ -275,23 +282,30 @@ export default function QuoteSteps({ data, headerTheme, className }: Props) {
                 </div>
 
                 {/* 步骤文本 */}
-                <p
+                <div
                   className={cn(
-                    "absolute z-10 font-anaheim font-bold transition-colors duration-300 whitespace-pre-line",
+                    "absolute z-10 overflow-y-auto",
                     isActive
                       ? "text-brand-text-black"
                       : "text-brand-text-black/80"
                   )}
+                  data-lenis-prevent
                   style={{
                     left: `${(735 / DESIGN_WIDTH) * 100}%`,
                     top: `${(40 / DESIGN_WIDTH) * 100}vw`,
                     fontSize: `${(36 / DESIGN_WIDTH) * 100}vw`,
                     lineHeight: `${(36 / DESIGN_WIDTH) * 100}vw`,
                     width: `${(609 / DESIGN_WIDTH) * 100}vw`,
+                    maxHeight: `calc(${(36 / DESIGN_WIDTH) * 100}vw * 3)`,
+                    overscrollBehavior: "contain",
+                    msOverflowStyle: "none",
+                    scrollbarWidth: "none"
                   }}
                 >
-                  {step.text.replace(/\\n|\/n/g, '\n')}
-                </p>
+                  <p className="font-anaheim font-bold whitespace-pre-line">
+                    {step.text.replace(/\\n|\/n/g, '\n')}
+                  </p>
+                </div>
 
                 {/* 步骤图片 - 位于右侧 */}
                 <div

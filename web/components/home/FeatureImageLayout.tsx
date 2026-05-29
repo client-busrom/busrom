@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, Transition } from "framer-motion";
 import { cn, getCropStyles, getObjectPosition } from "@/lib/utils";
 import { ServerImage } from "@/components/ui/ServerImage";
@@ -83,9 +84,6 @@ const FeatureImageItem = ({
   }
 
   // 普通布局 (Layout 1, 2, 3)
-  // 这些布局在 SVG 中仅仅是 rx="31" 的圆角矩形和 4px 的边框。
-  // 因为导出的 SVG 包含 fill="white"，作为 overlay 会完全遮挡底层图片，
-  // 所以对于标准圆角矩形，直接使用原生 CSS 进行精准等比渲染是最佳方案。
   return (
     <div
       className={cn("relative overflow-hidden group", className)}
@@ -118,10 +116,161 @@ const FeatureImageItem = ({
   );
 };
 
+// 提取布局渲染逻辑为独立组件，避免重复创建
+const LayoutContent = memo(function LayoutContent({
+  layoutType,
+  images,
+  cropDataList,
+}: {
+  layoutType: number;
+  images: any[];
+  cropDataList: any[];
+}) {
+  switch (layoutType) {
+    case 0:
+      return (
+        <div
+          className="w-full h-full flex flex-col"
+          style={{ gap: "calc(18 * var(--rpx))" }}
+        >
+          <div
+            className="w-full flex"
+            style={{ flex: "170 1 0", gap: "calc(18 * var(--rpx))" }}
+          >
+            <FeatureImageItem
+              image={images[0]}
+              alt={images[0]?.alt || "Feature 1"}
+              cropData={cropDataList[0]}
+              svgMask="feature-image-layout-1-1.svg"
+              style={{ flex: "243 1 0" }}
+              className="h-full"
+            />
+            <FeatureImageItem
+              image={images[1]}
+              alt={images[1]?.alt || "Feature 2"}
+              cropData={cropDataList[1]}
+              svgMask="feature-image-layout-1-2.svg"
+              style={{ flex: "332 1 0" }}
+              className="h-full"
+            />
+          </div>
+          <div
+            className="w-full flex"
+            style={{ flex: "232 1 0", gap: "calc(18 * var(--rpx))" }}
+          >
+            <FeatureImageItem
+              image={images[2]}
+              alt={images[2]?.alt || "Feature 3"}
+              cropData={cropDataList[2]}
+              svgMask="feature-image-layout-1-3.svg"
+              style={{ flex: "382 1 0" }}
+              className="h-full"
+            />
+            <FeatureImageItem
+              image={images[3]}
+              alt={images[3]?.alt || "Feature 4"}
+              cropData={cropDataList[3]}
+              svgMask="feature-image-layout-1-4.svg"
+              style={{ flex: "192 1 0" }}
+              className="h-full"
+            />
+          </div>
+        </div>
+      );
+    case 1:
+      return (
+        <div
+          className="w-full h-full flex"
+          style={{ gap: "calc(18 * var(--rpx))" }}
+        >
+          <FeatureImageItem
+            image={images[0]}
+            alt={images[0]?.alt || "Feature 1"}
+            cropData={cropDataList[0]}
+            svgMask="feature-image-layout-2.svg"
+            className="flex-1 h-full"
+          />
+          <FeatureImageItem
+            image={images[1]}
+            alt={images[1]?.alt || "Feature 2"}
+            cropData={cropDataList[1]}
+            svgMask="feature-image-layout-2.svg"
+            className="flex-1 h-full"
+          />
+        </div>
+      );
+    case 2:
+      return (
+        <div
+          className="w-full h-full grid grid-cols-3 grid-rows-2"
+          style={{ gap: "calc(18 * var(--rpx))" }}
+        >
+          {[0, 1, 2, 3, 4, 5].map((idx) => (
+            <FeatureImageItem
+              key={idx}
+              image={images[idx]}
+              alt={images[idx]?.alt || `Feature ${idx + 1}`}
+              cropData={cropDataList[idx]}
+              svgMask="feature-image-layout-3.svg"
+              className="w-full h-full"
+            />
+          ))}
+        </div>
+      );
+    case 3:
+      return (
+        <div className="w-full h-full flex" style={{ gap: 0 }}>
+          <FeatureImageItem
+            image={images[0]}
+            alt={images[0]?.alt || "Feature 1"}
+            cropData={cropDataList[0]}
+            isSpecialLayout4={true}
+            style={{ marginLeft: "calc(20 * var(--rpx))" }}
+          />
+          <FeatureImageItem
+            image={images[1]}
+            alt={images[1]?.alt || "Feature 2"}
+            cropData={cropDataList[1]}
+            isSpecialLayout4={true}
+            style={{ marginLeft: "calc(-56 * var(--rpx))" }}
+          />
+        </div>
+      );
+    default:
+      return null;
+  }
+});
+
+// 预加载 hook
+function usePreloadImages(features: any[]) {
+  const preloadedRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    features.forEach((feature) => {
+      if (!feature?.images) return;
+      feature.images.forEach((img: any) => {
+        if (!img?.url) return;
+        const url = img.url;
+        if (preloadedRef.current.has(url)) return;
+        preloadedRef.current.add(url);
+        const link = document.createElement("link");
+        link.rel = "preload";
+        link.as = "image";
+        link.href = url;
+        document.head.appendChild(link);
+      });
+    });
+  }, [features]);
+}
+
 export default function FeatureImageLayout({
   activeFeature,
   activeIndex,
 }: FeatureImageLayoutProps) {
+  // 预加载所有图片
+  const allFeatures = activeFeature?.__parentFeatures || [];
+  usePreloadImages(allFeatures);
+
   if (
     !activeFeature ||
     !activeFeature.images ||
@@ -134,18 +283,16 @@ export default function FeatureImageLayout({
     );
   }
 
-  // 五个 Feature 对应的四种布局模式 (0: 4张图, 1: 2张图, 2: 6张图, 3: 特殊2张图)
   const layoutMap = [0, 1, 2, 3, 3];
   const layoutType = layoutMap[activeIndex] ?? 0;
   const images = activeFeature.images;
   const cropDataList = activeFeature.imageCropDataList || [];
 
-  // 按照设计稿的原始尺寸定义每个 Layout 的外框宽高比
   const layoutDimensions = [
-    { w: 593, h: 420 }, // Layout 0: 243+332 (+18 gap) x 170+232 (+18 gap)
-    { w: 614, h: 416 }, // Layout 1: 298+298 (+18 gap) x 416
-    { w: 600, h: 424 }, // Layout 2: 188*3 (+36 gap) x 203*2 (+18 gap)
-    { w: 722, h: 408 }, // Layout 3: 352+352 (+18 gap) x 408
+    { w: 593, h: 420 },
+    { w: 614, h: 416 },
+    { w: 600, h: 424 },
+    { w: 722, h: 408 },
   ];
   const { w: nativeW, h: nativeH } = layoutDimensions[layoutType];
 
@@ -161,10 +308,6 @@ export default function FeatureImageLayout({
           className="w-full flex items-center justify-center"
           style={{ height: "100%" }}
         >
-          {/* 
-            关键点：使用 aspect-ratio 保证内部元素比例与 SVG 完美契合，防止拉伸变形。
-            限制 maxWidth 和 maxHeight 使用 var(--rpx) 进行等比缩放。
-          */}
           <div
             className="feature-img-container relative flex justify-center items-center w-full"
             style={{
@@ -182,118 +325,11 @@ export default function FeatureImageLayout({
                 ["--rpx" as any]: `calc(100cqw / ${nativeW})`,
               }}
             >
-            {/* Layout 0: 四张图 (1-1 ~ 1-4) */}
-            {layoutType === 0 && (
-              <div
-                className="w-full h-full flex flex-col"
-                style={{ gap: "calc(18 * var(--rpx))" }}
-              >
-                <div
-                  className="w-full flex"
-                  style={{ flex: "170 1 0", gap: "calc(18 * var(--rpx))" }}
-                >
-                  <FeatureImageItem
-                    image={images[0]}
-                    alt={images[0]?.alt || "Feature 1"}
-                    cropData={cropDataList[0]}
-                    svgMask="feature-image-layout-1-1.svg"
-                    style={{ flex: "243 1 0" }}
-                    className="h-full"
-                  />
-                  <FeatureImageItem
-                    image={images[1]}
-                    alt={images[1]?.alt || "Feature 2"}
-                    cropData={cropDataList[1]}
-                    svgMask="feature-image-layout-1-2.svg"
-                    style={{ flex: "332 1 0" }}
-                    className="h-full"
-                  />
-                </div>
-                <div
-                  className="w-full flex"
-                  style={{ flex: "232 1 0", gap: "calc(18 * var(--rpx))" }}
-                >
-                  <FeatureImageItem
-                    image={images[2]}
-                    alt={images[2]?.alt || "Feature 3"}
-                    cropData={cropDataList[2]}
-                    svgMask="feature-image-layout-1-3.svg"
-                    style={{ flex: "382 1 0" }}
-                    className="h-full"
-                  />
-                  <FeatureImageItem
-                    image={images[3]}
-                    alt={images[3]?.alt || "Feature 4"}
-                    cropData={cropDataList[3]}
-                    svgMask="feature-image-layout-1-4.svg"
-                    style={{ flex: "192 1 0" }}
-                    className="h-full"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Layout 1: 两张图 (Layout 2) */}
-            {layoutType === 1 && (
-              <div
-                className="w-full h-full flex"
-                style={{ gap: "calc(18 * var(--rpx))" }}
-              >
-                <FeatureImageItem
-                  image={images[0]}
-                  alt={images[0]?.alt || "Feature 1"}
-                  cropData={cropDataList[0]}
-                  svgMask="feature-image-layout-2.svg"
-                  className="flex-1 h-full"
-                />
-                <FeatureImageItem
-                  image={images[1]}
-                  alt={images[1]?.alt || "Feature 2"}
-                  cropData={cropDataList[1]}
-                  svgMask="feature-image-layout-2.svg"
-                  className="flex-1 h-full"
-                />
-              </div>
-            )}
-
-            {/* Layout 2: 六张图 (Layout 3) */}
-            {layoutType === 2 && (
-              <div
-                className="w-full h-full grid grid-cols-3 grid-rows-2"
-                style={{ gap: "calc(18 * var(--rpx))" }}
-              >
-                {[0, 1, 2, 3, 4, 5].map((idx) => (
-                  <FeatureImageItem
-                    key={idx}
-                    image={images[idx]}
-                    alt={images[idx]?.alt || `Feature ${idx + 1}`}
-                    cropData={cropDataList[idx]}
-                    svgMask="feature-image-layout-3.svg"
-                    className="w-full h-full"
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Layout 3: 两张图 (Layout 4) - 特殊处理 */}
-            {layoutType === 3 && (
-              <div className="w-full h-full flex" style={{ gap: 0 }}>
-                <FeatureImageItem
-                  image={images[0]}
-                  alt={images[0]?.alt || "Feature 1"}
-                  cropData={cropDataList[0]}
-                  isSpecialLayout4={true}
-                  style={{ marginLeft: "calc(20 * var(--rpx))" }}
-                />
-                <FeatureImageItem
-                  image={images[1]}
-                  alt={images[1]?.alt || "Feature 2"}
-                  cropData={cropDataList[1]}
-                  isSpecialLayout4={true}
-                  style={{ marginLeft: "calc(-56 * var(--rpx))" }}
-                />
-              </div>
-            )}
+              <LayoutContent
+                layoutType={layoutType}
+                images={images}
+                cropDataList={cropDataList}
+              />
             </div>
           </div>
         </motion.div>

@@ -154,7 +154,12 @@ const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardPr
           style={!isMobile ? {
             fontSize: vw(LAYOUT.cards.titleFontSize),
             marginBottom: vw(15),
+            maxHeight: `calc(${vw(LAYOUT.cards.titleFontSize)} * 1.3 * 3)`,
+            overflowY: 'auto',
+            overscrollBehavior: 'contain',
+            msOverflowStyle: 'scrollbar',
           } : undefined}
+          data-lenis-prevent
         >
           {product.title}
         </h3>
@@ -167,19 +172,25 @@ const ProductCard = ({ product, index, isMobile = false, locale }: ProductCardPr
           style={!isMobile ? {
             fontSize: vw(LAYOUT.cards.featureFontSize),
             lineHeight: vw(LAYOUT.cards.featureLineHeight),
+            maxHeight: `calc(${vw(LAYOUT.cards.featureLineHeight)} * 4)`,
+            overflowY: 'auto',
+            overscrollBehavior: 'contain',
+            msOverflowStyle: 'scrollbar',
           } : undefined}
+          data-lenis-prevent
         >
           {product.features.map((feature, idx) => (
-            <li key={idx} className="flex items-center">
+            <li key={idx} className="flex items-start">
               <svg
                 className={cn(
-                  "flex-shrink-0",
+                  "flex-shrink-0 mt-[2px]",
                   isMobile ? "w-4 h-4 mr-1.5" : ""
                 )}
                 style={!isMobile ? {
                   width: vw(28),
                   height: vw(28),
                   marginRight: vw(14),
+                  marginTop: vw(2),
                 } : undefined}
                 viewBox="0 0 28 28"
                 fill="none"
@@ -571,7 +582,7 @@ export default function FeaturedProducts({ data, locale, headerTheme, className 
             style={{ maxWidth: `${LAYOUT.gridMaxWidth}%` }}
           >
             {/* 左侧标题 */}
-            <div>
+            <div style={{ maxWidth: vw(600) }}>
               <p
                 className="font-anaheim font-medium text-brand-secondary"
                 style={{
@@ -586,15 +597,23 @@ export default function FeaturedProducts({ data, locale, headerTheme, className 
                 className="font-anaheim font-extrabold text-brand-text-black"
                 style={{
                   fontSize: vw(LAYOUT.header.titleFontSize),
-                  lineHeight: '1',
+                  lineHeight: '1.4',
+                  maxHeight: `calc(${LAYOUT.header.titleFontSize} * 1.4 * 3 * min(100vw, 1920px) / 1920)`,
+                  overflowY: 'auto',
+                  overscrollBehavior: 'contain',
+                  msOverflowStyle: 'scrollbar',
                 }}
+                data-lenis-prevent
               >
                 {data.title || "Hot Products"}
               </h2>
             </div>
 
             {/* 右侧 VIEW MORE */}
-            <AnimatedLinkButton href={data.viewAllButtonUrl || `/${locale}/shop`}>
+            <AnimatedLinkButton
+              href={data.viewAllButtonUrl || `/${locale}/shop`}
+              style={{ maxWidth: vw(500) }}
+            >
               {data.viewAllButton || "VIEW MORE INFORMATION"}
               <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1">»</span>
             </AnimatedLinkButton>

@@ -69,6 +69,21 @@ const SECTION_TITLE = {
   lineHeight: 1.1, // 行高
 };
 
+// 固定宽度换行配置：以英文为基准，每个 item 的最大宽度（px，基于 1920px 视口）
+// 取该 item 所有行中最宽一行的宽度
+// 测量方式：Anaheim 500 weight, 18px, line-height 1.3
+const ADVANTAGE_MAX_WIDTHS: number[] = [
+  210,  // 0: Performance & Innovation & / Refined Design
+  110,  // 1: Ultra Pursue
+  185,  // 2: Carefully Developed / Structure & Parts
+  235,  // 3: Strictly Selected / Aviation-Grade Materials
+  220,  // 4: Precision Performance & / Premium Finishes
+  175,  // 5: Clean Aesthetics & / Hidden Fixings
+  240,  // 6: IP-rated Components... / or Electrical... / Areas
+  115,  // 7: Smart-Ready / Integration
+  190,  // 8: From Single-Unit Orders / To OEM/ODM
+];
+
 /**
  * Check if a CMS icon value is valid (not empty / not default placeholder)
  */
@@ -286,11 +301,12 @@ export default function BrandAdvantages({ data, headerTheme, className }: Props)
                 className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-none px-6 pb-6 w-full"
                 style={{ scrollSnapType: "x mandatory" }}
               >
-                {data.advantages.map((advantage, index) => {
+                {data.advantages.map((advantage: string | {text?: string}, index) => {
                   const iconIndex = index + 1;
+                  const advantageText = typeof advantage === "string" ? advantage : advantage.text || "";
                   return (
                     <div
-                      key={advantage}
+                      key={`adv-mobile-${index}`}
                       className="flex-shrink-0 w-[78vw] sm:w-[300px] snap-center bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col items-center text-center justify-between min-h-[220px]"
                     >
                       <div className="flex flex-col items-center gap-4 w-full">
@@ -314,7 +330,7 @@ export default function BrandAdvantages({ data, headerTheme, className }: Props)
                           )}
                         </div>
                         <p className="font-anaheim text-white text-sm sm:text-base leading-relaxed whitespace-pre-line px-2 font-medium">
-                          {advantage.replace(/\\n|\/n/g, "\n")}
+                          {advantageText.replace(/\\n|\/n/g, "\n")}
                         </p>
                       </div>
                       <span className="text-[10px] tracking-widest text-brand-cream/40 font-mono mt-4">
@@ -377,16 +393,17 @@ export default function BrandAdvantages({ data, headerTheme, className }: Props)
             </h1>
 
             {/* Advantages 按设计稿位置分布 */}
-            {data.advantages.map((advantage, index) => {
+            {data.advantages.map((advantage: string | { text?: string }, index) => {
               const pos =
                 ADVANTAGE_POSITIONS_DESIGN[
                   index % ADVANTAGE_POSITIONS_DESIGN.length
                 ];
               const iconIndex = index + 1; // SVG 文件从 1 开始编号
+              const advantageText = typeof advantage === "string" ? advantage : advantage.text || "";
 
               return (
                 <div
-                  key={advantage}
+                  key={`adv-${index}`}
                   className="absolute flex items-center gap-3 hover:scale-105 transition-transform duration-300"
                   style={{
                     left: `${(pos.x / DESIGN_WIDTH) * 100}%`,
@@ -421,15 +438,19 @@ export default function BrandAdvantages({ data, headerTheme, className }: Props)
                       />
                     )}
                   </div>
-                  {/* 文字 - 支持 \n 和 /n 换行 */}
+                  {/* 文字 - 固定宽度换行，以英文为基准 */}
+                  {/* 文字 - 固定宽度换行，以英文为基准 */}
                   <span
-                    className="font-anaheim text-white whitespace-pre-line"
+                    className="font-anaheim text-white block"
                     style={{
                       fontSize: `${(18 / DESIGN_WIDTH) * 100}vw`,
                       lineHeight: 1.3,
+                      maxWidth: ADVANTAGE_MAX_WIDTHS[index]
+                        ? `${ADVANTAGE_MAX_WIDTHS[index]}px`
+                        : undefined,
                     }}
                   >
-                    {advantage.replace(/\\n|\/n/g, "\n")}
+                    {advantageText.replace(/\\n|\/n/g, "\n")}
                   </span>
                 </div>
               );

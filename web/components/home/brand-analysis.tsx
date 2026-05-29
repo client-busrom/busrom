@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/carousel";
 import Fade from "embla-carousel-fade";
 import { cn } from "@/lib/utils";
+import { useOverflow } from "@/lib/hooks/useOverflow";
 
 type Props = {
   data: HomeContent["brandAnalysis"];
@@ -62,6 +63,8 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
   const [canScrollNextMobile, setCanScrollNextMobile] = React.useState(true);
   const [canScrollPrevDesktop, setCanScrollPrevDesktop] = React.useState(false);
   const [canScrollNextDesktop, setCanScrollNextDesktop] = React.useState(true);
+
+  const { ref: descRef, isOverflow: descOverflow } = useOverflow<HTMLDivElement>();
 
   const fadePluginMobile = React.useRef(Fade({}));
   const fadePluginDesktop = React.useRef(Fade({}));
@@ -228,15 +231,35 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
           </Carousel>
         </div>
 
-        {/* 标题 - 图形下方 */}
-        <h3 className="font-anaheim font-bold text-white text-center capitalize text-xl mb-4">
-          {currentCenter?.title}
-        </h3>
+        {/* 标题 - 图形下方，最多2行 */}
+        <div
+          className="overflow-y-auto mb-4"
+          data-lenis-prevent
+          style={{
+            maxHeight: "calc(2 * 1.75em)",
+            overscrollBehavior: "contain",
+            msOverflowStyle: "scrollbar",
+          }}
+        >
+          <h3 className="font-anaheim font-bold text-white text-center capitalize text-xl">
+            {currentCenter?.title}
+          </h3>
+        </div>
 
-        {/* 描述文字 - 两侧padding */}
-        <p className="text-white font-anaheim font-medium text-base leading-relaxed mb-6 text-justify px-4">
-          {currentCenter?.description}
-        </p>
+        {/* 描述文字 - 两侧padding，最多4行 */}
+        <div
+          className="overflow-y-auto mb-6 px-4"
+          data-lenis-prevent
+          style={{
+            maxHeight: "calc(4 * 1.625em)",
+            overscrollBehavior: "contain",
+            msOverflowStyle: "scrollbar",
+          }}
+        >
+          <p className="text-white font-anaheim font-medium text-base leading-relaxed text-justify">
+            {currentCenter?.description}
+          </p>
+        </div>
 
         {/* 按钮 - 居中 */}
         <div className="flex gap-4 justify-center mb-12">
@@ -368,17 +391,30 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
                           )}
                         </div>
 
-                        {/* 标题 - x:597, y:406, 32px */}
-                        <h3
-                          className="absolute font-anaheim font-bold text-white text-center capitalize"
+                        {/* 标题 - 小圆中心水平对齐: x=606+168/2=690 */}
+                        <div
+                          className="absolute"
                           style={{
-                            left: `${(597 / 939) * 100}%`,
+                            left: `${(690 / 939) * 100}%`,
                             top: `${(406 / TOP_HEIGHT) * 100}%`,
-                            fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
+                            transform: "translateX(-50%) translateY(-40%)",
+                            maxWidth: `${(300 / 939) * 100}%`,
                           }}
                         >
-                          {center.title}
-                        </h3>
+                          <h3
+                            className="font-anaheim font-bold text-white text-center capitalize break-words"
+                            style={{
+                              fontSize: `${(32 / DESIGN_WIDTH) * 100}vw`,
+                              lineHeight: 1.2,
+                              display: "-webkit-box",
+                              WebkitLineClamp: 3,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }}
+                          >
+                            {center.title}
+                          </h3>
+                        </div>
                       </div>
                     </CarouselItem>
                   );
@@ -387,20 +423,32 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
             </Carousel>
           </div>
 
-          {/* 描述文字 - x:1030, y:62, 577x231, 28px */}
-          <p
-            className="absolute text-white font-anaheim font-medium capitalize"
+          {/* 描述文字 - x:1030, y:62, 577x231, 28px，超过8行内部滚动 */}
+          <div
+            ref={descRef}
+            className={cn(descOverflow && "overflow-y-auto")}
+            data-lenis-prevent={descOverflow || undefined}
             style={{
+              position: "absolute",
               left: `${(1030 / TOP_WIDTH) * 100}%`,
               top: `${(62 / TOP_HEIGHT) * 100}%`,
               width: `${(577 / TOP_WIDTH) * 100}%`,
-              fontSize: `${(28 / DESIGN_WIDTH) * 100}vw`,
-              lineHeight: `${46 / 28}`,
-              textAlign: "justify",
+              maxHeight: `calc(${(28 / DESIGN_WIDTH) * 100}vw * ${46 / 28} * 7)`,
+              overscrollBehavior: descOverflow ? "contain" : undefined,
+              msOverflowStyle: descOverflow ? "scrollbar" : undefined,
             }}
           >
-            {currentCenter?.description}
-          </p>
+            <p
+              className="text-white font-anaheim font-medium capitalize mr-2"
+              style={{
+                fontSize: `${(28 / DESIGN_WIDTH) * 100}vw`,
+                lineHeight: `${46 / 28}`,
+                textAlign: "justify",
+              }}
+            >
+              {currentCenter?.description}
+            </p>
+          </div>
 
           {/* 按钮区域 - 左按钮 x:1118, 右按钮 x:1177, y:422, 88x88 */}
           <div

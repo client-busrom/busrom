@@ -320,7 +320,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
 
         {/* Main Image Carousel */}
         <div
-          className="relative w-full h-full flex items-center justify-center p-16"
+          className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="overflow-hidden w-full h-full" ref={emblaModalRef}>

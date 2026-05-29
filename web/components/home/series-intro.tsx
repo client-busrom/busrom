@@ -283,7 +283,15 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                   Product Series Introduction
                 </h2>
                 {activeSeries && (
-                  <p className="text-sm xl:text-base leading-relaxed text-white max-w-2xl mt-2 ml-4">
+                  <p
+                    className="text-sm xl:text-base leading-relaxed text-white max-w-2xl mt-2 ml-4 overflow-y-auto"
+                    data-lenis-prevent
+                    style={{
+                      maxHeight: "calc(1.625 * 10rem)",
+                      overscrollBehavior: "contain",
+                      msOverflowStyle: "scrollbar",
+                    }}
+                  >
                     {activeSeries.description}
                   </p>
                 )}
@@ -294,7 +302,7 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                 {/* 系列列表 */}
                 <div className="flex-1">
                   <div className="h-72 overflow-hidden relative">
-                    <div className="flex flex-col absolute w-full top-0 left-0">
+                    <div className="flex flex-col gap-4 absolute w-full top-0 left-0">
                       <AnimatePresence initial={false}>
                         {renderWindow.map((item) => (
                           <motion.button
@@ -314,7 +322,8 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                               },
                               opacity: { duration: 0.2 },
                             }}
-                            className="w-full text-left py-4 pl-6 transition-colors duration-300 h-14 origin-left"
+                            className="w-full text-left pr-6 transition-colors duration-300 origin-left flex-shrink-0"
+                            style={{ paddingTop: 8, paddingBottom: 8 }}
                             onClick={() => {
                               setActiveSeriesIndex(item.originalIndex);
                               setActiveImageIndex(0);
@@ -322,7 +331,7 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                           >
                             <span
                               className={cn(
-                                "text-lg font-anaheim font-bold transition-colors duration-300",
+                                "text-lg font-anaheim font-bold transition-colors duration-300 block leading-snug",
                                 item.isCurrent
                                   ? "text-brand-cream"
                                   : "text-brand-cream/70 hover:text-brand-cream",
@@ -410,13 +419,16 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
             <div className="flex gap-6 items-stretch">
               {/* 左侧: 竖排标题 + 按钮 (横向排列) */}
               <div className="w-36 flex-shrink-0 flex flex-col justify-between py-2">
-                {/* 竖排标题 */}
-                <div className="flex-1 flex items-center justify-center">
+                {/* 竖排标题 - 高度限制为轮播图区域减去按钮区域，超出内部滚动 */}
+                <div className="flex-1 flex items-center justify-center overflow-hidden min-h-0">
                   <span
-                    className="text-xl font-anaheim text-brand-cream whitespace-nowrap tracking-[0.2em]"
+                    className="text-xl font-anaheim text-brand-cream tracking-[0.2em] overflow-x-auto max-h-full"
+                    data-lenis-prevent
                     style={{
                       writingMode: "vertical-rl",
                       transform: "rotate(180deg)",
+                      overscrollBehavior: "contain",
+                      msOverflowStyle: "scrollbar",
                     }}
                   >
                     {activeSeries?.title || "Series Title"}

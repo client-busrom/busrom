@@ -11,6 +11,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { useOverflow } from "@/lib/hooks/useOverflow";
 import type {
   CaseStudiesData,
   CaseStudyApplication,
@@ -77,6 +78,9 @@ export default function CaseStudies({ data, headerTheme, className }: Props) {
   const [desktopApi, setDesktopApi] = React.useState<CarouselApi>();
   const [desktopCanScrollPrev, setDesktopCanScrollPrev] = React.useState(false);
   const [desktopCanScrollNext, setDesktopCanScrollNext] = React.useState(true);
+
+  const { ref: titleRef, isOverflow: titleOverflow } = useOverflow<HTMLDivElement>();
+  const { ref: subtitleRef, isOverflow: subtitleOverflow } = useOverflow<HTMLDivElement>();
 
   // 移动端 API 事件
   React.useEffect(() => {
@@ -259,34 +263,58 @@ export default function CaseStudies({ data, headerTheme, className }: Props) {
           paddingTop: rpx(LAYOUT.header.titleY),
         }}
       >
-        {/* 主标题 */}
-        <h2
-          className="font-anaheim font-extrabold text-black"
+        {/* 主标题 - 限制宽度，超出内部滚动 */}
+        <div
+          ref={titleRef}
+          className={cn(titleOverflow && "overflow-y-auto")}
+          data-lenis-prevent={titleOverflow || undefined}
           style={{
-            fontSize: rpx(LAYOUT.header.titleFontSize),
-            lineHeight: rpx(LAYOUT.header.titleLineHeight),
-            WebkitTextStroke: `calc(4 * var(--rpx)) #756f3f`,
-            paintOrder: "stroke fill",
+            maxWidth: rpx(1422),
+            maxHeight: `calc(var(--rpx) * ${LAYOUT.header.titleLineHeight} * 2)`,
+            overscrollBehavior: titleOverflow ? 'contain' : undefined,
+            msOverflowStyle: titleOverflow ? 'scrollbar' : undefined,
           }}
         >
-          {data.title}
-        </h2>
+          <h2
+            className="font-anaheim font-extrabold text-black"
+            style={{
+              fontSize: rpx(LAYOUT.header.titleFontSize),
+              lineHeight: rpx(LAYOUT.header.titleLineHeight),
+              WebkitTextStroke: `calc(4 * var(--rpx)) #756f3f`,
+              paintOrder: "stroke fill",
+            }}
+          >
+            {data.title}
+          </h2>
+        </div>
 
-        {/* 副标题 */}
-        <p
-          className="font-anaheim font-medium text-[#756F3F]"
+        {/* 副标题 - 限制宽度，超出内部滚动 */}
+        <div
+          ref={subtitleRef}
+          className={cn(subtitleOverflow && "overflow-y-auto")}
+          data-lenis-prevent={subtitleOverflow || undefined}
           style={{
-            fontSize: rpx(LAYOUT.header.subtitleFontSize),
-            lineHeight: rpx(LAYOUT.header.subtitleLineHeight),
+            maxWidth: rpx(1422),
+            maxHeight: `calc(var(--rpx) * ${LAYOUT.header.subtitleLineHeight} * 2)`,
             marginTop: rpx(
               LAYOUT.header.subtitleY -
                 LAYOUT.header.titleY -
                 LAYOUT.header.titleLineHeight,
             ),
+            overscrollBehavior: subtitleOverflow ? 'contain' : undefined,
+            msOverflowStyle: subtitleOverflow ? 'scrollbar' : undefined,
           }}
         >
-          {data.description}
-        </p>
+          <p
+            className="font-anaheim font-medium text-[#756F3F]"
+            style={{
+              fontSize: rpx(LAYOUT.header.subtitleFontSize),
+              lineHeight: rpx(LAYOUT.header.subtitleLineHeight),
+            }}
+          >
+            {data.description}
+          </p>
+        </div>
 
         {/* 导航按钮 - 绝对定位 */}
         <div

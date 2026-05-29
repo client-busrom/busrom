@@ -549,8 +549,7 @@ export function SupportContactFormSection({
               style={{
                 maxHeight: isMobile ? undefined : `calc(${vw(96)} * 1.4 * 2)`,
                 overscrollBehavior: "contain",
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
+                msOverflowStyle: "scrollbar",
               }}
             >
               <h2
@@ -592,8 +591,7 @@ export function SupportContactFormSection({
                 marginTop: isMobile ? mvw(24) : vw(92),
                 maxHeight: isMobile ? undefined : `calc(${vw(36)} * 1.31 * 4)`,
                 overscrollBehavior: "contain",
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
+                msOverflowStyle: "scrollbar",
               }}
             >
               <p

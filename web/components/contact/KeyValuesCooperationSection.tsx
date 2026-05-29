@@ -122,12 +122,13 @@ export function KeyValuesCooperationSection({
 
             {/* 中间月牙形 - 用clipPath裁剪第一张图片 */}
             <div
-              className="absolute"
+              className="absolute z-10"
               style={{
                 left: vw(249.6), // 312 * 0.8
                 top: 0,
                 width: vw(332.8), // 416 * 0.8
                 height: vw(441.6), // 552 * 0.8
+                willChange: 'transform',
               }}
             >
               {/* SVG clipPath 定义 */}
@@ -249,7 +250,7 @@ export function KeyValuesCooperationSection({
 
             {/* 中间 "Value" 标签 - 字符跳动效果 */}
             <div
-              className="absolute font-josefin-sans font-bold text-white text-center flex justify-center"
+              className="absolute z-20 font-josefin-sans font-bold text-white text-center flex justify-center pointer-events-none"
               style={{
                 left: vw(316.8), // 396 * 0.8
                 top: vw(181.6), // 227 * 0.8
