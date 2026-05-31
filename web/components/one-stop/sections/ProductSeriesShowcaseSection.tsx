@@ -6,6 +6,7 @@ import Link from "next/link";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { HollowText } from "@/components/common/HollowText";
 import useEmblaCarousel from "embla-carousel-react";
+import { useOverflow } from "@/lib/hooks/useOverflow";
 
 interface Product {
   id: string;
@@ -28,6 +29,8 @@ export function ProductSeriesShowcaseSection({
   products,
   locale,
 }: ProductSeriesShowcaseSectionProps) {
+  const { ref: desktopTitleRef, isOverflow: desktopTitleOverflows } = useOverflow<HTMLDivElement>();
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shouldPreload, setShouldPreload] = useState(false);
 
@@ -204,10 +207,10 @@ export function ProductSeriesShowcaseSection({
           <div className="flex relative items-stretch">
             {validProducts.map((item, idx) => {
               const isActive = idx === currentIndex;
-              
+
               // Get display name
               const displayName = getDisplayName(item);
-              
+
               // Get images
               const mainImages = (item as any).mainImage || [];
               const showImgNode = (item as any).showImage;
@@ -368,14 +371,28 @@ export function ProductSeriesShowcaseSection({
       <div className="hidden lg:flex flex-col relative w-full max-w-[83vw] mx-auto z-30 px-[5%]">
         {/* Header Row: Title + Nav Arrows */}
         <div className="flex justify-between items-end -mb-[1.6vw] relative z-10 pointer-events-none">
-          <div className="flex-1">
+          <div
+            className="flex-1 custom-scrollbar pointer-events-auto text-[6.25vw] xl:text-[5vw] leading-none"
+            data-lenis-prevent={desktopTitleOverflows ? true : undefined}
+            ref={desktopTitleRef}
+            style={{
+              maxWidth: "50vw",
+              maxHeight: "calc(3em + 10px)",
+              overflowY: desktopTitleOverflows ? "auto" : "hidden",
+              overflowX: "hidden",
+              overscrollBehavior: desktopTitleOverflows ? "contain" : "auto",
+              paddingTop: "5px",
+              paddingBottom: "5px",
+              paddingRight: "16px",
+            }}
+          >
             <HollowText
               strokeColor="#846500"
               strokeWidth={1.5}
-              className="font-anaheim block font-extrabold text-[6.25vw] xl:text-[5vw] leading-none"
+              className="font-anaheim block font-extrabold text-[6.25vw] xl:text-[5vw] leading-none m-0"
               style={{
-                width: "50vw",
-                whiteSpace: "pre-line",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
               }}
             >
               {title || "PRODUCT SERIES"}
@@ -515,11 +532,11 @@ export function ProductSeriesShowcaseSection({
             const nextIdx = (currentIndex + 1) % validProducts.length;
             const prevIdx = (currentIndex - 1 + validProducts.length) % validProducts.length;
             const preloadIndices = Array.from(new Set([nextIdx, prevIdx]));
-            
+
             return preloadIndices.map((idx) => {
               const prod = validProducts[idx];
               if (!prod) return null;
-              
+
               const mainImages = (prod as any).mainImage || [];
               const showImgNode = (prod as any).showImage;
               let img1 = showImgNode;
@@ -528,7 +545,7 @@ export function ProductSeriesShowcaseSection({
                 img1 = mainImages[0];
                 img2 = mainImages.length > 1 ? mainImages[1] : showImgNode || mainImages[0];
               }
-              
+
               return (
                 <React.Fragment key={`preload-${prod.id}-${idx}`}>
                   <OptimizedImage

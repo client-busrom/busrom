@@ -37,7 +37,7 @@ const AdvantageItemTitle = ({ title, isActive, layout }: { title: string; isActi
       <div
         ref={ref}
         className="custom-scrollbar pointer-events-auto pr-1"
-        data-lenis-prevent
+        data-lenis-prevent={isOverflow ? true : undefined}
         style={{
           maxHeight: "calc(2.5em + 10px)",
           fontSize: layout.type === "desktop" ? vw(24) : "18px",
@@ -45,7 +45,7 @@ const AdvantageItemTitle = ({ title, isActive, layout }: { title: string; isActi
           paddingBottom: "5px",
           overflowY: isOverflow ? "auto" : "hidden",
           overflowX: "hidden",
-          overscrollBehavior: "contain",
+          overscrollBehavior: isOverflow ? "contain" : "auto",
         }}
       >
         <h3
@@ -183,7 +183,7 @@ export function AdvantagesSection({
           <div
             ref={sectionTitleRef}
             className="custom-scrollbar pointer-events-auto inline-block text-left"
-            data-lenis-prevent
+            data-lenis-prevent={sectionTitleOverflows ? true : undefined}
             style={{
               maxHeight: "calc(2.5em + 10px)",
               fontSize: layout.type === "desktop" ? vw(60) : "32px",
@@ -191,7 +191,7 @@ export function AdvantagesSection({
               paddingBottom: "5px",
               overflowY: sectionTitleOverflows ? "auto" : "hidden",
               overflowX: "hidden",
-              overscrollBehavior: "contain",
+              overscrollBehavior: sectionTitleOverflows ? "contain" : "auto",
             }}
           >
             <h2
@@ -270,14 +270,14 @@ export function AdvantagesSection({
                       animate={
                         isActive
                           ? {
-                              scale: [1, 1.1, 1.05, 1],
-                              y: [0, -6, 2, 0],
-                              transition: {
-                                duration: 4,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                              },
-                            }
+                            scale: [1, 1.1, 1.05, 1],
+                            y: [0, -6, 2, 0],
+                            transition: {
+                              duration: 4,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                            },
+                          }
                           : {}
                       }
                     />
@@ -305,14 +305,14 @@ export function AdvantagesSection({
                   </div>
 
                   {/* Description Text */}
-                  <div 
+                  <div
                     className="w-full flex-1 overflow-y-auto pointer-events-auto pr-1 select-text"
                     style={{
                       WebkitOverflowScrolling: "touch",
                     }}
                   >
                     <p
-                      className="font-medium leading-normal text-black text-justify"
+                      className="font-medium leading-normal text-black text-left"
                       style={{
                         fontSize: layout.type === "desktop" ? vw(20) : "14px",
                         fontFamily: "var(--font-anaheim)",

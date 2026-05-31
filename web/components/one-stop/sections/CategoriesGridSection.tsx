@@ -5,9 +5,36 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { ArrowUpRight } from "lucide-react";
+import { useOverflow } from "@/lib/hooks/useOverflow";
 
 // Viewport width conversion utility based on 1920px design width
 const vw = (px: number) => `${(px / 1920) * 100}vw`;
+
+/**
+ * Sub-component to handle overflow for the category item title
+ */
+const CategoryItemTitle = ({ title }: { title: string }) => {
+  const { ref, isOverflow } = useOverflow<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className="custom-scrollbar pointer-events-auto pr-1"
+      data-lenis-prevent={isOverflow ? true : undefined}
+      style={{
+        maxHeight: "calc(4.4em + 10px)",
+        paddingTop: "5px",
+        paddingBottom: "5px",
+        overflowY: isOverflow ? "auto" : "hidden",
+        overflowX: "hidden",
+        overscrollBehavior: isOverflow ? "contain" : "auto",
+      }}
+    >
+      <h4 className="font-montserrat font-regular group-hover:font-extrabold text-black text-[18px] lg:text-[1.51vw] leading-[1.25] transition-all duration-300 m-0">
+        {title}
+      </h4>
+    </div>
+  );
+};
 
 interface Product {
   id: string;
@@ -154,10 +181,8 @@ export function CategoriesGridSection({
                 </div>
 
                 {/* Text Content */}
-                <div className="absolute z-30 left-6 top-[22px] w-[80%] lg:left-[2.08vw] lg:top-[1.14vw] lg:w-[13.54vw]">
-                  <h4 className="font-montserrat font-regular group-hover:font-extrabold text-black text-[18px] lg:text-[1.51vw] leading-[1.25] transition-all duration-300">
-                    {(item as any).title || item.category?.name || item.name}
-                  </h4>
+                <div className="absolute z-30 left-6 top-[17px] w-[80%] lg:left-[2.08vw] lg:top-[calc(1.14vw-5px)] lg:w-[13.54vw]">
+                  <CategoryItemTitle title={(item as any).title || item.category?.name || item.name} />
                 </div>
 
                 {/* Product Image */}

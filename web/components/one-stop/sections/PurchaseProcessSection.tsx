@@ -360,7 +360,7 @@ export function PurchaseProcessSection({
           <div
             ref={titleRef}
             className="custom-scrollbar pointer-events-auto"
-            data-lenis-prevent
+            data-lenis-prevent={titleOverflows ? true : undefined}
             style={{
               maxWidth: vw(400),
               maxHeight: "calc(3.6em + 10px)",
@@ -369,7 +369,7 @@ export function PurchaseProcessSection({
               paddingBottom: "5px",
               overflowY: titleOverflows ? "auto" : "hidden",
               overflowX: "hidden",
-              overscrollBehavior: "contain",
+              overscrollBehavior: titleOverflows ? "contain" : "auto",
               wordBreak: "break-word",
             }}
           >

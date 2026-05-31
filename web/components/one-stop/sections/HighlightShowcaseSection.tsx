@@ -3,11 +3,11 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { HollowText } from "@/components/common/HollowText";
 import useEmblaCarousel from "embla-carousel-react";
 import { AnimatedLinkButton } from "@/components/ui/animated-link-button";
+import { useOverflow } from "@/lib/hooks/useOverflow";
 
 // Viewport width conversion utility based on 1920px design width
 const vw = (px: number) => `${(px / 1920) * 100}vw`;
@@ -76,6 +76,9 @@ export function HighlightShowcaseSection({
     containScroll: "trimSnaps",
     dragFree: true,
   });
+
+  const { ref: desktopTitleRef, isOverflow: desktopTitleOverflows } = useOverflow<HTMLDivElement>();
+  const { ref: viewMoreRef, isOverflow: viewMoreOverflows } = useOverflow<HTMLDivElement>();
 
   const [mobileIndex, setMobileIndex] = useState(0);
   const [layout, setLayout] = useState({
@@ -174,7 +177,7 @@ export function HighlightShowcaseSection({
                         size="large"
                       />
                     </div>
-                    
+
                     {/* Dark Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent z-10" />
 
@@ -210,9 +213,8 @@ export function HighlightShowcaseSection({
             <button
               key={idx}
               onClick={() => mobileEmblaApi && mobileEmblaApi.scrollTo(idx)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                idx === mobileIndex ? "w-6 bg-[#C7BB5D]" : "w-2 bg-[#756F3F]/30"
-              }`}
+              className={`h-2 rounded-full transition-all duration-300 ${idx === mobileIndex ? "w-6 bg-[#C7BB5D]" : "w-2 bg-[#756F3F]/30"
+                }`}
             />
           ))}
         </div>
@@ -257,24 +259,38 @@ export function HighlightShowcaseSection({
           className="absolute flex justify-center w-full"
           style={{ top: vw(100) }}
         >
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center font-bold text-[#FFFED7]"
+          <div
+            ref={desktopTitleRef}
+            className="custom-scrollbar pointer-events-auto"
+            data-lenis-prevent={desktopTitleOverflows ? true : undefined}
             style={{
-              fontSize: vw(64),
-              width: vw(1193),
-              fontFamily: "var(--font-anaheim)",
-              lineHeight: vw(102),
+              maxHeight: `calc(${vw(140)} + 10px)`,
+              paddingTop: "5px",
+              paddingBottom: "5px",
+              overflowY: desktopTitleOverflows ? "auto" : "hidden",
+              overflowX: "hidden",
+              overscrollBehavior: desktopTitleOverflows ? "contain" : "auto",
+              width: vw(860),
             }}
           >
-            <RichTitle
-              title={titleHtml || title}
-              defaultText="You Might Be Looking For..."
-              strokeColor="#FFFED7"
-            />
-          </motion.h2>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center font-bold text-[#FFFED7] m-0"
+              style={{
+                fontSize: vw(64),
+                fontFamily: "var(--font-anaheim)",
+                lineHeight: 1,
+              }}
+            >
+              <RichTitle
+                title={titleHtml || title}
+                defaultText="You Might Be Looking For..."
+                strokeColor="#FFFED7"
+              />
+            </motion.h2>
+          </div>
         </div>
 
         {/* View More Button (Group 186) */}
@@ -283,21 +299,37 @@ export function HighlightShowcaseSection({
           className="absolute z-20 flex items-center group"
           style={{ top: vw(160), right: vw(160), gap: vw(15) }}
         >
-          <AnimatedLinkButton
-            variant="dark"
-            className="text-white"
-            ballColor="#ABA465"
+          <div
+            ref={viewMoreRef}
+            className="custom-scrollbar pointer-events-auto"
+            data-lenis-prevent={viewMoreOverflows ? true : undefined}
+            style={{
+              maxWidth: vw(300),
+              maxHeight: `calc(${vw(60)} + 10px)`, // Allows ~2 lines
+              overflowY: viewMoreOverflows ? "auto" : "hidden",
+              overflowX: "hidden",
+              overscrollBehavior: viewMoreOverflows ? "contain" : "auto",
+              paddingTop: "5px",
+              paddingBottom: "5px",
+            }}
           >
-            {viewMoreText || "VIEW MORE"}
-          </AnimatedLinkButton>
+            <AnimatedLinkButton
+              variant="dark"
+              className="text-white"
+              ballColor="#ABA465"
+              wrapText={true}
+              style={{ height: "auto", minHeight: vw(60), paddingRight: vw(10) }}
+            >
+              {viewMoreText || "VIEW MORE"}
+            </AnimatedLinkButton>
+          </div>
           <div
             className="relative transition-transform duration-300 group-hover:translate-x-2"
             style={{ width: vw(32), height: vw(26) }}
           >
-            <Image
+            <img
               src="/images/service-icons/view-more-arrow.svg"
               alt="View More"
-              fill
               className="object-contain brightness-0 invert"
             />
           </div>

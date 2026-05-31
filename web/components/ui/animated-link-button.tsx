@@ -12,6 +12,7 @@ type AnimatedLinkButtonProps = {
   ballColor?: string; // 自定义球体颜色
   style?: React.CSSProperties; // 支持外部样式覆盖
   href?: string; // 链接地址
+  wrapText?: boolean; // 是否允许文字折行
 };
 
 export function AnimatedLinkButton({
@@ -21,6 +22,7 @@ export function AnimatedLinkButton({
   ballColor: customBallColor,
   style: externalStyle,
   href,
+  wrapText = false,
 }: AnimatedLinkButtonProps) {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -43,6 +45,10 @@ export function AnimatedLinkButton({
   const textRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
+    if (wrapText) {
+      setTextScale(1);
+      return;
+    }
     const span = textRef.current;
     if (!span) return;
     const parent = span.parentElement;
@@ -62,7 +68,7 @@ export function AnimatedLinkButton({
     checkOverflow();
     window.addEventListener("resize", checkOverflow);
     return () => window.removeEventListener("resize", checkOverflow);
-  }, [children, isMobile]);
+  }, [children, isMobile, wrapText]);
 
   const content = (
     <>
@@ -78,11 +84,12 @@ export function AnimatedLinkButton({
       />
       <span
         ref={textRef}
-        className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 whitespace-nowrap"
+        className={`relative z-10 transition-transform duration-300 group-hover:translate-x-1 ${wrapText ? "whitespace-normal break-words" : "whitespace-nowrap"}`}
         style={{
           transform: `scale(${textScale})`,
-          transformOrigin: "center center",
+          transformOrigin: "center left",
           display: "inline-block",
+          textAlign: "left",
         }}
       >
         {children}
