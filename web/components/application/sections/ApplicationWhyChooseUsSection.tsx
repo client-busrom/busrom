@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { HollowText } from "@/components/common/HollowText";
@@ -60,6 +61,8 @@ export function ApplicationWhyChooseUsSection({
   title = "contractors choose us?",
   items = defaultItems,
 }: ApplicationWhyChooseUsSectionProps) {
+  const params = useParams();
+  const locale = (params?.locale as string) || "en";
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentItem = items[currentIndex % items.length];
 
@@ -139,7 +142,7 @@ export function ApplicationWhyChooseUsSection({
 
           {/* contractors choose us? Header */}
           <h4
-            className="absolute font-extrabold"
+            className="absolute font-extrabold overflow-x-auto overflow-y-hidden whitespace-nowrap"
             style={{
               left: vw(726),
               top: vw(10 + 150),
@@ -149,6 +152,10 @@ export function ApplicationWhyChooseUsSection({
               color: "#756F3F",
               zIndex: 10,
               maxWidth: vw(1920 - 726),
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(117,111,63,0.3) transparent",
+              overscrollBehavior: "contain",
+              paddingBottom: vw(6),
             }}
           >
             {title}
@@ -241,14 +248,18 @@ export function ApplicationWhyChooseUsSection({
 
                 {/* Item Description */}
                 <p
-                  className="absolute text-black whitespace-pre-line"
+                  className={`absolute text-black overflow-y-auto ${locale === "en" ? "whitespace-pre-line" : ""}`}
                   style={{
                     left: vw(812 - 550),
                     top: vw(377 - 136),
                     width: vw(700),
+                    maxHeight: vw(46 * 5), // 5 lines
                     fontSize: vw(29),
                     lineHeight: vw(46),
                     fontFamily: "var(--font-anaheim), sans-serif",
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "rgba(0,0,0,0.3) transparent",
+                    paddingRight: "4px",
                   }}
                 >
                   {currentItem.descriptionParts
@@ -384,10 +395,15 @@ export function ApplicationWhyChooseUsSection({
             {decorate}
           </HollowText>
           <h4
-            className="font-extrabold text-xl md:text-2xl"
+            className="font-extrabold text-xl md:text-2xl overflow-x-auto overflow-y-hidden whitespace-nowrap"
             style={{
               fontFamily: "var(--font-anaheim), sans-serif",
               color: "#756F3F",
+              maxWidth: "100%",
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(117,111,63,0.3) transparent",
+              overscrollBehavior: "contain",
+              paddingBottom: "4px",
             }}
           >
             {title}
@@ -447,9 +463,9 @@ export function ApplicationWhyChooseUsSection({
                 </h5>
               </div>
 
-              {/* Description - no pre-line to auto wrap, smaller text */}
+              {/* Description - auto wrap for non-en, pre-line for en */}
               <p
-                className="text-black text-xs md:text-sm leading-relaxed break-words"
+                className={`text-black text-xs md:text-sm leading-relaxed break-words ${locale === "en" ? "whitespace-pre-line" : ""}`}
                 style={{ fontFamily: "var(--font-anaheim), sans-serif" }}
               >
                 {currentItem.descriptionParts
@@ -461,10 +477,10 @@ export function ApplicationWhyChooseUsSection({
                           fontWeight: part.bold ? "bold" : "normal",
                         }}
                       >
-                        {part.text?.replace(/\n/g, " ")}
+                        {locale === "en" ? part.text : part.text?.replace(/\n/g, " ")}
                       </span>
                     ))
-                  : currentItem.description?.replace(/\n/g, " ")}
+                  : locale === "en" ? currentItem.description : currentItem.description?.replace(/\n/g, " ")}
               </p>
             </motion.div>
           </AnimatePresence>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import { useParams } from "next/navigation";
 import { motion, useScroll, useTransform } from "framer-motion";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 
@@ -26,13 +27,15 @@ export function ApplicationGuideSection({
   serviceCta = { title: "Explore Our Service", url: "#" },
   oemCta = { title: "Unlock OEM / ODM", url: "#" },
 }: Props) {
+  const params = useParams();
+  const locale = (params?.locale as string) || "en";
   const containerRef = useRef<HTMLDivElement>(null);
 
   const renderSegments = (segments: RichTextSegment[]) => {
     return segments.map((s, i) => (
       <React.Fragment key={i}>
         {s.linebreak ? (
-          <br />
+          locale === "en" ? <br /> : " "
         ) : (
           <span className={s.bold ? "font-bold" : ""}>{s.text}</span>
         )}
@@ -109,12 +112,15 @@ export function ApplicationGuideSection({
       initial="default"
       whileHover="hover"
       animate="default"
-      className="group relative flex items-center justify-end overflow-hidden border border-[#756F3F]"
+      className={`group relative flex items-center ${locale === "en" ? "justify-end" : "justify-between"} overflow-hidden border border-[#756F3F]`}
       style={{
-        width: vw(375),
+        width: locale === "en" ? vw(375) : "max-content",
+        minWidth: locale === "en" ? "auto" : vw(375),
+        maxWidth: vw(460), // slightly smaller than the 562 big circle
         height: vw(84),
         borderRadius: vw(90),
         paddingRight: vw(7),
+        paddingLeft: locale === "en" ? 0 : vw(16),
       }}
     >
       {/* Background fill on hover */}
@@ -127,15 +133,28 @@ export function ApplicationGuideSection({
         transition={{ duration: 0.3 }}
       />
 
-      <span
-        className="font-bold font-montserrat relative z-10 text-black"
-        style={{ fontSize: vw(24), marginRight: vw(24) }}
+      <div
+        className={`relative z-10 flex-1 flex ${locale === "en" ? "flex-col justify-center items-end" : "items-center overflow-x-auto overflow-y-hidden"}`}
+        style={{
+          marginRight: locale === "en" ? vw(24) : vw(10),
+          scrollbarWidth: locale === "en" ? "none" : "thin",
+          scrollbarColor: "rgba(0,0,0,0.3) transparent",
+          paddingBottom: locale === "en" ? 0 : "2px", // padding for scrollbar
+        }}
       >
-        {text}
-      </span>
+        <span
+          className={`font-bold font-montserrat text-black whitespace-nowrap ${locale === "en" ? "" : "mx-auto"}`}
+          style={{ 
+            fontSize: vw(24),
+            lineHeight: 1.5,
+          }}
+        >
+          {text}
+        </span>
+      </div>
 
       <motion.div
-        className="relative z-10 flex items-center justify-center rounded-full"
+        className="relative z-10 flex items-center justify-center rounded-full shrink-0"
         style={{ width: vw(70), height: vw(70) }}
         variants={{
           default: { backgroundColor: "#756F3F", color: "#BFB991" },
@@ -308,13 +327,18 @@ export function ApplicationGuideSection({
               }}
             >
               <p
-                className="text-white font-montserrat text-center leading-relaxed whitespace-pre-line"
-                style={{ fontSize: vw(22) }}
+                className={`text-white font-montserrat text-center leading-relaxed ${locale === "en" ? "whitespace-pre-line" : "overflow-y-auto"}`}
+                style={{ 
+                  fontSize: vw(22),
+                  maxWidth: locale === "en" ? "none" : vw(440),
+                  maxHeight: locale === "en" ? "none" : "4.875em", // 3 lines * 1.625
+                  scrollbarWidth: "none",
+                }}
               >
                 {renderSegments(description)}
               </p>
 
-              <div className="flex flex-col gap-4" style={{ gap: vw(18) }}>
+              <div className="flex flex-col items-center gap-4" style={{ gap: vw(18) }}>
                 <GuideButton text={serviceCta.title} url={serviceCta.url} />
                 <GuideButton text={oemCta.title} url={oemCta.url} />
               </div>

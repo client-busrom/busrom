@@ -315,7 +315,7 @@ export function ApplicationContactFormSection({
       return (
         <span
           key={idx}
-          className="text-[#D6CD88] font-cherry-bomb not-italic text-[1.12em] tracking-tight inline whitespace-pre-line"
+          className={`text-[#D6CD88] font-cherry-bomb not-italic text-[1.12em] tracking-tight inline ${locale === "en" ? "whitespace-pre-line" : ""}`}
           style={{
             WebkitTextStroke: `1.5px #514a0d`,
             paintOrder: "stroke fill",
@@ -326,7 +326,7 @@ export function ApplicationContactFormSection({
       );
     }
     return (
-      <span key={idx} className="font-cherry-bomb inline whitespace-pre-line">
+      <span key={idx} className={`font-cherry-bomb inline ${locale === "en" ? "whitespace-pre-line" : ""}`}>
         {segment.text}
       </span>
     );
@@ -632,8 +632,15 @@ export function ApplicationContactFormSection({
           }}
         >
           <div
-            className="font-cherry-bomb font-black text-[#1D1A02] leading-[1.4] whitespace-pre-line block"
-            style={{ fontSize: isMobile ? "20px" : "24px", width: "100%" }}
+            className={`font-cherry-bomb font-black text-[#1D1A02] leading-[1.4] block break-words overflow-y-auto ${locale === "en" ? "whitespace-pre-line" : ""}`}
+            style={{
+              fontSize: isMobile ? "20px" : "24px",
+              width: "100%",
+              maxHeight: "12em", // 8 lines * 1.4 leading
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(0,0,0,0.3) transparent",
+              paddingRight: "4px",
+            }}
           >
             {(() => {
               // Filter out the marker text if it's accidentally included in segments
