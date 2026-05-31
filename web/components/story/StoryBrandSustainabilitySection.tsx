@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
@@ -64,9 +65,9 @@ const SustainabilityOrbit = React.memo(({ isMobile }: { isMobile: boolean }) => 
     const xPoints = [];
     const yPoints = [];
     const steps = 60;
-    
+
     // Scale dimensions based on mobile/desktop
-    const a = isMobile ? 150 : 261; 
+    const a = isMobile ? 150 : 261;
     const b = isMobile ? 65 : 112;
     const rot = -22.02 * (Math.PI / 180);
     const centerX = isMobile ? 150 : 261;
@@ -140,6 +141,8 @@ export function StoryBrandSustainabilitySection({
 }: StoryBrandSustainabilitySectionProps) {
   const [windowWidth, setWindowWidth] = React.useState(0);
   const images = data.images || [];
+  const params = useParams();
+  const locale = (params?.locale as string) || "en";
 
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => {
@@ -381,14 +384,21 @@ export function StoryBrandSustainabilitySection({
               {data.content1 && (
                 <div
                   className="absolute z-20"
-                  style={{ top: vw(763), left: vw(49), width: vw(240) }}
+                  style={{ top: vw(763), left: vw(49), width: vw(250) }}
                 >
                   <div className="mb-2">
                     <StaggeredBalls />
                   </div>
                   <p
-                    className="font-josefin-sans font-bold text-[#FF7B04] tracking-wide whitespace-pre-line"
-                    style={{ fontSize: vw(24), lineHeight: 1.2 }}
+                    className={`font-josefin-sans font-bold text-[#FF7B04] tracking-wide ${locale === "en" ? "whitespace-pre-line" : "overflow-y-auto"}`}
+                    style={{
+                      fontSize: vw(24),
+                      lineHeight: 1.2,
+                      maxHeight: locale === "en" ? "none" : "5.0em", // 4 lines * 1.2 + 0.2
+                      scrollbarWidth: locale === "en" ? "none" : "thin",
+                      scrollbarColor: "rgba(255,123,4,0.3) transparent",
+                      paddingRight: locale === "en" ? 0 : "4px"
+                    }}
                   >
                     {data.content1}
                   </p>

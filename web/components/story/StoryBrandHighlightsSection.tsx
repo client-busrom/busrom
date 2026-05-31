@@ -220,11 +220,10 @@ export function StoryBrandHighlightsSection({
                     {slides.map((_, i) => (
                       <div
                         key={i}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                          activeSlideIdx === i
-                            ? "bg-[#574f0e] w-4"
-                            : "bg-[#574f0e]/20"
-                        }`}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${activeSlideIdx === i
+                          ? "bg-[#574f0e] w-4"
+                          : "bg-[#574f0e]/20"
+                          }`}
                       />
                     ))}
                   </div>
@@ -268,11 +267,11 @@ export function StoryBrandHighlightsSection({
       <div className="relative z-10 w-full h-full mx-auto">
         {/* 1. Section Title: Precise Position (x:331, y:11) */}
         <div
-          className="absolute font-josefin-sans font-bold text-[#3b3b3b] flex items-center justify-center text-center"
+          className="absolute font-josefin-sans font-bold text-[#3b3b3b] flex items-center justify-start text-left"
           style={{
             left: vw(331),
             top: vw(11),
-            width: vw(588.65),
+            width: vw(1920 - 331),
             height: vw(135.15),
             fontSize: vw(72),
             lineHeight: 1,
@@ -506,11 +505,10 @@ export function StoryBrandHighlightsSection({
               >
                 <div
                   onClick={() => !isActive && setActiveSlideIdx(index)}
-                  className={`relative w-full flex flex-col items-center transition-all duration-300 ${
-                    isActive
-                      ? "opacity-0 pointer-events-none"
-                      : "cursor-pointer group"
-                  }`}
+                  className={`relative w-full flex flex-col items-center transition-all duration-300 ${isActive
+                    ? "opacity-0 pointer-events-none"
+                    : "cursor-pointer group"
+                    }`}
                 >
                   <div
                     className="relative w-full aspect-[164/189] overflow-hidden mb-3 border border-black/5"

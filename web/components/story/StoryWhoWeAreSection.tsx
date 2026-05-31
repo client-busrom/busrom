@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useParams } from "next/navigation";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -69,6 +70,8 @@ export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
   }, []);
 
   const isMobileHook = useIsMobile();
+  const params = useParams();
+  const locale = (params?.locale as string) || "en";
   const isTabletOrMobile = isMobileHook || (windowWidth > 0 && windowWidth <= 1024);
 
   if (isTabletOrMobile) {
@@ -269,20 +272,23 @@ export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
 
           {/* Description Text (iAWyA) */}
           <div
-            className="absolute flex items-center text-left font-josefin-sans"
+            className={`absolute flex flex-col text-left font-josefin-sans ${locale === "en" ? "justify-center" : "overflow-y-auto"}`}
             style={{
               left: vw(30),
               top: vw(31),
               width: vw(482),
-              height: vw(157),
+              height: vw(157), // The fixed box height, roughly ~3.8 lines
               color: "#ffec51",
               fontSize: vw(32),
               lineHeight: 1.3,
               fontWeight: 500,
               textShadow: `0 ${vw(4)} ${vw(11)} #565020`,
+              scrollbarWidth: locale === "en" ? "none" : "thin",
+              scrollbarColor: "rgba(255,255,255,0.3) transparent",
+              paddingRight: locale === "en" ? 0 : "4px"
             }}
           >
-            {data.description}
+            <span className={locale === "en" ? "" : "my-auto"}>{data.description}</span>
           </div>
         </motion.div>
 
@@ -291,15 +297,19 @@ export function StoryWhoWeAreSection({ data }: StoryWhoWeAreSectionProps) {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="absolute font-josefin-sans text-left whitespace-pre-wrap"
+          className={`absolute font-josefin-sans text-left ${locale === "en" ? "whitespace-pre-wrap" : "overflow-y-auto"}`}
           style={{
             left: vw(892),
             top: vw(180),
             maxWidth: vw(980), // Keep a safe boundary but allow wide lines
             fontSize: vw(28),
             lineHeight: 1.6,
-            color: "#ffffff",
-            textShadow: `0 ${vw(4)} ${vw(11)} #565020`,
+            color: "rgba(255, 255, 255, 0.9)",
+            textShadow: `0 ${vw(4)} ${vw(12)} rgba(0, 0, 0, 0.25)`,
+            maxHeight: locale === "en" ? "none" : "14.6em", // 9 lines * 1.6 + breathing room
+            scrollbarWidth: locale === "en" ? "none" : "thin",
+            scrollbarColor: "rgba(255,255,255,0.3) transparent",
+            paddingRight: locale === "en" ? 0 : "8px"
           }}
         >
           {data.content}

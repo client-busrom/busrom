@@ -650,7 +650,7 @@ export function StoryBrandPositionSection({
           style={{
             left: vw(811 + 193),
             top: vw(910),
-            width: vw(664),
+            width: vw(1920 - 811 - 193),
             fontSize: vw(32),
             lineHeight: 1.4,
             color: "#6b6744",
