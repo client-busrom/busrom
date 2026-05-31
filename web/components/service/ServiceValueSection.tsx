@@ -669,27 +669,54 @@ export function ServiceValueSection({
                 </div>
               )}
 
-              {/* Text content - scaled by 0.83 from design (32/47, 22/31) */}
-              <div className="flex flex-col justify-start flex-1 overflow-hidden">
-                <h3
-                  className="font-anaheim font-extrabold text-black"
+              <div
+                className="flex flex-col justify-start flex-1 overflow-hidden"
+              >
+                <div
+                  className="custom-scrollbar"
+                  data-lenis-prevent
                   style={{
-                    fontSize: vw(24),
-                    lineHeight: vw(32),
-                    marginBottom: vw(36),
+                    maxHeight: vw(84), // Max 2 lines + 10 padding
+                    paddingTop: vw(5),
+                    paddingBottom: vw(5),
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    overscrollBehavior: "contain",
+                    marginBottom: vw(36), // Moved from h3
                   }}
                 >
-                  {activeSlide?.title}
-                </h3>
-                <p
-                  className="font-anaheim font-medium text-[#3C3C3C]"
+                  <h3
+                    className="font-anaheim font-extrabold text-black m-0"
+                    style={{
+                      fontSize: vw(24),
+                      lineHeight: vw(32),
+                    }}
+                  >
+                    {activeSlide?.title}
+                  </h3>
+                </div>
+                <div
+                  className="custom-scrollbar"
+                  data-lenis-prevent
                   style={{
-                    fontSize: vw(16),
-                    lineHeight: vw(24),
+                    maxHeight: vw(164), // Max 6 lines + 10 padding
+                    paddingTop: vw(5),
+                    paddingBottom: vw(5),
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    overscrollBehavior: "contain",
                   }}
                 >
-                  {activeSlide?.description}
-                </p>
+                  <p
+                    className="font-anaheim font-medium text-[#3C3C3C] m-0"
+                    style={{
+                      fontSize: vw(16),
+                      lineHeight: vw(24),
+                    }}
+                  >
+                    {activeSlide?.description}
+                  </p>
+                </div>
               </div>
             </div>
           </motion.div>

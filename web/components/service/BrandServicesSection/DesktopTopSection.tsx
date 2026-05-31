@@ -59,26 +59,52 @@ export function DesktopTopSection({
         }}
       >
         {/* Title and Description */}
-        <div style={{ maxWidth: vw(405) }}> {/* 579 * 0.7 */}
-          <h2
-            className="font-anaheim font-extrabold text-white"
+        <div> {/* 579 * 0.7 */}
+          <div
+            className="custom-scrollbar"
+            data-lenis-prevent
             style={{
-              fontSize: vw(60),
-              lineHeight: vw(68),
-              marginBottom: vw(10), // 40 * 0.7
+              maxHeight: vw(90), // Max 1 line + 10 padding
+              paddingTop: vw(5),
+              paddingBottom: vw(5),
+              overflowY: "auto",
+              overflowX: "hidden",
+              marginBottom: vw(10),
             }}
           >
-            {title}
-          </h2>
-          <p
-            className="font-anaheim font-semibold text-[#FFF9D3]"
+            <h2
+              className="font-anaheim font-extrabold text-white m-0"
+              style={{
+                maxWidth: vw(560),
+                fontSize: vw(60),
+                lineHeight: vw(68),
+              }}
+            >
+              {title}
+            </h2>
+          </div>
+          <div
+            className="custom-scrollbar"
+            data-lenis-prevent
             style={{
-              fontSize: vw(18),
-              lineHeight: vw(28),
+              maxHeight: vw(106), // Max 3 lines + 10 padding
+              paddingTop: vw(5),
+              paddingBottom: vw(5),
+              overflowY: "auto",
+              overflowX: "hidden",
             }}
           >
-            {description}
-          </p>
+            <p
+              className="font-anaheim font-semibold text-[#FFF9D3] m-0"
+              style={{
+                maxWidth: vw(405),
+                fontSize: vw(18),
+                lineHeight: vw(28),
+              }}
+            >
+              {description}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -103,25 +129,42 @@ export function DesktopTopSection({
               {/* Category button */}
               <button
                 onClick={() => setActiveCategoryIndex(index)}
-                className={`flex items-center justify-center transition-all duration-300 hover:scale-105 ${
-                  isActive ? "bg-[#89834C]" : "bg-transparent border-2 border-[#B7B180]"
-                }`}
+                className={`flex items-center justify-center transition-all duration-300 hover:scale-105 ${isActive ? "bg-[#89834C]" : "bg-transparent border-2 border-[#B7B180]"
+                  }`}
                 style={{
                   width: isActive ? vw(509) : vw(469),  // 727/670 * 0.7
                   height: isActive ? vw(92) : vw(85),   // 132/121 * 0.7
                   borderRadius: vw(21),                 // 30 * 0.7
                   boxShadow: isActive ? `0px ${vw(48)} ${vw(34)} rgba(91, 84, 30, 0.52)` : "none", // 68/48.2 * 0.7
+                  padding: `0 ${vw(30)}`
                 }}
               >
-                <span
-                  className={`font-anaheim text-[#FFF38E] transition-all duration-300 ${isActive ? "font-bold" : "font-medium"}`}
+                <div
+                  className="custom-scrollbar"
+                  data-lenis-prevent
                   style={{
-                    fontSize: isActive ? vw(32) : vw(29),
-                    display: "inline-block",
+                    maxHeight: isActive ? vw(96) : vw(88), // Buffer for 2 lines + 8 padding
+                    paddingTop: vw(4),
+                    paddingBottom: vw(4),
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    overscrollBehavior: "contain",
+                    width: "100%",
                   }}
                 >
-                  {category.title}
-                </span>
+                  <span
+                    className={`font-anaheim text-[#FFF38E] transition-all duration-300 m-0 ${isActive ? "font-bold" : "font-medium"}`}
+                    style={{
+                      fontSize: isActive ? vw(32) : vw(29),
+                      lineHeight: isActive ? vw(40) : vw(36),
+                      display: "block",
+                      textAlign: "center",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {category.title}
+                  </span>
+                </div>
               </button>
 
               {/* Arrow button */}
@@ -209,8 +252,8 @@ export function DesktopTopSection({
             animate={{ opacity: 1, scale: 1.05 }}
             exit={{ opacity: 0, scale: 1.1 }}
             whileHover={{ scale: 1.12 }}
-            transition={{ 
-              duration: 0.25, 
+            transition={{
+              duration: 0.25,
               ease: "easeOut",
               scale: { type: "spring", stiffness: 400, damping: 15 }
             }}
@@ -263,8 +306,8 @@ export function DesktopTopSection({
             animate={{ opacity: 1, scale: 1.05 }}
             exit={{ opacity: 0, scale: 1.1 }}
             whileHover={{ scale: 1.12 }}
-            transition={{ 
-              duration: 0.25, 
+            transition={{
+              duration: 0.25,
               ease: "easeOut",
               scale: { type: "spring", stiffness: 400, damping: 15 }
             }}

@@ -96,16 +96,16 @@ export function DesktopBottomSection({
                 height: vw(11),  // 16 * 0.7
               }}
             >
-              <path d="M1 17L9.3208 9L1 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0s" }}/>
-              <path d="M13.9099 17L22.2307 9L13.9099 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.1s" }}/>
-              <path d="M26.8217 17L35.1405 9L26.8217 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.2s" }}/>
-              <path d="M39.7317 17L48.0525 9L39.7317 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.3s" }}/>
-              <path d="M52.6415 17L60.9623 9L52.6415 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.4s" }}/>
-              <path d="M66.9588 17L75.2796 9L66.9588 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.5s" }}/>
-              <path d="M79.8687 17L88.1895 9L79.8687 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.6s" }}/>
-              <path d="M92.7805 17L101.099 9L92.7805 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.7s" }}/>
-              <path d="M105.69 17L114.011 9L105.69 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.8s" }}/>
-              <path d="M118.6 17L126.921 9L118.6 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.9s" }}/>
+              <path d="M1 17L9.3208 9L1 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0s" }} />
+              <path d="M13.9099 17L22.2307 9L13.9099 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.1s" }} />
+              <path d="M26.8217 17L35.1405 9L26.8217 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.2s" }} />
+              <path d="M39.7317 17L48.0525 9L39.7317 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.3s" }} />
+              <path d="M52.6415 17L60.9623 9L52.6415 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.4s" }} />
+              <path d="M66.9588 17L75.2796 9L66.9588 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.5s" }} />
+              <path d="M79.8687 17L88.1895 9L79.8687 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.6s" }} />
+              <path d="M92.7805 17L101.099 9L92.7805 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.7s" }} />
+              <path d="M105.69 17L114.011 9L105.69 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.8s" }} />
+              <path d="M118.6 17L126.921 9L118.6 1" stroke="#756F3F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-wave" style={{ animationDelay: "0.9s" }} />
             </svg>
           </div>
 
@@ -196,8 +196,7 @@ export function DesktopBottomSection({
             style={{
               left: 0,
               right: 0,
-              top: "50%",
-              transform: "translateY(-50%)",
+              top: vw(285), // Fixed top instead of 50% + translateY to prevent shifting
               gap: vw(90),    // 128 * 0.7
             }}
           >
@@ -298,15 +297,29 @@ export function DesktopBottomSection({
                     </div>
 
                     {/* Title */}
-                    <h4
-                      className="font-anaheim font-bold text-black"
+                    <div
+                      className="custom-scrollbar"
+                      data-lenis-prevent
                       style={{
-                        fontSize: fontVw(20),
-                        lineHeight: fontVw(26),
+                        maxHeight: fontVw(218), // 8 lines * 26 + 10 padding
+                        paddingTop: fontVw(5),
+                        paddingBottom: fontVw(5),
+                        overflowY: "auto",
+                        overflowX: "hidden",
+                        overscrollBehavior: "contain",
+                        width: "100%",
                       }}
                     >
-                      {item.title}
-                    </h4>
+                      <h4
+                        className="font-anaheim font-bold text-black m-0"
+                        style={{
+                          fontSize: fontVw(20),
+                          lineHeight: fontVw(26),
+                        }}
+                      >
+                        {item.title}
+                      </h4>
+                    </div>
                   </button>
                 </motion.div>
               )
@@ -381,25 +394,52 @@ export function DesktopBottomSection({
 
                           {/* Title & Description */}
                           <div className="flex-1">
-                            <h4
-                              className="font-anaheim font-bold text-black"
+                            <div
+                              className="custom-scrollbar"
+                              data-lenis-prevent
                               style={{
-                                fontSize: fontVw(20),
-                                lineHeight: fontVw(26),
-                                marginBottom: vw(11), // 16 * 0.7
+                                maxHeight: fontVw(62), // 2 lines * 26 + 10 padding
+                                paddingTop: fontVw(5),
+                                paddingBottom: fontVw(5),
+                                overflowY: "auto",
+                                overflowX: "hidden",
+                                overscrollBehavior: "contain",
+                                marginBottom: vw(11), // Moved from h4
                               }}
                             >
-                              {item.title}
-                            </h4>
-                            <p
-                              className="font-anaheim font-medium text-[#535353] text-justify"
+                              <h4
+                                className="font-anaheim font-bold text-black m-0"
+                                style={{
+                                  fontSize: fontVw(20),
+                                  lineHeight: fontVw(26),
+                                }}
+                              >
+                                {item.title}
+                              </h4>
+                            </div>
+                            <div
+                              className="custom-scrollbar"
+                              data-lenis-prevent
                               style={{
-                                fontSize: fontVw(16),
-                                lineHeight: fontVw(20),
+                                maxHeight: fontVw(130), // 6 lines * 20 + 10 padding
+                                paddingTop: fontVw(5),
+                                paddingRight: fontVw(5),
+                                paddingBottom: fontVw(5),
+                                overflowY: "auto",
+                                overflowX: "hidden",
+                                overscrollBehavior: "contain",
                               }}
                             >
-                              {item.description}
-                            </p>
+                              <p
+                                className="font-anaheim font-medium text-[#535353] text-justify m-0"
+                                style={{
+                                  fontSize: fontVw(16),
+                                  lineHeight: fontVw(20),
+                                }}
+                              >
+                                {item.description}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -463,11 +503,10 @@ export function DesktopBottomSection({
           {/* Left Navigation Button */}
           <button
             onClick={expandedItemIndex !== null ? onPrevItem : undefined}
-            className={`group absolute z-20 rounded-full flex items-center justify-center transition-all border-2 ${
-              expandedItemIndex !== null
+            className={`group absolute z-20 rounded-full flex items-center justify-center transition-all border-2 ${expandedItemIndex !== null
                 ? "border-[#756F3F] bg-transparent hover:bg-[#756F3F] cursor-pointer"
                 : "border-[#756F3F]/30 bg-transparent cursor-default"
-            }`}
+              }`}
             style={{
               width: vw(52),    // 74 * 0.7
               height: vw(52),
@@ -479,11 +518,10 @@ export function DesktopBottomSection({
             disabled={expandedItemIndex === null}
           >
             <ChevronLeft
-              className={`transition-colors ${
-                expandedItemIndex !== null
+              className={`transition-colors ${expandedItemIndex !== null
                   ? "text-[#756F3F] group-hover:text-white"
                   : "text-[#756F3F]/30"
-              }`}
+                }`}
               strokeWidth={3}
               style={{ width: vw(17), height: vw(17) }}
             />
@@ -492,11 +530,10 @@ export function DesktopBottomSection({
           {/* Right Navigation Button */}
           <button
             onClick={expandedItemIndex !== null ? onNextItem : undefined}
-            className={`group absolute z-20 rounded-full flex items-center justify-center transition-all border-2 ${
-              expandedItemIndex !== null
+            className={`group absolute z-20 rounded-full flex items-center justify-center transition-all border-2 ${expandedItemIndex !== null
                 ? "border-[#756F3F] bg-transparent hover:bg-[#756F3F] cursor-pointer"
                 : "border-[#756F3F]/30 bg-transparent cursor-default"
-            }`}
+              }`}
             style={{
               width: vw(52),    // 74 * 0.7
               height: vw(52),
@@ -508,11 +545,10 @@ export function DesktopBottomSection({
             disabled={expandedItemIndex === null}
           >
             <ChevronRight
-              className={`transition-colors ${
-                expandedItemIndex !== null
+              className={`transition-colors ${expandedItemIndex !== null
                   ? "text-[#756F3F] group-hover:text-white"
                   : "text-[#756F3F]/30"
-              }`}
+                }`}
               strokeWidth={3}
               style={{ width: vw(17), height: vw(17) }}
             />

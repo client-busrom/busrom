@@ -342,15 +342,31 @@ export function ContactFormSection({
                     "w-full min-h-[52px] py-3 rounded-[100px] bg-[#B2A224] text-white font-anaheim font-semibold text-[16px] leading-tight hover:bg-[#9A8C1E] transition-all flex items-center justify-center text-center",
                     "disabled:opacity-50 disabled:cursor-not-allowed",
                     !!formConfig?.privacyConsentText &&
-                      !privacyAccepted &&
-                      "grayscale",
+                    !privacyAccepted &&
+                    "grayscale",
                   )}
                 >
-                  {submitting
-                    ? formConfig?.submittingText ||
-                      (locale === "zh" ? "发送中..." : "Sending...")
-                    : formConfig?.submitButtonText ||
-                      (locale === "zh" ? "提交咨询" : "Send Inquiry")}
+                  <div
+                    className="custom-scrollbar"
+                    data-lenis-prevent
+                    style={{
+                      maxHeight: "50px", // 2 lines * 20 (1.25 * 16) + 10 padding
+                      paddingTop: "5px",
+                      paddingBottom: "5px",
+                      overflowY: "auto",
+                      overflowX: "hidden",
+                      overscrollBehavior: "contain",
+                      width: "100%",
+                    }}
+                  >
+                    <span className="m-0 block w-full text-center" style={{ wordBreak: "break-word" }}>
+                      {submitting
+                        ? formConfig?.submittingText ||
+                        (locale === "zh" ? "发送中..." : "Sending...")
+                        : formConfig?.submitButtonText ||
+                        (locale === "zh" ? "提交咨询" : "Send Inquiry")}
+                    </span>
+                  </div>
                 </motion.button>
               </form>
             )}
@@ -459,63 +475,102 @@ export function ContactFormSection({
               <div
                 style={{ width: "476px", flexShrink: 0, paddingLeft: "67px" }}
               >
-                <h2
-                  className="font-anaheim font-extrabold text-white whitespace-pre-line"
+                <div
+                  className="custom-scrollbar"
+                  data-lenis-prevent
                   style={{
-                    fontSize: "56px",
-                    lineHeight: "67px",
+                    maxHeight: "144px",
+                    paddingTop: "5px",
+                    paddingBottom: "5px",
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    overscrollBehavior: "contain",
                     marginBottom: "7px",
                   }}
                 >
-                  {title.map((segment, idx) =>
-                    segment.hollow ? (
-                      <HollowText
-                        key={idx}
-                        strokeColor="#FFEF72"
-                        strokeWidth={1.5}
-                      >
-                        {segment.text}
-                      </HollowText>
-                    ) : (
-                      <span
-                        key={idx}
-                        style={{
-                          WebkitTextStroke: "1.1px #FFEF72",
-                          paintOrder: "stroke fill",
-                        }}
-                      >
-                        {segment.text}
-                      </span>
-                    ),
-                  )}
-                </h2>
-
-                {(subtitle || formConfig?.displayName || displayName) && (
-                  <p
-                    className="font-anaheim font-extrabold"
+                  <h2
+                    className="font-anaheim font-extrabold text-white whitespace-pre-line m-0"
                     style={{
-                      marginTop: "14px",
-                      fontSize: "28px",
-                      lineHeight: "38px",
-                      color: "#FFF071",
+                      fontSize: "56px",
+                      lineHeight: "67px",
                     }}
                   >
-                    {subtitle || formConfig?.displayName || displayName}
-                  </p>
+                    {title.map((segment, idx) =>
+                      segment.hollow ? (
+                        <HollowText
+                          key={idx}
+                          strokeColor="#FFEF72"
+                          strokeWidth={1.5}
+                        >
+                          {segment.text}
+                        </HollowText>
+                      ) : (
+                        <span
+                          key={idx}
+                          style={{
+                            WebkitTextStroke: "1.1px #FFEF72",
+                            paintOrder: "stroke fill",
+                          }}
+                        >
+                          {segment.text}
+                        </span>
+                      ),
+                    )}
+                  </h2>
+                </div>
+
+                {(formConfig?.displayName || displayName) && (
+                  <div
+                    className="custom-scrollbar"
+                    data-lenis-prevent
+                    style={{
+                      maxHeight: "86px",
+                      paddingTop: "5px",
+                      paddingBottom: "5px",
+                      overflowY: "auto",
+                      overflowX: "hidden",
+                      overscrollBehavior: "contain",
+                      marginTop: "14px",
+                    }}
+                  >
+                    <p
+                      className="font-anaheim font-extrabold m-0"
+                      style={{
+                        fontSize: "28px",
+                        lineHeight: "38px",
+                        color: "#FFF071",
+                      }}
+                    >
+                      {formConfig?.displayName || displayName}
+                    </p>
+                  </div>
                 )}
 
                 {(formConfig?.description || description) && (
-                  <p
-                    className="font-anaheim font-normal text-white"
+                  <div
+                    className="custom-scrollbar"
+                    data-lenis-prevent
                     style={{
+                      maxHeight: "110px",
+                      paddingTop: "5px",
+                      paddingBottom: "5px",
+                      overflowY: "auto",
+                      overflowX: "hidden",
+                      overscrollBehavior: "contain",
                       marginTop: "32px",
-                      width: "333px",
-                      fontSize: "17px",
-                      lineHeight: "25px",
                     }}
                   >
-                    {formConfig?.description || description}
-                  </p>
+                    <p
+                      className="font-anaheim font-normal text-white m-0"
+                      style={{
+                        width: "333px",
+                        fontSize: "17px",
+                        lineHeight: "25px",
+                      }}
+                    >
+                      {formConfig?.description || description}
+                    </p>
+                  </div>
                 )}
 
                 {/* contact-form-info List */}
@@ -535,17 +590,30 @@ export function ContactFormSection({
 
                 {/* contact-form-tips */}
                 {footerNote && (
-                  <p
-                    className="font-anaheim font-semibold text-white/70 whitespace-pre-line"
+                  <div
+                    className="custom-scrollbar"
+                    data-lenis-prevent
                     style={{
+                      maxHeight: "46px",
+                      paddingTop: "5px",
+                      paddingBottom: "5px",
+                      overflowY: "auto",
+                      overflowX: "hidden",
+                      overscrollBehavior: "contain",
                       marginTop: "56px",
-                      width: "300px",
-                      fontSize: "11px",
-                      lineHeight: "18px",
                     }}
                   >
-                    {footerNote}
-                  </p>
+                    <p
+                      className="font-anaheim font-semibold text-white/70 whitespace-pre-line m-0"
+                      style={{
+                        width: "300px",
+                        fontSize: "11px",
+                        lineHeight: "18px",
+                      }}
+                    >
+                      {footerNote}
+                    </p>
+                  </div>
                 )}
               </div>
 
@@ -553,16 +621,29 @@ export function ContactFormSection({
               <div
                 style={{ flex: 1, paddingRight: "67px", paddingLeft: "35px" }}
               >
-                <h3
-                  className="font-anaheim font-semibold text-white"
+                <div
+                  className="custom-scrollbar"
+                  data-lenis-prevent
                   style={{
-                    fontSize: "30px",
-                    lineHeight: "43px",
+                    maxHeight: "96px",
+                    paddingTop: "5px",
+                    paddingBottom: "5px",
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    overscrollBehavior: "contain",
                     marginBottom: "30px",
                   }}
                 >
-                  {subtitle}
-                </h3>
+                  <h3
+                    className="font-anaheim font-semibold text-white m-0"
+                    style={{
+                      fontSize: "30px",
+                      lineHeight: "43px",
+                    }}
+                  >
+                    {subtitle}
+                  </h3>
+                </div>
 
                 {loading ? (
                   <div className="flex items-center justify-center p-12">
@@ -687,8 +768,8 @@ export function ContactFormSection({
                         "w-full bg-[#B2A224] text-white font-anaheim font-bold hover:bg-[#9A8C1E] transition-colors flex items-center justify-center text-center",
                         "disabled:opacity-50 disabled:cursor-not-allowed",
                         !!formConfig?.privacyConsentText &&
-                          !privacyAccepted &&
-                          "grayscale",
+                        !privacyAccepted &&
+                        "grayscale",
                       )}
                       style={{
                         borderRadius: "70px",
@@ -702,11 +783,27 @@ export function ContactFormSection({
                         transformOrigin: "center",
                       }}
                     >
-                      {submitting
-                        ? formConfig?.submittingText ||
-                          (locale === "zh" ? "发送中..." : "Sending...")
-                        : formConfig?.submitButtonText ||
-                          (locale === "zh" ? "提交咨询" : "Send Inquiry")}
+                      <div
+                        className="custom-scrollbar"
+                        data-lenis-prevent
+                        style={{
+                          maxHeight: "63px", // 2 lines * 26.4 (1.2 * 22) + 10 padding
+                          paddingTop: "5px",
+                          paddingBottom: "5px",
+                          overflowY: "auto",
+                          overflowX: "hidden",
+                          overscrollBehavior: "contain",
+                          width: "100%",
+                        }}
+                      >
+                        <span className="m-0 block w-full text-center" style={{ wordBreak: "break-word" }}>
+                          {submitting
+                            ? formConfig?.submittingText ||
+                            (locale === "zh" ? "发送中..." : "Sending...")
+                            : formConfig?.submitButtonText ||
+                            (locale === "zh" ? "提交咨询" : "Send Inquiry")}
+                        </span>
+                      </div>
                     </motion.button>
                   </form>
                 )}

@@ -533,17 +533,31 @@ export const DesktopField: React.FC<DesktopFieldProps> = ({
             }}
             className="bg-[#211C0B]/50 border border-dashed border-white/30 transition-all duration-200 hover:bg-[#211C0B]/70 hover:border-white/60 hover:scale-[1.02]"
           >
-            <span
-              className="font-anaheim font-semibold text-white/50 text-center"
-              style={{ fontSize: "16px", whiteSpace: "pre-wrap" }}
+            <div
+              className="custom-scrollbar"
+              data-lenis-prevent
+              style={{
+                maxHeight: "58px", // 2 lines * 24 (1.5 * 16) + 10 padding
+                paddingTop: "5px",
+                paddingBottom: "5px",
+                overflowY: "auto",
+                overflowX: "hidden",
+                overscrollBehavior: "contain",
+                width: "100%",
+              }}
             >
-              {uploadingFiles[field.fieldName]
-                ? "Uploading..."
-                : (Object.keys(pendingFiles).includes(field.fieldName) && pendingFiles[field.fieldName].length > 0) || 
-                  uploadedAttachments.filter(a => a.fieldName === field.fieldName).length > 0
-                  ? `${(pendingFiles[field.fieldName]?.length || 0) + uploadedAttachments.filter(a => a.fieldName === field.fieldName).length} file(s) selected`
-                  : field.placeholder || "Upload File"}
-            </span>
+              <span
+                className="font-anaheim font-semibold text-white/50 text-center m-0 block"
+                style={{ fontSize: "16px", whiteSpace: "pre-wrap", lineHeight: "24px", wordBreak: "break-word" }}
+              >
+                {uploadingFiles[field.fieldName]
+                  ? "Uploading..."
+                  : (Object.keys(pendingFiles).includes(field.fieldName) && pendingFiles[field.fieldName].length > 0) || 
+                    uploadedAttachments.filter(a => a.fieldName === field.fieldName).length > 0
+                    ? `${(pendingFiles[field.fieldName]?.length || 0) + uploadedAttachments.filter(a => a.fieldName === field.fieldName).length} file(s) selected`
+                    : field.placeholder || "Upload File"}
+              </span>
+            </div>
             <input
               type="file"
               id={field.fieldName}
@@ -893,14 +907,31 @@ export const MobileField: React.FC<MobileFieldProps> = ({
             htmlFor={`mobile-${field.fieldName}`}
             className="flex items-center justify-center min-h-[52px] h-auto py-[12px] px-[16px] rounded-[12px] bg-[#211C0B]/50 border border-dashed border-white/30 cursor-pointer transition-all hover:bg-[#211C0B]/70"
           >
-            <span className="font-anaheim font-semibold text-white/50 text-center text-[14px]">
-              {uploadingFiles[field.fieldName]
-                ? "Uploading..."
-                : (Object.keys(pendingFiles).includes(field.fieldName) && pendingFiles[field.fieldName].length > 0) || 
-                  uploadedAttachments.filter(a => a.fieldName === field.fieldName).length > 0
-                  ? `${(pendingFiles[field.fieldName]?.length || 0) + uploadedAttachments.filter(a => a.fieldName === field.fieldName).length} file(s) selected`
-                  : field.placeholder || "Upload File"}
-            </span>
+            <div
+              className="custom-scrollbar"
+              data-lenis-prevent
+              style={{
+                maxHeight: "52px", // 2 lines * 21 (1.5 * 14) + 10 padding
+                paddingTop: "5px",
+                paddingBottom: "5px",
+                overflowY: "auto",
+                overflowX: "hidden",
+                overscrollBehavior: "contain",
+                width: "100%",
+              }}
+            >
+              <span 
+                className="font-anaheim font-semibold text-white/50 text-center text-[14px] m-0 block"
+                style={{ whiteSpace: "pre-wrap", lineHeight: "21px", wordBreak: "break-word" }}
+              >
+                {uploadingFiles[field.fieldName]
+                  ? "Uploading..."
+                  : (Object.keys(pendingFiles).includes(field.fieldName) && pendingFiles[field.fieldName].length > 0) || 
+                    uploadedAttachments.filter(a => a.fieldName === field.fieldName).length > 0
+                    ? `${(pendingFiles[field.fieldName]?.length || 0) + uploadedAttachments.filter(a => a.fieldName === field.fieldName).length} file(s) selected`
+                    : field.placeholder || "Upload File"}
+              </span>
+            </div>
             <input
               type="file"
               id={`mobile-${field.fieldName}`}

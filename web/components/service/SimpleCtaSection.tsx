@@ -75,25 +75,66 @@ export function SimpleCtaSection({
           }}
         >
           {/* Title */}
-          <h2
-            className="font-anaheim font-extrabold text-[24px] leading-[32px] mb-3"
-            style={{ color: "#FFF180" }}
+          <div
+            className="custom-scrollbar"
+            data-lenis-prevent
+            style={{
+              maxWidth: "100%",
+              paddingBottom: "5px",
+              overflowX: "auto",
+              overflowY: "hidden",
+              overscrollBehavior: "contain",
+              marginBottom: "12px",
+            }}
           >
-            {title}
-          </h2>
+            <h2
+              className="font-anaheim font-extrabold text-[24px] leading-[32px] m-0 whitespace-nowrap"
+              style={{ color: "#FFF180" }}
+            >
+              {title}
+            </h2>
+          </div>
 
           {/* Description */}
-          <p className="font-anaheim font-medium text-[13px] leading-[20px] text-white mb-3">
-            {description}
-          </p>
+          <div
+            className="custom-scrollbar"
+            data-lenis-prevent
+            style={{
+              maxHeight: "130px", // 6 lines * 20px + 10px padding
+              paddingTop: "5px",
+              paddingBottom: "5px",
+              overflowY: "auto",
+              overflowX: "hidden",
+              overscrollBehavior: "contain",
+              marginBottom: "12px",
+            }}
+          >
+            <p className="font-anaheim font-medium text-[13px] leading-[20px] text-white m-0">
+              {description}
+            </p>
+          </div>
 
           {/* CTA Text */}
-          <p
-            className="font-anaheim font-extrabold text-[16px] leading-[24px] mb-5"
-            style={{ color: "#FFEB4E" }}
+          <div
+            className="custom-scrollbar"
+            data-lenis-prevent
+            style={{
+              maxHeight: "58px", // 2 lines * 24px + 10px padding
+              paddingTop: "5px",
+              paddingBottom: "5px",
+              overflowY: "auto",
+              overflowX: "hidden",
+              overscrollBehavior: "contain",
+              marginBottom: "20px",
+            }}
           >
-            {ctaText}
-          </p>
+            <p
+              className="font-anaheim font-extrabold text-[16px] leading-[24px] m-0"
+              style={{ color: "#FFEB4E" }}
+            >
+              {ctaText}
+            </p>
+          </div>
 
           {/* Button */}
           <Link href={`/${locale}${buttonLink}`} className="inline-block">
@@ -118,14 +159,27 @@ export function SimpleCtaSection({
             >
               <div
                 className="inline-flex items-center justify-center px-6 py-2.5 rounded-full"
-                style={{ backgroundColor: "#FFF7B3" }}
+                style={{ backgroundColor: "#FFF7B3", maxWidth: "100%" }}
               >
-                <span
-                  className="font-anaheim font-semibold text-[14px]"
-                  style={{ color: "#625D2F" }}
+                <div
+                  className="custom-scrollbar"
+                  data-lenis-prevent
+                  style={{
+                    maxHeight: "50px", // 2 lines * 20px + 10px padding
+                    paddingTop: "5px",
+                    paddingBottom: "5px",
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    overscrollBehavior: "contain",
+                  }}
                 >
-                  {buttonText}
-                </span>
+                  <span
+                    className="font-anaheim font-semibold text-[14px] m-0 block text-center"
+                    style={{ color: "#625D2F", lineHeight: "20px", wordBreak: "break-word" }}
+                  >
+                    {buttonText}
+                  </span>
+                </div>
               </div>
             </motion.div>
           </Link>
@@ -188,68 +242,102 @@ export function SimpleCtaSection({
 
         {/* Title with stroke effect */}
         <div
-          className="absolute"
+          className="absolute custom-scrollbar"
+          data-lenis-prevent
           style={{
             left: vw(186),
             top: vw(96),
+            maxWidth: vw(1520),
+            paddingBottom: "10px",
+            overflowX: "auto",
+            overflowY: "hidden",
+            overscrollBehavior: "contain",
           }}
         >
-          {/* Shadow/background layer - solid fill with background color + stroke */}
-          <span
-            className="absolute font-anaheim font-extrabold whitespace-nowrap"
-            style={{
-              left: vw(1.5),
-              top: vw(2),
-              fontSize: fontVw(60),
-              lineHeight: fontVw(68),
-              color: "#756F3F",
-              WebkitTextStroke: `2px #FFFAD0`,
-              paintOrder: "stroke fill",
-            }}
-          >
-            {title}
-          </span>
-          {/* Main text layer */}
-          <h2
-            className="relative font-anaheim font-extrabold whitespace-nowrap"
-            style={{
-              fontSize: fontVw(60),
-              lineHeight: fontVw(68),
-              color: "#FFF180",
-            }}
-          >
-            {title}
-          </h2>
+          <div className="relative min-w-max" style={{ height: fontVw(68), paddingRight: vw(5) }}>
+            {/* Shadow/background layer - solid fill with background color + stroke */}
+            <span
+              className="absolute font-anaheim font-extrabold whitespace-nowrap m-0"
+              style={{
+                left: vw(1.5),
+                top: vw(2),
+                fontSize: fontVw(60),
+                lineHeight: fontVw(68),
+                color: "#756F3F",
+                WebkitTextStroke: `2px #FFFAD0`,
+                paintOrder: "stroke fill",
+              }}
+            >
+              {title}
+            </span>
+            {/* Main text layer */}
+            <h2
+              className="relative font-anaheim font-extrabold whitespace-nowrap m-0"
+              style={{
+                fontSize: fontVw(60),
+                lineHeight: fontVw(68),
+                color: "#FFF180",
+              }}
+            >
+              {title}
+            </h2>
+          </div>
         </div>
 
         {/* Description text */}
-        <p
-          className="absolute font-montserrat font-medium text-white"
+        <div
+          className="absolute custom-scrollbar"
+          data-lenis-prevent
           style={{
             left: vw(190),
             top: vw(210),
             width: vw(683),
-            fontSize: fontVw(16),
-            lineHeight: fontVw(26),
+            maxHeight: `calc(${fontVw(156)} + 10px)`, // 6 lines * 26vw + 10px padding
+            paddingTop: "5px",
+            paddingBottom: "5px",
+            overflowY: "auto",
+            overflowX: "hidden",
+            overscrollBehavior: "contain",
           }}
         >
-          {description}
-        </p>
+          <p
+            className="font-montserrat font-medium text-white m-0"
+            style={{
+              fontSize: fontVw(16),
+              lineHeight: fontVw(26),
+            }}
+          >
+            {description}
+          </p>
+        </div>
 
         {/* CTA text */}
-        <p
-          className="absolute font-anaheim font-extrabold"
+        <div
+          className="absolute custom-scrollbar"
+          data-lenis-prevent
           style={{
             left: vw(291),
             top: vw(456),
             width: vw(503),
-            fontSize: fontVw(24),
-            lineHeight: fontVw(32),
-            color: "#FFEB4E",
+            maxHeight: `calc(${fontVw(64)} + 10px)`, // 2 lines * 32vw + 10px padding
+            paddingTop: "5px",
+            paddingBottom: "5px",
+            overflowY: "auto",
+            overflowX: "hidden",
+            overscrollBehavior: "contain",
           }}
         >
-          {ctaText}
-        </p>
+          <p
+            className="font-anaheim font-extrabold m-0"
+            style={{
+              fontSize: fontVw(24),
+              lineHeight: fontVw(32),
+              color: "#FFEB4E",
+            }}
+          >
+            {ctaText}
+          </p>
+        </div>
 
         {/* Get Started Button */}
         <Link href={`/${locale}${buttonLink}`} className="absolute" style={{ left: vw(305), top: vw(576) }}>
@@ -281,16 +369,32 @@ export function SimpleCtaSection({
                 backgroundColor: "#FFF7B3",
               }}
             >
-              <span
-                className="font-anaheim font-semibold"
+              <div
+                className="custom-scrollbar"
+                data-lenis-prevent
                 style={{
-                  fontSize: fontVw(24),
-                  lineHeight: fontVw(32),
-                  color: "#625D2F",
+                  maxHeight: `calc(${fontVw(48)})`, // 2 lines * 32vw + 10px padding
+                  paddingTop: "5px",
+                  paddingBottom: "5px",
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                  overscrollBehavior: "contain",
+                  width: "100%",
+                  textAlign: "center",
                 }}
               >
-                {buttonText}
-              </span>
+                <span
+                  className="font-anaheim font-semibold m-0 block"
+                  style={{
+                    fontSize: fontVw(24),
+                    lineHeight: fontVw(24),
+                    color: "#625D2F",
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {buttonText}
+                </span>
+              </div>
             </div>
           </motion.div>
         </Link>

@@ -280,7 +280,7 @@ export function ApplicationsSection({
           <div className="relative">
             {/* Large highlight text */}
             <span
-              className="absolute left-[50px] -top-[4px] font-anaheim font-extrabold text-[40px] leading-[36px] z-0"
+              className="absolute left-[50px] -top-[4px] font-anaheim font-extrabold text-[40px] leading-[36px] z-0 whitespace-nowrap"
               style={{
                 color: "#F6F4EF",
                 WebkitTextStroke: "1.5px #756F3F",
@@ -378,7 +378,7 @@ export function ApplicationsSection({
         >
           {/* Large highlight text with stroke - positioned behind */}
           <span
-            className="absolute font-anaheim font-extrabold"
+            className="absolute font-anaheim font-extrabold whitespace-nowrap"
             style={{
               left: vw(256),
               top: vw(-10),
