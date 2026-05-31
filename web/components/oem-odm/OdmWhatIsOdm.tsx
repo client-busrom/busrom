@@ -1,6 +1,8 @@
 "use client"
 
 import React from "react"
+import { useParams } from "next/navigation"
+import { HollowText } from "@/components/common/HollowText"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
@@ -59,6 +61,8 @@ export function OdmWhatIsOdm({
   subtitle = defaultContent.subtitle,
   descriptionSegments = defaultContent.descriptionSegments,
 }: OdmWhatIsOdmProps) {
+  const params = useParams()
+  const locale = (params?.locale as string) || "en"
   return (
     <section
       className="relative w-full overflow-hidden"
@@ -159,45 +163,43 @@ export function OdmWhatIsOdm({
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <span
+          <HollowText
+            strokeColor="#5F5716"
+            strokeWidth={2}
             className="font-anaheim font-bold block text-right"
             style={{
               fontSize: rpx(96),
               lineHeight: rpx(51), // 73 * 0.7
               color: "#efecd0",
-              textShadow: `
-                -2px -2px 0 #5F5716,
-                2px -2px 0 #5F5716,
-                -2px 2px 0 #5F5716,
-                2px 2px 0 #5F5716,
-                0px -2px 0 #5F5716,
-                0px 2px 0 #5F5716,
-                -2px 0px 0 #5F5716,
-                2px 0px 0 #5F5716
-              `,
             }}
           >
             What Is ODM
-          </span>
+          </HollowText>
         </motion.div>
 
         {/* We Design & Manufacture, You Brand - 在 What Is ODM 下方 */}
-        <motion.p
-          className="absolute font-anaheim font-semibold text-right"
+        <motion.div
+          className="absolute font-anaheim font-semibold text-right overflow-x-auto overflow-y-hidden"
           style={{
             left: rpx(755), // 1079 * 0.7
             top: rpx(171), // 244 * 0.7
             width: rpx(475), // 678 * 0.7
+            maxHeight: rpx(45),
             fontSize: rpx(28), // 40 * 0.7
             lineHeight: rpx(39), // 56 * 0.7
             color: "#756F3F",
+            whiteSpace: "nowrap",
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(255,255,255,0.3) transparent',
+            overscrollBehavior: 'contain',
+            paddingBottom: rpx(6),
           }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
         >
           {subtitle}
-        </motion.p>
+        </motion.div>
 
         {/* 右下角毛玻璃卡片 */}
         <motion.div
@@ -227,7 +229,7 @@ export function OdmWhatIsOdm({
               maxHeight: rpx(120),
               fontSize: rpx(17), // 24 * 0.7
               lineHeight: rpx(27), // 38 * 0.7
-              textAlign: "justify",
+              textAlign: "left",
               color: "#3B3529",
               scrollbarWidth: 'thin',
               scrollbarColor: 'rgba(255,255,255,0.3) transparent',
@@ -238,10 +240,12 @@ export function OdmWhatIsOdm({
           >
             {descriptionSegments.map((segment, index) => {
               if (segment.text === "\n") {
-                return <br key={index} />
+                return locale === "en" ? <br key={index} /> : <span key={index}> </span>
               }
               if (segment.bold) {
                 return (
+                  <React.Fragment key={index}>
+                    {" "}
                   <span
                     key={index}
                     className="font-anaheim font-bold"
@@ -252,6 +256,8 @@ export function OdmWhatIsOdm({
                   >
                     {segment.text}
                   </span>
+                    {" "}
+                  </React.Fragment>
                 )
               }
               return <span key={index}>{segment.text}</span>
@@ -306,22 +312,30 @@ export function OdmWhatIsOdm({
             WebkitBackdropFilter: "blur(30px)",
           }}
         >
-          <p
-            className="font-anaheim font-semibold text-lg mb-2"
-            style={{ color: "#756F3F" }}
+          <div 
+            className="font-anaheim font-semibold text-lg mb-2 overflow-x-auto overflow-y-hidden whitespace-nowrap"
+            style={{ 
+              color: "#756F3F",
+              maxHeight: "2.5rem",
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(255,255,255,0.3) transparent",
+              paddingBottom: "4px",
+            }}
           >
             {subtitle}
-          </p>
+          </div>
           <p
             className="font-anaheim text-sm leading-relaxed"
             style={{ color: "#3B3529" }}
           >
             {descriptionSegments.map((segment, index) => {
               if (segment.text === "\n") {
-                return <br key={index} />
+                return locale === "en" ? <br key={index} /> : <span key={index}> </span>
               }
               if (segment.bold) {
                 return (
+                  <React.Fragment key={index}>
+                    {" "}
                   <span
                     key={index}
                     className="font-bold"
@@ -329,6 +343,8 @@ export function OdmWhatIsOdm({
                   >
                     {segment.text}
                   </span>
+                    {" "}
+                  </React.Fragment>
                 )
               }
               return <span key={index}>{segment.text}</span>

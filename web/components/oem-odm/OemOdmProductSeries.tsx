@@ -168,22 +168,27 @@ export function OemOdmProductSeries({
           </motion.div>
 
           {/* 左侧描述文字 */}
-          <motion.p
-            className="absolute font-anaheim font-medium"
+          <motion.div
+            className="absolute font-anaheim font-medium overflow-y-auto"
             style={{
               left: rpx(106), // 152 * 0.7
               top: rpx(191), // 273 * 0.7
               width: rpx(317), // 453 * 0.7
+              maxHeight: rpx(280), // 35 * 8
               fontSize: rpx(22), // 32 * 0.7
               lineHeight: rpx(35), // 50 * 0.7
               color: "#F9EA79",
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(249, 234, 121, 0.3) transparent',
+              overscrollBehavior: 'contain',
+              paddingRight: rpx(8),
             }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
             {description}
-          </motion.p>
+          </motion.div>
 
           {/* 产品系列条形图区域 */}
           <motion.div
@@ -342,12 +347,17 @@ export function OemOdmProductSeries({
         </div>
 
         {/* 描述文字 */}
-        <p
-          className="font-anaheim font-medium text-sm leading-relaxed mb-4"
-          style={{ color: "#F9EA79" }}
+        <div
+          className="font-anaheim font-medium text-sm leading-relaxed mb-4 overflow-y-auto"
+          style={{ 
+            color: "#F9EA79",
+            maxHeight: "11.375rem", // 8 lines (text-sm * leading-relaxed = 0.875rem * 1.625)
+            scrollbarWidth: "thin",
+            paddingRight: "8px",
+          }}
         >
           {description}
-        </p>
+        </div>
 
         {/* 产品系列图片 - 带条形遮罩和产品名称 */}
         <div className="relative w-full h-[280px]">

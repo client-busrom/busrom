@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { useParams } from "next/navigation";
 
 // 设计稿基准尺寸
 const DESIGN_WIDTH = 1920;
@@ -107,6 +108,9 @@ export function OemOdmValueGuide({
   leftImage,
   rightImage,
 }: OemOdmValueGuideProps) {
+  const params = useParams();
+  const locale = params?.locale || "en";
+
   const [isLeftImageHovered, setIsLeftImageHovered] = useState(false);
   const [isRightTextExpanded, setIsRightTextExpanded] = useState(false);
 
@@ -469,7 +473,7 @@ export function OemOdmValueGuide({
                   paddingTop: rpx(35),
                   fontSize: rpx(20),
                   lineHeight: rpx(28),
-                  whiteSpace: "pre-line",
+                  whiteSpace: locale === "en" ? "pre-line" : "normal",
                 }}
               >
                 {leftDescription}
@@ -528,7 +532,7 @@ export function OemOdmValueGuide({
                 display: "-webkit-box",
                 WebkitLineClamp: isRightTextExpanded ? "unset" : 3,
                 WebkitBoxOrient: "vertical",
-                whiteSpace: "pre-line",
+                whiteSpace: locale === "en" ? "pre-line" : "normal",
               }}
             >
               {rightDescription}
@@ -625,7 +629,7 @@ export function OemOdmValueGuide({
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6 flex items-end pointer-events-none">
             <p
               className="text-white text-xs font-anaheim leading-relaxed"
-              style={{ whiteSpace: "pre-line" }}
+              style={{ whiteSpace: locale === "en" ? "pre-line" : "normal" }}
             >
               {leftDescription}
             </p>
@@ -667,7 +671,7 @@ export function OemOdmValueGuide({
           <div className="w-12 h-1 bg-[#756F3F]/30 mx-auto mb-6 rounded-full" />
           <p
             className="text-[#504911] font-anaheim font-semibold text-sm italic leading-relaxed"
-            style={{ whiteSpace: "pre-line" }}
+            style={{ whiteSpace: locale === "en" ? "pre-line" : "normal" }}
           >
             {rightDescription}
           </p>

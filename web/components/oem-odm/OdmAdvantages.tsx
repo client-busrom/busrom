@@ -289,6 +289,12 @@ export function OdmAdvantages({
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
+            maxHeight: rpx(136),
+            overflowY: "auto",
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(117, 111, 63, 0.5) transparent",
+            paddingRight: rpx(10),
+            paddingBottom: rpx(6),
           }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -513,12 +519,18 @@ export function OdmAdvantages({
       <div className="block md:hidden px-5 py-8">
         {/* 标题 */}
         <h2
-          className="font-anaheim font-extrabold text-2xl mb-6"
+          className="font-anaheim font-extrabold text-2xl mb-6 overflow-y-auto"
           style={{
             background: "linear-gradient(to bottom, #D8D2A2 0%, #756F3F 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
+            maxHeight: "4.2rem",
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(117, 111, 63, 0.5) transparent",
+            paddingRight: "8px",
+            paddingBottom: "4px",
+            whiteSpace: "pre-line",
           }}
         >
           {title}

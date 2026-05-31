@@ -297,6 +297,12 @@ export function OemAdvantages({
               letterSpacing: "0.03em",
               color: "#756f3f",
               whiteSpace: "pre-line",
+              maxHeight: rpx(136),
+              overflowY: "auto",
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(202, 195, 134, 0.5) transparent",
+              paddingRight: rpx(10),
+              paddingBottom: rpx(6),
               textShadow: `
               -2px -2px 0 #CAC386,
               2px -2px 0 #CAC386,
@@ -535,11 +541,16 @@ export function OemAdvantages({
       <div className="block md:hidden px-5 py-8">
         {/* 标题 */}
         <h2
-          className="font-anaheim font-extrabold text-2xl mb-6"
+          className="font-anaheim font-extrabold text-2xl mb-6 overflow-y-auto"
           style={{
             color: "transparent",
             WebkitTextStroke: "1px #CAC386",
             whiteSpace: "pre-line",
+            maxHeight: "4.2rem",
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(202, 195, 134, 0.5) transparent",
+            paddingRight: "8px",
+            paddingBottom: "4px",
           }}
         >
           {title}

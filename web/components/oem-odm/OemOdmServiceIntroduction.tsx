@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { useParams } from "next/navigation";
 
 // 设计稿基准尺寸 (已按0.7缩放)
 const DESIGN_WIDTH = 1920;
@@ -40,6 +41,8 @@ interface TextSegment {
 }
 
 interface OemOdmServiceIntroductionProps {
+  // 标题
+  title?: string;
   // 右侧图片
   image?: MediaObject | null;
   // 右上角格式化文本片段
@@ -82,7 +85,19 @@ export function OemOdmServiceIntroduction({
   oemTitle = "OEM",
   serviceTitle = "Service",
   introductionTitle = "Introduction",
+  title,
 }: OemOdmServiceIntroductionProps) {
+  let finalOemTitle = oemTitle;
+  let finalServiceTitle = serviceTitle;
+  let finalIntroductionTitle = introductionTitle;
+  if (title) {
+    const lines = title.includes("\n") ? title.split("\n") : title.split(" ");
+    if (lines.length > 0) finalOemTitle = lines[0];
+    if (lines.length > 1) finalServiceTitle = lines[1];
+    if (lines.length > 2) finalIntroductionTitle = lines.slice(2).join(title.includes("\n") ? "\n" : " ");
+  }
+  const params = useParams();
+  const locale = params?.locale || "en";
   const [isArrowHovered, setIsArrowHovered] = useState(false);
 
   return (
@@ -153,7 +168,7 @@ export function OemOdmServiceIntroduction({
               `,
               }}
             >
-              {oemTitle}
+              {finalOemTitle}
             </span>
           </motion.div>
 
@@ -176,7 +191,7 @@ export function OemOdmServiceIntroduction({
                 lineHeight: rpx(53), // 75 * 0.7
               }}
             >
-              {serviceTitle}
+              {finalServiceTitle}
             </div>
             {/* Introduction 双层叠字 */}
             <div className="relative">
@@ -195,7 +210,7 @@ export function OemOdmServiceIntroduction({
                   opacity: 0.3,
                 }}
               >
-                {introductionTitle}
+                {finalIntroductionTitle}
               </div>
               {/* 上层主文字 */}
               <div
@@ -210,7 +225,7 @@ export function OemOdmServiceIntroduction({
                   backgroundClip: "text",
                 }}
               >
-                {introductionTitle}
+                {finalIntroductionTitle}
               </div>
             </div>
           </motion.div>
@@ -325,12 +340,13 @@ export function OemOdmServiceIntroduction({
           >
             {topDescriptionSegments.map((segment, index) => {
               if (segment.text === "\n") {
-                return <br key={index} />;
+                return locale === "en" ? <br key={index} /> : <span key={index}> </span>;
               }
               if (segment.underline) {
                 return (
+                  <React.Fragment key={index}>
+                    {" "}
                   <span
-                    key={index}
                     className="relative inline-block font-anaheim font-extrabold"
                     style={{
                       fontSize: rpx(30),
@@ -372,12 +388,15 @@ export function OemOdmServiceIntroduction({
                       {segment.text}
                     </span>
                   </span>
+                    {" "}
+                  </React.Fragment>
                 );
               }
               if (segment.bold) {
                 return (
+                  <React.Fragment key={index}>
+                    {" "}
                   <span
-                    key={index}
                     className="font-anaheim font-bold"
                     style={{
                       fontSize: rpx(20),
@@ -386,6 +405,8 @@ export function OemOdmServiceIntroduction({
                   >
                     {segment.text}
                   </span>
+                    {" "}
+                  </React.Fragment>
                 );
               }
               return (
@@ -464,13 +485,14 @@ export function OemOdmServiceIntroduction({
               {leftDescriptionSegments.map((segment, index) => {
                 // 换行
                 if (segment.text === "\n") {
-                  return <br key={index} />;
+                  return locale === "en" ? <br key={index} /> : <span key={index}> </span>;
                 }
                 // 下划线文字 - 双层字体
                 if (segment.underline) {
                   return (
+                    <React.Fragment key={index}>
+                      {" "}
                     <span
-                      key={index}
                       className="relative inline-block font-anaheim font-extrabold"
                       style={{
                         fontSize: rpx(30),
@@ -508,13 +530,16 @@ export function OemOdmServiceIntroduction({
                         {segment.text}
                       </span>
                     </span>
+                    {" "}
+                  </React.Fragment>
                   );
                 }
                 // 加粗文字
                 if (segment.bold) {
                   return (
+                    <React.Fragment key={index}>
+                      {" "}
                     <span
-                      key={index}
                       className="font-anaheim font-bold"
                       style={{
                         fontSize: rpx(20),
@@ -523,6 +548,8 @@ export function OemOdmServiceIntroduction({
                     >
                       {segment.text}
                     </span>
+                    {" "}
+                  </React.Fragment>
                   );
                 }
                 // 普通文字
@@ -554,7 +581,7 @@ export function OemOdmServiceIntroduction({
                 WebkitTextStroke: "1.5px #ffffff",
               }}
             >
-              {oemTitle}
+              {finalOemTitle}
             </span>
           </div>
 
@@ -568,9 +595,9 @@ export function OemOdmServiceIntroduction({
               WebkitTextFillColor: "transparent",
             }}
           >
-            {serviceTitle}
+            {finalServiceTitle}
             <br />
-            {introductionTitle}
+            {finalIntroductionTitle}
           </div>
 
           {/* 图片 */}
@@ -605,20 +632,28 @@ export function OemOdmServiceIntroduction({
           <p className="text-white text-sm leading-relaxed mb-4">
             {topDescriptionSegments.map((segment, index) => {
               if (segment.text === "\n") {
-                return <br key={index} />;
+                return locale === "en" ? <br key={index} /> : <span key={index}> </span>;
               }
               if (segment.underline) {
                 return (
-                  <span key={index} className="font-bold text-[#FFF392]">
-                    {segment.text}
-                  </span>
+                  <React.Fragment key={index}>
+                    {" "}
+                    <span className="font-bold text-[#FFF392]">
+                      {segment.text}
+                    </span>
+                    {" "}
+                  </React.Fragment>
                 );
               }
               if (segment.bold) {
                 return (
-                  <span key={index} className="font-bold text-[#FFDB4B]">
-                    {segment.text}
-                  </span>
+                  <React.Fragment key={index}>
+                    {" "}
+                    <span className="font-bold text-[#FFDB4B]">
+                      {segment.text}
+                    </span>
+                    {" "}
+                  </React.Fragment>
                 );
               }
               return <span key={index}>{segment.text}</span>;
@@ -628,20 +663,28 @@ export function OemOdmServiceIntroduction({
           <p className="text-white text-sm leading-relaxed">
             {leftDescriptionSegments.map((segment, index) => {
               if (segment.text === "\n") {
-                return <br key={index} />;
+                return locale === "en" ? <br key={index} /> : <span key={index}> </span>;
               }
               if (segment.underline) {
                 return (
-                  <span key={index} className="font-bold text-[#FFF392]">
-                    {segment.text}
-                  </span>
+                  <React.Fragment key={index}>
+                    {" "}
+                    <span className="font-bold text-[#FFF392]">
+                      {segment.text}
+                    </span>
+                    {" "}
+                  </React.Fragment>
                 );
               }
               if (segment.bold) {
                 return (
-                  <span key={index} className="font-bold text-[#FFDB4B]">
-                    {segment.text}
-                  </span>
+                  <React.Fragment key={index}>
+                    {" "}
+                    <span className="font-bold text-[#FFDB4B]">
+                      {segment.text}
+                    </span>
+                    {" "}
+                  </React.Fragment>
                 );
               }
               return <span key={index}>{segment.text}</span>;

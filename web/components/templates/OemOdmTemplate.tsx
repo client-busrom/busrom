@@ -59,6 +59,10 @@ export function OemOdmTemplate({ locale, data }: OemOdmTemplateProps) {
 
       {/* Brand Advantage Section */}
       <OemOdmBrandAdvantage
+        title={brandAdvantage.title || undefined}
+        oemLabel={brandAdvantage.tagOem || undefined}
+        odmLabel={brandAdvantage.tagOdm || undefined}
+        clickToKnowMore={brandAdvantage.tagTips || undefined}
         brandAdvantages={
           brandAdvantage.items.length > 0 ? brandAdvantage.items : undefined
         }
@@ -80,6 +84,7 @@ export function OemOdmTemplate({ locale, data }: OemOdmTemplateProps) {
       <div id="oem-service-section" style={{ backgroundColor: "#756f3f" }}>
         {/* OEM Service Introduction Section */}
         <OemOdmServiceIntroduction
+          title={oemService.title || undefined}
           image={oemService.image}
           topDescriptionSegments={
             oemService.description.length > 0
@@ -144,6 +149,7 @@ export function OemOdmTemplate({ locale, data }: OemOdmTemplateProps) {
       >
         {/* ODM Service Introduction Section */}
         <OdmServiceIntroduction
+          title={odmService.title || undefined}
           image={odmService.image}
           topDescriptionSegments={
             odmService.description.length > 0
