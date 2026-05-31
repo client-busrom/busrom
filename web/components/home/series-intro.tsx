@@ -311,7 +311,6 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                             initial={{ opacity: 0 }}
                             animate={{
                               opacity: getOpacity(item.distanceFromFocus),
-                              scale: item.isCurrent ? 1.05 : 1,
                             }}
                             exit={{ opacity: 0 }}
                             transition={{
@@ -322,23 +321,31 @@ export default function SeriesIntro({ data, headerTheme, className }: Props) {
                               },
                               opacity: { duration: 0.2 },
                             }}
-                            className="w-full text-left pr-6 transition-colors duration-300 origin-left flex-shrink-0"
+                            className="w-full text-left pr-6 transition-colors duration-300 flex-shrink-0 overflow-visible"
                             style={{ paddingTop: 8, paddingBottom: 8 }}
                             onClick={() => {
                               setActiveSeriesIndex(item.originalIndex);
                               setActiveImageIndex(0);
                             }}
                           >
-                            <span
-                              className={cn(
-                                "text-lg font-anaheim font-bold transition-colors duration-300 block leading-snug",
-                                item.isCurrent
-                                  ? "text-brand-cream"
-                                  : "text-brand-cream/70 hover:text-brand-cream",
-                              )}
+                            <motion.span
+                              animate={{
+                                scale: item.isCurrent ? 1.05 : 1,
+                              }}
+                              transition={{ duration: 0.2 }}
+                              className="block origin-left"
                             >
-                              {item.title}
-                            </span>
+                              <span
+                                className={cn(
+                                  "text-lg font-anaheim font-bold transition-colors duration-300 block leading-snug",
+                                  item.isCurrent
+                                    ? "text-brand-cream"
+                                    : "text-brand-cream/70 hover:text-brand-cream",
+                                )}
+                              >
+                                {item.title}
+                              </span>
+                            </motion.span>
                           </motion.button>
                         ))}
                       </AnimatePresence>
