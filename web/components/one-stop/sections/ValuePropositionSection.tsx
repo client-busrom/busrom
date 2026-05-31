@@ -29,7 +29,7 @@ const vw = (px: number) => `${(px / 1920) * 100}vw`;
  */
 const DesktopActiveText = ({ text }: { text: string }) => {
   const { ref, isOverflow } = useOverflow<HTMLParagraphElement>();
-  
+
   return (
     <motion.p
       ref={ref}
@@ -197,7 +197,7 @@ export function ValuePropositionSection({
       {/* 1. Header Area */}
       <div
         className="hidden lg:block absolute z-50 text-left pointer-events-auto"
-        style={{ left: vw(192), top: vw(120), width: vw(1000) }}
+        style={{ left: vw(192), top: vw(120), width: vw(1200) }}
       >
         <div
           ref={desktopTitleRef}

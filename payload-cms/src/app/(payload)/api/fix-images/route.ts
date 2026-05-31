@@ -1,5 +1,5 @@
 import { getPayload } from 'payload'
-import config from '../../../../../payload.config'
+import config from '@payload-config'
 import { regenerateImageSizesTask } from '../../../../jobs/regenerateImageSizes'
 import { NextRequest, NextResponse } from 'next/server'
 

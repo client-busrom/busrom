@@ -12,17 +12,14 @@ export function useOverflow<T extends HTMLElement>(): {
     if (!el) return;
 
     const check = () => {
-      // 临时移除 overflow 限制来测量自然高度
-      const originalOverflow = el.style.overflow;
-      el.style.overflow = "visible";
       const naturalHeight = el.scrollHeight;
-      el.style.overflow = originalOverflow;
 
       const maxH = parseFloat(getComputedStyle(el).maxHeight);
       const hasMaxHeight = !isNaN(maxH) && maxH > 0;
 
       if (hasMaxHeight) {
-        setIsOverflow(naturalHeight > maxH);
+        // Add 5px tolerance for subpixel rendering and font metrics bleeding
+        setIsOverflow(naturalHeight > maxH + 5);
       } else {
         setIsOverflow(false);
       }

@@ -4,6 +4,49 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { HollowText } from "@/components/common/HollowText";
+import { useOverflow } from "@/lib/hooks/useOverflow";
+
+const DesktopTitleLine2 = ({ html, text }: { html?: string; text: string }) => {
+  const { ref, isOverflow } = useOverflow<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className="custom-scrollbar pointer-events-auto pr-2 max-h-[calc(6.25vw_+_5px)] xl:max-h-[calc(5vw_+_5px)]"
+      data-lenis-prevent={isOverflow ? true : undefined}
+      style={{
+        maxWidth: "700px",
+        overflowY: isOverflow ? "auto" : "hidden",
+        overflowX: "hidden",
+        overscrollBehavior: isOverflow ? "contain" : "auto",
+        paddingTop: "2px",
+        paddingBottom: "2px",
+      }}
+    >
+      <h2 className="text-[5vw] xl:text-[4vw] font-extrabold font-anaheim leading-tight text-black m-0 break-words">
+        <RichTitle title={html || text} defaultText="Highlights" />
+      </h2>
+    </div>
+  );
+};
+
+const ScrollableDescription = ({ text, className, maxLines, lineHeight }: { text: string; className: string; maxLines: number; lineHeight: number }) => {
+  const { ref, isOverflow } = useOverflow<HTMLParagraphElement>();
+  return (
+    <p
+      ref={ref}
+      className={className}
+      data-lenis-prevent={isOverflow ? true : undefined}
+      style={{ 
+        overscrollBehavior: 'contain', 
+        overflowY: isOverflow ? 'auto' : 'hidden',
+        maxHeight: `${lineHeight * maxLines}em`,
+        whiteSpace: 'pre-line'
+      }}
+    >
+      {text}
+    </p>
+  );
+};
 
 /**
  * Helper component to render rich titles with selective HollowText for bold parts
@@ -64,6 +107,21 @@ export function BrandHighlightsSection({
 }: BrandHighlightsSectionProps) {
   const [[index, direction], setIndex] = useState([0, 0]);
 
+  let finalTitle1 = titleLine1;
+  let finalTitle1Html = titleLine1Html;
+  let finalTitle2 = titleLine2;
+  let finalTitle2Html = titleLine2Html;
+
+  // If no explicit second paragraph was provided, but the first paragraph contains a soft break, split it
+  if (!finalTitle2 && finalTitle1Html?.includes('<br />')) {
+    const partsHtml = finalTitle1Html.split('<br />');
+    const partsText = finalTitle1.split('\n');
+    finalTitle1Html = partsHtml[0].trim();
+    finalTitle1 = partsText[0].trim();
+    finalTitle2Html = partsHtml.slice(1).join('<br />').trim();
+    finalTitle2 = partsText.slice(1).join('\n').trim();
+  }
+
   const total = items.length;
   const nextIndex = (index + 1) % total;
   const prevIndex = (index - 1 + total) % total;
@@ -113,24 +171,17 @@ export function BrandHighlightsSection({
       {/* 1. DESKTOP/TABLET CONTENT (Visible on MD and above) */}
       <div className="hidden md:block relative w-full max-w-[80vw] mx-auto aspect-[1344/845] h-[55vw] xl:h-auto shrink-0 z-10">
         {/* 1. Section Title */}
-        <div className="absolute left-[5.96%] top-[9.45%] flex flex-col">
+        <div className="absolute left-[5.96%] top-[9.45%] flex flex-col min-h-0">
           <h2
             className="text-[6.66vw] xl:text-[5vw] font-extrabold font-anaheim leading-none text-black"
           >
             <RichTitle
-              title={titleLine1Html || titleLine1}
+              title={finalTitle1Html || finalTitle1}
               defaultText="Brand"
             />
           </h2>
-          {titleLine2 && (
-            <h2
-              className="text-[5vw] xl:text-[4vw] font-extrabold font-anaheim leading-tight text-black"
-            >
-              <RichTitle
-                title={titleLine2Html || titleLine2}
-                defaultText="Highlights"
-              />
-            </h2>
+          {finalTitle2 && (
+            <DesktopTitleLine2 html={finalTitle2Html} text={finalTitle2} />
           )}
         </div>
 
@@ -145,11 +196,12 @@ export function BrandHighlightsSection({
               transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
               className="w-full"
             >
-              <p
-                className="text-[1.25vw] xl:text-[1vw] font-anaheim font-semibold leading-[1.6] text-black"
-              >
-                {currentItem.description}
-              </p>
+              <ScrollableDescription
+                className="text-[1.25vw] xl:text-[1vw] font-anaheim font-semibold leading-[1.6] text-black custom-scrollbar pr-4 pointer-events-auto"
+                text={currentItem.description}
+                maxLines={7}
+                lineHeight={1.6}
+              />
             </motion.div>
           </AnimatePresence>
         </div>
@@ -259,14 +311,14 @@ export function BrandHighlightsSection({
         <div className="flex flex-col">
           <h2 className="text-3xl font-bold text-black leading-tight">
             <RichTitle
-              title={titleLine1Html || titleLine1}
+              title={finalTitle1Html || finalTitle1}
               defaultText="Brand"
             />
           </h2>
-          {titleLine2 && (
+          {finalTitle2 && (
             <h2 className="text-4xl font-bold text-black leading-tight">
               <RichTitle
-                title={titleLine2Html || titleLine2}
+                title={finalTitle2Html || finalTitle2}
                 defaultText="Highlights"
               />
             </h2>
@@ -274,16 +326,20 @@ export function BrandHighlightsSection({
         </div>
         <div className="min-h-[100px]">
           <AnimatePresence mode="wait" custom={direction}>
-            <motion.p
+            <motion.div
               key={index}
               initial={{ opacity: 0, x: direction === 1 ? 20 : -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: direction === 1 ? -20 : 20 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="text-base text-gray-700 leading-relaxed font-semibold"
             >
-              {currentItem.description}
-            </motion.p>
+              <ScrollableDescription
+                className="text-base text-gray-700 leading-relaxed font-semibold custom-scrollbar pr-3 pointer-events-auto"
+                text={currentItem.description}
+                maxLines={7}
+                lineHeight={1.625}
+              />
+            </motion.div>
           </AnimatePresence>
         </div>
         <div className="relative w-full max-w-[320px] mx-auto aspect-[3/4] rounded-3xl overflow-hidden shadow-lg">

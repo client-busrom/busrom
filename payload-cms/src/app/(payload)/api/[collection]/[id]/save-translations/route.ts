@@ -46,15 +46,25 @@ export async function POST(
         console.log(`[save-translations] ⏳ Saving locale=${localeCode}... Data keys: ${Object.keys(data as any).join(', ')}`)
         
         // 清理数据
-        const cleanedData: any = {
-          status: currentDoc.status, // 强制带上当前状态
-          publishedAt: currentDoc.publishedAt, // 强制带上发布时间
-        }
+        const cleanedData: any = {}
+        
+        // 1. 将现有的所有数据作为底板（解决嵌套数组/Blocks的必填字段校验问题，比如 Form Fields 里的 Label）
+        Object.entries(currentDoc).forEach(([key, value]) => {
+          if (systemFields.includes(key)) return
+          if (key.startsWith('_') && key !== '_id') return
+          cleanedData[key] = value
+        })
+
+        // 2. 覆盖翻译过来的数据
         Object.entries(data as any).forEach(([key, value]) => {
           if (systemFields.includes(key)) return
           if (key.startsWith('_') && key !== '_id') return
           cleanedData[key] = value
         })
+
+        // 3. 强制带上状态和发布时间
+        cleanedData.status = currentDoc.status
+        cleanedData.publishedAt = currentDoc.publishedAt
 
         // 在请求上下文中注入标记，确保审计插件能够识别并跳过
         i18nReq.context.isTranslationSave = true

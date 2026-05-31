@@ -177,7 +177,7 @@ export function AdvantagesSection({
           className="relative z-20 pointer-events-none px-10 mb-8 lg:mb-0 w-full text-center lg:text-left"
           style={{
             paddingLeft: layout.type === "desktop" ? vw(140) : undefined,
-            width: layout.type === "desktop" ? vw(1000) : "100%",
+            width: layout.type === "desktop" ? vw(1800) : "100%",
           }}
         >
           <div

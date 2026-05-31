@@ -8,6 +8,69 @@ import { HollowText } from "@/components/common/HollowText";
 import useEmblaCarousel from "embla-carousel-react";
 import { useOverflow } from "@/lib/hooks/useOverflow";
 
+// Sub-components for handling overflow
+const ProductCardTitle = ({ title }: { title: string }) => {
+  const { ref, isOverflow } = useOverflow<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className="custom-scrollbar pointer-events-auto pr-0 mb-9 max-h-[calc(8.33vw+5px)] xl:max-h-[calc(3.5vw+5px)]"
+      data-lenis-prevent={isOverflow ? true : undefined}
+      style={{
+        overflowY: isOverflow ? "auto" : "hidden",
+        overflowX: "hidden",
+        overscrollBehavior: isOverflow ? "contain" : "auto",
+        paddingTop: "2px",
+        paddingBottom: "2px",
+      }}
+    >
+      <h3 className="text-[3.33vw] xl:text-[2.5vw] font-[800] text-[#6D5400] leading-tight font-anaheim break-words m-0">
+        {title}
+      </h3>
+    </div>
+  );
+};
+
+const ProductCardAttributes = ({ attributes }: { attributes: string[] }) => {
+  const { ref, isOverflow } = useOverflow<HTMLDivElement>();
+
+  return (
+    <div
+      ref={ref}
+      className="custom-scrollbar pointer-events-auto pr-2 max-h-[calc(10vw+10px)] xl:max-h-[calc(8.5vw+10px)]"
+      data-lenis-prevent={isOverflow ? true : undefined}
+      style={{
+        overflowY: isOverflow ? "auto" : "hidden",
+        overflowX: "hidden",
+        overscrollBehavior: isOverflow ? "contain" : "auto",
+        paddingTop: "2px",
+        paddingBottom: "2px",
+      }}
+    >
+      <div className="flex flex-col gap-[0.83vw]">
+        {attributes.slice(0, 4).map((attr, i) => (
+          <div key={i} className="flex items-start gap-[0.83vw]">
+            <div className="w-[1.87vw] h-[2vw] xl:w-[1.5vw] xl:h-[1.5vw] rounded-full bg-[#BCB263] flex items-center justify-center shrink-0 mt-[0.1em]">
+              <svg width="50%" height="50%" viewBox="0 0 18 14" fill="none">
+                <path
+                  d="M1.5 7L6.5 12L16.5 2"
+                  stroke="#f2e7c9"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <p className="text-[1.25vw] xl:text-[1.04vw] font-semibold text-black font-anaheim leading-snug break-words m-0">
+              {attr}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 interface Product {
   id: string;
   name: string;
@@ -441,42 +504,16 @@ export function ProductSeriesShowcaseSection({
             className="flex justify-center items-stretch gap-[1.667vw] z-0"
           >
             {/* Left Beige Card */}
-            <div className="w-[40%] rounded-[1.56vw] xl:rounded-[22.8px] bg-[#F1E8CA] p-[4.68%] flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[23.4vw]">
+            <div className="w-[40%] rounded-[1.56vw] xl:rounded-[22.8px] bg-[#F1E8CA] py-[4.68%] pl-[4.68%] pr-[2.08%] flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[23.4vw]">
               <div className="relative z-10">
-                <h3 className="text-[3.33vw] xl:text-[2.5vw] font-[800] text-[#6D5400] leading-tight mb-9 font-anaheim">
-                  {getDisplayName()}
-                </h3>
-                <div className="flex flex-col gap-[0.83vw]">
-                  {attributes.slice(0, 4).map((attr, i) => (
-                    <div key={i} className="flex items-center gap-[0.83vw]">
-                      <div className="w-[1.87vw] h-[2vw] xl:w-[1.5vw] xl:h-[1.5vw] rounded-full bg-[#BCB263] flex items-center justify-center shrink-0">
-                        <svg
-                          width="50%"
-                          height="50%"
-                          viewBox="0 0 18 14"
-                          fill="none"
-                        >
-                          <path
-                            d="M1.5 7L6.5 12L16.5 2"
-                            stroke="#f2e7c9"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </div>
-                      <p className="text-[1.25vw] xl:text-[1.04vw] font-semibold text-black font-anaheim leading-none truncate">
-                        {attr}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                <ProductCardTitle title={getDisplayName()} />
+                <ProductCardAttributes attributes={attributes} />
               </div>
 
               <div className="self-end relative z-10">
                 <Link
                   href={`/${locale}/shop/${activeProduct.slug}`}
-                  className="flex items-center gap-[0.78vw] xl:gap-[0.625vw] group/see transition-all duration-300 transform translate-x-[2.08vw] translate-y-[1.56vw]"
+                  className="flex items-center gap-[0.78vw] xl:gap-[0.625vw] group/see transition-all duration-300 transform translate-y-[1.56vw]"
                 >
                   <span className="text-[1.14vw] xl:text-[1vw] font-bold text-[#756F3F] transition-colors group-hover/see:text-black font-anaheim">
                     {(activeProduct as any)._carouselItem?.buttonText ||

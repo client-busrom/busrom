@@ -131,6 +131,7 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'errorRequiredFields', labelKey: 'custom:fields:errorRequiredFields', type: 'textarea' },
     { name: 'errorNetworkMessage', labelKey: 'custom:fields:errorNetworkMessage', type: 'textarea' },
     { name: 'errorCaptchaMessage', labelKey: 'custom:fields:errorCaptchaMessage', type: 'textarea', condition: (doc: any) => !!doc.captchaEnabled },
+    { name: 'privacyConsentText', labelKey: '__inline:隐私同意文本 (Privacy Consent)', type: 'textarea' },
     { name: 'autoReplySubject', labelKey: 'custom:fields:autoReplySubject', type: 'textarea', condition: (doc: any) => doc.autoReplyEnabled === 'enabled' },
   ],
   'seo-settings': [

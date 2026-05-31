@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { useOverflow } from "@/lib/hooks/useOverflow";
 
 interface TrustSectionProps {
   title?: string;
@@ -19,6 +20,7 @@ export function TrustSection({
   bgImage,
 }: TrustSectionProps) {
   const [expandedIndices, setExpandedIndices] = useState<number[]>([0]);
+  const { ref: titleRef, isOverflow: isTitleOverflow } = useOverflow<HTMLHeadingElement>();
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -168,11 +170,17 @@ export function TrustSection({
         {/* Left Column: Title & Accordion */}
         <div className="w-full lg:w-[629.6px] shrink-0">
           <motion.h2
+            ref={titleRef}
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="text-[32px] lg:text-[60px] font-extrabold text-white leading-tight lg:leading-[70px] tracking-[0.05em] mb-8 lg:mb-10 text-center lg:text-left select-none"
-            style={{ fontFamily: "var(--font-anaheim)" }}
+            className="text-[32px] lg:text-[60px] font-extrabold text-white leading-tight lg:leading-[70px] tracking-[0.05em] mb-8 lg:mb-10 text-center lg:text-left select-none max-h-[80px] lg:max-h-[150px] custom-scrollbar pr-2 pointer-events-auto"
+            style={{
+              fontFamily: "var(--font-anaheim)",
+              overflowY: isTitleOverflow ? "auto" : "hidden",
+              overscrollBehavior: "contain",
+            }}
+            data-lenis-prevent={isTitleOverflow ? true : undefined}
             dangerouslySetInnerHTML={{
               __html: (title || "Why Contractors<br />Trust Us?").replace(
                 /\n/g,
@@ -191,6 +199,9 @@ export function TrustSection({
             onWheel={(e) => e.stopPropagation()}
             data-lenis-prevent
             className={`w-full lg:max-w-[640px] mx-auto lg:mx-0 lg:max-h-[540px] lg:overflow-y-auto lg:pr-8 custom-scrollbar select-none ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+            style={{
+              overscrollBehavior: "contain",
+            }}
           >
             <style jsx>{`
               .custom-scrollbar::-webkit-scrollbar {
