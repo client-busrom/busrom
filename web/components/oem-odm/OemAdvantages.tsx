@@ -90,7 +90,6 @@ function BubbleText({ text, isActive }: { text: string; isActive: boolean }) {
 
   return (
     <div className="relative text-left" style={{ height: rpx(74) }}>
-      {" "}
       {/* 105 * 0.7 */}
       {/* 气泡层 - 向上飘动并渐变消失 */}
       {bubbles.map((bubble) => (

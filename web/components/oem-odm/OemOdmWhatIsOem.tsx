@@ -231,7 +231,7 @@ export function OemOdmWhatIsOem({
                 maxHeight: rpx(120),
                 fontSize: rpx(17), // 24 * 0.7
                 lineHeight: rpx(23), // 33 * 0.7
-                textAlign: "left",
+                textAlign: locale === "en" ? "justify" : "left",
                 scrollbarWidth: 'thin',
                 scrollbarColor: 'rgba(255,255,255,0.3) transparent',
                 overscrollBehavior: 'contain',
@@ -246,7 +246,6 @@ export function OemOdmWhatIsOem({
                 if (segment.bold) {
                   return (
                     <React.Fragment key={index}>
-                      {" "}
                       <span
                         key={index}
                         className="font-anaheim font-bold"
@@ -257,7 +256,6 @@ export function OemOdmWhatIsOem({
                       >
                         {segment.text}
                       </span>
-                      {" "}
                     </React.Fragment>
                   )
                 }
@@ -332,7 +330,6 @@ export function OemOdmWhatIsOem({
               if (segment.bold) {
                 return (
                   <React.Fragment key={index}>
-                    {" "}
                     <span
                       key={index}
                       className="font-bold"
@@ -340,7 +337,6 @@ export function OemOdmWhatIsOem({
                     >
                       {segment.text}
                     </span>
-                    {" "}
                   </React.Fragment>
                 )
               }

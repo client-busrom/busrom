@@ -350,12 +350,18 @@ export function OemOdmWhatWeOffer({
             </span>
             {/* 标题 */}
             <h3
-              className="font-anaheim font-extrabold text-white text-right"
+              onMouseEnter={() => setHoveredCard(0)}
+              onMouseLeave={() => setHoveredCard(null)}
+              className={`font-anaheim font-extrabold text-white text-right overflow-y-auto ${hoveredCard === 0 ? "pointer-events-auto" : "pointer-events-none"}`}
               style={{
                 fontSize: rpx(34), // 48 * 0.7
                 lineHeight: rpx(38), // 54 * 0.7
                 marginTop: rpx(13), // 18 * 0.7
                 width: rpx(224), // 320 * 0.7
+                maxHeight: rpx(76),
+                scrollbarWidth: "thin",
+                scrollbarColor: "rgba(255,255,255,0.3) transparent",
+                paddingRight: rpx(6),
                 marginLeft: rpx(-6), // -8 * 0.7
               }}
             >
@@ -457,12 +463,18 @@ export function OemOdmWhatWeOffer({
             </span>
             {/* 标题 */}
             <h3
-              className="font-anaheim font-extrabold text-white text-right"
+              onMouseEnter={() => setHoveredCard(1)}
+              onMouseLeave={() => setHoveredCard(null)}
+              className={`font-anaheim font-extrabold text-white text-right overflow-y-auto ${hoveredCard === 1 ? "pointer-events-auto" : "pointer-events-none"}`}
               style={{
                 fontSize: rpx(34),
                 lineHeight: rpx(38),
                 marginTop: rpx(0),
                 width: rpx(224),
+                maxHeight: rpx(76),
+                scrollbarWidth: "thin",
+                scrollbarColor: "rgba(255,255,255,0.3) transparent",
+                paddingRight: rpx(6),
                 marginLeft: rpx(-6),
               }}
             >
@@ -558,12 +570,18 @@ export function OemOdmWhatWeOffer({
             </span>
             {/* 标题 */}
             <h3
-              className="font-anaheim font-extrabold text-white text-right"
+              onMouseEnter={() => setHoveredCard(2)}
+              onMouseLeave={() => setHoveredCard(null)}
+              className={`font-anaheim font-extrabold text-white text-right overflow-y-auto ${hoveredCard === 2 ? "pointer-events-auto" : "pointer-events-none"}`}
               style={{
                 fontSize: rpx(34), // 48 * 0.7
                 lineHeight: rpx(38), // 54 * 0.7
                 marginTop: rpx(13), // 18 * 0.7
                 width: rpx(224), // 320 * 0.7
+                maxHeight: rpx(76),
+                scrollbarWidth: "thin",
+                scrollbarColor: "rgba(255,255,255,0.3) transparent",
+                paddingRight: rpx(6),
                 marginLeft: rpx(-6), // -9 * 0.7
               }}
             >
@@ -782,7 +800,7 @@ export function OemOdmWhatWeOffer({
                     <span className="font-anaheim font-extrabold text-white text-5xl leading-none">
                       {item.number}
                     </span>
-                    <h3 className="font-anaheim font-extrabold text-white text-xl leading-tight">
+                    <h3 className="font-anaheim font-extrabold text-white text-xl leading-tight overflow-y-auto" style={{ maxHeight: "3.2rem", scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.3) transparent", paddingRight: "6px" }}>
                       {item.title}
                     </h3>
                   </div>

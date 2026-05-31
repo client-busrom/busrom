@@ -330,6 +330,7 @@ export function OdmServiceIntroduction({
               fontSize: rpx(20),
               lineHeight: rpx(36), // 51 * 0.7
               color: "#59542A",
+              textWrap: "balance",
               zIndex: 10,
               scrollbarWidth: 'thin',
               scrollbarColor: 'rgba(89,84,42,0.3) transparent',
@@ -346,65 +347,61 @@ export function OdmServiceIntroduction({
               if (segment.underline) {
                 return (
                   <React.Fragment key={index}>
-                    {" "}
-                  <span
-                    key={index}
-                    className="relative inline-block font-anaheim font-extrabold"
-                    style={{
-                      fontSize: rpx(30),
-                      lineHeight: rpx(36),
-                      verticalAlign: "baseline",
-                      transform: `translateY(-${rpx(2)})`, // 向上微调以确保底对齐
-                    }}
-                  >
-                    {/* 下层 - #9E8C00 填充 + #FFF392 外描边，向右下偏移 */}
                     <span
-                      className="absolute font-anaheim font-extrabold"
+                      key={index}
+                      className="relative inline-block font-anaheim font-extrabold"
                       style={{
                         fontSize: rpx(30),
-                        color: "#9E8C00",
-                        left: rpx(3), // 4 * 0.7
-                        top: rpx(3), // 4 * 0.7
-                        textShadow: `
+                        lineHeight: rpx(36),
+                        verticalAlign: "baseline",
+                        transform: `translateY(-${rpx(2)})`, // 向上微调以确保底对齐
+                      }}
+                    >
+                      {/* 下层 - #9E8C00 填充 + #FFF392 外描边，向右下偏移 */}
+                      <span
+                        className="absolute font-anaheim font-extrabold"
+                        style={{
+                          fontSize: rpx(30),
+                          color: "#9E8C00",
+                          left: rpx(3), // 4 * 0.7
+                          top: rpx(3), // 4 * 0.7
+                          textShadow: `
                         -1px -1px 0 #FFF392,
                         1px -1px 0 #FFF392,
                         -1px 1px 0 #FFF392,
                         1px 1px 0 #FFF392
                       `,
-                      }}
-                    >
-                      {segment.text}
+                        }}
+                      >
+                        {segment.text}
+                      </span>
+                      {/* 上层 - 深色 */}
+                      <span
+                        className="relative font-anaheim font-extrabold"
+                        style={{
+                          fontSize: rpx(30),
+                          color: "#59542A",
+                        }}
+                      >
+                        {segment.text}
+                      </span>
                     </span>
-                    {/* 上层 - 深色 */}
-                    <span
-                      className="relative font-anaheim font-extrabold"
-                      style={{
-                        fontSize: rpx(30),
-                        color: "#59542A",
-                      }}
-                    >
-                      {segment.text}
-                    </span>
-                  </span>
-                    {" "}
                   </React.Fragment>
                 );
               }
               if (segment.bold) {
                 return (
                   <React.Fragment key={index}>
-                    {" "}
-                  <span
-                    key={index}
-                    className="font-anaheim font-bold"
-                    style={{
-                      fontSize: rpx(20),
-                      color: "#756F3F",
-                    }}
-                  >
-                    {segment.text}
-                  </span>
-                    {" "}
+                    <span
+                      key={index}
+                      className="font-anaheim font-bold"
+                      style={{
+                        fontSize: rpx(20),
+                        color: "#756F3F",
+                      }}
+                    >
+                      {segment.text}
+                    </span>
                   </React.Fragment>
                 );
               }
@@ -463,8 +460,9 @@ export function OdmServiceIntroduction({
             style={{
               left: rpx(111), // 159 * 0.7
               top: rpx(306), // 437 * 0.7
-              width: rpx(392), // 560 * 0.7
+              width: rpx(408), // 560 * 0.7
               maxHeight: rpx(280),
+              textWrap: "balance",
               zIndex: 10,
               scrollbarWidth: 'thin',
               scrollbarColor: 'rgba(89,84,42,0.3) transparent',
@@ -490,67 +488,63 @@ export function OdmServiceIntroduction({
                 if (segment.underline) {
                   return (
                     <React.Fragment key={index}>
-                      {" "}
-                    <span
-                      key={index}
-                      className="relative inline-block font-anaheim font-extrabold"
-                      style={{
-                        fontSize: rpx(30),
-                        lineHeight: rpx(39),
-                        verticalAlign: "baseline",
-                        transform: `translateY(-${rpx(2)})`, // 向上微调
-                      }}
-                    >
-                      {/* 下层 - #9E8C00 填充 + #FFF392 外描边，向右下偏移 */}
                       <span
-                        className="absolute font-anaheim font-extrabold"
+                        key={index}
+                        className="relative inline-block font-anaheim font-extrabold"
                         style={{
                           fontSize: rpx(30),
-                          color: "#9E8C00",
-                          left: rpx(1), // 2 * 0.7
-                          top: rpx(1), // 2 * 0.7
-                          textShadow: `
+                          lineHeight: rpx(39),
+                          verticalAlign: "baseline",
+                          transform: `translateY(-${rpx(2)})`, // 向上微调
+                        }}
+                      >
+                        {/* 下层 - #9E8C00 填充 + #FFF392 外描边，向右下偏移 */}
+                        <span
+                          className="absolute font-anaheim font-extrabold"
+                          style={{
+                            fontSize: rpx(30),
+                            color: "#9E8C00",
+                            left: rpx(1), // 2 * 0.7
+                            top: rpx(1), // 2 * 0.7
+                            textShadow: `
                           -1px -1px 0 #FFF392,
                           1px -1px 0 #FFF392,
                           -1px 1px 0 #FFF392,
                           1px 1px 0 #FFF392
                         `,
-                        }}
-                      >
-                        {segment.text}
+                          }}
+                        >
+                          {segment.text}
+                        </span>
+                        {/* 上层 - 深色 */}
+                        <span
+                          className="relative font-anaheim font-extrabold"
+                          style={{
+                            fontSize: rpx(30),
+                            color: "#59542A",
+                          }}
+                        >
+                          {segment.text}
+                        </span>
                       </span>
-                      {/* 上层 - 深色 */}
-                      <span
-                        className="relative font-anaheim font-extrabold"
-                        style={{
-                          fontSize: rpx(30),
-                          color: "#59542A",
-                        }}
-                      >
-                        {segment.text}
-                      </span>
-                    </span>
-                    {" "}
-                  </React.Fragment>
+                    </React.Fragment>
                   );
                 }
                 // 加粗文字
                 if (segment.bold) {
                   return (
                     <React.Fragment key={index}>
-                      {" "}
-                    <span
-                      key={index}
-                      className="font-anaheim font-bold"
-                      style={{
-                        fontSize: rpx(20),
-                        color: "#756F3F",
-                      }}
-                    >
-                      {segment.text}
-                    </span>
-                    {" "}
-                  </React.Fragment>
+                      <span
+                        key={index}
+                        className="font-anaheim font-bold"
+                        style={{
+                          fontSize: rpx(20),
+                          color: "#756F3F",
+                        }}
+                      >
+                        {segment.text}
+                      </span>
+                    </React.Fragment>
                   );
                 }
                 // 普通文字
@@ -656,30 +650,26 @@ export function OdmServiceIntroduction({
               if (segment.underline) {
                 return (
                   <React.Fragment key={index}>
-                    {" "}
-                  <span
-                    key={index}
-                    className="font-bold"
-                    style={{ color: "#756F3F" }}
-                  >
-                    {segment.text}
-                  </span>
-                    {" "}
+                    <span
+                      key={index}
+                      className="font-bold"
+                      style={{ color: "#756F3F" }}
+                    >
+                      {segment.text}
+                    </span>
                   </React.Fragment>
                 );
               }
               if (segment.bold) {
                 return (
                   <React.Fragment key={index}>
-                    {" "}
-                  <span
-                    key={index}
-                    className="font-bold"
-                    style={{ color: "#756F3F" }}
-                  >
-                    {segment.text}
-                  </span>
-                    {" "}
+                    <span
+                      key={index}
+                      className="font-bold"
+                      style={{ color: "#756F3F" }}
+                    >
+                      {segment.text}
+                    </span>
                   </React.Fragment>
                 );
               }
@@ -695,30 +685,26 @@ export function OdmServiceIntroduction({
               if (segment.underline) {
                 return (
                   <React.Fragment key={index}>
-                    {" "}
-                  <span
-                    key={index}
-                    className="font-bold"
-                    style={{ color: "#756F3F" }}
-                  >
-                    {segment.text}
-                  </span>
-                    {" "}
+                    <span
+                      key={index}
+                      className="font-bold"
+                      style={{ color: "#756F3F" }}
+                    >
+                      {segment.text}
+                    </span>
                   </React.Fragment>
                 );
               }
               if (segment.bold) {
                 return (
                   <React.Fragment key={index}>
-                    {" "}
-                  <span
-                    key={index}
-                    className="font-bold"
-                    style={{ color: "#756F3F" }}
-                  >
-                    {segment.text}
-                  </span>
-                    {" "}
+                    <span
+                      key={index}
+                      className="font-bold"
+                      style={{ color: "#756F3F" }}
+                    >
+                      {segment.text}
+                    </span>
                   </React.Fragment>
                 );
               }

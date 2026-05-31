@@ -405,7 +405,35 @@ export const MultiLocaleRichTextField: React.FC<MultiLocaleRichTextFieldProps> =
             results.push({ locale: targetLang, success: false })
           } else {
             const data = await res.json()
-            const translatedTexts = data.translations as string[]
+            let translatedTexts = data.translations as string[]
+
+            if (translatedTexts && Array.isArray(translatedTexts)) {
+              // Preserve leading and trailing spaces from original segments
+              // This prevents losing spaces around bold/italic words during translation
+              translatedTexts = translatedTexts.map((translated, i) => {
+                if (i >= segments.length) return translated;
+                const original = segments[i].text;
+                
+                // If the original was just whitespace, keep it intact
+                if (original.trim() === '') return original;
+                
+                let adjusted = translated || '';
+                
+                // Restore leading whitespace if it existed in original but was lost
+                const leadingMatch = original.match(/^\s+/);
+                if (leadingMatch && !adjusted.match(/^\s+/)) {
+                  adjusted = leadingMatch[0] + adjusted;
+                }
+                
+                // Restore trailing whitespace if it existed in original but was lost
+                const trailingMatch = original.match(/\s+$/);
+                if (trailingMatch && !adjusted.match(/\s+$/)) {
+                  adjusted = adjusted + trailingMatch[0];
+                }
+                
+                return adjusted;
+              });
+            }
 
             if (!translatedTexts || !Array.isArray(translatedTexts)) {
               console.error(`Invalid translation response for ${targetLang}:`, data)
