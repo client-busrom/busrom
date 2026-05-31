@@ -46,12 +46,12 @@ export interface ParsedOneStopData {
   showcase: OneStopSection & { viewMoreText: string; viewMoreLink: string; products: OneStopProduct[] };
   categories: { title: string; subtitle: string; products: OneStopProduct[] };
   productSeries: { title: string; titleHtml?: string; products: OneStopProduct[] };
-  brandHighlights: { 
-    titleLine1: string; 
+  brandHighlights: {
+    titleLine1: string;
     titleLine1Html?: string;
-    titleLine2: string; 
+    titleLine2: string;
     titleLine2Html?: string;
-    items: any[] 
+    items: any[]
   };
   trust: { title: string; items: any[]; images: any[]; bgImage: MediaObject | null };
   cta: { title: string; description: string; image: MediaObject | null; formConfig: any };
@@ -77,7 +77,7 @@ const getDeepText = (node: any, useHtml = false): string => {
 
     let text = node.text;
     if (useHtml && node.format && (node.format & 1)) {
-        return `<b>${text}</b>`;
+      return `<b>${text}</b>`;
     }
     return text;
   }
@@ -198,14 +198,14 @@ const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = [
   const usedProductIds = new Set<string>();
   return carouselItems.map((item: any, idx: number) => {
     const getTargetId = (val: any) => (typeof val === 'object' && val !== null ? val.id : val);
-    
+
     let product = null;
     if (item.selectionMode === 'manual') {
       const targetId = getTargetId(item.product);
       product = products.find(p => String(p.id) === String(targetId));
     } else {
       const targetSeriesId = getTargetId(item.productSeries);
-      
+
       // Find all products belonging to this series
       const seriesProducts = products.filter(p => {
         const pSeriesId = typeof p.series === 'object' && p.series !== null ? p.series.id : p.series;
@@ -227,22 +227,22 @@ const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = [
         product = seriesProducts[pickIdx];
       }
     }
-    
+
     if (!product) return null;
     if (item.selectionMode !== 'manual') usedProductIds.add(product.id);
-    
+
     // Support multiple image field names used in different collections
-    const displayImage = 
-      product.showImage || 
-      product.image || 
-      product.featuredImage || 
-      product.mainImage || 
+    const displayImage =
+      product.showImage ||
+      product.image ||
+      product.featuredImage ||
+      product.mainImage ||
       (product.images && product.images.length > 0 ? (product.images[0].image || product.images[0]) : null) ||
       null;
 
     const categoryName = product.category?.name || "";
     const title = item?.customName?.trim() || ((item?.showCategory === true || item?.showName === false) ? categoryName : product.name);
-    
+
     // Hydrate Product Attributes + Custom Attributes — deterministically shuffle by product ID, pick 4
     let resolvedAttrs: string[] = [];
     const attributePage = product.attributePage;
@@ -321,6 +321,35 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
   const problemsRaw = extractSectionRaw(contentChildren, "one-stop-shop-value-item", mediaData);
   const advantagesRaw = extractSectionRaw(contentChildren, "one-stop-shop-advantage-item", mediaData);
   const processRaw = extractSectionRaw(contentChildren, "how-to-make-item", mediaData);
+  const processIconList = extractNodesAfterMarker(contentChildren, "how-to-make-item").find((n: any) => n.type === "iconList");
+  const processImageGallery = extractNodesAfterMarker(contentChildren, "how-to-make-image").find((n: any) => n.type === "custom-image-gallery");
+
+  const combinedProcessItems: any[] = [];
+  if (processIconList || processImageGallery) {
+    const iconItems = processIconList?.data?.items || [];
+    const imageItems = processImageGallery?.data?.images || [];
+    const maxLen = Math.max(iconItems.length, imageItems.length);
+    for (let i = 0; i < maxLen; i++) {
+      const iconItem = iconItems[i] || {};
+      const imgItem = imageItems[i] || {};
+      let finalImage = null;
+      if (imgItem.sourceType === 'application' && imgItem.application) {
+        const appId = typeof imgItem.application === 'object' ? imgItem.application.id : String(imgItem.application);
+        const app = applicationsRes.find((a: any) => String(a.id) === appId);
+        if (app) finalImage = getRandomAppImage(app);
+      } else {
+        finalImage = imgItem.image ? (mediaData[typeof imgItem.image === 'object' ? imgItem.image.id : String(imgItem.image)] || (typeof imgItem.image === 'object' ? imgItem.image : null)) : null;
+      }
+
+      combinedProcessItems.push({
+        title: iconItem.title || "",
+        description: iconItem.subtitle || "",
+        icon: iconItem.icon || "",
+        image: finalImage,
+      });
+    }
+  }
+
 
   // Showcase
   const showcaseRaw = extractSectionRaw(contentChildren, "product-show-item", mediaData);
@@ -360,8 +389,8 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
       image: it.image,
       title: it.title
     }));
-  
-  const categoriesProducts = catMapped.length > 0 || catOther.length > 0 
+
+  const categoriesProducts = catMapped.length > 0 || catOther.length > 0
     ? [...catMapped, ...catOther]
     : products.map((p: any) => ({ ...p, title: p.category?.name || p.name, link: `/${locale}/product/${p.slug}` }));
 
@@ -390,12 +419,12 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
     const id = typeof idOrObj === 'object' ? idOrObj.id : idOrObj;
     const app = applicationsRes.find((a: any) => String(a.id) === String(id));
     if (!app) return null;
-    return { 
-      id: String(app.id), 
-      title: app.name, 
-      description: app.shortDescription, 
-      image: getRandomAppImage(app), 
-      link: `/${locale}/application/${app.slug}` 
+    return {
+      id: String(app.id),
+      title: app.name,
+      description: app.shortDescription,
+      image: getRandomAppImage(app),
+      link: `/${locale}/application/${app.slug}`
     };
   }).filter(Boolean);
 
@@ -417,42 +446,42 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
   const bestFormConfig = (blockConfig?.fields ? blockConfig : (pageConfig?.fields ? pageConfig : (blockConfig || pageConfig)));
 
 
-    return { 
-      hero: { ...heroRaw },
-      problems: { ...problemsRaw },
-      advantages: { title: advantagesRaw.title, subtitle: "", items: advantagesRaw.items },
-      process: { title: processRaw.title, subtitle: "", items: processRaw.items },
-      showcase: { 
-        title: showcaseRaw.title,
-        titleHtml: showcaseRaw.titleHtml,
-        subtitle: showcaseRaw.subtitle,
-        subtitleHtml: showcaseRaw.subtitleHtml,
-        items: showcaseRaw.items,
-        viewMoreText, 
-        viewMoreLink, 
-        products: showcaseProducts 
-      },
-      categories: { title: categoriesRaw.title, subtitle: categoriesRaw.subtitle, products: categoriesProducts },
-      productSeries: { 
-        title: seriesRaw.title,
-        titleHtml: seriesRaw.titleHtml,
-        products: seriesProducts 
-      },
-      brandHighlights: { 
-        titleLine1: brandHighlightsRaw.title, 
-        titleLine1Html: brandHighlightsRaw.titleHtml,
-        titleLine2: brandHighlightsRaw.subtitle, 
-        titleLine2Html: brandHighlightsRaw.subtitleHtml,
-        items: brandHighlightsRaw.items 
-      },
-      trust: { title: trustRaw.title, items: trustItems, images: trustRaw.items.filter((it: any) => it.sourceType === 'custom-image-gallery' || it.sourceType === 'carousel'), bgImage: trustBgImage },
-      cta: { 
-        title: ctaRaw.title || (typeof bestFormConfig === 'object' ? bestFormConfig?.displayName : undefined), 
-        description: ctaRaw.subtitle || (typeof bestFormConfig === 'object' ? bestFormConfig?.description : undefined), 
-        image: ctaImage, 
-        formConfig: bestFormConfig
-      },
-      applications: { title: appsSectionRaw.title, items: finalApps },
-      oemOdmGuide: { title: oemTitle, description: oemRaw.subtitle, bgImage: oemBgImage, ctaText: locale === 'cn' ? "了解更多" : "READ MORE", ctaLink: `/${locale}/oem-odm` }
-    };
+  return {
+    hero: { ...heroRaw },
+    problems: { ...problemsRaw },
+    advantages: { title: advantagesRaw.title, subtitle: "", items: advantagesRaw.items },
+    process: { title: processRaw.title, subtitle: "", items: combinedProcessItems.length > 0 ? combinedProcessItems : processRaw.items },
+    showcase: {
+      title: showcaseRaw.title,
+      titleHtml: showcaseRaw.titleHtml,
+      subtitle: showcaseRaw.subtitle,
+      subtitleHtml: showcaseRaw.subtitleHtml,
+      items: showcaseRaw.items,
+      viewMoreText,
+      viewMoreLink,
+      products: showcaseProducts
+    },
+    categories: { title: categoriesRaw.title, subtitle: categoriesRaw.subtitle, products: categoriesProducts },
+    productSeries: {
+      title: seriesRaw.title,
+      titleHtml: seriesRaw.titleHtml,
+      products: seriesProducts
+    },
+    brandHighlights: {
+      titleLine1: brandHighlightsRaw.title,
+      titleLine1Html: brandHighlightsRaw.titleHtml,
+      titleLine2: brandHighlightsRaw.subtitle,
+      titleLine2Html: brandHighlightsRaw.subtitleHtml,
+      items: brandHighlightsRaw.items
+    },
+    trust: { title: trustRaw.title, items: trustItems, images: trustRaw.items.filter((it: any) => it.sourceType === 'custom-image-gallery' || it.sourceType === 'carousel'), bgImage: trustBgImage },
+    cta: {
+      title: ctaRaw.title || (typeof bestFormConfig === 'object' ? bestFormConfig?.displayName : undefined),
+      description: ctaRaw.subtitle || (typeof bestFormConfig === 'object' ? bestFormConfig?.description : undefined),
+      image: ctaImage,
+      formConfig: bestFormConfig
+    },
+    applications: { title: appsSectionRaw.title, items: finalApps },
+    oemOdmGuide: { title: oemTitle, description: oemRaw.subtitle, bgImage: oemBgImage, ctaText: locale === 'cn' ? "了解更多" : "READ MORE", ctaLink: `/${locale}/oem-odm` }
+  };
 };

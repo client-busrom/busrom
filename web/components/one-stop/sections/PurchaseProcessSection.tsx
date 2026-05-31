@@ -3,12 +3,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { IconifyIcon } from "@/components/ui/IconifyIcon";
 import useEmblaCarousel from "embla-carousel-react";
 
 interface SectionSlide {
   title: string;
   description: string;
   image: { url: string } | any;
+  icon?: string;
 }
 
 interface PurchaseProcessSectionProps {
@@ -417,7 +419,7 @@ export function PurchaseProcessSection({
                   >
                     <OptimizedImage
                       image={slide.image}
-                      size="large"
+                      size="medium"
                       priority={true}
                       className="w-full h-full object-cover"
                       alt={`Step ${i}`}
@@ -505,25 +507,29 @@ export function PurchaseProcessSection({
                           height: vw(48),
                         }}
                       >
-                        <svg
-                          width="60%"
-                          height="60%"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <path
-                            d="M12 2C10.9 2 10 2.9 10 4V6H7C5.9 6 5 6.9 5 8V11C5 12.1 5.9 13 7 13H17C18.1 13 19 12.1 19 11V8C19 6.9 18.1 6 17 6H14V4C14 2.9 13.1 2 12 2Z"
-                            fill="white"
-                          />
-                          <rect
-                            x="7"
-                            y="14"
-                            width="10"
-                            height="8"
-                            rx="1"
-                            fill="white"
-                          />
-                        </svg>
+                        {step.data.icon ? (
+                          <IconifyIcon name={step.data.icon} className="w-[60%] h-[60%] text-white" />
+                        ) : (
+                          <svg
+                            width="60%"
+                            height="60%"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <path
+                              d="M12 2C10.9 2 10 2.9 10 4V6H7C5.9 6 5 6.9 5 8V11C5 12.1 5.9 13 7 13H17C18.1 13 19 12.1 19 11V8C19 6.9 18.1 6 17 6H14V4C14 2.9 13.1 2 12 2Z"
+                              fill="white"
+                            />
+                            <rect
+                              x="7"
+                              y="14"
+                              width="10"
+                              height="8"
+                              rx="1"
+                              fill="white"
+                            />
+                          </svg>
+                        )}
                       </motion.div>
 
                       <div
@@ -571,23 +577,27 @@ export function PurchaseProcessSection({
                           height: vw(34),
                         }}
                       >
-                        <svg
-                          width="60%"
-                          height="60%"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          className="text-[#756F3F] group-hover:text-white transition-colors duration-300"
-                        >
-                          <path
-                            d={
-                              step.pos === "top"
-                                ? "M7 17L17 7M17 7H7M17 7V17"
-                                : "M7 7L17 17M17 17V7M17 17H7"
-                            }
-                          />
-                        </svg>
+                        {step.data.icon ? (
+                          <IconifyIcon name={step.data.icon} className="w-[50%] h-[50%] text-[#756F3F] group-hover:text-white transition-colors duration-300" />
+                        ) : (
+                          <svg
+                            width="60%"
+                            height="60%"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            className="text-[#756F3F] group-hover:text-white transition-colors duration-300"
+                          >
+                            <path
+                              d={
+                                step.pos === "top"
+                                  ? "M7 17L17 7M17 7H7M17 7V17"
+                                  : "M7 7L17 17M17 17V7M17 17H7"
+                              }
+                            />
+                          </svg>
+                        )}
                       </div>
                       <span
                         className="font-bold text-[#141414] tracking-widest uppercase transition-colors duration-300 group-hover:text-[#756F3F]"

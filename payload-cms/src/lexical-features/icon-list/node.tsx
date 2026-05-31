@@ -64,6 +64,8 @@ export class IconListNode extends DecoratorNode<React.ReactElement> {
   createDOM(config: EditorConfig): HTMLElement {
     const div = document.createElement('div')
     div.className = 'icon-list-node'
+    div.style.width = '100%'
+    div.style.maxWidth = '100%'
     return div
   }
 
