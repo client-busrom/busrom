@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import useEmblaCarousel from "embla-carousel-react";
+import { useOverflow } from "@/lib/hooks/useOverflow";
 
 interface SectionSlide {
   title: string;
@@ -22,6 +23,37 @@ interface ValuePropositionProps {
 
 // Viewport width conversion utility based on 1920px design width (scaled by 0.7 to fix oversized design draft values)
 const vw = (px: number) => `${(px / 1920) * 100}vw`;
+
+/**
+ * Sub-component to handle overflow for the active text with AnimatePresence
+ */
+const DesktopActiveText = ({ text }: { text: string }) => {
+  const { ref, isOverflow } = useOverflow<HTMLParagraphElement>();
+  
+  return (
+    <motion.p
+      ref={ref}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.4 }}
+      className="font-semibold leading-relaxed text-black custom-scrollbar pointer-events-auto pr-2"
+      data-lenis-prevent
+      style={{
+        fontFamily: "var(--font-anaheim)",
+        fontSize: vw(20),
+        maxHeight: `calc(${vw(130)} + 10px)`, // 4 lines * 1.625 * 20vw = 130vw
+        paddingTop: "5px",
+        paddingBottom: "5px",
+        overflowY: isOverflow ? "auto" : "hidden",
+        overflowX: "hidden",
+        overscrollBehavior: "contain",
+      }}
+    >
+      {text}
+    </motion.p>
+  );
+};
 
 /**
  * ValuePropositionSection - The Value of One-Stop Procurement
@@ -43,6 +75,8 @@ export function ValuePropositionSection({
     padding: 0,
     cardH: 300,
   });
+
+  const { ref: desktopTitleRef, isOverflow: desktopTitleOverflows } = useOverflow<HTMLDivElement>();
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
@@ -127,6 +161,105 @@ export function ValuePropositionSection({
     return () => clearInterval(timer);
   }, [isDesktop, autoplay, interval, data.length, handleNext]);
 
+  const mobileHeader = React.useMemo(() => (
+    <div className="w-full text-center px-6">
+      <h2
+        className="font-extrabold leading-tight text-[#78713A] tracking-[0.05em] mb-3"
+        style={{
+          fontFamily: "var(--font-anaheim)",
+          fontSize: "clamp(24px, 7.46vw, 32px)",
+        }}
+        dangerouslySetInnerHTML={{
+          __html: (title || "The Value Of One-Stop Procurement").replace(
+            /\n/g,
+            "<br />",
+          ),
+        }}
+      />
+      <h3
+        className="font-semibold leading-tight text-[#756F3F] opacity-60 mb-4"
+        style={{
+          fontFamily: "var(--font-anaheim)",
+          fontSize: "clamp(16px, 4.8vw, 20px)",
+        }}
+        dangerouslySetInnerHTML={{
+          __html: (subtitle || "Problems To Be Solved").replace(
+            /\n/g,
+            "<br />",
+          ),
+        }}
+      />
+    </div>
+  ), [title, subtitle]);
+
+  const desktopHeader = useMemo(() => (
+    <>
+      {/* 1. Header Area */}
+      <div
+        className="hidden lg:block absolute z-50 text-left pointer-events-auto"
+        style={{ left: vw(192), top: vw(120), width: vw(1000) }}
+      >
+        <div
+          ref={desktopTitleRef}
+          className="custom-scrollbar"
+          data-lenis-prevent
+          style={{
+            maxHeight: `calc(${vw(160)} + 10px)`, // Huge buffer for 2 lines (visual vw(140)) to completely bypass font bounding box overflows, while still < 3 lines (vw(211)).
+            paddingTop: "5px",
+            paddingBottom: "5px",
+            fontSize: vw(64),
+            overflowY: desktopTitleOverflows ? "auto" : "hidden",
+            overflowX: "hidden",
+            overscrollBehavior: "contain",
+          }}
+        >
+          <h2
+            className="font-extrabold leading-[1.1] text-[#78713A] tracking-[0.05em] m-0"
+            style={{
+              fontFamily: "var(--font-anaheim)",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: (
+                title || "The Value Of One-Stop<br />Procurement"
+              ).replace(/\n/g, "<br />"),
+            }}
+          />
+        </div>
+      </div>
+
+      {/* 2. Sub-indicator Area */}
+      <div
+        className="hidden lg:flex absolute flex-col items-end z-50 pointer-events-none"
+        style={{ right: vw(150), top: vw(140) }}
+      >
+        <div className="relative mb-2">
+          <motion.div
+            animate={{
+              x: [0, 60, -60, 0],
+              y: [0, -40, 40, 0],
+            }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            className="bg-[#EDEBD8] rounded-full absolute -top-4 right-[64px] -z-10 opacity-70"
+            style={{ width: vw(80), height: vw(80) }}
+          />
+          <h3
+            className="font-semibold leading-tight text-[#756F3F] text-right opacity-60"
+            style={{
+              fontFamily: "var(--font-anaheim)",
+              fontSize: vw(32),
+            }}
+            dangerouslySetInnerHTML={{
+              __html: (subtitle || "Problems<br />To Be Solved").replace(
+                /\n/g,
+                "<br />",
+              ),
+            }}
+          />
+        </div>
+      </div>
+    </>
+  ), [title, subtitle, desktopTitleOverflows]);
+
   if (data.length === 0) return null;
 
   return (
@@ -147,34 +280,7 @@ export function ValuePropositionSection({
         {/* === MOBILE ONLY CONTENT (< 1024px) === */}
         <div className="flex lg:hidden flex-col w-full px-0 gap-6">
           {/* Header */}
-          <div className="w-full text-center px-6">
-            <h2
-              className="font-extrabold leading-tight text-[#78713A] tracking-[0.05em] mb-3"
-              style={{
-                fontFamily: "var(--font-anaheim)",
-                fontSize: "clamp(24px, 7.46vw, 32px)",
-              }}
-              dangerouslySetInnerHTML={{
-                __html: (title || "The Value Of One-Stop Procurement").replace(
-                  /\n/g,
-                  "<br />",
-                ),
-              }}
-            />
-            <h3
-              className="font-semibold leading-tight text-[#756F3F] opacity-60 mb-4"
-              style={{
-                fontFamily: "var(--font-anaheim)",
-                fontSize: "clamp(16px, 4.8vw, 20px)",
-              }}
-              dangerouslySetInnerHTML={{
-                __html: (subtitle || "Problems To Be Solved").replace(
-                  /\n/g,
-                  "<br />",
-                ),
-              }}
-            />
-          </div>
+          {mobileHeader}
 
           {/* Carousel - Embla Implementation */}
           <div
@@ -228,15 +334,22 @@ export function ValuePropositionSection({
 
                     {/* Description Text */}
                     <div
-                      className="w-full flex-1 overflow-y-auto pointer-events-auto pr-1 select-text"
+                      className="w-full flex-1 pointer-events-auto pr-1 select-text custom-scrollbar"
+                      data-lenis-prevent
                       style={{
                         WebkitOverflowScrolling: "touch",
+                        fontSize: "13.5px",
+                        maxHeight: "calc(6.5em + 10px)", // 4 lines * 1.625 leading + 10px padding
+                        paddingTop: "5px",
+                        paddingBottom: "5px",
+                        overflowY: "auto",
+                        overflowX: "hidden",
+                        overscrollBehavior: "contain",
                       }}
                     >
                       <p
-                        className="font-semibold leading-relaxed text-[#7A7A7A] text-justify"
+                        className="font-semibold leading-relaxed text-[#7A7A7A] text-justify m-0"
                         style={{
-                          fontSize: "13.5px",
                           fontFamily: "var(--font-anaheim)",
                         }}
                       >
@@ -267,55 +380,7 @@ export function ValuePropositionSection({
 
         {/* === DESKTOP ONLY CONTENT (>= 1024px) === */}
 
-        {/* 1. Header Area */}
-        <div
-          className="hidden lg:block absolute z-50 text-left"
-          style={{ left: vw(192), top: vw(120), width: vw(1000) }}
-        >
-          <h2
-            className="font-extrabold leading-[1.1] text-[#78713A] tracking-[0.05em]"
-            style={{
-              fontFamily: "var(--font-anaheim)",
-              fontSize: vw(64),
-            }}
-            dangerouslySetInnerHTML={{
-              __html: (
-                title || "The Value Of One-Stop<br />Procurement"
-              ).replace(/\n/g, "<br />"),
-            }}
-          />
-        </div>
-
-        {/* 2. Sub-indicator Area */}
-        <div
-          className="hidden lg:flex absolute flex-col items-end z-50 pointer-events-none"
-          style={{ right: vw(150), top: vw(140) }}
-        >
-          <div className="relative mb-2">
-            <motion.div
-              animate={{
-                x: [0, 60, -60, 0],
-                y: [0, -40, 40, 0],
-              }}
-              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-              className="bg-[#EDEBD8] rounded-full absolute -top-4 right-[64px] -z-10 opacity-70"
-              style={{ width: vw(80), height: vw(80) }}
-            />
-            <h3
-              className="font-semibold leading-tight text-[#756F3F] text-right opacity-60"
-              style={{
-                fontFamily: "var(--font-anaheim)",
-                fontSize: vw(32),
-              }}
-              dangerouslySetInnerHTML={{
-                __html: (subtitle || "Problems<br />To Be Solved").replace(
-                  /\n/g,
-                  "<br />",
-                ),
-              }}
-            />
-          </div>
-        </div>
+        {desktopHeader}
 
         {/* 3 & 6. Background Box + Navigation Controls - Grouped as a single unit */}
         <div
@@ -421,20 +486,7 @@ export function ValuePropositionSection({
             style={{ left: vw(369), top: vw(600), width: vw(450) }}
           >
             <AnimatePresence mode="wait">
-              <motion.p
-                key={currentIndex}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4 }}
-                className="font-semibold leading-relaxed text-black"
-                style={{
-                  fontFamily: "var(--font-anaheim)",
-                  fontSize: vw(20),
-                }}
-              >
-                {data[currentIndex].description}
-              </motion.p>
+              <DesktopActiveText key={currentIndex} text={data[currentIndex].description} />
             </AnimatePresence>
           </div>
         </div>

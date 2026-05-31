@@ -18,6 +18,8 @@ interface PurchaseProcessSectionProps {
 
 const vw = (px: number) => `${(px / 1920) * 100}vw`;
 
+import { useOverflow } from "@/lib/hooks/useOverflow";
+
 export function PurchaseProcessSection({
   title,
   slides,
@@ -58,6 +60,8 @@ export function PurchaseProcessSection({
     },
     [emblaApi],
   );
+
+  const { ref: titleRef, isOverflow: titleOverflows } = useOverflow<HTMLDivElement>();
 
   useEffect(() => {
     const handleResize = () => {
@@ -348,28 +352,44 @@ export function PurchaseProcessSection({
 
         {/* 1. Title - Fluid & Aligned */}
         <div
-          className="hidden lg:block relative lg:absolute z-30 lg:pointer-events-none mb-10 lg:mb-0 text-center lg:text-left"
+          className="hidden lg:block relative lg:absolute z-30 mb-10 lg:mb-0 text-center lg:text-left"
           style={{ left: vw(60), top: vw(-50) }}
         >
-          <h2
-            className="font-semibold tracking-wide text-[32px]"
+          <div
+            ref={titleRef}
+            className="custom-scrollbar pointer-events-auto"
+            data-lenis-prevent
             style={{
-              fontFamily: "var(--font-anaheim)",
-              background:
-                "linear-gradient(135deg, #756F3F 40%, rgba(117, 111, 63, 0.35) 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
+              maxWidth: vw(400),
+              maxHeight: "calc(3.6em + 10px)",
               fontSize: isDesktop ? vw(48) : "32px",
-              lineHeight: isDesktop ? 1.2 : undefined,
+              paddingTop: "5px",
+              paddingBottom: "5px",
+              overflowY: titleOverflows ? "auto" : "hidden",
+              overflowX: "hidden",
+              overscrollBehavior: "contain",
+              wordBreak: "break-word",
             }}
-            dangerouslySetInnerHTML={{
-              __html: (
-                title ||
-                '<span class="opacity-100">How To Make</span><br /><span class="opacity-100">One-Stop<br />Purchases</span>'
-              ).replace(/\n/g, "<br />"),
-            }}
-          />
+          >
+            <h2
+              className="font-semibold tracking-wide m-0"
+              style={{
+                fontFamily: "var(--font-anaheim)",
+                background:
+                  "linear-gradient(135deg, #756F3F 40%, rgba(117, 111, 63, 0.35) 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                lineHeight: isDesktop ? 1.2 : undefined,
+              }}
+              dangerouslySetInnerHTML={{
+                __html: (
+                  title ||
+                  '<span class="opacity-100">How To Make</span><br /><span class="opacity-100">One-Stop<br />Purchases</span>'
+                ).replace(/\n/g, "<br />"),
+              }}
+            />
+          </div>
         </div>
 
         {/* 2. Central Image (Capsule) - DESKTOP ONLY */}

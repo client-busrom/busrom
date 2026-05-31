@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import useEmblaCarousel from "embla-carousel-react";
+import { useOverflow } from "@/lib/hooks/useOverflow";
 
 interface SectionSlide {
   title: string;
@@ -18,6 +19,47 @@ interface AdvantagesSectionProps {
 
 const DESIGN_WIDTH = 1920;
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
+
+/**
+ * Sub-component to handle overflow for the advantage item title
+ */
+const AdvantageItemTitle = ({ title, isActive, layout }: { title: string; isActive: boolean; layout: any }) => {
+  const { ref, isOverflow } = useOverflow<HTMLDivElement>();
+  return (
+    <div
+      style={{
+        paddingTop: layout.type === "desktop" ? vw(20) : "12px",
+        paddingLeft: layout.type === "desktop" ? vw(30) : "20px",
+        position: "relative",
+        zIndex: 10,
+      }}
+    >
+      <div
+        ref={ref}
+        className="custom-scrollbar pointer-events-auto pr-1"
+        data-lenis-prevent
+        style={{
+          maxHeight: "calc(2.5em + 10px)",
+          fontSize: layout.type === "desktop" ? vw(24) : "18px",
+          paddingTop: "5px",
+          paddingBottom: "5px",
+          overflowY: isOverflow ? "auto" : "hidden",
+          overflowX: "hidden",
+          overscrollBehavior: "contain",
+        }}
+      >
+        <h3
+          className={`leading-tight transition-all duration-500 m-0 ${isActive ? "font-extrabold text-black" : "font-medium text-[#4A4A4A]"}`}
+          style={{
+            fontFamily: "var(--font-anaheim)",
+          }}
+        >
+          {title}
+        </h3>
+      </div>
+    </div>
+  );
+};
 
 export function AdvantagesSection({
   title,
@@ -42,6 +84,8 @@ export function AdvantagesSection({
     dragFree: false,
     containScroll: false,
   });
+
+  const { ref: sectionTitleRef, isOverflow: sectionTitleOverflows } = useOverflow<HTMLDivElement>();
 
   // Sync internal Embla state with our index state
   const onSelect = useCallback(() => {
@@ -136,23 +180,37 @@ export function AdvantagesSection({
             width: layout.type === "desktop" ? vw(1000) : "100%",
           }}
         >
-          <h2
-            className="font-semibold leading-tight tracking-tight text-[#756F3F] text-[32px]"
+          <div
+            ref={sectionTitleRef}
+            className="custom-scrollbar pointer-events-auto inline-block text-left"
+            data-lenis-prevent
             style={{
+              maxHeight: "calc(2.5em + 10px)",
               fontSize: layout.type === "desktop" ? vw(60) : "32px",
-              fontFamily: "var(--font-anaheim)",
-              background:
-                "linear-gradient(to right, #756F3F 0%, rgba(117, 111, 63, 0.5) 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              paddingTop: "5px",
+              paddingBottom: "5px",
+              overflowY: sectionTitleOverflows ? "auto" : "hidden",
+              overflowX: "hidden",
+              overscrollBehavior: "contain",
             }}
-            dangerouslySetInnerHTML={{
-              __html: (
-                title ||
-                "Advantages And Features<br />Of Busrom's One-Stop Purchasing"
-              ).replace(/\n/g, "<br />"),
-            }}
-          />
+          >
+            <h2
+              className="font-semibold leading-tight tracking-tight text-[#756F3F] m-0"
+              style={{
+                fontFamily: "var(--font-anaheim)",
+                background:
+                  "linear-gradient(to right, #756F3F 0%, rgba(117, 111, 63, 0.5) 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+              dangerouslySetInnerHTML={{
+                __html: (
+                  title ||
+                  "Advantages And Features<br />Of Busrom's One-Stop Purchasing"
+                ).replace(/\n/g, "<br />"),
+              }}
+            />
+          </div>
         </div>
 
         {/* 3. Carousel - Embla Implementation */}
@@ -223,18 +281,7 @@ export function AdvantagesSection({
                           : {}
                       }
                     />
-                    <h3
-                      className={`relative z-10 leading-tight transition-all duration-500 ${isActive ? "font-extrabold text-black" : "font-medium text-[#4A4A4A]"}`}
-                      style={{
-                        fontSize: layout.type === "desktop" ? vw(24) : "18px",
-                        fontFamily: "var(--font-anaheim)",
-                        paddingTop: layout.type === "desktop" ? vw(20) : "12px",
-                        paddingLeft:
-                          layout.type === "desktop" ? vw(30) : "20px",
-                      }}
-                    >
-                      {item.title}
-                    </h3>
+                    <AdvantageItemTitle title={item.title} isActive={isActive} layout={layout} />
                   </div>
 
                   {/* Card Image */}

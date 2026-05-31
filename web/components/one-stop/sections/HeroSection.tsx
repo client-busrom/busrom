@@ -222,47 +222,67 @@ export function HeroSection({ slides, locale }: HeroSectionProps) {
                         }}
                       >
                         <div
-                          className="relative"
+                          className="custom-scrollbar"
+                          data-lenis-prevent
                           style={{
+                            fontSize: isDesktop ? rpx(60) : "clamp(24px, 6vw, 36px)",
+                            maxHeight: "calc(3.75em + 10px)", // 3 lines * 1.25em (leading-tight) + 10px padding
+                            paddingTop: "5px",
+                            paddingBottom: "5px",
                             marginBottom: isDesktop ? rpx(24) : "16px",
+                            overflowY: "auto",
+                            overflowX: "hidden",
+                            overscrollBehavior: "contain",
+                            paddingRight: isDesktop ? rpx(4) : "4px", // to prevent false positive scrollbar from offset shadow
                           }}
                         >
-                          {/* 1. Behind Layer (HollowText Stroke) - 2px Offset */}
-                          <div
-                            className="absolute w-full font-normal leading-tight text-center md:text-left"
-                            style={{
-                              left: isDesktop ? rpx(2) : "2px",
-                              top: isDesktop ? rpx(2) : "2px",
-                              fontSize: isDesktop ? rpx(60) : "clamp(24px, 6vw, 36px)",
-                              fontFamily: "var(--font-paytone-one)",
-                              zIndex: 0,
-                            }}
-                          >
-                            <HollowText strokeColor="#FFF499" strokeWidth={strokeWidth}>
-                              {slide.title}
-                            </HollowText>
-                          </div>
+                          <div className="relative">
+                            {/* 1. Behind Layer (HollowText Stroke) - 2px Offset */}
+                            <div
+                              className="absolute w-full font-normal leading-tight text-center md:text-left"
+                              style={{
+                                left: isDesktop ? rpx(2) : "2px",
+                                top: isDesktop ? rpx(2) : "2px",
+                                fontFamily: "var(--font-paytone-one)",
+                                zIndex: 0,
+                              }}
+                            >
+                              <HollowText strokeColor="#FFF499" strokeWidth={strokeWidth}>
+                                {slide.title}
+                              </HollowText>
+                            </div>
 
-                          {/* 2. Top Primary Layer */}
-                          <h1
-                            className="relative font-normal leading-tight text-center md:text-left"
-                            style={{
-                              fontSize: isDesktop ? rpx(60) : "clamp(24px, 6vw, 36px)",
-                              fontFamily: "var(--font-paytone-one)",
-                              color: titleColor,
-                              textShadow: `0 4px 12.6px ${titleShadowColor}`,
-                              zIndex: 1,
-                            }}
-                          >
-                            {slide.title}
-                          </h1>
+                            {/* 2. Top Primary Layer */}
+                            <h1
+                              className="relative font-normal leading-tight text-center md:text-left m-0"
+                              style={{
+                                fontFamily: "var(--font-paytone-one)",
+                                color: titleColor,
+                                textShadow: `0 4px 12.6px ${titleShadowColor}`,
+                                zIndex: 1,
+                              }}
+                            >
+                              {slide.title}
+                            </h1>
+                          </div>
                         </div>
 
-                        <div className="text-center md:text-left">
+                        <div 
+                          className="text-center md:text-left custom-scrollbar"
+                          data-lenis-prevent
+                          style={{
+                            fontSize: isDesktop ? rpx(33) : "clamp(13px, 3.5vw, 18px)",
+                            maxHeight: "calc(4.5em + 10px)", // 3 lines * 1.5em (leading-normal) + 10px padding
+                            paddingTop: "5px",
+                            paddingBottom: "5px",
+                            overflowY: "auto",
+                            overflowX: "hidden",
+                            overscrollBehavior: "contain",
+                          }}
+                        >
                           <p
-                            className="text-white font-semibold leading-normal tracking-tight"
+                            className="text-white font-semibold leading-normal tracking-tight m-0"
                             style={{
-                              fontSize: isDesktop ? rpx(33) : "clamp(13px, 3.5vw, 18px)",
                               fontFamily: "var(--font-anaheim)",
                               textShadow: "0 4px 7.8px rgba(0,0,0,0.71)",
                             }}

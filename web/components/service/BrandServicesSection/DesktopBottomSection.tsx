@@ -421,7 +421,7 @@ export function DesktopBottomSection({
                               className="custom-scrollbar"
                               data-lenis-prevent
                               style={{
-                                maxHeight: fontVw(130), // 6 lines * 20 + 10 padding
+                                maxHeight: fontVw(128), // 6 lines * 20 + 10 padding
                                 paddingTop: fontVw(5),
                                 paddingRight: fontVw(5),
                                 paddingBottom: fontVw(5),
@@ -431,7 +431,7 @@ export function DesktopBottomSection({
                               }}
                             >
                               <p
-                                className="font-anaheim font-medium text-[#535353] text-justify m-0"
+                                className="font-anaheim font-medium text-[#535353] text-left m-0"
                                 style={{
                                   fontSize: fontVw(16),
                                   lineHeight: fontVw(20),
@@ -504,8 +504,8 @@ export function DesktopBottomSection({
           <button
             onClick={expandedItemIndex !== null ? onPrevItem : undefined}
             className={`group absolute z-20 rounded-full flex items-center justify-center transition-all border-2 ${expandedItemIndex !== null
-                ? "border-[#756F3F] bg-transparent hover:bg-[#756F3F] cursor-pointer"
-                : "border-[#756F3F]/30 bg-transparent cursor-default"
+              ? "border-[#756F3F] bg-transparent hover:bg-[#756F3F] cursor-pointer"
+              : "border-[#756F3F]/30 bg-transparent cursor-default"
               }`}
             style={{
               width: vw(52),    // 74 * 0.7
@@ -519,8 +519,8 @@ export function DesktopBottomSection({
           >
             <ChevronLeft
               className={`transition-colors ${expandedItemIndex !== null
-                  ? "text-[#756F3F] group-hover:text-white"
-                  : "text-[#756F3F]/30"
+                ? "text-[#756F3F] group-hover:text-white"
+                : "text-[#756F3F]/30"
                 }`}
               strokeWidth={3}
               style={{ width: vw(17), height: vw(17) }}
@@ -531,8 +531,8 @@ export function DesktopBottomSection({
           <button
             onClick={expandedItemIndex !== null ? onNextItem : undefined}
             className={`group absolute z-20 rounded-full flex items-center justify-center transition-all border-2 ${expandedItemIndex !== null
-                ? "border-[#756F3F] bg-transparent hover:bg-[#756F3F] cursor-pointer"
-                : "border-[#756F3F]/30 bg-transparent cursor-default"
+              ? "border-[#756F3F] bg-transparent hover:bg-[#756F3F] cursor-pointer"
+              : "border-[#756F3F]/30 bg-transparent cursor-default"
               }`}
             style={{
               width: vw(52),    // 74 * 0.7
@@ -546,8 +546,8 @@ export function DesktopBottomSection({
           >
             <ChevronRight
               className={`transition-colors ${expandedItemIndex !== null
-                  ? "text-[#756F3F] group-hover:text-white"
-                  : "text-[#756F3F]/30"
+                ? "text-[#756F3F] group-hover:text-white"
+                : "text-[#756F3F]/30"
                 }`}
               strokeWidth={3}
               style={{ width: vw(17), height: vw(17) }}
