@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { QuoteSection as QuoteSectionType } from "@/types/product-overview";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Icon } from "@iconify/react";
 
 const DESIGN_WIDTH = 1920;
@@ -15,10 +16,39 @@ interface QuoteSectionProps {
 }
 
 export function QuoteSection({ data }: QuoteSectionProps) {
+  const params = useParams();
+  const locale = params?.locale as string || "en";
+
   if (!data) return null;
 
   return (
     <section className="relative w-full overflow-hidden" id="quote-section">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .hover-show-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: transparent transparent;
+          transition: scrollbar-color 0.3s;
+        }
+        .hover-show-scrollbar:hover {
+          scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        }
+        .hover-show-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .hover-show-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .hover-show-scrollbar::-webkit-scrollbar-thumb {
+          background-color: transparent;
+          border-radius: 10px;
+        }
+        .hover-show-scrollbar:hover::-webkit-scrollbar-thumb {
+          background-color: rgba(0, 0, 0, 0.2);
+        }
+        `
+      }} />
+
       {/* ==================== 1. Desktop Layout (>= md) ==================== */}
       <div
         className="hidden md:block relative w-full"
@@ -38,17 +68,17 @@ export function QuoteSection({ data }: QuoteSectionProps) {
           >
             {Array.isArray(data.title)
               ? data.title.map((part: any, idx: number) => {
-                  if (part.linebreak) return <br key={idx} />;
-                  return (
-                    <span
-                      key={idx}
-                      className={part.bold ? "font-bold" : ""}
-                      style={{ color: part.bold ? "#756F3F" : "inherit" }}
-                    >
-                      {part.text}
-                    </span>
-                  );
-                })
+                if (part.linebreak) return <br key={idx} />;
+                return (
+                  <span
+                    key={idx}
+                    className={part.bold ? "font-bold" : ""}
+                    style={{ color: part.bold ? "#756F3F" : "inherit" }}
+                  >
+                    {part.text}
+                  </span>
+                );
+              })
               : data.title}
           </motion.h2>
 
@@ -57,14 +87,21 @@ export function QuoteSection({ data }: QuoteSectionProps) {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="absolute font-anaheim text-[#000000] leading-[1.37] font-medium whitespace-pre-line"
+            className={`absolute font-anaheim text-[#000000] leading-[1.37] font-medium hover-show-scrollbar ${locale === 'en' ? 'whitespace-pre-line' : 'whitespace-normal text-balance break-words'}`}
             style={{
               fontSize: vw(32),
               left: vw(187),
               top: vw(355),
+              width: vw(750),
+              maxHeight: vw(32 * 1.37 * 4),
+              overflowY: "auto",
+              overflowX: "hidden",
+              paddingRight: vw(10), // scrollbar padding
+              overscrollBehavior: "contain",
             }}
+            data-lenis-prevent
           >
-            {data.description}
+            {locale === 'en' ? data.description : data.description.replace(/<br\s*\/?>/gi, ' ').replace(/\n/g, ' ')}
           </motion.p>
 
           {/* 3. CTA Button - No entrance animation, only hover breathing effect */}
@@ -78,7 +115,7 @@ export function QuoteSection({ data }: QuoteSectionProps) {
               className="group/btn cursor-pointer block"
             >
               <motion.div
-                whileHover={{ 
+                whileHover={{
                   scale: [1, 1.05, 1],
                   transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
                 }}
@@ -158,7 +195,7 @@ export function QuoteSection({ data }: QuoteSectionProps) {
             <motion.div
               initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
               whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-              animate={{ 
+              animate={{
                 y: [0, -15, 0]
               }}
               transition={{
@@ -228,7 +265,7 @@ export function QuoteSection({ data }: QuoteSectionProps) {
           <motion.div
             initial={{ opacity: 0, rotate: -30, scale: 0.5 }}
             whileInView={{ opacity: 1, rotate: 0, scale: 1 }}
-            animate={{ 
+            animate={{
               y: [0, -10, 0]
             }}
             transition={{
@@ -254,17 +291,17 @@ export function QuoteSection({ data }: QuoteSectionProps) {
         >
           {Array.isArray(data.title)
             ? data.title.map((part: any, idx: number) => {
-                if (part.linebreak && idx > 0) return <br key={idx} />;
-                return (
-                  <span
-                    key={idx}
-                    className={part.bold ? "font-bold" : ""}
-                    style={{ color: part.bold ? "#756F3F" : "inherit" }}
-                  >
-                    {part.text}
-                  </span>
-                );
-              })
+              if (part.linebreak && idx > 0) return <br key={idx} />;
+              return (
+                <span
+                  key={idx}
+                  className={part.bold ? "font-bold" : ""}
+                  style={{ color: part.bold ? "#756F3F" : "inherit" }}
+                >
+                  {part.text}
+                </span>
+              );
+            })
             : data.title}
         </motion.h2>
 
@@ -273,9 +310,16 @@ export function QuoteSection({ data }: QuoteSectionProps) {
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="font-anaheim text-lg text-black/80 font-medium text-center leading-relaxed mb-10 max-w-[90%]"
+          className={`font-anaheim text-lg text-black/80 font-medium text-center leading-relaxed mb-10 max-w-[90%] hover-show-scrollbar ${locale === 'en' ? 'whitespace-pre-line' : 'whitespace-normal text-balance break-words'}`}
+          style={{
+            maxHeight: "calc(1.125rem * 1.625 * 4)", // 4 lines using text-lg and leading-relaxed
+            overflowY: "auto",
+            overflowX: "hidden",
+            paddingRight: "8px",
+            overscrollBehavior: "contain",
+          }}
         >
-          {data.description}
+          {locale === 'en' ? data.description : data.description.replace(/<br\s*\/?>/gi, ' ').replace(/\n/g, ' ')}
         </motion.p>
 
         {/* Mobile CTA - No entrance animation, only breathing effect */}

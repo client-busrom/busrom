@@ -278,9 +278,21 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
     const galleryImageConfig = galleryImages[idx];
     let rightImg = null;
     if (galleryImageConfig?.sourceType === 'application' && galleryImageConfig.application) {
-      const targetAppId = String(galleryImageConfig.application);
-      const app = applications.find((a: any) => String(a.id) === targetAppId);
-      if (app) rightImg = getRandomAppImage(app);
+      const appOrId = galleryImageConfig.application;
+      if (typeof appOrId === 'object' && appOrId !== null) {
+        // 已经被 hydration 替换成完整 app 对象，直接取图
+        rightImg = resolveMedia(getRandomAppImage(appOrId));
+      } else {
+        const targetAppId = String(appOrId);
+        // 优先从 mediaData 取（resolveAllMedia 已做好 appId -> image 的映射）
+        if (mediaData[targetAppId]) {
+          rightImg = resolveMedia(mediaData[targetAppId]);
+        } else {
+          // 降级：从 applications 数组里找
+          const app = applications.find((a: any) => String(a.id) === targetAppId);
+          if (app) rightImg = resolveMedia(getRandomAppImage(app));
+        }
+      }
     } else {
       rightImg = resolveMedia(galleryImageConfig?.image);
     }
@@ -420,7 +432,13 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
         if (node.type === 'custom-image-gallery' && node.data?.images) {
           slideImages = node.data.images.map((imgConfig: any) => {
             if (imgConfig.sourceType === 'application' && imgConfig.application) {
-              const app = applications.find((a: any) => String(a.id) === String(imgConfig.application));
+              const appOrId = imgConfig.application;
+              if (typeof appOrId === 'object' && appOrId !== null) {
+                return resolveMedia(getRandomAppImage(appOrId));
+              }
+              const appId = String(appOrId);
+              if (mediaData[appId]) return resolveMedia(mediaData[appId]);
+              const app = applications.find((a: any) => String(a.id) === appId);
               return app ? resolveMedia(getRandomAppImage(app)) : null;
             }
             return resolveMedia(imgConfig.image);

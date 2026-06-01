@@ -12,12 +12,18 @@ interface BrandTrustSectionProps {
   data: BrandTrust;
 }
 
+import { useParams } from "next/navigation";
+
 export function BrandTrustSection({ data }: BrandTrustSectionProps) {
+  const params = useParams();
+  const locale = params?.locale as string || "en";
+
   if (!data) return null;
 
   const renderTitle = (titleStr: string, isMobile = false) => {
     if (!titleStr) return null;
-    const parts = titleStr.split(/(<strong>.*?<\/strong>)/gi);
+    const processedTitle = locale === 'en' ? titleStr : titleStr.replace(/<br\s*\/?>/gi, ' ').replace(/\n/g, ' ');
+    const parts = processedTitle.split(/(<strong>.*?<\/strong>)/gi);
     return parts.map((part, index) => {
       if (
         part.toLowerCase().startsWith("<strong>") &&
@@ -171,9 +177,9 @@ export function BrandTrustSection({ data }: BrandTrustSectionProps) {
             style={{ paddingTop: vw(32.1) }}
           >
             <motion.h2
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
-              className="font-limelight text-[#000000] leading-[1.1] z-0 whitespace-pre-line"
+              className={`font-limelight text-[#000000] leading-[1.1] z-0 ${locale === 'en' ? 'whitespace-pre-line' : 'whitespace-normal text-balance break-words'}`}
               style={{
                 fontSize: vw(72),
                 width: vw(869.4),
@@ -243,7 +249,7 @@ export function BrandTrustSection({ data }: BrandTrustSectionProps) {
                 />
 
                 <p
-                  className="font-josefin-sans text-[#4b4512] leading-[1.5] whitespace-pre-line relative z-10"
+                  className={`font-josefin-sans text-[#4b4512] leading-[1.5] ${locale === 'en' ? 'whitespace-pre-line' : 'whitespace-normal text-balance break-words'} relative z-10`}
                   style={{ 
                     fontSize: vw(24),
                     width: vw(588.9),
@@ -251,7 +257,7 @@ export function BrandTrustSection({ data }: BrandTrustSectionProps) {
                     padding: `${vw(30)} ${vw(20)} ${vw(30)} ${vw(60)}` 
                   }}
                 >
-                  {data.content}
+                  {locale === 'en' ? data.content : data.content.replace(/<br\s*\/?>/gi, ' ').replace(/\n/g, ' ')}
                 </p>
               </div>
             </div>
@@ -268,7 +274,7 @@ export function BrandTrustSection({ data }: BrandTrustSectionProps) {
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="font-limelight text-[#000000] text-4xl leading-tight mb-10 text-center whitespace-pre-line"
+          className={`font-limelight text-[#000000] text-4xl leading-tight mb-10 text-center ${locale === 'en' ? 'whitespace-pre-line' : 'whitespace-normal text-balance break-words'}`}
         >
           {renderTitle(data.title, true)}
         </motion.h2>
@@ -309,8 +315,8 @@ export function BrandTrustSection({ data }: BrandTrustSectionProps) {
           whileInView={{ opacity: 1, y: 0 }}
           className="w-full bg-white/50 backdrop-blur-md rounded-[32px] p-8 mt-4 border border-white/20 shadow-lg"
         >
-          <p className="font-josefin-sans text-[#4b4512] text-lg leading-relaxed whitespace-pre-line text-center">
-            {data.content}
+          <p className={`font-josefin-sans text-[#4b4512] text-lg leading-relaxed text-center ${locale === 'en' ? 'whitespace-pre-line' : 'whitespace-normal text-balance break-words'}`}>
+            {locale === 'en' ? data.content : data.content.replace(/<br\s*\/?>/gi, ' ').replace(/\n/g, ' ')}
           </p>
         </motion.div>
       </div>

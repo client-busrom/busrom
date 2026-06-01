@@ -47,8 +47,12 @@ const NavButton = ({
   );
 };
 
+import { useParams } from "next/navigation";
+
 export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionProps) {
   const [isAppleOS, setIsAppleOS] = useState(false);
+  const params = useParams();
+  const locale = params?.locale as string || "en";
 
   useEffect(() => {
     const userAgent = window.navigator.userAgent.toLowerCase();
@@ -83,7 +87,10 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
     if (!node) return null;
     if (node.root) return renderRichText(node.root);
     if (node.children) return node.children.map((child: any, idx: number) => <React.Fragment key={idx}>{renderRichText(child)}</React.Fragment>);
-    if (node.type === "linebreak") return <br />;
+    
+    // 如果是非英文，忽略后端的强制换行（用空格替代，防止单词粘连）
+    if (node.type === "linebreak") return locale === "en" ? <br /> : " ";
+    
     if (node.type === "text") {
       if ((node.format & 16) === 16) return null;
       const isBold = (node.format & 1) === 1;
@@ -140,7 +147,7 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
                 <div className="absolute inset-0 pointer-events-none">
                   <svg className="w-full h-full"><rect x="1" y="1" width="calc(100% - 2px)" height="calc(100% - 2px)" rx={vw(35)} ry={vw(35)} fill="none" stroke="#E9D89E" strokeWidth="2" strokeDasharray="8 8" strokeLinecap="round" /></svg>
                 </div>
-                <p className="font-katibeh text-[#965200] whitespace-pre-line relative z-10 w-full" style={{ fontSize: vw(38), lineHeight: 1.15 }}>
+                <p className={`font-katibeh text-[#965200] relative z-10 w-full ${locale === 'en' ? 'whitespace-pre-line' : 'whitespace-normal text-balance break-words'}`} style={{ fontSize: vw(38), lineHeight: 1.15 }}>
                   <span style={{ display: 'block', transform: fontOffset }}>{renderRichText(content)}</span>
                 </p>
               </motion.div>
@@ -159,7 +166,7 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
                 {items.map((item: any, idx: number) => (
                   <div key={idx} className="flex-shrink-0 w-full h-full flex items-end" style={{ padding: `${vw(157)} ${vw(60)} ${vw(58)} ${vw(60)}` }}>
                     <div className="flex w-full h-full items-end" style={{ gap: vw(20) }}>
-                      <div className="flex flex-col justify-between h-full shrink-0" style={{ width: "auto" }}>
+                      <div className="flex flex-col justify-between h-full shrink-0" style={{ width: "auto", maxWidth: vw(550) }}>
                         <div className="bg-[#5a5319] flex items-center shadow-lg" style={{ borderRadius: vw(60), padding: vw(38), width: "fit-content", maxWidth: vw(550) }}>
                           <p className="font-josefin-sans text-white opacity-90 whitespace-pre-line" style={{ fontSize: vw(32), lineHeight: 1.4 }}>{item.description}</p>
                         </div>
@@ -168,10 +175,10 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
 
                       <div className="flex flex-1 h-full justify-end" style={{ gap: vw(20) }}>
                         <div className="overflow-hidden shadow-xl shrink-0" style={{ width: vw(425), height: "100%", borderRadius: vw(60) }}>
-                          {item.leftImage && <OptimizedImage image={item.leftImage} alt="Solution Detail" className="w-full h-full object-cover" size="large" />}
+                          {item.leftImage && <OptimizedImage image={item.leftImage} alt="Solution Detail" className="w-full h-full object-cover" size="medium" />}
                         </div>
                         <div className="overflow-hidden shadow-xl shrink-0" style={{ width: vw(425), height: "100%", borderRadius: vw(60) }}>
-                          {item.rightImage && <OptimizedImage image={item.rightImage} alt="Application Case" className="w-full h-full object-cover" size="large" />}
+                          {item.rightImage && <OptimizedImage image={item.rightImage} alt="Application Case" className="w-full h-full object-cover" size="medium" />}
                         </div>
                       </div>
                     </div>
@@ -232,10 +239,10 @@ export function ExclusiveSolutionsSection({ data }: ExclusiveSolutionsSectionPro
                 <div key={idx} className="flex-shrink-0 w-full flex flex-col gap-5">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="aspect-[4/5] rounded-[20px] overflow-hidden shadow-lg">
-                      {item.leftImage && <OptimizedImage image={item.leftImage} alt="Detail 1" size="large" className="w-full h-full object-cover" />}
+                      {item.leftImage && <OptimizedImage image={item.leftImage} alt="Detail 1" size="medium" className="w-full h-full object-cover" />}
                     </div>
                     <div className="aspect-[4/5] rounded-[20px] overflow-hidden shadow-lg">
-                      {item.rightImage && <OptimizedImage image={item.rightImage} alt="Detail 2" size="large" className="w-full h-full object-cover" />}
+                      {item.rightImage && <OptimizedImage image={item.rightImage} alt="Detail 2" size="medium" className="w-full h-full object-cover" />}
                     </div>
                   </div>
                   <div className="flex flex-col gap-3">

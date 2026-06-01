@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { SelectionGuide } from "@/types/product-overview";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useParams } from "next/navigation";
 
 const DESIGN_WIDTH = 1920;
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
@@ -14,6 +15,8 @@ interface SelectionGuideSectionProps {
 }
 
 export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
+  const params = useParams();
+  const locale = params?.locale as string || "en";
   const [activeIndex, setActiveIndex] = useState(0);
   const slides = data.slides;
 
@@ -233,12 +236,12 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                     }}
                   >
                     <p
-                      className="font-josefin-sans text-white whitespace-pre-line"
+                      className={`font-josefin-sans text-white ${locale === 'en' ? 'whitespace-pre-line' : 'whitespace-normal break-words'}`}
                       style={{
                         fontSize: vw(24),
                         lineHeight: 1.28
                       }}
-                      dangerouslySetInnerHTML={{ __html: currentSlide.content2 }}
+                      dangerouslySetInnerHTML={{ __html: locale === 'en' ? currentSlide.content2 : currentSlide.content2.replace(/<br\s*\/?>/gi, ' ').replace(/\n/g, ' ') }}
                     />
                   </div>
                 </motion.div>
@@ -291,12 +294,12 @@ export function SelectionGuideSection({ data }: SelectionGuideSectionProps) {
                     }}
                   >
                     <p
-                      className="font-josefin-sans text-white whitespace-pre-line"
+                      className={`font-josefin-sans text-white ${locale === 'en' ? 'whitespace-pre-line' : 'whitespace-normal break-words'}`}
                       style={{
                         fontSize: vw(24),
                         lineHeight: 1.28
                       }}
-                      dangerouslySetInnerHTML={{ __html: currentSlide.content1 }}
+                      dangerouslySetInnerHTML={{ __html: locale === 'en' ? currentSlide.content1 : currentSlide.content1.replace(/<br\s*\/?>/gi, ' ').replace(/\n/g, ' ') }}
                     />
                   </div>
                 </motion.div>
