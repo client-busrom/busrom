@@ -33,7 +33,7 @@ export const IconSearchGrid: React.FC<IconSearchGridProps> = ({ onSelect, select
       setIcons(result.icons)
       setTotal(result.total)
     } catch (error) {
-      console.error('Search failed:', error)
+      console.warn('Search failed:', error)
     } finally {
       setIsLoading(false)
     }

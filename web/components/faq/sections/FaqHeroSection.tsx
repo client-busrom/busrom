@@ -453,8 +453,8 @@ export function FaqHeroSection({ data, locale }: FaqHeroSectionProps) {
         )}
         {data.text[0] && (
           <motion.div
-            className="absolute"
-            style={{ left: vw(410), top: vw(757), width: 'auto' }}
+            className="absolute w-full z-50"
+            style={{ top: vw(757) }}
             animate={{ y: [0, vw(-15) as any, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           >

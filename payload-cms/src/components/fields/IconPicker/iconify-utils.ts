@@ -46,18 +46,33 @@ export async function searchIcons(
     params.set('prefix', prefix)
   }
 
-  try {
-    const res = await fetch(`https://api.iconify.design/search?${params}`)
-    if (!res.ok) throw new Error(`API error: ${res.status}`)
-    const data = await res.json()
-    return {
-      icons: data.icons || [],
-      total: data.total || 0,
+  const qs = params.toString()
+  const hosts = ['api.iconify.design', 'api.simplesvg.com', 'api.unisvg.com']
+
+  for (const host of hosts) {
+    try {
+      const controller = new AbortController()
+      // 5 seconds timeout per host
+      const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+      const res = await fetch(`https://${host}/search?${qs}`, {
+        signal: controller.signal,
+      })
+      clearTimeout(timeoutId)
+
+      if (!res.ok) throw new Error(`API error: ${res.status}`)
+      const data = await res.json()
+      return {
+        icons: data.icons || [],
+        total: data.total || 0,
+      }
+    } catch (error) {
+      console.warn(`Iconify search failed for ${host}:`, error instanceof Error ? error.message : error)
+      // Continue to the next host
     }
-  } catch (error) {
-    console.error('Iconify search failed:', error)
-    return { icons: [], total: 0 }
   }
+
+  return { icons: [], total: 0 }
 }
 
 /**

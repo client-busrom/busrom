@@ -56,7 +56,7 @@ class PassiveRipple {
     } catch (err) {
       this.canvas.style.display = "none";
     }
-    
+
     this.animate = this.animate.bind(this);
   }
 
@@ -80,7 +80,7 @@ class PassiveRipple {
 
   private animate(time: number) {
     this.animationId = requestAnimationFrame(this.animate);
-    
+
     // Performance optimization: Limit to ~30 FPS
     if (time - this.lastTime < 32) return;
     this.lastTime = time;
@@ -116,11 +116,11 @@ class PassiveRipple {
         let sy = Math.floor(y + (dy >> 3));
         if (sx < 0) sx = 0; if (sx >= w) sx = w - 1;
         if (sy < 0) sy = 0; if (sy >= h) sy = h - 1;
-        
+
         const srcIdx = (sy * w + sx) << 2;
         const dstIdx = (yw + (x - 1)) << 2;
         const shade = Math.min(255, Math.max(0, 128 + (dx >> 1))) / 128;
-        
+
         rData[dstIdx] = Math.min(255, tData[srcIdx] * shade);
         rData[dstIdx + 1] = Math.min(255, tData[srcIdx + 1] * shade);
         rData[dstIdx + 2] = Math.min(255, tData[srcIdx + 2] * shade);
@@ -162,7 +162,7 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
     const canvas = canvasRef.current;
     const img = new Image();
     img.crossOrigin = "anonymous";
-    
+
     const initRipple = () => {
       const rect = canvas.parentElement?.getBoundingClientRect();
       if (rect && rect.width > 0) {
@@ -197,7 +197,7 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
 
     img.onload = initRipple;
     img.src = data.image.url;
-    
+
     if (img.complete) initRipple();
 
     return () => {
@@ -229,10 +229,10 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
       {/* Top Banner Image with Floating Decorators */}
       <div
         className="absolute left-0 overflow-hidden"
-        style={{ 
-          width: isMobile ? "100%" : vw(1737), 
-          height: isMobile ? mvw(400) : vw(268), 
-          top: isMobile ? 0 : vw(80) 
+        style={{
+          width: isMobile ? "100%" : vw(1737),
+          height: isMobile ? mvw(400) : vw(268),
+          top: isMobile ? 0 : vw(80)
         }}
       >
         <OptimizedImage
@@ -327,8 +327,8 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
         </div>
 
         {/* Right: Exit Navigation Buttons */}
-        <div 
-          className={`flex flex-col ${isMobile ? "w-full items-start" : "flex-1 items-end"}`} 
+        <div
+          className={`flex flex-col ${isMobile ? "w-full items-start" : "flex-1 items-end"}`}
           style={{ gap: isMobile ? mvw(24) : vw(36) }}
         >
           {exitLinks.map((link: any, i: number) => (
@@ -355,7 +355,7 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
               }}
             >
               <span
-                className="text-white group-hover:text-[#756f3f] font-semibold transition-colors duration-300"
+                className="text-white group-hover:text-[#756f3f] font-semibold transition-colors duration-300 text-balance text-center leading-tight"
                 style={{
                   fontSize: isMobile ? mvw(20) : vw(32),
                   fontFamily: "var(--font-anaheim), sans-serif",
