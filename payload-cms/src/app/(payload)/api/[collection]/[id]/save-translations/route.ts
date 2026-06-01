@@ -48,14 +48,7 @@ export async function POST(
         // 清理数据
         const cleanedData: any = {}
         
-        // 1. 将现有的所有数据作为底板（解决嵌套数组/Blocks的必填字段校验问题，比如 Form Fields 里的 Label）
-        Object.entries(currentDoc).forEach(([key, value]) => {
-          if (systemFields.includes(key)) return
-          if (key.startsWith('_') && key !== '_id') return
-          cleanedData[key] = value
-        })
-
-        // 2. 覆盖翻译过来的数据
+        // 覆盖翻译过来的数据 (只更新传入的字段，不合并 currentDoc，避免引发 hasMany 关联字段重复插入的 Bug)
         Object.entries(data as any).forEach(([key, value]) => {
           if (systemFields.includes(key)) return
           if (key.startsWith('_') && key !== '_id') return
