@@ -167,10 +167,11 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
       <div className="relative z-10">
       {/* Hero Section */}
       <ContactHeroSection
-        buttonText={data.hero.buttonText || "Get A Quote"}
-        buttonLink={data.hero.buttonLink || "#contact-form"}
+        buttonText={data.hero.buttonText || undefined}
+        buttonLink={data.hero.buttonLink || undefined}
         heroImage={data.hero.heroImage}
-        subtitle={data.hero.subtitle || undefined}
+        subtitle={data.hero.subtitle || "Tell Us Your Business Needs.\nBusrom Will Give You Custom Production Strategies\nTo Match."}
+        locale={locale}
       />
 
       {/* Narrative & Product Series Wrapper with Background Blobs */}

@@ -298,7 +298,7 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className={`text-[#363105] ${isMobile ? "whitespace-normal" : "whitespace-pre-line"}`}
+            className={`text-[#363105] ${locale !== "en" || isMobile ? "whitespace-normal" : "whitespace-pre-line"}`}
             style={{
               fontSize: isMobile ? mvw(32) : vw(64),
               lineHeight: 1.2,
@@ -314,7 +314,7 @@ export function FaqQuoteSection({ data, locale }: FaqQuoteSectionProps) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className={`text-[#797133] font-medium ${isMobile ? "whitespace-normal" : "whitespace-pre-line"}`}
+            className={`text-[#797133] font-medium ${locale !== "en" || isMobile ? "whitespace-normal" : "whitespace-pre-line"}`}
             style={{
               fontSize: isMobile ? mvw(18) : vw(24),
               lineHeight: 1.6,

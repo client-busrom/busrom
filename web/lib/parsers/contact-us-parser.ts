@@ -247,9 +247,21 @@ export function parseContactUsData(content: any, mediaData: Record<string, Media
   const heroData = {
     heroImage: extractImageAfterMarker(children, "business-hero-image", mediaData),
     subtitle: extractTextAfterMarker(children, "business-hero-subtitle"),
-    buttonText: extractTextAfterMarker(children, "business-hero-button-text"),
-    buttonLink: extractTextAfterMarker(children, "business-hero-button-link"),
+    buttonText: null as string | null,
+    buttonLink: null as string | null,
   };
+
+  const heroCtaNodes = extractAfterMarker(children, "business-hero-image-cta");
+  const heroBtnNode = heroCtaNodes.find((n: any) => n.type === "ctaButton");
+  if (heroBtnNode?.data) {
+    heroData.buttonText = heroBtnNode.data.text || heroBtnNode.data.buttonText || null;
+    heroData.buttonLink = heroBtnNode.data.link || heroBtnNode.data.url || heroBtnNode.data.href || null;
+  }
+  
+  if (!heroData.buttonText && !heroData.buttonLink) {
+    heroData.buttonText = extractTextAfterMarker(children, "business-hero-button-text");
+    heroData.buttonLink = extractTextAfterMarker(children, "business-hero-button-link");
+  }
 
   // 2. Support Narrative
   const supportNarrativeItems = extractAfterMarker(children, "support-narrative-item");
