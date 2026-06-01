@@ -48,26 +48,26 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
   const subtitleText = getNodesText(data.subtitle) || "NAVIGATION";
 
   return (
-    <section 
-      className="relative w-full overflow-hidden" 
-      style={{ 
+    <section
+      className="relative w-full overflow-hidden"
+      style={{
         height: isMobile ? "auto" : vw(1080),
         paddingBottom: isMobile ? mvw(80) : vw(80)
       }}
     >
       {/* Header Area */}
-      <div 
-        className="relative w-full" 
-        style={{ 
-          marginTop: isMobile ? mvw(60) : vw(80), 
-          marginBottom: isMobile ? mvw(40) : vw(60) 
+      <div
+        className="relative w-full"
+        style={{
+          marginTop: isMobile ? mvw(60) : vw(80),
+          marginBottom: isMobile ? mvw(40) : vw(60)
         }}
       >
-        <div 
-          className="absolute pointer-events-none select-none right-0 top-0" 
-          style={{ 
+        <div
+          className="absolute pointer-events-none select-none right-0 top-0"
+          style={{
             marginTop: isMobile ? mvw(-30) : vw(-110),
-            opacity: isMobile ? 0.2 : 1 
+            opacity: isMobile ? 0.2 : 1
           }}
         >
           <HollowText
@@ -94,7 +94,7 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
               fontFamily: "var(--font-anaheim), sans-serif",
               fontSize: isMobile ? mvw(32) : vw(96),
               color: "#756f3f",
-              width: isMobile ? "100%" : vw(1009),
+              width: "100%",
               letterSpacing: isMobile ? mvw(0.5) : vw(1.92),
               lineHeight: 1.2,
             }}
@@ -105,14 +105,14 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
       </div>
 
       {/* Main Content Area */}
-      <div 
-        className={`relative w-full ${isMobile ? "flex flex-col gap-10 px-12" : "flex justify-center"}`} 
+      <div
+        className={`relative w-full ${isMobile ? "flex flex-col gap-10 px-12" : "flex justify-center"}`}
         style={{ marginTop: isMobile ? mvw(30) : vw(20) }}
       >
         {isMobile ? (
           /* Mobile: Simple Vertical Stack */
           data.items?.map((item: any, index: number) => (
-            <div 
+            <div
               key={item.id || index}
               className="flex flex-col"
               onClick={() => {
@@ -132,7 +132,7 @@ export function FaqGuideSection({ data, locale, onNavigate }: FaqGuideSectionPro
                   alt={item.title}
                   className="w-full h-full object-cover"
                 />
-                
+
                 {/* Dark Overlay with Description Text */}
                 <div className="absolute inset-0 bg-black/45 flex items-center justify-center p-4 text-center">
                   <p

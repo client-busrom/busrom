@@ -202,7 +202,6 @@ export const FormConfigs: CollectionConfig = {
             zh: '显示标签',
           },
           localized: true,
-          required: true,
         },
         {
           name: 'placeholder',
@@ -259,7 +258,6 @@ export const FormConfigs: CollectionConfig = {
               type: 'textarea',
               label: 'Label',
               localized: true,
-              required: true,
             },
             {
               name: 'hasCustomInput',

@@ -69,6 +69,16 @@ const BANNER_1_ASSETS = {
 // ========================================
 
 const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
+  // 辅助函数：将一段文字尽量从中间拆分成两行
+  const wrapTextOnce = (text?: string) => {
+    if (!text) return "";
+    if (text.includes("\n")) return text;
+    const words = text.trim().split(/\s+/);
+    if (words.length < 2) return text;
+    const mid = Math.ceil(words.length / 2);
+    return words.slice(0, mid).join(" ") + "\n" + words.slice(mid).join(" ");
+  };
+
   const formatText = (text: string) => text || "";
 
   // 图片渲染辅助函数：支持精确裁剪 & 高清规格获取
@@ -300,7 +310,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
                           lineHeight: "1.4",
                         }}
                       >
-                        {feature}
+                        {wrapTextOnce(feature)}
                       </p>
                     </div>
                   </MagneticWrapper>

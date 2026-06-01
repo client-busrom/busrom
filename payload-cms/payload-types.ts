@@ -1258,7 +1258,7 @@ export interface FormConfig {
          * Internal field name (e.g., "email", "company")
          */
         fieldName: string;
-        label: string;
+        label?: string | null;
         placeholder?: string | null;
         fieldType:
           | 'text'
@@ -1275,7 +1275,7 @@ export interface FormConfig {
         options?:
           | {
               value: string;
-              label: string;
+              label?: string | null;
               /**
                * If checked, selecting this option will show a text input for the user to type manually.
                */

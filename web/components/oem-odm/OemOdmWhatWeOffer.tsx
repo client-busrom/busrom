@@ -24,14 +24,14 @@ const CARD_WIDTH = 280;
 
 // 第一个卡片 (左侧 - 上圆下方)
 const CARD1_LEFT = 237;
-const CARD1_TEXT_LEFT = 339;
+const CARD1_TEXT_LEFT = 189; // 339 - 150
 const CARD1_TEXT_TOP = 294; // 844 - 550 = 294
 const CARD1_DESC_LEFT = 336;
 const CARD1_DESC_TOP = 488; // 294 + 194
 
 // 第二个卡片 (中间 - 上方下圆) - 文字初始在底部，悬停时上移
 const CARD2_LEFT = 529;
-const CARD2_TEXT_LEFT = 636;
+const CARD2_TEXT_LEFT = 486; // 636 - 150
 const CARD2_TEXT_TOP_DEFAULT = 615; // 底部位置
 const CARD2_TEXT_TOP_HOVER = 421; // 悬停时上移位置
 const CARD2_DESC_LEFT = 631;
@@ -39,7 +39,7 @@ const CARD2_DESC_TOP = 615;
 
 // 第三个卡片 (右侧 - 上圆下方)
 const CARD3_LEFT = 820;
-const CARD3_TEXT_LEFT = 936;
+const CARD3_TEXT_LEFT = 786; // 936 - 150
 const CARD3_TEXT_TOP = 294;
 const CARD3_DESC_LEFT = 929;
 const CARD3_DESC_TOP = 488;
@@ -334,7 +334,7 @@ export function OemOdmWhatWeOffer({
             style={{
               left: rpx(CARD1_TEXT_LEFT),
               top: rpx(CARD1_TEXT_TOP),
-              width: rpx(218), // 312 * 0.7
+              width: rpx(368), // 218 + 150
               zIndex: 20,
             }}
           >
@@ -357,7 +357,7 @@ export function OemOdmWhatWeOffer({
                 fontSize: rpx(34), // 48 * 0.7
                 lineHeight: rpx(38), // 54 * 0.7
                 marginTop: rpx(13), // 18 * 0.7
-                width: rpx(224), // 320 * 0.7
+                width: rpx(374), // 224 + 150
                 maxHeight: rpx(76),
                 scrollbarWidth: "thin",
                 scrollbarColor: "rgba(255,255,255,0.3) transparent",
@@ -440,7 +440,7 @@ export function OemOdmWhatWeOffer({
             className="absolute pointer-events-none"
             style={{
               left: rpx(CARD2_TEXT_LEFT),
-              width: rpx(218),
+              width: rpx(368), // 218 + 150
               zIndex: 20,
             }}
             animate={{
@@ -470,7 +470,7 @@ export function OemOdmWhatWeOffer({
                 fontSize: rpx(34),
                 lineHeight: rpx(38),
                 marginTop: rpx(0),
-                width: rpx(224),
+                width: rpx(374), // 224 + 150
                 maxHeight: rpx(76),
                 scrollbarWidth: "thin",
                 scrollbarColor: "rgba(255,255,255,0.3) transparent",
@@ -554,7 +554,7 @@ export function OemOdmWhatWeOffer({
             style={{
               left: rpx(CARD3_TEXT_LEFT),
               top: rpx(CARD3_TEXT_TOP),
-              width: rpx(218), // 311 * 0.7
+              width: rpx(368), // 218 + 150
               zIndex: 20,
             }}
           >
@@ -577,7 +577,7 @@ export function OemOdmWhatWeOffer({
                 fontSize: rpx(34), // 48 * 0.7
                 lineHeight: rpx(38), // 54 * 0.7
                 marginTop: rpx(13), // 18 * 0.7
-                width: rpx(224), // 320 * 0.7
+                width: rpx(374), // 224 + 150
                 maxHeight: rpx(76),
                 scrollbarWidth: "thin",
                 scrollbarColor: "rgba(255,255,255,0.3) transparent",

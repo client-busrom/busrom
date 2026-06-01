@@ -298,24 +298,25 @@ export function FraudContactFormSection({
     }
   };
 
-  const renderSegment = (segment: RichTextSegment, idx: number) => {
+  const renderSegment = (segment: RichTextSegment, idx: number, isEnglish: boolean = true) => {
+    const textContent = isEnglish ? segment.text : segment.text.replace(/<br\s*\/?>/gi, ' ').replace(/\n/g, '');
     if (segment.bold) {
       return (
         <span
           key={idx}
-          className="text-[#D6CD88] font-josefin-sans not-italic text-[1.12em] tracking-tight inline whitespace-pre-line"
+          className="text-[#D6CD88] font-josefin-sans not-italic text-[1.12em] tracking-tight inline"
           style={{
             WebkitTextStroke: `1.5px #514a0d`,
             paintOrder: "stroke fill",
           }}
         >
-          {segment.text}
+          {textContent}
         </span>
       );
     }
     return (
-      <span key={idx} className="font-josefin-sans inline whitespace-pre-line">
-        {segment.text}
+      <span key={idx} className="font-josefin-sans inline">
+        {textContent}
       </span>
     );
   };
@@ -454,7 +455,7 @@ export function FraudContactFormSection({
             className="w-full font-medium text-[#463B17] placeholder:text-[#9E9474] outline-none resize-none [&:-webkit-autofill]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:hover]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:hover]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:focus]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:focus]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill:active]:[-webkit-text-fill-color:#463B17!important] [&:-webkit-autofill:active]:[box-shadow:0_0_0px_1000px_#D4CBAF_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s]"
             spellCheck="false"
             style={{
-              height: isMobile ? "120px" : "200px",
+              height: isMobile ? "120px" : "140px",
               backgroundColor: "#D4CBAF",
               borderRadius: "10px",
               fontSize: "16px",
@@ -606,7 +607,8 @@ export function FraudContactFormSection({
           }}
         >
           <div
-            className="font-josefin-sans font-black text-[#1D1A02] leading-[1.4] whitespace-pre-line block"
+            className={`font-josefin-sans font-black text-[#1D1A02] leading-[1.4] block ${locale === 'en' ? 'whitespace-pre-line' : 'whitespace-normal text-balance break-words'
+              }`}
             style={{ fontSize: isMobile ? "24px" : "32px", width: "100%" }}
           >
             {(() => {
@@ -617,12 +619,14 @@ export function FraudContactFormSection({
                   s.text.trim().toLowerCase() !== "contact-form-title",
               );
 
+              const isEnglish = locale === 'en';
+
               if (
                 displaySegments.length > 0 &&
                 displaySegments.some((s) => s.text && s.text.trim())
               ) {
                 return displaySegments.map((segment, i) =>
-                  renderSegment(segment, i),
+                  renderSegment(segment, i, isEnglish),
                 );
               }
               return (
@@ -638,7 +642,8 @@ export function FraudContactFormSection({
           </div>
 
           <div
-            className="font-josefin-sans font-medium text-[#1D1A02] leading-[1.6] whitespace-pre-line block opacity-80"
+            className={`font-josefin-sans font-medium text-[#1D1A02] leading-[1.6] block opacity-80 ${locale === 'en' ? 'whitespace-pre-line' : 'whitespace-normal text-balance break-words'
+              }`}
             style={{ fontSize: isMobile ? "15px" : "18px", width: "100%", marginTop: isMobile ? "12px" : "16px" }}
           >
             {(() => {
@@ -648,11 +653,13 @@ export function FraudContactFormSection({
                   s.text.trim().toLowerCase() !== "contact-form-description",
               );
 
+              const isEnglish = locale === 'en';
+
               if (
                 displaySegments.length > 0 &&
                 displaySegments.some((s) => s.text && s.text.trim())
               ) {
-                return displaySegments.map((segment, i) => renderSegment(segment, i));
+                return displaySegments.map((segment, i) => renderSegment(segment, i, isEnglish));
               }
               return null;
             })()}
@@ -661,7 +668,7 @@ export function FraudContactFormSection({
           <div
             className={cn(
               "overflow-hidden rounded-[35px] border-4 border-[#F6F4ED]",
-              isMobile ? "mt-5" : "mt-auto",
+              isMobile ? "mt-5" : "mt-16",
             )}
             style={{
               width: isMobile ? "100%" : "343px",

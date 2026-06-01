@@ -168,7 +168,7 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
                       }}
                     />
                     <div
-                      className="relative font-bold text-[#FDF6C2] whitespace-nowrap"
+                      className="relative font-bold font-montserrat text-[#FDF6C2] whitespace-nowrap"
                       style={{
                         fontSize: rpx(30),
                         paddingTop: rpx(16),

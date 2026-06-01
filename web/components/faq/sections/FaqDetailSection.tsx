@@ -127,9 +127,10 @@ const FaqItemRow = React.memo(({
               className="flex"
               style={{
                 paddingTop: vw(10),
-                paddingBottom: vw(10),
+                paddingBottom: vw(20),
                 paddingLeft: vw(62),
                 paddingRight: vw(260),
+                minHeight: faq.image ? vw(200) : "auto",
               }}
             >
               <div

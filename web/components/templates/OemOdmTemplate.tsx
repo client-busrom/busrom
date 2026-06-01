@@ -223,6 +223,7 @@ export function OemOdmTemplate({ locale, data }: OemOdmTemplateProps) {
         description={contactForm.description || undefined}
         image={contactForm.image}
         formConfig={contactForm.formConfig}
+        locale={locale as any}
       />
 
       <OemOdmApplications

@@ -126,8 +126,8 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
         <div className="absolute z-40 flex flex-col items-start pointer-events-auto" style={{ left: rpx(BANNER_7_ASSETS.content.titleGroup.x), top: rpx(BANNER_7_ASSETS.content.titleGroup.y), maxWidth: rpx(680) }}>
            <div className="flex flex-col w-full">
             {titleParts.map((line, idx) => (
-              <h1 key={idx} className="font-paytone-one leading-[1.1]" style={{ fontSize: rpx(96), color: idx === 0 ? "#FFFFFF" : "#433E12", WebkitTextStroke: `${rpx(4)} #000000`, paintOrder: "stroke fill" }}>
-                <AutoScaleText minScale={0.5}>
+              <h1 key={idx} className="font-paytone-one leading-[1.1] w-full" style={{ fontSize: rpx(96), color: idx === 0 ? "#FFFFFF" : "#433E12", WebkitTextStroke: `${rpx(4)} #000000`, paintOrder: "stroke fill" }}>
+                <AutoScaleText minScale={0.3}>
                   {idx === 0 ? line.split(/(-)/g).map((part, pIdx) => <span key={pIdx} className={part === '-' ? 'text-[#433E12]' : ''}>{part}</span>) : line}
                 </AutoScaleText>
               </h1>
@@ -137,14 +137,26 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
 
         <div className="absolute z-40 flex flex-col pointer-events-auto" style={{ left: rpx(BANNER_7_ASSETS.content.featureGroup.x), top: rpx(BANNER_7_ASSETS.content.featureGroup.y), gap: rpx(24) }}>
           {data.features.slice(2, 5).map((feature, idx) => (
-            <div key={idx} className="flex items-center justify-center bg-[#E9E2A0] rounded-full" style={{ width: rpx(455), height: rpx(100) }}>
-              <span className="font-montserrat font-bold text-black" style={{ fontSize: rpx(30), letterSpacing: '0.06em' }}>{feature}</span>
+            <div key={idx} className="flex items-center justify-center bg-[#E9E2A0] rounded-[50%] px-12" style={{ width: rpx(455), height: rpx(111) }}>
+              <div className="w-full text-center">
+                <AutoScaleText minScale={0.3}>
+                  <span className="font-montserrat font-bold text-black" style={{ fontSize: rpx(30), letterSpacing: '0.06em' }}>{feature}</span>
+                </AutoScaleText>
+              </div>
             </div>
           ))}
         </div>
 
-        <div className="absolute z-40 pointer-events-auto" style={{ left: rpx(BANNER_7_ASSETS.content.subtitle.x), top: rpx(BANNER_7_ASSETS.content.subtitle.y) }}>
-          <h2 className="font-paytone-one text-white leading-tight" style={{ fontSize: rpx(60) }}>{subtitleParts.map((line, i) => <div key={i}>{line}</div>)}</h2>
+        <div className="absolute z-40 pointer-events-auto" style={{ left: rpx(BANNER_7_ASSETS.content.subtitle.x), top: rpx(BANNER_7_ASSETS.content.subtitle.y), maxWidth: rpx(800) }}>
+          <h2 className="font-paytone-one text-white leading-tight w-full" style={{ fontSize: rpx(60) }}>
+            {subtitleParts.map((line, i) => (
+              <div key={i} className="w-full">
+                <AutoScaleText minScale={0.3}>
+                  {line}
+                </AutoScaleText>
+              </div>
+            ))}
+          </h2>
         </div>
       </div>
 

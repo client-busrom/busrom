@@ -92,9 +92,27 @@ export function OemOdmContactForm({
 
   const privacyText = getLocalizedString(configData?.privacyConsentText);
   const submitText =
-    getLocalizedString(
-      configData?.submitButtonText || configData?.data?.submitButtonText,
-    ) || "";
+    getLocalizedString(configData?.submitButtonText) ||
+    (locale === "zh" ? "提交" : "Submit");
+  const submittingText =
+    getLocalizedString(configData?.submittingText) ||
+    (locale === "zh" ? "提交中..." : "Submitting...");
+
+  const UPLOAD_TEXT: Record<string, string> = {
+    zh: "上传文件",
+    es: "Subir archivo",
+    pt: "Carregar arquivo",
+    en: "Upload File"
+  };
+
+  const getFilesSelectedText = (count: number, loc: string) => {
+    if (loc === "zh") return `已选择 ${count} 个文件`;
+    if (loc === "es") return `${count} archivo(s) seleccionado(s)`;
+    if (loc === "pt") return `${count} arquivo(s) selecionado(s)`;
+    return `${count} file(s) selected`;
+  };
+
+  const uploadLabel = UPLOAD_TEXT[locale] || UPLOAD_TEXT.en;
 
   // 表单数据状态
   const [formData, setFormData] = useState<Record<string, any>>({});
@@ -763,8 +781,8 @@ export function OemOdmContactForm({
                       </svg>
                       <span>
                         {uploadedFiles.length > 0
-                          ? `${uploadedFiles.length} file(s) selected`
-                          : "Upload File"}
+                          ? getFilesSelectedText(uploadedFiles.length, locale)
+                          : uploadLabel}
                       </span>
                       <input
                         ref={fileInputRef}
