@@ -390,6 +390,7 @@ export function StoryBrandSustainabilitySection({
                     <StaggeredBalls />
                   </div>
                   <p
+                    data-lenis-prevent="true"
                     className={`font-josefin-sans font-bold text-[#FF7B04] tracking-wide ${locale === "en" ? "whitespace-pre-line" : "overflow-y-auto"}`}
                     style={{
                       fontSize: vw(24),
@@ -397,7 +398,8 @@ export function StoryBrandSustainabilitySection({
                       maxHeight: locale === "en" ? "none" : "5.0em", // 4 lines * 1.2 + 0.2
                       scrollbarWidth: locale === "en" ? "none" : "thin",
                       scrollbarColor: "rgba(255,123,4,0.3) transparent",
-                      paddingRight: locale === "en" ? 0 : "4px"
+                      paddingRight: locale === "en" ? 0 : "4px",
+                      overscrollBehavior: "contain"
                     }}
                   >
                     {data.content1}

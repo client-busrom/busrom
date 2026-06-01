@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useParams } from "next/navigation"
 
 const DESIGN_WIDTH = 1920
 const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
@@ -14,19 +15,19 @@ const DEFAULT_ICONS = [
 ]
 
 const SubtractIcon = ({ fill = "currentColor", stroke = "none", className = "" }: { fill?: string, stroke?: string, className?: string }) => (
-  <svg 
-    width="43" 
-    height="44" 
-    viewBox="0 0 43 44" 
-    fill="none" 
+  <svg
+    width="43"
+    height="44"
+    viewBox="0 0 43 44"
+    fill="none"
     className={className}
     xmlns="http://www.w3.org/2000/svg"
   >
-    <path 
-      fillRule="evenodd" 
-      clipRule="evenodd" 
-      d="M0 22.02637c0.00004-12.16476 9.6259-22.02637 21.5-22.02637 11.8741 0 21.49996 9.86161 21.5 22.02637 0 12.16479-9.62587 22.02637-21.5 22.02636-11.87412 0-21.5-9.86158-21.5-22.02636z m14.43262 5.0039l7.09765-7.22656 7.09668 7.22656 1.23926-1.23144-8.33594-8.59473-8.33691 8.59571 1.23926 1.23046z" 
-      fill={fill} 
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M0 22.02637c0.00004-12.16476 9.6259-22.02637 21.5-22.02637 11.8741 0 21.49996 9.86161 21.5 22.02637 0 12.16479-9.62587 22.02637-21.5 22.02636-11.87412 0-21.5-9.86158-21.5-22.02636z m14.43262 5.0039l7.09765-7.22656 7.09668 7.22656 1.23926-1.23144-8.33594-8.59473-8.33691 8.59571 1.23926 1.23046z"
+      fill={fill}
       stroke={stroke}
       strokeWidth={stroke !== "none" ? 1 : 0}
     />
@@ -52,12 +53,34 @@ interface SupportCommitmentSectionProps {
   marketing?: GroupData
 }
 
-function renderNodes(nodes: any[], context: "title" | "subtitle" = "title", isDesktop: boolean = true): React.ReactNode {
+const Sphere = () => (
+  <motion.span
+    animate={{ y: [0, -15, 0] }}
+    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+    className="inline-block rounded-full align-middle mx-[0.2em]"
+    style={{ width: vw(59), height: vw(59), backgroundColor: "#5b5313", marginTop: vw(-5) }}
+  />
+)
+
+function renderTitleString(text: any, locale: string) {
+  if (typeof text !== 'string') return text;
+  const processed = locale === "en" ? text : text.replace(/\n/g, ' ');
+  const parts = processed.split(/ {2,}/);
+  if (parts.length === 1) return processed;
+  return parts.map((part, i) => (
+    <React.Fragment key={i}>
+      {part}
+      {i < parts.length - 1 && <Sphere key={`sphere-${i}`} />}
+    </React.Fragment>
+  ));
+}
+
+function renderNodes(nodes: any[], context: "title" | "subtitle" = "title", isDesktop: boolean = true, locale: string = "en"): React.ReactNode {
   let globalIndex = 0
   const renderRecursive = (nodeList: any[]): React.ReactNode[] => {
     return nodeList.map((node) => {
       globalIndex++
-      if (node.type === "linebreak") return <br key={globalIndex} />
+      if (node.type === "linebreak") return locale === "en" ? <br key={globalIndex} /> : <span key={globalIndex}> </span>
       if (node.children) return <React.Fragment key={globalIndex}>{renderRecursive(node.children)}</React.Fragment>
       if (node.text !== undefined) {
         const isBold = (node.format & 1) !== 0
@@ -86,7 +109,18 @@ function renderNodes(nodes: any[], context: "title" | "subtitle" = "title", isDe
           style.color = "#181818"
           if (isBold) { style.color = "#FF9900"; style.fontWeight = "bold" }
         }
-        return <span key={globalIndex} style={style}>{node.text}</span>
+
+        let content: React.ReactNode = node.text
+        if (context === "title" && typeof node.text === "string" && node.text.match(/ {2,}/)) {
+          const parts = node.text.split(/ {2,}/)
+          content = parts.map((part: any, i: any) => (
+            <React.Fragment key={i}>
+              {part}
+              {i < parts.length - 1 && <Sphere key={`sphere-${i}`} />}
+            </React.Fragment>
+          ))
+        }
+        return <span key={globalIndex} style={style}>{content}</span>
       }
       return null
     })
@@ -95,6 +129,7 @@ function renderNodes(nodes: any[], context: "title" | "subtitle" = "title", isDe
 }
 
 export function SupportCommitmentSection({ title, subtitle, technical, marketing }: SupportCommitmentSectionProps) {
+  const { locale } = useParams() as { locale: string }
   const hasTechnical = !!(technical && technical.items?.length > 0)
   const hasMarketing = !!(marketing && marketing.items?.length > 0)
   const [activeGroup, setActiveGroup] = useState<"technical" | "marketing">(hasTechnical ? "technical" : "marketing")
@@ -151,11 +186,11 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
           {/* Header */}
           <div className="text-center mb-24 w-full">
             <h2 className="font-montserrat text-black mb-8" style={{ lineHeight: 1.5 }}>
-              {Array.isArray(title) ? renderNodes(title, "title", false) : title}
+              {Array.isArray(title) ? renderNodes(title, "title", false, locale) : renderTitleString(title, locale)}
             </h2>
-            <div className="inline-block bg-[#faf5cd] rounded-xl px-5 py-3 border-[1.5px] border-dashed border-[#574F0E]">
-              <p className="font-montserrat text-sm text-[#574F0E] leading-relaxed">
-                {Array.isArray(subtitle) ? renderNodes(subtitle, "subtitle", false) : subtitle}
+            <div className="inline-block bg-[#faf5cd] rounded-xl px-5 py-3 border-[1.5px] border-dashed border-[#574F0E] max-w-[90%] md:max-w-[400px]">
+              <p className="font-montserrat text-sm text-[#574F0E] leading-relaxed text-left" style={{ textWrap: 'balance' }}>
+                {Array.isArray(subtitle) ? renderNodes(subtitle, "subtitle", false, locale) : (locale === "en" || typeof subtitle !== 'string' ? subtitle : subtitle.replace(/\n/g, ' '))}
               </p>
             </div>
           </div>
@@ -164,8 +199,8 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
           <div className="relative w-full max-w-[340px] aspect-square mb-12 mt-8 flex items-center justify-center">
             {/* Center Sphere */}
             <div className="w-[200px] h-[200px] rounded-full flex items-center justify-center text-center p-6 bg-gradient-to-b from-[#756f3f] to-[#dbd076] shadow-xl z-0 overflow-hidden">
-               <AnimatePresence mode="wait">
-                <motion.h3 
+              <AnimatePresence mode="wait">
+                <motion.h3
                   key={activeIndex + activeGroup}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -189,13 +224,13 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
               const isActive = activeIndex === idx
 
               return (
-                <button 
-                  key={idx} 
+                <button
+                  key={idx}
                   onClick={() => setActiveIndex(idx)}
                   className="absolute flex items-center justify-center transition-all duration-500 z-10"
-                  style={{ 
-                    left: `calc(50% + ${x}px)`, 
-                    top: `calc(50% + ${y}px)`, 
+                  style={{
+                    left: `calc(50% + ${x}px)`,
+                    top: `calc(50% + ${y}px)`,
                     width: isActive ? '74px' : '54px',
                     height: isActive ? '58px' : '54px',
                     transform: 'translate(-50%, -50%)',
@@ -215,32 +250,32 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
 
           {/* Description */}
           <div className="w-full text-center px-4 mb-10 min-h-[80px]">
-             <AnimatePresence mode="wait">
-                <motion.p 
-                  key={activeIndex + activeGroup}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="font-montserrat text-[#1c1c1c] text-base leading-relaxed"
-                >
-                  {Array.isArray(currentItem.description) ? renderNodes(currentItem.description) : currentItem.description}
-                </motion.p>
-              </AnimatePresence>
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={activeIndex + activeGroup}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="font-montserrat text-[#1c1c1c] text-base leading-relaxed"
+              >
+                {Array.isArray(currentItem.description) ? renderNodes(currentItem.description, "title", true, locale) : (locale === "en" || typeof currentItem.description !== 'string' ? currentItem.description : currentItem.description.replace(/\n/g, ' '))}
+              </motion.p>
+            </AnimatePresence>
           </div>
 
           {/* Toggle Buttons */}
           <div className="flex gap-4 w-full justify-center">
-            <button 
+            <button
               onClick={() => { setActiveGroup("technical"); setActiveIndex(0); }}
               className={`flex-1 max-w-[150px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "technical" ? "bg-[#262203] text-white shadow-lg" : "bg-[#f2efd8] text-[#262203] border border-[#262203]"}`}
             >
-              Technical
+              {technical?.title || "Technical"}
             </button>
-            <button 
+            <button
               onClick={() => { setActiveGroup("marketing"); setActiveIndex(0); }}
               className={`flex-1 max-w-[150px] py-4 rounded-full font-montserrat font-bold text-xs transition-all ${activeGroup === "marketing" ? "bg-[#262203] text-white shadow-lg" : "bg-[#f2efd8] text-[#262203] border border-[#262203]"}`}
             >
-              Marketing
+              {marketing?.title || "Marketing"}
             </button>
           </div>
         </div>
@@ -252,29 +287,30 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
     <section className="relative w-full bg-[#f2efd8] overflow-hidden" style={{ height: vw(760) }}>
       <div className="relative z-10 w-full h-full max-w-[1920px] mx-auto">
         <div className="absolute" style={{ left: vw(177), top: vw(103), width: vw(533), height: vw(471), zIndex: -1 }}>
-          <motion.div animate={{ y: [0, -15, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="absolute rounded-full" style={{ left: vw(0), top: vw(254), width: vw(59), height: vw(59), backgroundColor: "#5b5313" }} />
           <motion.div animate={{ y: [0, 12, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} className="absolute rounded-full opacity-66" style={{ left: vw(144), top: vw(95), width: vw(59), height: vw(59), background: "linear-gradient(180deg, #dbd076 0%, #756f3f 100%)" }} />
           <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }} className="absolute rounded-full" style={{ left: vw(332), top: vw(412), width: vw(59), height: vw(59), background: "linear-gradient(180deg, #dbd076 0%, #756f3f 100%)" }} />
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} className="absolute rounded-full" style={{ left: vw(474), top: vw(0), width: vw(59), height: vw(59), backgroundColor: "#c8c07f" }} />
         </div>
         <div className="absolute" style={{ left: vw(153), top: vw(220), width: vw(900) }}>
-          <h2 className="font-montserrat text-black whitespace-pre-wrap" style={{ lineHeight: 1.4 }}>
-            {Array.isArray(title) ? renderNodes(title) : title}
+          {locale !== "en" && <div style={{ float: 'right', width: vw(420), height: vw(150), shapeOutside: 'inset(0)' }} />}
+          <h2 className="font-montserrat text-black whitespace-pre-wrap" lang={locale} style={{ lineHeight: 1.4, hyphens: 'auto', WebkitHyphens: 'auto' }}>
+            {Array.isArray(title) ? renderNodes(title, "title", true, locale) : renderTitleString(title, locale)}
           </h2>
         </div>
-        <div className="absolute bg-[#faf5cd]" style={{ 
-          left: vw(660), 
-          top: vw(236), 
-          width: 'auto', 
-          height: 'auto', 
-          borderRadius: vw(20), 
-          padding: `${vw(4)} ${vw(12)}`, 
+        <div className="absolute bg-[#faf5cd]" style={{
+          left: vw(660),
+          top: vw(236),
+          width: 'auto',
+          maxWidth: vw(300),
+          height: 'auto',
+          borderRadius: vw(20),
+          padding: `${vw(12)} ${vw(20)}`,
           zIndex: 1,
           backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='${vwn(20)}' ry='${vwn(20)}' stroke='%23574F0E' stroke-width='${vwn(1.5)}' stroke-dasharray='${vwn(4)}%2c ${vwn(4)}' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
           backgroundSize: '100% 100%',
           backgroundRepeat: 'no-repeat'
         }}>
-          <p className="font-montserrat text-[20px] leading-[1.5]" style={{ fontSize: vw(16) }}>{Array.isArray(subtitle) ? renderNodes(subtitle, "subtitle") : subtitle}</p>
+          <p className="font-montserrat text-[20px] leading-[1.5] text-left" style={{ fontSize: vw(16), textWrap: locale === "en" ? "wrap" : "balance" }}>{Array.isArray(subtitle) ? renderNodes(subtitle, "subtitle", true, locale) : (locale === "en" || typeof subtitle !== 'string' ? subtitle : subtitle.replace(/\n/g, ' '))}</p>
         </div>
         <div className="absolute" style={{ left: vw(1062), top: vw(249), width: vw(700), height: vw(318) }}>
           <div className="absolute" style={{ left: 0, top: 0, width: vw(170), height: vw(350), zIndex: 10 }} onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
@@ -296,42 +332,42 @@ export function SupportCommitmentSection({ title, subtitle, technical, marketing
             <AnimatePresence mode="wait"><motion.div key={activeIndex + activeGroup} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} className="text-center px-6"><h3 className="font-montserrat font-normal text-white" style={{ fontSize: vw(28), lineHeight: 1.36 }}>{currentItem.title?.split(/\\n|\n/).map((line, i, arr) => <React.Fragment key={i}>{line}{i < arr.length - 1 && <br />}</React.Fragment>)}</h3></motion.div></AnimatePresence>
           </div>
           <div className="absolute border border-[#574f0e] flex flex-col justify-center z-[10]" style={{ left: vw(320), top: vw(14), width: vw(378), height: vw(251), borderRadius: vw(125.5), backgroundColor: 'transparent' }}>
-              <div className="relative mx-auto" style={{ width: vw(300), marginLeft: vw(40) }}>
-                <AnimatePresence mode="wait"><React.Fragment key={activeGroup}><motion.h4 initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="font-lemon font-bold text-transparent w-full" style={{ fontSize: vw(32), lineHeight: 1.31, WebkitTextStroke: "0.5px #978e45", position: 'absolute', top: 4, left: 1, zIndex: 0 }}>{groupTitle.split(/\\n|\n/).map((line, i, arr) => <React.Fragment key={i}>{line}{i < arr.length - 1 && <br />}</React.Fragment>)}</motion.h4><motion.h4 initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="font-lemon font-bold text-[#464010] w-full" style={{ fontSize: vw(32), lineHeight: 1.31, textShadow: "0px 1px 1px #978e45", position: 'relative', zIndex: 1 }}>{groupTitle.split(/\\n|\n/).map((line, i, arr) => <React.Fragment key={i}>{line}{i < arr.length - 1 && <br />}</React.Fragment>)}</motion.h4></React.Fragment></AnimatePresence>
+            <div className="relative mx-auto" style={{ width: vw(300), marginLeft: vw(40) }}>
+              <AnimatePresence mode="wait"><React.Fragment key={activeGroup}><motion.h4 initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="font-lemon font-bold text-transparent w-full" style={{ fontSize: vw(32), lineHeight: 1.31, WebkitTextStroke: "0.5px #978e45", position: 'absolute', top: 4, left: 1, zIndex: 0 }}>{groupTitle.split(/\\n|\n/).map((line, i, arr) => <React.Fragment key={i}>{line}{i < arr.length - 1 && <br />}</React.Fragment>)}</motion.h4><motion.h4 initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }} className="font-lemon font-bold text-[#464010] w-full" style={{ fontSize: vw(32), lineHeight: 1.31, textShadow: "0px 1px 1px #978e45", position: 'relative', zIndex: 1 }}>{groupTitle.split(/\\n|\n/).map((line, i, arr) => <React.Fragment key={i}>{line}{i < arr.length - 1 && <br />}</React.Fragment>)}</motion.h4></React.Fragment></AnimatePresence>
+            </div>
+            {hasTechnical && hasMarketing && (
+              <div className="absolute flex flex-col items-center justify-between z-[50]" style={{ right: vw(34), top: vw(60), height: vw(100) }}>
+                <button
+                  onClick={handleToggleGroup}
+                  onMouseEnter={() => setHoverTop(true)}
+                  onMouseLeave={() => setHoverTop(false)}
+                  className="transition-all hover:scale-110 active:scale-95 cursor-pointer relative z-50 pointer-events-auto"
+                  style={{ width: vw(40), height: vw(40) }}
+                >
+                  <SubtractIcon
+                    fill={hoverTop ? "#756f3f" : "#f2efd8"}
+                    stroke={hoverTop ? "none" : "#b9b280"}
+                  />
+                </button>
+                <div className="h-4" />
+                <button
+                  onClick={handleToggleGroup}
+                  onMouseEnter={() => setHoverBottom(true)}
+                  onMouseLeave={() => setHoverBottom(false)}
+                  className="transition-all hover:scale-110 active:scale-95 cursor-pointer relative z-50 pointer-events-auto"
+                  style={{ width: vw(40), height: vw(40) }}
+                >
+                  <SubtractIcon
+                    fill={hoverBottom ? "#756f3f" : "#f2efd8"}
+                    stroke={hoverBottom ? "none" : "#b9b280"}
+                    className="rotate-180"
+                  />
+                </button>
               </div>
-              {hasTechnical && hasMarketing && (
-                  <div className="absolute flex flex-col items-center justify-between z-[50]" style={{ right: vw(34), top: vw(60), height: vw(100) }}>
-                  <button 
-                    onClick={handleToggleGroup} 
-                    onMouseEnter={() => setHoverTop(true)}
-                    onMouseLeave={() => setHoverTop(false)}
-                    className="transition-all hover:scale-110 active:scale-95 cursor-pointer relative z-50 pointer-events-auto" 
-                    style={{ width: vw(40), height: vw(40) }}
-                  >
-                    <SubtractIcon 
-                      fill={hoverTop ? "#756f3f" : "#f2efd8"} 
-                      stroke={hoverTop ? "none" : "#b9b280"}
-                    />
-                  </button>
-                  <div className="h-4" /> 
-                  <button 
-                    onClick={handleToggleGroup} 
-                    onMouseEnter={() => setHoverBottom(true)}
-                    onMouseLeave={() => setHoverBottom(false)}
-                    className="transition-all hover:scale-110 active:scale-95 cursor-pointer relative z-50 pointer-events-auto" 
-                    style={{ width: vw(40), height: vw(40) }}
-                  >
-                    <SubtractIcon 
-                      fill={hoverBottom ? "#756f3f" : "#f2efd8"} 
-                      stroke={hoverBottom ? "none" : "#b9b280"}
-                      className="rotate-180" 
-                    />
-                  </button>
-                </div>
-              )}
-           </div>
-           <div className="absolute" style={{ left: vw(415), top: vw(16), width: vw(218) }}>
-            <p className="font-montserrat text-[#1c1c1c] leading-[1.36]" style={{ fontSize: vw(20) }}>{Array.isArray(currentItem.description) ? renderNodes(currentItem.description) : currentItem.description}</p>
+            )}
+          </div>
+          <div className="absolute" style={{ left: vw(415), top: vw(16), width: vw(218) }}>
+            <p className="font-montserrat text-[#1c1c1c] leading-[1.36]" style={{ fontSize: vw(20) }}>{Array.isArray(currentItem.description) ? renderNodes(currentItem.description, "title", true, locale) : (locale === "en" || typeof currentItem.description !== 'string' ? currentItem.description : currentItem.description.replace(/\n/g, ' '))}</p>
           </div>
         </div>
       </div>
