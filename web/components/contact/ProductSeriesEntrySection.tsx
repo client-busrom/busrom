@@ -436,7 +436,7 @@ export function ProductSeriesEntrySection({
           </span>
           {/* 顶层：黑色填充 */}
           <span
-            className="relative text-black"
+            className="relative text-black z-10"
             style={{
               fontSize: vw(96),
               lineHeight: vw(104),
@@ -444,25 +444,30 @@ export function ProductSeriesEntrySection({
             }}
           >
             <span style={{ display: "block" }}>{(titleLeft || "Which\nProducts").split("\n")[0]}</span>
-            <span style={{ display: "block", paddingLeft: vw(80) }}>{(titleLeft || "Which\nProducts").split("\n")[1]}</span>
+            <span style={{ display: "block", paddingLeft: vw(80) }}>
+              <span className="relative inline-block">
+                {(titleLeft || "Which\nProducts").split("\n")[1]}
+                {/* series 小标签：跟随在第二行文字的右上角 */}
+                {titleLeftSuperscript && (
+                  <span
+                    className="absolute font-josefin-sans font-bold text-black uppercase"
+                    style={{
+                      left: "100%",
+                      top: vw(4),
+                      marginLeft: vw(16),
+                      fontSize: vw(16),
+                      lineHeight: vw(21),
+                    }}
+                  >
+                    {titleLeftSuperscript}
+                  </span>
+                )}
+              </span>
+            </span>
           </span>
         </h2>
       </div>
 
-      {/* series 小标签 */}
-      {titleLeftSuperscript && (
-        <span
-          className="absolute font-josefin-sans font-bold text-black uppercase"
-          style={{
-            left: vw(831),
-            top: vw(108),
-            fontSize: vw(16),
-            lineHeight: vw(21),
-          }}
-        >
-          {titleLeftSuperscript}
-        </span>
-      )}
 
       {/* 斜杠 / */}
       <div

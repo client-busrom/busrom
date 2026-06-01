@@ -110,9 +110,10 @@ interface SupportCardProps {
   index: number
   isActive: boolean
   onHover: () => void
+  locale?: string
 }
 
-function SupportCard({ card, index, isActive, onHover }: SupportCardProps) {
+function SupportCard({ card, index, isActive, onHover, locale = "en" }: SupportCardProps) {
   // 根据icon字符串获取图标组件，否则使用默认顺序
   const Icon = card.icon ? iconMap[card.icon] || defaultIcons[index] : defaultIcons[index]
 
@@ -250,7 +251,8 @@ function SupportCard({ card, index, isActive, onHover }: SupportCardProps) {
 
         {/* 标题 - 下方区域顶部对齐，支持换行 */}
         <div
-          className={`absolute font-anaheim text-black text-center transition-all duration-300 ${isActive ? 'font-bold' : 'font-semibold'}`}
+          data-lenis-prevent="true"
+          className={`absolute font-anaheim text-black text-center transition-all duration-300 hover-show-scrollbar ${isActive ? 'font-bold' : 'font-semibold'}`}
           style={{
             left: "50%",
             top: rpx(176),  // 220 * 0.8
@@ -258,8 +260,42 @@ function SupportCard({ card, index, isActive, onHover }: SupportCardProps) {
             width: rpx(160), // 200 * 0.8
             fontSize: rpx(19), // 24 * 0.8
             lineHeight: rpx(22), // 28 * 0.8
+            ...(locale !== 'en' ? {
+              maxHeight: rpx(66), // 22 * 3
+              overflowY: "auto",
+              overflowX: "hidden",
+              paddingLeft: "10px", // 对称 padding 抵消滚动条宽度
+              paddingRight: "0px", // 为滚动条预留空间，防止遮挡文字
+              overscrollBehavior: "contain",
+            } : {})
           }}
         >
+          {locale !== 'en' && (
+            <style dangerouslySetInnerHTML={{
+              __html: `
+              .hover-show-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: transparent transparent;
+                transition: scrollbar-color 0.3s;
+              }
+              .hover-show-scrollbar:hover {
+                scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+              }
+              .hover-show-scrollbar::-webkit-scrollbar {
+                width: 4px;
+              }
+              .hover-show-scrollbar::-webkit-scrollbar-track {
+                background: transparent;
+              }
+              .hover-show-scrollbar::-webkit-scrollbar-thumb {
+                background: transparent;
+                border-radius: 4px;
+              }
+              .hover-show-scrollbar:hover::-webkit-scrollbar-thumb {
+                background: rgba(0, 0, 0, 0.2);
+              }
+            `}} />
+          )}
           {card.title.split("\n").map((line, i) => (
             <span key={i}>
               {line}
@@ -275,11 +311,13 @@ function SupportCard({ card, index, isActive, onHover }: SupportCardProps) {
 interface SupportNarrativeSectionProps {
   title?: string
   cards?: SupportCardData[]
+  locale?: string
 }
 
 export function SupportNarrativeSection({
   title = "",
   cards = [],
+  locale = "en",
 }: SupportNarrativeSectionProps) {
   // 计算卡片总宽度
   const cardCount = cards.length || 6
@@ -367,9 +405,56 @@ export function SupportNarrativeSection({
                   />
                 </div>
                 {/* 标题 */}
-                <p className={`font-anaheim text-sm text-center text-black leading-tight transition-all duration-300 ${isActive ? 'font-bold' : 'font-semibold'}`}>
-                  {card.title.split("\n").join(" ")}
-                </p>
+                <div
+                  data-lenis-prevent="true"
+                  className={`font-anaheim text-sm text-center text-black transition-all duration-300 hover-show-scrollbar-mobile ${isActive ? 'font-bold' : 'font-semibold'}`}
+                  style={{
+                    lineHeight: "1.25rem", // 20px leading-tight
+                    ...(locale !== 'en' ? {
+                      maxHeight: "3.75rem", // 20px * 3
+                      overflowY: "auto",
+                      overflowX: "hidden",
+                      paddingLeft: "2px", // 对称 padding 抵消滚动条宽度
+                      paddingRight: "2px",
+                      overscrollBehavior: "contain",
+                    } : {})
+                  }}
+                >
+                  {locale !== 'en' && (
+                    <style dangerouslySetInnerHTML={{
+                      __html: `
+                      .hover-show-scrollbar-mobile {
+                        scrollbar-width: thin;
+                        scrollbar-color: transparent transparent;
+                        transition: scrollbar-color 0.3s;
+                      }
+                      .hover-show-scrollbar-mobile:hover,
+                      .hover-show-scrollbar-mobile:active {
+                        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+                      }
+                      .hover-show-scrollbar-mobile::-webkit-scrollbar {
+                        width: 2px;
+                      }
+                      .hover-show-scrollbar-mobile::-webkit-scrollbar-track {
+                        background: transparent;
+                      }
+                      .hover-show-scrollbar-mobile::-webkit-scrollbar-thumb {
+                        background: transparent;
+                        border-radius: 2px;
+                      }
+                      .hover-show-scrollbar-mobile:hover::-webkit-scrollbar-thumb,
+                      .hover-show-scrollbar-mobile:active::-webkit-scrollbar-thumb {
+                        background: rgba(0, 0, 0, 0.2);
+                      }
+                    `}} />
+                  )}
+                  {card.title.split("\n").map((line, i) => (
+                    <span key={i}>
+                      {line}
+                      {i < card.title.split("\n").length - 1 && <br />}
+                    </span>
+                  ))}
+                </div>
               </div>
             )
           })}
@@ -459,6 +544,7 @@ export function SupportNarrativeSection({
                 index={index}
                 isActive={index === activeIndex}
                 onHover={() => handleHover(index)}
+                locale={locale}
               />
             ))}
           </div>

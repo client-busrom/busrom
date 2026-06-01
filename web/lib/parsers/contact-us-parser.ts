@@ -339,24 +339,88 @@ export function parseContactUsData(content: any, mediaData: Record<string, Media
   }
 
   const kvItems: KeyValuesCooperationItem[] = [];
-  const carouselNode = nodesAfterItemMarker.find(n => n.type === "carousel");
   
-  console.log("[Parser] Carousel node found:", !!carouselNode);
+  // Find the list node immediately after the item marker
+  const topListNode = nodesAfterItemMarker.find(n => n.type === "list" && (n.tag === "ol" || n.tag === "ul"));
 
-  if (carouselNode?.data?.slides) {
-    carouselNode.data.slides.forEach((slide: any, index: number) => {
-      const imageId = typeof slide.image === "object" ? slide.image?.id : String(slide.image || "");
-      const primaryImage = (imageId && mediaData[imageId]) ? mediaData[imageId] : null;
-      const secondaryImage = supplementaryImages[index] || null;
+  console.log("[Parser] Top-level list node found:", !!topListNode);
+
+  if (topListNode && topListNode.children) {
+    const listItems = topListNode.children.filter((n: any) => n.type === "listitem");
+    let currentItemIndex = 0;
+
+    for (let i = 0; i < listItems.length; i += 2) {
+      const titleLi = listItems[i];
+      const pointsLi = listItems[i + 1];
+
+      if (!titleLi || !pointsLi) break;
+
+      // Extract Title and Link
+      let title = "";
+      let link = "";
+      const linkNode = titleLi.children?.find((c: any) => c.type === "link");
+      
+      if (linkNode) {
+        title = getNodeTotalText(linkNode);
+        if (linkNode.fields?.linkType === "internal" && linkNode.fields?.doc) {
+          const val = linkNode.fields.doc.value;
+          if (typeof val === "object" && val.slug) {
+            link = `/${val.slug}`;
+          } else if (linkNode.fields.doc.label) {
+            link = `/${linkNode.fields.doc.label}`;
+          }
+        } else {
+          link = linkNode.fields?.url || "";
+        }
+      } else {
+        title = getNodeTotalText(titleLi).trim();
+      }
+
+      // Extract Points from nested list
+      let points: string[] = [];
+      const nestedList = pointsLi.children?.find((c: any) => c.type === "list");
+      if (nestedList && nestedList.children) {
+        points = nestedList.children
+          .filter((li: any) => li.type === "listitem")
+          .map((li: any) => getNodeTotalText(li).trim())
+          .filter(Boolean);
+      } else {
+        // Fallback: maybe they just wrote text directly in the listitem
+        const text = getNodeTotalText(pointsLi).trim();
+        if (text) points = text.split(/[\n|]/).map(t => t.trim()).filter(Boolean);
+      }
+
+      // Extract Images from gallery
+      let primaryImage: MediaObject | null = null;
+      let secondaryImage: MediaObject | null = null;
+
+      const getImgFromGallery = (idx: number): MediaObject | null => {
+        const gItem = galleryNode?.data?.images?.[idx];
+        if (!gItem) return null;
+        
+        let targetId = "";
+        if (gItem.sourceType === "application" && gItem.application) {
+          targetId = typeof gItem.application === "object" ? String(gItem.application.id) : String(gItem.application);
+        } else {
+          targetId = typeof gItem.image === "object" ? String(gItem.image?.id) : String(gItem.image || "");
+        }
+        
+        return mediaData[targetId] || null;
+      };
+
+      primaryImage = getImgFromGallery(currentItemIndex * 2);
+      secondaryImage = getImgFromGallery(currentItemIndex * 2 + 1);
 
       kvItems.push({
-        id: index + 1,
-        title: slide.title || "",
-        link: slide.buttonLink || slide.link || "",
+        id: currentItemIndex + 1,
+        title,
+        link,
         images: [primaryImage, secondaryImage],
-        points: (slide.description || "").split("\n").map((p: string) => p.trim()).filter(Boolean)
+        points
       });
-    });
+
+      currentItemIndex++;
+    }
   }
 
   console.log("[Parser] Final kvItems count:", kvItems.length);
@@ -394,9 +458,21 @@ export function parseContactUsData(content: any, mediaData: Record<string, Media
       }
     }
   }
+  let coopTitle1 = extractTextAfterMarker(children, "cooperation-process-title-line1");
+  let coopTitle2 = extractTextAfterMarker(children, "cooperation-process-title-line2");
+  
+  if (!coopTitle1 && !coopTitle2) {
+    const combinedTitle = extractTextAfterMarker(children, "cooperation-process-title");
+    if (combinedTitle) {
+      const parts = combinedTitle.split("\n");
+      coopTitle1 = parts[0] || "";
+      coopTitle2 = parts[1] || "";
+    }
+  }
+
   const cooperationProcess = {
-    titleLine1: extractTextAfterMarker(children, "cooperation-process-title-line1"),
-    titleLine2: extractTextAfterMarker(children, "cooperation-process-title-line2"),
+    titleLine1: coopTitle1,
+    titleLine2: coopTitle2,
     steps,
     buttonText: extractTextAfterMarker(children, "cooperation-process-connect")
   };

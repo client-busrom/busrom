@@ -93,10 +93,17 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
           if (it.selectionMode === 'auto' && it.productSeries) seriesIds.push(typeof it.productSeries === 'object' ? it.productSeries.id : it.productSeries);
         });
       }
-      // Applications from carousels
+      // Applications from carousels and galleries
       if (node.type === 'applicationCarousel') {
         const ids = node.data?.applicationIds || node.data?.applications || [];
         appIds.push(...ids.map((id: any) => typeof id === 'object' ? id.id : id));
+      }
+      if (node.type === 'custom-image-gallery') {
+        (node.data?.images || []).forEach((img: any) => {
+          if (img.sourceType === 'application' && img.application) {
+            appIds.push(typeof img.application === 'object' ? img.application.id : img.application);
+          }
+        });
       }
       // FAQ categories
       if (node.type === 'faqSelection') {
@@ -284,6 +291,20 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
           node.data.applications = node.data.applications.map((id: any) => {
             const appId = typeof id === 'object' ? id.id : id;
             return appsMap.get(String(appId)) || id;
+          });
+        }
+      }
+
+      // Hydrate Custom Image Gallery applications
+      if (node.type === 'custom-image-gallery') {
+        if (node.data?.images) {
+          node.data.images.forEach((img: any) => {
+            if (img.sourceType === 'application' && img.application) {
+              const appId = typeof img.application === 'object' ? img.application.id : img.application;
+              if (appId && appsMap.has(String(appId))) {
+                img.application = appsMap.get(String(appId));
+              }
+            }
           });
         }
       }

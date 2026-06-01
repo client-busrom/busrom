@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useRef } from "react"
 import Link from "next/link"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
@@ -34,22 +34,28 @@ export function KeyValuesCooperationSection({
   label = "Value",
   items = [],
 }: KeyValuesCooperationSectionProps) {
-  const [activeIndex, setActiveIndex] = useState(0)
-
   // vw 尺寸计算
   const vw = (px: number) => `calc(${px} * min(100vw, 1920px) / 1920)`
 
   // 当前显示的item
+  const [activeIndex, setActiveIndex] = useState(0)
+  const isNavigating = useRef(false)
   const currentItem = items[activeIndex] || null
 
   // 左箭头点击
   const handlePrev = useCallback(() => {
-    setActiveIndex((prev) => (prev > 0 ? prev - 1 : items.length - 1))
+    if (isNavigating.current) return;
+    isNavigating.current = true;
+    setActiveIndex((prev) => (prev > 0 ? prev - 1 : items.length - 1));
+    setTimeout(() => { isNavigating.current = false }, 250);
   }, [items.length])
 
   // 右箭头点击
   const handleNext = useCallback(() => {
-    setActiveIndex((prev) => (prev < items.length - 1 ? prev + 1 : 0))
+    if (isNavigating.current) return;
+    isNavigating.current = true;
+    setActiveIndex((prev) => (prev < items.length - 1 ? prev + 1 : 0));
+    setTimeout(() => { isNavigating.current = false }, 250);
   }, [items.length])
 
   // 移除缩放相关的派生变量
@@ -145,7 +151,7 @@ export function KeyValuesCooperationSection({
               {/* 图片 - 黑色背景 + 85%透明度图片 */}
               {items.map((item, idx) => (
                 <div
-                  key={`img0-${idx}`}
+                  key={`img1-${item.id}-${idx}`}
                   className={`w-full h-full animate-fade-in group/img1 cursor-pointer bg-black ${idx === activeIndex ? "block" : "hidden"}`}
                   style={{
                     clipPath: "url(#middle-crescent-clip)",
@@ -158,7 +164,7 @@ export function KeyValuesCooperationSection({
                           image={item.images[0] as any}
                           alt={item.title}
                           size="medium"
-                          priority={true}
+                          priority={idx === 0}
                           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img1:scale-110"
                           objectPosition={
                             item.images[0]?.cropFocalPoint
@@ -172,7 +178,7 @@ export function KeyValuesCooperationSection({
                         image={item.images[0] as any}
                         alt={item.title}
                         size="medium"
-                        priority={true}
+                        priority={idx === 0}
                         className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img1:scale-110"
                         objectPosition={
                           item.images[0]?.cropFocalPoint
@@ -207,7 +213,7 @@ export function KeyValuesCooperationSection({
               {/* 图片 - 黑色背景 + 85%透明度图片 */}
               {items.map((item, idx) => (
                 <div
-                  key={`img1-${idx}`}
+                  key={`img2-${item.id}-${idx}`}
                   className={`w-full h-full animate-fade-in group/img2 cursor-pointer bg-black ${idx === activeIndex ? "block" : "hidden"}`}
                   style={{
                     clipPath: "url(#right-circle-clip)",
@@ -220,7 +226,7 @@ export function KeyValuesCooperationSection({
                           image={item.images[1] as any}
                           alt={item.title}
                           size="medium"
-                          priority={true}
+                          priority={idx === 0}
                           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img2:scale-110"
                           objectPosition={
                             item.images[1]?.cropFocalPoint
@@ -234,7 +240,7 @@ export function KeyValuesCooperationSection({
                         image={item.images[1] as any}
                         alt={item.title}
                         size="medium"
-                        priority={true}
+                        priority={idx === 0}
                         className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img2:scale-110"
                         objectPosition={
                           item.images[1]?.cropFocalPoint
@@ -401,12 +407,38 @@ export function KeyValuesCooperationSection({
                 paddingRight: vw(122.4), // 153 * 0.8
               }}
             >
+              <style dangerouslySetInnerHTML={{__html: `
+                .hover-show-scrollbar-keyvalue {
+                  scrollbar-width: thin;
+                  scrollbar-color: transparent transparent;
+                  transition: scrollbar-color 0.3s;
+                }
+                .hover-show-scrollbar-keyvalue:hover,
+                .hover-show-scrollbar-keyvalue:active {
+                  scrollbar-color: rgba(117, 111, 63, 0.4) transparent;
+                }
+                .hover-show-scrollbar-keyvalue::-webkit-scrollbar {
+                  width: 4px;
+                }
+                .hover-show-scrollbar-keyvalue::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+                .hover-show-scrollbar-keyvalue::-webkit-scrollbar-thumb {
+                  background: transparent;
+                  border-radius: 4px;
+                }
+                .hover-show-scrollbar-keyvalue:hover::-webkit-scrollbar-thumb,
+                .hover-show-scrollbar-keyvalue:active::-webkit-scrollbar-thumb {
+                  background: rgba(117, 111, 63, 0.4);
+                }
+              `}} />
               {currentItem.points.map((point, index) => (
                 <div
                   key={index}
                   className="flex flex-col bg-brand-cream-light border border-brand-cream-border"
                   style={{
                     flex: 1,
+                    maxWidth: vw(536.5), // 限制最大宽度，防止单项时占满整行
                     minHeight: vw(148), // 185 * 0.8
                     borderRadius: vw(24), // 30 * 0.8
                     padding: `${vw(32)} ${vw(32)}`, // 40 * 0.8
@@ -425,11 +457,17 @@ export function KeyValuesCooperationSection({
                   />
                   {/* 要点文字 */}
                   <p
-                    className="font-acme font-regular text-left text-brand-orange"
+                    className="font-acme font-regular text-left text-brand-orange hover-show-scrollbar-keyvalue"
+                    data-lenis-prevent="true"
                     style={{
                       fontSize: vw(32), // 32 * 0.8
                       lineHeight: vw(44), // 44 * 0.8
                       width: "100%",
+                      maxHeight: vw(88), // 限制最多2行 (44 * 2)
+                      overflowY: "auto",
+                      overflowX: "hidden",
+                      paddingRight: vw(4),
+                      overscrollBehavior: "contain",
                     }}
                   >
                     {point}
@@ -455,7 +493,7 @@ export function KeyValuesCooperationSection({
           {/* 简化版韦恩图视觉 - 两个重叠的圆形 */}
           <div className="relative w-full aspect-[4/3] max-w-[260px] mb-6">
             {items.map((item, idx) => (
-              <React.Fragment key={`mobile-circles-${idx}`}>
+              <React.Fragment key={`mobile-circles-${item.id}-${idx}`}>
                 {/* 左侧圆形图片 */}
                 <div
                   className={`absolute left-0 top-0 w-[140px] h-[140px] rounded-full border-4 border-white shadow-xl z-10 transition-opacity duration-300 ${idx === activeIndex ? "opacity-100" : "opacity-0 pointer-events-none"}`}
@@ -465,7 +503,7 @@ export function KeyValuesCooperationSection({
                       image={item.images[0] as any}
                       alt={item.title}
                       size="medium"
-                      priority={true}
+                      priority={idx === 0}
                       className="w-full h-full object-cover"
                     />
                   )}
@@ -479,7 +517,7 @@ export function KeyValuesCooperationSection({
                       image={item.images[1] as any}
                       alt={item.title}
                       size="medium"
-                      priority={true}
+                      priority={idx === 0}
                       className="w-full h-full object-cover"
                     />
                   )}
@@ -550,12 +588,23 @@ export function KeyValuesCooperationSection({
                 {item.points.map((point, pIdx) => (
                   <div
                     key={pIdx}
-                    className="w-full p-4 bg-brand-cream-light border border-brand-cream-border rounded-[20px] flex flex-col gap-2 shadow-sm"
+                    className="w-full max-w-[340px] p-4 bg-brand-cream-light border border-brand-cream-border rounded-[20px] flex flex-col gap-2 shadow-sm"
                   >
                     <div className="w-8 h-1 bg-brand-secondary rounded-full" />
-                    <p className="font-acme font-semibold text-brand-orange text-base leading-snug">
-                      {point}
-                    </p>
+                    <p 
+                    className="font-acme font-regular text-brand-orange text-lg w-full hover-show-scrollbar-keyvalue"
+                    data-lenis-prevent="true"
+                    style={{
+                      lineHeight: "1.4rem",
+                      maxHeight: "2.8rem", // 限制最多2行
+                      overflowY: "auto",
+                      overflowX: "hidden",
+                      paddingRight: "2px",
+                      overscrollBehavior: "contain",
+                    }}
+                  >
+                    {point}
+                  </p>
                   </div>
                 ))}
               </div>

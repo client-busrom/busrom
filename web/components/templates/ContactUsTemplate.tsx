@@ -249,6 +249,7 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
         <SupportNarrativeSection
           title={data.supportNarrative.title || undefined}
           cards={data.supportNarrative.cards}
+          locale={locale}
         />
 
         {/* Product Series Entry Section */}
@@ -274,6 +275,7 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
           subtitle={data.projectGuide.subtitle || undefined}
           description={data.projectGuide.description || undefined}
           image={data.projectGuide.image}
+          locale={locale}
         />
 
         {/* Key Values Cooperation Section */}

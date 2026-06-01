@@ -90,7 +90,7 @@ const defaultSubtitle: SubtitleSegment[] = [
 
 export function ContactFormSection({
   verticalTitle = "Get A Quote",
-  title = "Warmly Welcome To Send Us Inquiry!",
+  title = "",
   subtitle = defaultSubtitle,
   images = [],
   formConfig,
@@ -111,6 +111,15 @@ export function ContactFormSection({
   const [openCountrySelector, setOpenCountrySelector] = useState(false);
   const countrySelectorRef = useRef<HTMLDivElement>(null);
 
+  const verticalTitleScrollRef1 = useRef<HTMLDivElement>(null);
+  const verticalTitleScrollRef2 = useRef<HTMLDivElement>(null);
+
+  const handleVerticalTitleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (verticalTitleScrollRef2.current) {
+      verticalTitleScrollRef2.current.scrollLeft = e.currentTarget.scrollLeft;
+    }
+  };
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1025);
@@ -128,9 +137,23 @@ export function ContactFormSection({
     };
     document.addEventListener("mousedown", handleClickOutside);
 
+    const titleEl = verticalTitleScrollRef1.current;
+    const handleTitleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        titleEl!.scrollLeft -= e.deltaY;
+      }
+    };
+    if (titleEl) {
+      titleEl.addEventListener("wheel", handleTitleWheel, { passive: false });
+    }
+
     return () => {
       window.removeEventListener("resize", checkMobile);
       document.removeEventListener("mousedown", handleClickOutside);
+      if (titleEl) {
+        titleEl.removeEventListener("wheel", handleTitleWheel);
+      }
     };
   }, []);
 
@@ -289,25 +312,25 @@ export function ContactFormSection({
 
     const containerStyle = mobile
       ? {
-          width: "100%",
-          height: mvw(220),
-          borderRadius: mvw(40),
-          backgroundColor: "#D9D9D9",
-          marginTop: mvw(20),
-          marginBottom: mvw(20),
-          position: "relative" as const,
-          overflow: "hidden" as const,
-        }
+        width: "100%",
+        height: mvw(220),
+        borderRadius: mvw(40),
+        backgroundColor: "#D9D9D9",
+        marginTop: mvw(20),
+        marginBottom: mvw(20),
+        position: "relative" as const,
+        overflow: "hidden" as const,
+      }
       : {
-          left: vw(4),
-          top: vw(420),
-          width: vw(780),
-          height: vw(340),
-          borderRadius: vw(260),
-          backgroundColor: "#D9D9D9",
-          position: "absolute" as const,
-          overflow: "hidden" as const,
-        };
+        left: vw(4),
+        top: vw(420),
+        width: vw(780),
+        height: vw(340),
+        borderRadius: vw(260),
+        backgroundColor: "#D9D9D9",
+        position: "absolute" as const,
+        overflow: "hidden" as const,
+      };
 
     return (
       <div
@@ -414,7 +437,7 @@ export function ContactFormSection({
       [fieldName]: digits ? `+${selectedCountry[2]}${digits}` : "",
     }));
   };
-  
+
   const handleStatusReset = () => {
     if (submitStatus === "error") {
       setSubmitStatus("idle");
@@ -598,8 +621,28 @@ export function ContactFormSection({
           box-shadow: none !important;
         }
         .contact-input-el option {
-          color: #000000 !important;
+          color: #302C06 !important;
           background-color: #FFFFFF !important;
+        }
+        .hover-show-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: transparent transparent;
+          transition: scrollbar-color 0.3s;
+        }
+        .hover-show-scrollbar:hover {
+          scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        }
+        .hover-show-scrollbar::-webkit-scrollbar {
+          width: 4px;
+          background: transparent;
+        }
+        .hover-show-scrollbar::-webkit-scrollbar-thumb {
+          background: transparent;
+          border-radius: 4px;
+          transition: background 0.3s;
+        }
+        .hover-show-scrollbar:hover::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.2);
         }
 
         .contact-submit-btn:hover:not(:disabled) {
@@ -640,14 +683,23 @@ export function ContactFormSection({
         style={
           !isMobile
             ? {
-                left: vw(373),
-                top: vw(70),
-                width: vw(520),
-              }
+              left: vw(373),
+              top: vw(70),
+              width: vw(720),
+            }
             : { maxWidth: "640px" }
         }
       >
-        <div className="relative">
+        <div
+          className={cn("relative", !isMobile && "hover-show-scrollbar")}
+          data-lenis-prevent={!isMobile ? "true" : undefined}
+          style={!isMobile ? {
+            maxHeight: vw(104), // 2 lines
+            overflowY: "auto",
+            overscrollBehavior: "contain",
+            paddingRight: vw(10),
+          } : {}}
+        >
           {/* 标题阴影层 */}
           <h2
             className={cn("font-moul", !isMobile ? "absolute" : "hidden")}
@@ -693,14 +745,20 @@ export function ContactFormSection({
       {/* 副标题 (PC Only) */}
       {!isMobile && (
         <p
-          className="absolute font-moul"
+          className="absolute font-moul hover-show-scrollbar"
+          data-lenis-prevent="true"
           style={{
             left: vw(372),
             top: vw(210),
-            width: vw(520),
+            width: vw(720),
+            maxHeight: vw(160), // 4 lines
+            overflowY: "auto",
+            overscrollBehavior: "contain",
             fontSize: vw(26),
             lineHeight: vw(40),
             color: "#4B3A02",
+            paddingRight: vw(10),
+            margin: 0,
           }}
         >
           {renderSubtitle()}
@@ -717,11 +775,11 @@ export function ContactFormSection({
         style={
           !isMobile
             ? {
-                marginLeft: vw(1188),
-                paddingTop: vw(60),
-                paddingBottom: vw(60), // 底部间距
-                width: vw(486),
-              }
+              marginLeft: vw(1188),
+              paddingTop: vw(60),
+              paddingBottom: vw(60), // 底部间距
+              width: vw(486),
+            }
             : {}
         }
       >
@@ -762,8 +820,8 @@ export function ContactFormSection({
                         openCountrySelector ? "z-20" : "z-0"
                       )}
                       ref={countrySelectorRef}
-                      style={{ 
-                        width: "100%", 
+                      style={{
+                        width: "100%",
                         height: isMobile ? mvw(50) : vw(50),
                         borderRadius: isMobile ? mvw(12) : vw(12)
                       }}
@@ -976,8 +1034,8 @@ export function ContactFormSection({
                     "flex items-stretch bg-[#B4A25F] border border-white/34 overflow-hidden transition-all",
                     openCountrySelector ? "z-20" : "z-0"
                   )}
-                  style={{ 
-                    width: "100%", 
+                  style={{
+                    width: "100%",
                     height: isMobile ? mvw(50) : vw(50),
                     borderRadius: isMobile ? mvw(12) : vw(12)
                   }}
@@ -1180,7 +1238,7 @@ export function ContactFormSection({
                   </svg>
                 )}
               </div>
-              <p 
+              <p
                 className={cn(
                   "text-[12px] md:text-[14px] leading-relaxed text-left whitespace-pre-line select-none transition-opacity duration-300",
                   privacyAccepted ? "text-[#4B3A02] opacity-100" : "text-[#4B3A02] opacity-70"
@@ -1205,7 +1263,7 @@ export function ContactFormSection({
               justifyContent: "center",
             }}
             initial={{ rotate: 0, scale: 1, backgroundColor: "#7B6100", color: "#FFFFFF" }}
-            animate={{ 
+            animate={{
               rotate: [0, -3, 3, -3, 3, 0],
               backgroundColor: submitStatus === "success" ? "#4CAF50" : "#7B6100",
               color: "#FFFFFF"
@@ -1281,50 +1339,70 @@ export function ContactFormSection({
       {/* 竖排文字 (PC Only) */}
       {!isMobile && (
         <>
-          {/* 底层 - 深色文字（完整显示） */}
-          <span
-            className="absolute font-moul whitespace-nowrap"
+          {/* 底层 - 深色文字 */}
+          <div
+            ref={verticalTitleScrollRef1}
+            onScroll={handleVerticalTitleScroll}
+            data-lenis-prevent="true"
+            className="absolute overflow-x-auto overflow-y-hidden no-scrollbar"
             style={{
               left: vw(180),
               top: vw(580),
-              width: vw(80),
-              height: vw(600),
-              fontSize: vw(80),
-              lineHeight: vw(75),
+              width: vw(580),
+              height: vw(100),
               transform: "rotate(-90deg)",
               transformOrigin: "top left",
-              color: "#302C06",
             }}
           >
-            {verticalTitle}
-          </span>
+            <span
+              className="font-moul whitespace-nowrap"
+              style={{
+                fontSize: vw(80),
+                lineHeight: vw(80),
+                color: "#302C06",
+                display: "block",
+                paddingRight: vw(40),
+              }}
+            >
+              {verticalTitle}
+            </span>
+          </div>
           {/* 上层 - 白色文字（只在图片区域显示） */}
           <div
             className="absolute overflow-hidden pointer-events-none"
             style={{
               left: vw(4),
               top: vw(420),
-              width: vw(780),
+              width: vw(760),
               height: vw(340),
               borderRadius: vw(260),
             }}
           >
-            <span
-              className="absolute font-moul whitespace-nowrap"
+            <div
+              ref={verticalTitleScrollRef2}
+              className="absolute overflow-x-hidden overflow-y-hidden no-scrollbar"
               style={{
                 left: vw(176),
                 top: vw(160),
-                width: vw(80),
-                height: vw(600),
-                fontSize: vw(80),
-                lineHeight: vw(75),
+                width: vw(580),
+                height: vw(100),
                 transform: "rotate(-90deg)",
                 transformOrigin: "top left",
-                color: "white",
               }}
             >
-              {verticalTitle}
-            </span>
+              <span
+                className="font-moul whitespace-nowrap"
+                style={{
+                  fontSize: vw(80),
+                  lineHeight: vw(80),
+                  color: "white",
+                  display: "block",
+                  paddingRight: vw(40),
+                }}
+              >
+                {verticalTitle}
+              </span>
+            </div>
           </div>
         </>
       )}

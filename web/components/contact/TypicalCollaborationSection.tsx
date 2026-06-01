@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useParams } from "next/navigation"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 
 // 设计稿基准尺寸
@@ -47,6 +48,9 @@ export function TypicalCollaborationSection({
   sectionTitle = "Typical Collaboration",
   items = [],
 }: TypicalCollaborationSectionProps) {
+  const params = useParams()
+  const locale = (params?.locale as string) || "en"
+
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isChanging, setIsChanging] = useState(false)
 
@@ -259,9 +263,15 @@ export function TypicalCollaborationSection({
             color: "#46403F",
           }}
         >
-          {(currentItem?.title || sectionTitle).split("\n").map((line, i) => (
-            <span key={i} style={{ display: "block" }}>{line}</span>
-          ))}
+          {locale === "en" ? (
+            (currentItem?.title || sectionTitle).split("\n").map((line, i) => (
+              <span key={i} style={{ display: "block" }}>{line}</span>
+            ))
+          ) : (
+            <span style={{ display: "block", whiteSpace: "normal", wordBreak: "break-word" }}>
+              {(currentItem?.title || sectionTitle).replace(/\n/g, " ")}
+            </span>
+          )}
         </h2>
 
         {/* 箭头控制 */}
@@ -284,9 +294,15 @@ export function TypicalCollaborationSection({
           {/* 上部分：标题和指示器（带按钮） */}
           <div className="relative min-h-[90px] flex flex-col items-center justify-center">
             <h2 className="font-kaushan-script text-[36px] leading-tight text-brand-secondary text-center">
-              {(currentItem?.title || sectionTitle).split("\n").map((line, i) => (
-                <span key={i} className="block">{line}</span>
-              ))}
+              {locale === "en" ? (
+                (currentItem?.title || sectionTitle).split("\n").map((line, i) => (
+                  <span key={i} className="block">{line}</span>
+                ))
+              ) : (
+                <span className="block whitespace-normal break-words">
+                  {(currentItem?.title || sectionTitle).replace(/\n/g, " ")}
+                </span>
+              )}
             </h2>
             <div className="mt-2 relative h-[45px] w-full">
               {renderIndicators(true)}
