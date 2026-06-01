@@ -36,6 +36,30 @@ const cardConfigs = [
 // Animation constants
 const AUTO_PLAY_INTERVAL = 5000
 
+
+const formatBalancedText = (text?: string) => {
+  if (!text || text.length < 25) return text;
+  
+  const mid = Math.floor(text.length / 2);
+  const leftSpace = text.lastIndexOf(' ', mid);
+  const rightSpace = text.indexOf(' ', mid + 1);
+  
+  let breakIndex = -1;
+  if (leftSpace === -1) breakIndex = rightSpace;
+  else if (rightSpace === -1) breakIndex = leftSpace;
+  else breakIndex = (mid - leftSpace) <= (rightSpace - mid) ? leftSpace : rightSpace;
+
+  if (breakIndex === -1) return text;
+
+  return (
+    <React.Fragment>
+      {text.slice(0, breakIndex)}
+      <br />
+      {text.slice(breakIndex + 1)}
+    </React.Fragment>
+  );
+};
+
 export const SupportQuoteSection: React.FC<SupportQuoteSectionProps> = ({
   slides = [],
   autoplay = true,
@@ -148,11 +172,12 @@ export const SupportQuoteSection: React.FC<SupportQuoteSectionProps> = ({
 
         {/* LEFT DYNAMIC CONTENT - MOVED DOWN */}
         <div 
-          className="absolute flex flex-col" 
+          className="absolute flex flex-col pointer-events-auto" 
           style={{ 
             left: '8vw',
             top: vw(220), 
             zIndex: 10,
+            maxWidth: vw(900)
           }}
         >
           {/* TITLE */}
@@ -164,7 +189,7 @@ export const SupportQuoteSection: React.FC<SupportQuoteSectionProps> = ({
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20, position: "absolute", top: 0, left: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="font-bold leading-[1.2] text-[#574F0E] font-josefin-sans whitespace-nowrap"
+                className="font-bold leading-[1.2] text-[#574F0E] font-josefin-sans"
                 style={{ 
                   fontSize: vw(36), 
                 }}
@@ -213,39 +238,45 @@ export const SupportQuoteSection: React.FC<SupportQuoteSectionProps> = ({
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.4 }}
               >
-                <Link 
+                  <Link 
                   href={currentSlide.buttonLink || "/"} 
                   target={currentSlide.openInNewTab ? "_blank" : "_self"}
-                  className="group flex items-center relative w-fit"
-                  style={{ minWidth: vw(544), height: vw(125) }}
+                  className="group flex items-center bg-transparent transition-all duration-300 hover:bg-[#756F3F] border border-[#756F3F] w-fit"
+                  style={{ 
+                    minHeight: vw(125),
+                    borderRadius: vw(62.5),
+                    paddingLeft: vw(57.6),
+                    paddingRight: vw(6),
+                    paddingTop: vw(6),
+                    paddingBottom: vw(6),
+                    maxWidth: "100%"
+                  }}
                 >
-                  <div 
-                    className="absolute inset-0 bg-transparent rounded-full flex items-center px-[3vw] transition-all duration-300 group-hover:bg-[#756F3F] border border-[#756F3F]"
-                    style={{ 
-                      borderRadius: vw(62.5),
-                      paddingRight: vw(120)
-                    }}
-                  >
+                  <div className="shrink min-w-0" style={{ marginRight: vw(20) }}>
                     <span 
                       className="font-medium text-[#565020] transition-colors duration-300 group-hover:text-[#F4F2ED]"
                       style={{ 
                         fontSize: vw(40),
                         fontFamily: "Josefin Sans, sans-serif",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        lineHeight: 1.2,
                       }}
                     >
-                      {currentSlide.buttonText}
+                      {formatBalancedText(currentSlide.buttonText)}
                     </span>
-                    
-                    <div 
-                      className="absolute right-0 flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1"
-                      style={{ 
-                        width: vw(112), 
-                        height: vw(112),
-                        marginRight: vw(6)
-                      }}
-                    >
-                      <RightArrowCircle />
-                    </div>
+                  </div>
+                  
+                  <div 
+                    className="flex-shrink-0 flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1 ml-auto"
+                    style={{ 
+                      width: vw(112), 
+                      height: vw(112),
+                    }}
+                  >
+                    <RightArrowCircle />
                   </div>
                 </Link>
               </motion.div>
@@ -419,29 +450,38 @@ export const SupportQuoteSection: React.FC<SupportQuoteSectionProps> = ({
             <Link 
               href={currentSlide.buttonLink || "/"} 
               target={currentSlide.openInNewTab ? "_blank" : "_self"}
-              className="relative block w-fit"
-              style={{ minWidth: vwm(240), height: vwm(62) }}
+              className="group flex items-center bg-transparent border border-[#756F3F] w-fit"
+              style={{ 
+                minHeight: vwm(62),
+                borderRadius: vwm(31),
+                paddingLeft: vwm(16),
+                paddingRight: vwm(4),
+                paddingTop: vwm(4),
+                paddingBottom: vwm(4),
+                maxWidth: "100%"
+              }}
             >
-              <div 
-                className="absolute inset-0 bg-transparent rounded-full flex items-center px-4 border border-[#756F3F]"
-                style={{ 
-                  borderRadius: vwm(31),
-                  paddingRight: vwm(55)
-                }}
-              >
-                <span 
-                  className="font-medium text-[#565020] font-josefin-sans"
-                  style={{ fontSize: vwm(18)}}
-                >
-                  {currentSlide.buttonText}
-                </span>
+                <div className="shrink min-w-0" style={{ marginRight: vwm(10) }}>
+                  <span 
+                    className="font-medium text-[#565020] font-josefin-sans"
+                    style={{ 
+                      fontSize: vwm(18),
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {formatBalancedText(currentSlide.buttonText)}
+                  </span>
+                </div>
                 <div 
-                  className="absolute right-1"
+                  className="flex-shrink-0 flex items-center justify-center ml-auto"
                   style={{ width: vwm(40), height: vwm(40) }}
                 >
                   <RightArrowCircle />
                 </div>
-              </div>
             </Link>
           )}
         </div>

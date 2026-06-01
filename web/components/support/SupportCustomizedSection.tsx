@@ -24,15 +24,16 @@ interface SupportCustomizedSectionProps {
     title: string
     items: CustomizedItem[]
   }
+  locale?: string
 }
 
-function renderNodes(nodes: any[], vw: (px: number) => string, context: "title" | "subtitle" = "title", isDesktop: boolean = true): React.ReactNode {
+function renderNodes(nodes: any[], vw: (px: number) => string, context: "title" | "subtitle" = "title", isDesktop: boolean = true, locale: string = "en"): React.ReactNode {
   let globalIndex = 0
   const renderRecursive = (nodeList: any[]): React.ReactNode[] => {
     if (!nodeList || !Array.isArray(nodeList)) return []
     return nodeList.map((node) => {
       globalIndex++
-      if (node.type === "linebreak") return <br key={globalIndex} />
+      if (node.type === "linebreak") return locale === "en" ? <br key={globalIndex} /> : <span key={globalIndex}> </span>
       if (node.children) return <Fragment key={globalIndex}>{renderRecursive(node.children)}</Fragment>
       if (node.text !== undefined) {
         const isBoldValue = (node.format & 1) !== 0
@@ -133,7 +134,7 @@ function CollapsedTitleCard({ title, vw }: { title: string, vw: (px: number) => 
   )
 }
 
-export function SupportCustomizedSection({ title, product, manufacturing }: SupportCustomizedSectionProps) {
+export function SupportCustomizedSection({ title, product, manufacturing, locale = "en" }: SupportCustomizedSectionProps) {
   const [activeGroup, setActiveGroup] = useState<"product" | "manufacturing">("product")
   const activeData = activeGroup === "product" ? product : manufacturing
   const items = activeData.items
@@ -235,7 +236,7 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
           {/* Header */}
           <div className="flex flex-col gap-6 mb-12 text-center">
             <h2 className="font-montserrat text-black" style={{ lineHeight: 1.5 }}>
-              {Array.isArray(title) ? renderNodes(title, vw, "title", false) : title}
+              {Array.isArray(title) ? renderNodes(title, vw, "title", false, locale) : title}
             </h2>
             <div className="flex gap-4 w-full justify-center">
               <button
@@ -305,8 +306,8 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
       <motion.div animate={{ y: [0, -60, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} className="absolute rounded-full blur-[10px]" style={{ left: vw(1319), top: vw(258), width: vw(281), height: vw(281), backgroundColor: "#fff5a8c7", zIndex: 1 }} />
 
       <div className="relative z-10 mx-auto w-full px-[10vw]">
-        <h2 className="text-center font-montserrat text-[#000000] mx-auto whitespace-pre-wrap" style={{ fontSize: vw(48), lineHeight: 1.6, width: vw(1500) }}>
-          {renderNodes(title, vw, "title", true)}
+        <h2 className={`text-center font-montserrat text-[#000000] mx-auto ${locale === "en" ? "whitespace-pre-wrap" : "whitespace-normal"}`} style={{ fontSize: vw(48), lineHeight: 1.6, width: vw(1500) }}>
+          {renderNodes(title, vw, "title", true, locale)}
         </h2>
       </div>
 
@@ -372,7 +373,7 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
                 <div className="absolute z-10 w-full h-full pointer-events-none">
                   <motion.h4
                     layout="position"
-                    className="absolute font-montserrat font-bold overflow-hidden whitespace-pre-wrap flex"
+                    className="absolute font-montserrat font-bold whitespace-pre-wrap flex overflow-x-hidden custom-scroll"
                     style={{
                       fontSize: isActive ? vw(29) : vw(24),
                       color: isActive ? "#000000" : "transparent",
@@ -381,7 +382,11 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
                       width: isActive ? vw(400) : vw(221),
                       justifyContent: isActive ? "flex-start" : "center",
                       textAlign: "left",
-                      lineHeight: isActive ? 1.28 : vw(46)
+                      lineHeight: isActive ? 1.28 : vw(46),
+                      maxHeight: isActive ? `calc(${vw(29)} * 1.28 * 3)` : "none",
+                      overflowY: isActive ? "auto" : "hidden",
+                      pointerEvents: isActive ? "auto" : "none",
+                      overscrollBehavior: "contain"
                     }}
                   >
                     {!isActive ? (
@@ -389,7 +394,24 @@ export function SupportCustomizedSection({ title, product, manufacturing }: Supp
                     ) : item.title}
                   </motion.h4>
                   {isActive && item.description && (
-                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="absolute font-montserrat font-light text-[#000000] whitespace-pre-wrap" style={{ fontSize: vw(20), lineHeight: 1.4, left: vw(243), top: vw(225), width: vw(450) }}>{item.description}</motion.p>
+                    <motion.p 
+                      initial={{ opacity: 0 }} 
+                      animate={{ opacity: 1 }} 
+                      transition={{ duration: 0.3 }} 
+                      className="absolute font-montserrat font-light text-[#000000] whitespace-pre-wrap overflow-x-hidden overflow-y-auto custom-scroll" 
+                      style={{ 
+                        fontSize: vw(20), 
+                        lineHeight: 1.4, 
+                        left: vw(243), 
+                        top: vw(225), 
+                        width: vw(450),
+                        maxHeight: `calc(${vw(20)} * 1.4 * 7)`,
+                        pointerEvents: "auto",
+                        overscrollBehavior: "contain"
+                      }}
+                    >
+                      {item.description}
+                    </motion.p>
                   )}
                 </div>
               </motion.div>

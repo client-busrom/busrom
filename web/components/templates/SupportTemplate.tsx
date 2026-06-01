@@ -43,6 +43,7 @@ export function SupportTemplate({ locale, data, resolvedApplications }: SupportT
           title={data.customized.mainTitle}
           product={data.customized.product}
           manufacturing={data.customized.manufacturing}
+          locale={locale}
         />
       )}
 
