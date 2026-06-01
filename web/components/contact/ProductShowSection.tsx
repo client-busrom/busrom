@@ -39,6 +39,7 @@ export interface ProductShowItem {
   showButton?: boolean
   showHighlights?: boolean
   highlightsCount?: number
+  openInNewTab?: boolean
   productAttributes?: any
 }
 
@@ -100,13 +101,15 @@ const CARD_POSITIONS = [
 export function ProductShowSection({
   backgroundImage,
   items = [],
-  buttonText = "view more",
+  buttonText = "",
 }: ProductShowSectionProps) {
   const [isMobile, setIsMobile] = useState(false)
   // 当前选中的索引
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
   const [dynamicFontSize, setDynamicFontSize] = useState(30)
+  
+  console.log("[ProductShowSection] items:", items, "selectedIndex:", selectedIndex)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -213,13 +216,13 @@ export function ProductShowSection({
       if (!item.showHighlights || !item.productAttributes?.highlights) {
         return { ...item, displayHighlights: [] }
       }
-      
+
       const shuffled = [...item.productAttributes.highlights]
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
       }
-      
+
       return {
         ...item,
         displayHighlights: shuffled.slice(0, item.highlightsCount || 3)
@@ -319,8 +322,8 @@ export function ProductShowSection({
           <div className="embla__container flex">
             {items.map((item, idx) => (
               <div key={idx} className="embla__slide flex-[0_0_100%] flex justify-center px-4">
-                <div 
-                  className="overflow-hidden bg-gray-800" 
+                <div
+                  className="overflow-hidden bg-gray-800"
                   style={{ width: vw(320), height: vw(242), borderRadius: vw(20) }}
                 >
                   {item.image && (
@@ -369,16 +372,35 @@ export function ProductShowSection({
 
           {centerItem.showButton !== false && (
             <div className="mt-8 pointer-events-auto">
-              <Link href={centerItem.link || "#"} className="relative flex items-center justify-center group" style={{ width: vw(isMobile ? 200 : 375), height: vw(isMobile ? 50 : 92), borderRadius: vw(62.5), border: "1px solid #FFF077" }}>
+              <Link 
+                href={centerItem.link || "#"} 
+                target={centerItem.openInNewTab ? "_blank" : undefined}
+                className="relative inline-flex items-center group overflow-hidden" 
+                style={{ 
+                  height: vw(isMobile ? 50 : 92), 
+                  borderRadius: vw(62.5), 
+                  border: "1px solid #FFF077"
+                }}
+              >
                 <div className="absolute inset-0 rounded-full bg-[#FFF077] opacity-0 group-hover:opacity-100 transition-all" style={{ borderRadius: vw(62.5) }} />
-                <div className="relative z-10 flex items-center justify-center" style={{ width: `calc(100% - ${vw(isMobile ? 50 : 92)})`, height: "100%" }}>
-                  <span className="font-josefin-sans font-medium text-[#FFF077] group-hover:text-[#333] transition-colors" style={{ fontSize: vw(isMobile ? 18 : 32), lineHeight: vw(isMobile ? 16 : 30) }}>{centerItem.buttonText || buttonText}</span>
-                </div>
+                
+                <span 
+                  className="relative z-10 font-josefin-sans font-medium text-[#FFF077] group-hover:text-[#333] transition-colors whitespace-nowrap text-center flex-1" 
+                  style={{ 
+                    fontSize: vw(isMobile ? 18 : 32), 
+                    lineHeight: vw(isMobile ? 16 : 30),
+                    paddingLeft: vw(isMobile ? 24 : 48),
+                    paddingRight: vw(isMobile ? 24 : 48)
+                  }}
+                >
+                  {centerItem.buttonText || buttonText}
+                </span>
+
                 <svg className="relative z-10 flex-shrink-0" style={{ width: vw(isMobile ? 50 : 92), height: vw(isMobile ? 50 : 92) }} viewBox="0 0 92 92" fill="none">
-                  <path 
-                    d="M25.4901 13.4437C43.4151 2.17188 67.0838 7.56529 78.3557 25.4902C89.6276 43.4152 84.2342 67.0838 66.3093 78.3557C48.3843 89.6277 24.7156 84.2343 13.4437 66.3093C2.17191 48.3843 7.56519 24.7156 25.4901 13.4437ZM57.0151 35.2466L56.9818 35.243L41.9885 34.01C41.007 33.9294 40.147 34.6599 40.0672 35.6415L40.0645 35.6709C40.0018 36.6403 40.7283 37.4859 41.7 37.566L52.6899 38.4697L34.3515 54.0394C33.7252 54.5712 33.6486 55.511 34.1808 56.1379L34.3158 56.2969C34.851 56.9063 35.7774 56.9761 36.3974 56.4497L54.7368 40.8802L53.8459 51.871C53.7663 52.8527 54.4973 53.7138 55.4788 53.7946C56.4605 53.8754 57.3213 53.1451 57.401 52.1633L58.6167 37.167L58.6189 37.1355C58.6255 37.0303 58.6226 36.9248 58.6106 36.8201L58.6077 36.7934L58.6076 36.7984C58.5859 36.4813 58.463 36.1792 58.2569 35.9372L58.1384 35.798L58.1234 35.7806C57.9244 35.5529 57.6609 35.3907 57.3676 35.3169L57.3553 35.3141C57.2444 35.2805 57.1304 35.2582 57.0151 35.2466Z" 
-                    fill="#FFF077" 
-                    className="group-hover:fill-[#333] transition-colors duration-300" 
+                  <path
+                    d="M25.4901 13.4437C43.4151 2.17188 67.0838 7.56529 78.3557 25.4902C89.6276 43.4152 84.2342 67.0838 66.3093 78.3557C48.3843 89.6277 24.7156 84.2343 13.4437 66.3093C2.17191 48.3843 7.56519 24.7156 25.4901 13.4437ZM57.0151 35.2466L56.9818 35.243L41.9885 34.01C41.007 33.9294 40.147 34.6599 40.0672 35.6415L40.0645 35.6709C40.0018 36.6403 40.7283 37.4859 41.7 37.566L52.6899 38.4697L34.3515 54.0394C33.7252 54.5712 33.6486 55.511 34.1808 56.1379L34.3158 56.2969C34.851 56.9063 35.7774 56.9761 36.3974 56.4497L54.7368 40.8802L53.8459 51.871C53.7663 52.8527 54.4973 53.7138 55.4788 53.7946C56.4605 53.8754 57.3213 53.1451 57.401 52.1633L58.6167 37.167L58.6189 37.1355C58.6255 37.0303 58.6226 36.9248 58.6106 36.8201L58.6077 36.7934L58.6076 36.7984C58.5859 36.4813 58.463 36.1792 58.2569 35.9372L58.1384 35.798L58.1234 35.7806C57.9244 35.5529 57.6609 35.3907 57.3676 35.3169L57.3553 35.3141C57.2444 35.2805 57.1304 35.2582 57.0151 35.2466Z"
+                    fill="#FFF077"
+                    className="group-hover:fill-[#333] transition-colors duration-300"
                   />
                 </svg>
               </Link>

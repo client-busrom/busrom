@@ -7,7 +7,7 @@ import Link from "next/link"
 // 自定义鼠标指针 SVG
 const CUSTOM_CURSOR_SVG = (
   <svg width="49" height="66" viewBox="0 0 49 66" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0.000295865 4.42946L0.539055 50.4774C0.567373 52.8953 2.57735 54.8327 5.02862 54.8049C6.07898 54.7929 7.09098 54.4139 7.8847 53.7352L19.2422 44.0239L30.8233 63.8102C32.049 65.9042 34.7635 66.6217 36.8864 65.4127L41.7526 62.6414C43.8756 61.4324 44.6029 58.7547 43.3772 56.6607L31.7962 36.8743L46.0112 32.0243C48.3278 31.2339 49.5563 28.7406 48.7549 26.4554C48.412 25.4774 47.729 24.6508 46.827 24.1223L6.70535 0.614656C4.59772 -0.620196 1.87437 0.0640426 0.622412 2.14303C0.206126 2.83436 -0.00911459 3.62542 0.000295865 4.42946Z" fill="#587AFF"/>
+    <path d="M0.000295865 4.42946L0.539055 50.4774C0.567373 52.8953 2.57735 54.8327 5.02862 54.8049C6.07898 54.7929 7.09098 54.4139 7.8847 53.7352L19.2422 44.0239L30.8233 63.8102C32.049 65.9042 34.7635 66.6217 36.8864 65.4127L41.7526 62.6414C43.8756 61.4324 44.6029 58.7547 43.3772 56.6607L31.7962 36.8743L46.0112 32.0243C48.3278 31.2339 49.5563 28.7406 48.7549 26.4554C48.412 25.4774 47.729 24.6508 46.827 24.1223L6.70535 0.614656C4.59772 -0.620196 1.87437 0.0640426 0.622412 2.14303C0.206126 2.83436 -0.00911459 3.62542 0.000295865 4.42946Z" fill="#587AFF" />
   </svg>
 )
 
@@ -79,7 +79,7 @@ export function QuoteImageSection({
         <div className="max-w-xl mx-auto flex flex-col items-center text-center">
           <h2 className="font-josefin-sans font-bold text-4xl mb-2 text-black">{titleLine1}</h2>
           <h2 className="font-josefin-sans font-bold text-4xl mb-8 text-black">{titleLine2}</h2>
-          
+
           <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden mb-8 shadow-xl">
             {image ? (
               <OptimizedImage image={image as any} alt="Quote" size="large" className="w-full h-full object-cover" />
@@ -91,7 +91,7 @@ export function QuoteImageSection({
               <p className="font-josefin-sans font-medium text-white text-lg leading-tight mb-4">{subtitle}</p>
               <Link href={buttonLink} className="inline-flex items-center gap-3 group">
                 <div className="w-10 h-10 rounded-full border border-white flex items-center justify-center">
-                   <div className="w-2 h-2 rounded-full bg-[#FFCC4A]" />
+                  <div className="w-2 h-2 rounded-full bg-[#FFCC4A]" />
                 </div>
                 <span className="font-anaheim font-medium text-white text-lg">{buttonText}</span>
               </Link>
@@ -130,6 +130,37 @@ export function QuoteImageSection({
         <h2 className="absolute font-josefin-sans font-bold text-center" style={{ left: vw(title1Left), top: vw(title1Top), width: vw(title1Width), fontSize: vw(150), lineHeight: vw(165), color: "#000000" }}>{titleLine1}</h2>
         <h2 className="absolute font-josefin-sans font-bold text-center" style={{ left: vw(title2Left), top: vw(title2Top), width: vw(title2Width), fontSize: vw(150), lineHeight: vw(167), color: "#000000" }}>{titleLine2}</h2>
 
+        {/* VISUAL BLACK BUTTON TEXT (Under the image) */}
+        {(() => {
+          const circleSize = 104
+          const dotSize = 12
+          const fontSize = 32
+          const dotGap = 8
+          const textMarginLeft = circleSize / 2 + dotSize / 2 + dotGap
+
+          return (
+            <div
+              className="absolute flex items-center pointer-events-none"
+              style={{
+                left: vw(1436),
+                top: vw(478),
+                height: vw(circleSize),
+              }}
+            >
+              <span
+                className="absolute font-anaheim font-medium text-[#000000] whitespace-nowrap cta-text-breathe"
+                style={{
+                  fontSize: vw(fontSize),
+                  left: vw(textMarginLeft),
+                  animation: 'breathe 2s ease-in-out infinite',
+                }}
+              >
+                {buttonText}
+              </span>
+            </div>
+          )
+        })()}
+
         <div
           id="qs-cursor-area-v3"
           ref={containerRef}
@@ -149,12 +180,13 @@ export function QuoteImageSection({
             cursor: "none",
           }}
         >
-          <style dangerouslySetInnerHTML={{ __html: `
+          <style dangerouslySetInnerHTML={{
+            __html: `
             #qs-cursor-area-v3, #qs-cursor-area-v3 *, #qs-cursor-area-v3 a, #qs-cursor-area-v3 img {
               cursor: none !important;
             }
           ` }} />
-          
+
           {image ? (
             image.enableLink && image.linkUrl ? (
               <Link href={image.linkUrl} target={image.openInNewTab ? "_blank" : undefined} className="block absolute inset-0 w-full h-full" style={{ cursor: "none" }}>
@@ -171,63 +203,27 @@ export function QuoteImageSection({
 
           <h2 className="absolute font-josefin-sans font-bold text-center pointer-events-none" style={{ left: vw(title1Left - IMAGE_LEFT), top: vw(title1Top - IMAGE_TOP), width: vw(title1Width), fontSize: vw(150), lineHeight: vw(165), color: "#F6F4ED" }}>{titleLine1}</h2>
           <h2 className="absolute font-josefin-sans font-bold text-center pointer-events-none" style={{ left: vw(title2Left - IMAGE_LEFT), top: vw(title2Top - IMAGE_TOP), width: vw(title2Width), fontSize: vw(150), lineHeight: vw(167), color: "#F6F4ED" }}>{titleLine2}</h2>
-          <p className="absolute font-josefin-sans font-medium text-white pointer-events-none" style={{ left: vw(995 - IMAGE_LEFT), top: vw(489 - IMAGE_TOP), width: vw(412), fontSize: vw(36), lineHeight: vw(47) }}>{subtitle}</p>
+          <p className="absolute font-josefin-sans font-medium text-white pointer-events-none" style={{ left: vw(995 - IMAGE_LEFT), top: vw(489 - IMAGE_TOP), width: vw(420), fontSize: vw(36), lineHeight: vw(47) }}>{subtitle}</p>
 
+          {/* VISUAL WHITE BUTTON TEXT (Inside the image box, clipped) */}
           {(() => {
             const circleSize = 104
             const dotSize = 12
             const fontSize = 32
-            const dotGap = 8 // 文字距离黄点的间距
-            // 文字起始位置 = 圆心位置 + 黄点半径 + 间距 = circleSize/2 + dotSize/2 + dotGap
+            const dotGap = 8
             const textMarginLeft = circleSize / 2 + dotSize / 2 + dotGap
 
             return (
-              <Link
-                href={buttonLink}
-                className="absolute flex items-center group pointer-events-auto"
+              <div
+                className="absolute flex items-center pointer-events-none"
                 style={{
                   left: vw(1436 - IMAGE_LEFT),
                   top: vw(478 - IMAGE_TOP),
-                  cursor: "none",
+                  height: vw(circleSize),
                 }}
               >
-                {/* Circle border - visible in default state, hidden on hover */}
-                <div
-                  className="relative border-2 border-white transition-all duration-500 ease-out group-hover:opacity-0"
-                  style={{
-                    width: vw(circleSize),
-                    height: vw(circleSize),
-                    borderRadius: vw(circleSize / 2),
-                  }}
-                >
-                  {/* Orbit container - rotates around center */}
-                  <div
-                    className="absolute inset-0 flex items-center justify-center"
-                    style={{
-                      animation: 'orbitSpin 4s linear infinite',
-                    }}
-                  >
-                    {/* Radius container - moves dot from center to edge */}
-                    <div
-                      style={{
-                        animation: 'orbitRadius 4s ease-in-out infinite',
-                      }}
-                    >
-                      {/* Yellow dot */}
-                      <div
-                        className="rounded-full bg-[#FFCC4A]"
-                        style={{
-                          width: vw(dotSize),
-                          height: vw(dotSize),
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Text - positioned 8px right of the yellow dot (at center), breathing effect */}
                 <span
-                  className="absolute font-anaheim font-medium text-white whitespace-nowrap transition-all duration-500 group-hover:opacity-0 cta-text-breathe"
+                  className="absolute font-anaheim font-medium text-[#F6F4ED] whitespace-nowrap cta-text-breathe"
                   style={{
                     fontSize: vw(fontSize),
                     left: vw(textMarginLeft),
@@ -236,29 +232,11 @@ export function QuoteImageSection({
                 >
                   {buttonText}
                 </span>
-
-                {/* Hover state: expanding capsule from left edge */}
-                <div
-                  className="absolute left-0 top-0 border-2 border-white bg-white transition-all duration-500 ease-out pointer-events-none opacity-0 group-hover:opacity-100 flex items-center cta-capsule-breathe"
-                  style={{
-                    height: vw(circleSize),
-                    borderRadius: vw(circleSize / 2),
-                    paddingLeft: vw(textMarginLeft),
-                    paddingRight: vw(circleSize / 2),
-                  }}
-                >
-                  <span
-                    className="font-anaheim font-medium text-[#756F3F] whitespace-nowrap"
-                    style={{
-                      fontSize: vw(fontSize),
-                    }}
-                  >
-                    {buttonText}
-                  </span>
-                </div>
-              </Link>
+              </div>
             )
           })()}
+
+
 
           <div
             ref={cursorRef}
@@ -272,6 +250,92 @@ export function QuoteImageSection({
             {CUSTOM_CURSOR_SVG}
           </div>
         </div>
+
+        {(() => {
+          const circleSize = 104
+          const dotSize = 12
+          const fontSize = 32
+          const dotGap = 8 // 文字距离黄点的间距
+          // 文字起始位置 = 圆心位置 + 黄点半径 + 间距 = circleSize/2 + dotSize/2 + dotGap
+          const textMarginLeft = circleSize / 2 + dotSize / 2 + dotGap
+
+          return (
+            <Link
+              href={buttonLink}
+              className="absolute flex items-center group pointer-events-auto"
+              style={{
+                left: vw(1436),
+                top: vw(478),
+              }}
+            >
+              {/* Circle border - visible in default state, hidden on hover */}
+              <div
+                className="relative border-2 border-white transition-all duration-500 ease-out group-hover:opacity-0"
+                style={{
+                  width: vw(circleSize),
+                  height: vw(circleSize),
+                  borderRadius: vw(circleSize / 2),
+                }}
+              >
+                {/* Orbit container - rotates around center */}
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{
+                    animation: 'orbitSpin 4s linear infinite',
+                  }}
+                >
+                  {/* Radius container - moves dot from center to edge */}
+                  <div
+                    style={{
+                      animation: 'orbitRadius 4s ease-in-out infinite',
+                    }}
+                  >
+                    {/* Yellow dot */}
+                    <div
+                      className="rounded-full bg-[#FFCC4A]"
+                      style={{
+                        width: vw(dotSize),
+                        height: vw(dotSize),
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Text - positioned 8px right of the yellow dot (at center), breathing effect */}
+              <span
+                className="absolute font-anaheim font-medium text-transparent whitespace-nowrap transition-all duration-500 group-hover:opacity-0 cta-text-breathe"
+                style={{
+                  fontSize: vw(fontSize),
+                  left: vw(textMarginLeft),
+                  animation: 'breathe 2s ease-in-out infinite',
+                }}
+              >
+                {buttonText}
+              </span>
+
+              {/* Hover state: expanding capsule from left edge */}
+              <div
+                className="absolute left-0 top-0 border-2 border-white bg-white transition-all duration-500 ease-out pointer-events-none opacity-0 group-hover:opacity-100 flex items-center cta-capsule-breathe"
+                style={{
+                  height: vw(circleSize),
+                  borderRadius: vw(circleSize / 2),
+                  paddingLeft: vw(textMarginLeft),
+                  paddingRight: vw(circleSize / 2),
+                }}
+              >
+                <span
+                  className="font-anaheim font-medium text-[#756F3F] whitespace-nowrap"
+                  style={{
+                    fontSize: vw(fontSize),
+                  }}
+                >
+                  {buttonText}
+                </span>
+              </div>
+            </Link>
+          )
+        })()}
       </div>
     </section>
   )
