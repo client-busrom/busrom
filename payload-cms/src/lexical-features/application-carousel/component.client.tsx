@@ -130,18 +130,34 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
     setIsEditing(false)
   }
 
-  const handleRemoveApplication = (appId: string) => {
+  const handleRemoveApplication = (appId: string | number) => {
     const newApplications = localData.applications.filter((app) => {
-      const id = typeof app === 'string' ? app : app.id
-      return id !== appId
+      const id = String(typeof app === 'string' ? app : app.id)
+      return id !== String(appId)
     })
     setLocalData({ ...localData, applications: newApplications })
   }
 
   const handleApplicationsSelect = (selectedIds: string[]) => {
+    // Keep applications that are still selected, preserving their current order
+    const remainingApplications = localData.applications.filter((app) => {
+      const id = String(typeof app === 'string' ? app : app.id)
+      return selectedIds.includes(id)
+    })
+
+    // Find current application IDs
+    const currentAppIds = remainingApplications.map((app) =>
+      String(typeof app === 'string' ? app : app.id)
+    )
+
+    // Create new items only for newly selected IDs
+    const newApplications = selectedIds
+      .filter((id) => !currentAppIds.includes(id))
+      .map((id) => ({ id }))
+
     setLocalData({
       ...localData,
-      applications: selectedIds.map((id) => ({ id })),
+      applications: [...remainingApplications, ...newApplications],
     })
     setShowApplicationPicker(false)
   }
@@ -730,6 +746,9 @@ export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({
                       backgroundColor: isSelected ? '#fef8e8' : 'white',
                       position: 'relative',
                       transition: 'all 0.2s',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '100%',
                     }}
                   >
                     {/* Selection Indicator */}
@@ -740,7 +759,7 @@ export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({
                     )}
 
                     {/* Preview Image */}
-                    <div style={{ marginBottom: '8px' }}>
+                    <div style={{ marginBottom: '8px', flexShrink: 0 }}>
                       {previewImage ? (
                         <img src={previewImage} alt={app.name || app.slug} style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
                       ) : (
@@ -751,7 +770,7 @@ export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({
                     </div>
 
                     {/* Application Info */}
-                    <div style={{ fontSize: '12px', fontWeight: 500, color: '#1f2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 500, color: '#1f2937', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', flexGrow: 1 }}>
                       {app.name || app.slug}
                     </div>
                   </div>
