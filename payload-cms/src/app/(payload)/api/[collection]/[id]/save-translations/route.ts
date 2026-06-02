@@ -74,10 +74,10 @@ export async function POST(
 
         console.log(`📡 [save-translations] ⏳ Updating locale=${localeCode} for ${collection}/${id}. User: ${i18nReq.user?.email || 'Admin'}`)
 
-        // [Bugfix] 如果是源语言（默认语言），必须开启 Hooks 进行保存，否则 Payload 底层会因为缺少 Hook 处理
+        // [Bugfix] 如果是源语言或默认语言(en)，必须开启 Hooks 进行保存，否则 Payload 底层会因为缺少 Hook 处理
         // 而导致默认语言的数据没有正确写入 locale 关联表，导致其凭空变为空值。
         // 其他目标语言则保持 disableHooks: true 追求极速。
-        const shouldUseHooks = localeCode === sourceLocale;
+        const shouldUseHooks = localeCode === 'en' || localeCode === sourceLocale;
 
         const updatedDoc = await payload.update({
           collection: collection as any,
