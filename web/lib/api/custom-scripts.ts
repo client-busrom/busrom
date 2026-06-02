@@ -63,7 +63,7 @@ const DANGEROUS_PATTERNS = [
   /localStorage\s*\./i,          // localStorage access
   /sessionStorage\s*\./i,        // sessionStorage access
   /eval\s*\(/i,                  // eval() execution
-  /Function\s*\(/i,              // Function constructor
+  /\bFunction\s*\(/,             // Function constructor
   /innerHTML\s*=/i,              // DOM manipulation (except for known safe patterns)
   /outerHTML\s*=/i,              // DOM manipulation
   /document\.write/i,            // document.write (except for known patterns)
@@ -86,7 +86,7 @@ const SAFE_PATTERNS = [
   /ttq\./i,                      // TikTok Pixel
   /dataLayer\.push/i,            // GTM dataLayer
   /hj\s*\(/i,                    // Hotjar
-  /clarity\s*\(/i,               // Microsoft Clarity
+  /["']clarity["']/i,            // Microsoft Clarity
 ]
 
 export interface CustomScript {
