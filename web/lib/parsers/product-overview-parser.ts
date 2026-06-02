@@ -415,7 +415,7 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
       appItems = (node.data.applications || []).map((ref: any) => {
         const appId = typeof ref === 'object' ? ref.id : ref;
         const appObj = applications.find((a: any) => String(a.id) === String(appId));
-        return appObj ? { id: appId, title: appObj.title, subtitle: appObj.subtitle || appObj.name, image: resolveMedia(getRandomAppImage(appObj)), href: `/${locale}/application/${appObj.slug}` } : null;
+        return appObj ? { id: appId, title: appObj.title, subtitle: appObj.subtitle || appObj.name, image: resolveMedia(getRandomAppImage(appObj)) } : null;
       }).filter(Boolean);
       break;
     }

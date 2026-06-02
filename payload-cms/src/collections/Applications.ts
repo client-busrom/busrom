@@ -69,15 +69,15 @@ export const Applications: CollectionConfig = {
               name: 'slug',
               type: 'text',
               label: {
-                en: 'Slug (URL ID)',
-                zh: 'Slug (URL标识)',
+                en: 'Internal Admin Label',
+                zh: '内部管理标识',
               },
               required: true,
               unique: true,
               admin: {
                 description: {
-                  en: 'URL-friendly identifier (e.g., "commercial-building-glass-railing")',
-                  zh: 'URL友好标识符（例如："commercial-building-glass-railing"）',
+                  en: 'Internal unique identifier for admin reference (e.g., "commercial-building-glass-railing")',
+                  zh: '用于后台区分不同图集的内部唯一标识（例如："commercial-building-glass-railing"）',
                 },
               },
             },

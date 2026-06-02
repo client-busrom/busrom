@@ -1703,7 +1703,7 @@ export interface Page {
 export interface Application {
   id: number;
   /**
-   * URL-friendly identifier (e.g., "commercial-building-glass-railing")
+   * Internal unique identifier for admin reference (e.g., "commercial-building-glass-railing")
    */
   slug: string;
   name: string;
