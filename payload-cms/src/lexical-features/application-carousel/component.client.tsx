@@ -5,7 +5,7 @@
  */
 'use client'
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useLexicalComposerContext } from '@payloadcms/richtext-lexical/lexical/react/LexicalComposerContext'
 import { $getNodeByKey } from '@payloadcms/richtext-lexical/lexical'
 import { useTranslation } from '@payloadcms/ui'
@@ -38,6 +38,8 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
   const [applications, setApplications] = useState<Application[]>([])
   const [applicationImages, setApplicationImages] = useState<Record<string, string>>({})
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  
+  const appsCache = useRef<Record<string, Application>>({})
 
   // Fetch applications data
   useEffect(() => {
@@ -51,15 +53,31 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
       }
 
       try {
-        // Fetch each application
-        const fetchedApps: Application[] = []
+        const missingIds: string[] = []
+
+        // Check cache first
         for (const id of applicationIds) {
-          const res = await fetch(`/api/applications/${id}?depth=1`)
-          if (res.ok) {
-            const appData = await res.json()
-            fetchedApps.push(appData)
+          if (!appsCache.current[id]) {
+            missingIds.push(id)
           }
         }
+
+        // Fetch missing applications in parallel
+        if (missingIds.length > 0) {
+          const fetchPromises = missingIds.map(id =>
+            fetch(`/api/applications/${id}?depth=1`).then(res => res.ok ? res.json() : null)
+          )
+          const newApps = await Promise.all(fetchPromises)
+          
+          newApps.forEach(appData => {
+            if (appData && appData.id) {
+              appsCache.current[appData.id] = appData
+            }
+          })
+        }
+
+        // Map from cache to preserve order
+        const fetchedApps = applicationIds.map(id => appsCache.current[id]).filter(Boolean)
         setApplications(fetchedApps)
 
         // Get random images for each application

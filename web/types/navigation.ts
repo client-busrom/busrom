@@ -35,6 +35,8 @@ export interface NavItem {
   openInNewTab: boolean;
   order: number;
   image?: NavigationImage;          // 子菜单可能有图片
+  linkLabel?: string;               // 链接文本
+  inquiryLabel?: string;            // 询单文本
   inquiryLink?: string;             // 询单链接（仅用于 PRODUCT_CARDS 类型）
   gridSpan?: number;                // 网格跨度 (1-4)
   childMenus?: NavItem[];           // 子菜单
@@ -49,6 +51,8 @@ export interface NavItemRaw {
   type: string;
   icon?: string;
   link: string;
+  linkLabel?: Record<string, string>;
+  inquiryLabel?: Record<string, string>;
   inquiryLink?: string;             // 询单链接
   order: number;
   parent?: { id: string } | null;

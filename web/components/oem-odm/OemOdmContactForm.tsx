@@ -493,7 +493,10 @@ export function OemOdmContactForm({
   }
 
   return (
-    <section className="w-full overflow-hidden py-10 md:py-20 font-anaheim">
+    <section 
+      id="contact-form"
+      className="w-full overflow-hidden py-10 md:py-20 font-anaheim"
+    >
       <div className="max-w-[1500px] mx-auto px-4 md:px-8">
         <div className="flex flex-col">
           {/* ========== Hero Header ========== */}

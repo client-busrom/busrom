@@ -210,16 +210,16 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
       style={
         isMobile
           ? {
-              background: "linear-gradient(103deg, #645c1d 0%, #fff587 100%)",
-              paddingTop: mvw(80),
-              paddingBottom: mvw(100),
-            }
+            background: "linear-gradient(103deg, #645c1d 0%, #fff587 100%)",
+            paddingTop: mvw(80),
+            paddingBottom: mvw(100),
+          }
           : {
-              minHeight: vw(968),
-              background: "linear-gradient(113deg, #645c1d 0%, #fff587 100%)",
-              paddingTop: vw(120),
-              paddingBottom: vw(120),
-            }
+            minHeight: vw(968),
+            background: "linear-gradient(113deg, #645c1d 0%, #fff587 100%)",
+            paddingTop: vw(120),
+            paddingBottom: vw(120),
+          }
       }
     >
       <style jsx>{`
@@ -478,7 +478,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                       listClassName="!bg-[#4d4618] !border-white/20"
                     />
                   </div>
-                 ) : field.fieldName === "whatsapp" ||
+                ) : field.fieldName === "whatsapp" ||
                   field.fieldType === "tel" ? (
                   <div
                     className="faq-phone-wrapper relative"
@@ -664,11 +664,11 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                         {uploading
                           ? "..."
                           : fileName ||
-                            (fileField.required ? "* " : "") +
-                              (fileField.label === "upload file" ||
-                              fileField.label === "Attach File"
-                                ? fileField.label
-                                : fileField.placeholder)}
+                          (fileField.required ? "* " : "") +
+                          (fileField.label === "upload file" ||
+                            fileField.label === "Attach File"
+                            ? fileField.label
+                            : fileField.placeholder)}
                       </span>
                     </label>
                   </div>
@@ -681,11 +681,10 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                     onClick={() => handlePrivacyToggle(!privacyAccepted)}
                   >
                     <div
-                      className={`mt-1 flex-shrink-0 w-6 h-6 rounded border flex items-center justify-center transition-all ${
-                        privacyAccepted
+                      className={`mt-1 flex-shrink-0 w-6 h-6 rounded border flex items-center justify-center transition-all ${privacyAccepted
                           ? "bg-[#d1be2e] border-[#d1be2e]"
                           : "border-white/30 bg-transparent"
-                      }`}
+                        }`}
                     >
                       {privacyAccepted && (
                         <svg
@@ -728,14 +727,14 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
                   border: "none",
                   cursor:
                     submitting ||
-                    uploading ||
-                    (!!privacyText && !privacyAccepted)
+                      uploading ||
+                      (!!privacyText && !privacyAccepted)
                       ? "not-allowed"
                       : "pointer",
                   opacity:
                     submitting ||
-                    uploading ||
-                    (!!privacyText && !privacyAccepted)
+                      uploading ||
+                      (!!privacyText && !privacyAccepted)
                       ? 0.6
                       : 1,
                 }}

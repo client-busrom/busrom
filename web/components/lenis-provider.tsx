@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { usePathname, useSearchParams } from "next/navigation"
 import { easings } from "./easings"
 
 interface LenisProviderProps {
@@ -8,6 +9,8 @@ interface LenisProviderProps {
 }
 
 export function LenisProvider({ easingKey }: LenisProviderProps) {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const lenisRef = useRef<any>(null)
   const rafCallbackRef = useRef<((time: number) => void) | null>(null)
   const gsapRef = useRef<any>(null)
@@ -48,7 +51,7 @@ export function LenisProvider({ easingKey }: LenisProviderProps) {
       })
 
       lenisRef.current = lenis
-      ;(window as any).lenis = lenis
+        ; (window as any).lenis = lenis
 
       lenis.on('scroll', ScrollTrigger.update)
 
@@ -59,6 +62,28 @@ export function LenisProvider({ easingKey }: LenisProviderProps) {
 
       gsap.ticker.add(rafCallback)
       gsap.ticker.lagSmoothing(0)
+
+      // Handle initial hash scroll after Lenis is ready
+      const hash = window.location.hash
+      if (hash) {
+        const attemptScroll = (attemptsLeft: number) => {
+          try {
+            const target = document.querySelector(hash) as HTMLElement | null
+            if (target) {
+              if (target.getBoundingClientRect().height > 0 || attemptsLeft <= 1) {
+                setTimeout(() => {
+                  lenis.scrollTo(target, { offset: -100 })
+                }, 800)
+              } else {
+                setTimeout(() => attemptScroll(attemptsLeft - 1), 250)
+              }
+            } else if (attemptsLeft > 0) {
+              setTimeout(() => attemptScroll(attemptsLeft - 1), 250)
+            }
+          } catch (e) {}
+        }
+        setTimeout(() => attemptScroll(20), 250)
+      }
     }
 
     if ('requestIdleCallback' in window) {
@@ -100,6 +125,74 @@ export function LenisProvider({ easingKey }: LenisProviderProps) {
       }
     }
   }, [easingKey])
+
+  // Handle route changes and hash navigation
+  useEffect(() => {
+    const handleHashScroll = () => {
+      if (!lenisRef.current) return
+      const hash = window.location.hash
+      if (hash) {
+        const attemptScroll = (attemptsLeft: number) => {
+          try {
+            const target = document.querySelector(hash) as HTMLElement | null
+            if (target) {
+              if (target.getBoundingClientRect().height > 0 || attemptsLeft <= 1) {
+                // Wait for dynamic layout (images/fonts) to settle
+                setTimeout(() => {
+                  if (lenisRef.current) {
+                    lenisRef.current.scrollTo(target, { offset: -100 })
+                  }
+                }, 800)
+              } else {
+                setTimeout(() => attemptScroll(attemptsLeft - 1), 250)
+              }
+            } else if (attemptsLeft > 0) {
+              setTimeout(() => attemptScroll(attemptsLeft - 1), 250)
+            }
+          } catch (e) {}
+        }
+        setTimeout(() => attemptScroll(20), 250)
+      }
+    }
+
+    handleHashScroll()
+    window.addEventListener('hashchange', handleHashScroll)
+    return () => window.removeEventListener('hashchange', handleHashScroll)
+  }, [pathname, searchParams])
+
+  // Handle same-page hash links since Next.js Link intercepts them without firing hashchange
+  useEffect(() => {
+    const handleAnchorClick = (e: MouseEvent) => {
+      const anchor = (e.target as Element).closest('a')
+      if (!anchor) return
+
+      const href = anchor.getAttribute('href')
+      if (!href) return
+
+      const hashIndex = href.indexOf('#')
+      if (hashIndex === -1) return
+      const hash = href.substring(hashIndex)
+
+      try {
+        const url = new URL(anchor.href, window.location.href)
+        if (url.pathname === window.location.pathname) {
+          // It's on the same page, we intercept it!
+          const target = document.querySelector(hash) as HTMLElement | null
+          if (target && lenisRef.current) {
+            e.preventDefault()
+            lenisRef.current.scrollTo(target, { offset: -100 })
+            // Update URL manually
+            window.history.pushState(null, '', url.href)
+          }
+        }
+      } catch (err) {
+        // ignore invalid URLs
+      }
+    }
+
+    document.addEventListener('click', handleAnchorClick)
+    return () => document.removeEventListener('click', handleAnchorClick)
+  }, [])
 
   return null
 }

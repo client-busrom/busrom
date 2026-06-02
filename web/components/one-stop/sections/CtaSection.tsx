@@ -358,13 +358,13 @@ export function CtaSection({
 
   return (
     <section
-      id="cta-section"
+      id="contact-form"
       className="relative w-full overflow-hidden flex flex-col items-center bg-transparent z-10 transition-[height] duration-500 ease-in-out justify-start pb-24 xl:pb-0"
       style={{ height: "auto" }}
     >
       <style jsx>{`
         @media (min-width: 1280px) {
-          #cta-section {
+          #contact-form {
             height: ${SECTION_HEIGHT}px !important;
           }
         }

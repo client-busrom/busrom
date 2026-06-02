@@ -554,6 +554,7 @@ export function FraudContactFormSection({
 
   return (
     <section
+      id="contact-form"
       className="relative w-full flex items-center justify-center select-none z-20"
       style={{
         minHeight: isMobile ? "auto" : "auto",

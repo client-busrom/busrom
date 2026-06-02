@@ -335,14 +335,14 @@ export function DesktopNavigation({
                                     className="flex-1 py-2 px-4 text-center text-sm font-montserrat font-bold bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
                                     onClick={() => setActiveMenuId(null)}
                                   >
-                                    Learn More
+                                    {child.linkLabel || "Learn More"}
                                   </Link>
                                   <Link
                                     href={child.inquiryLink || "/contact-us"}
                                     className="flex-1 py-2 px-4 text-center text-sm font-montserrat font-bold bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors"
                                     onClick={() => setActiveMenuId(null)}
                                   >
-                                    Inquiry
+                                    {child.inquiryLabel || "Inquiry"}
                                   </Link>
                                 </div>
                               </div>

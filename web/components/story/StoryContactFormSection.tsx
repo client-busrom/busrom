@@ -425,6 +425,7 @@ export function StoryContactFormSection({
       }
     >
       <div
+        id="contact-form"
         className={cn(
           "relative z-10 w-full mx-auto",
           effectiveIsMobile ? "flex flex-col" : "flex flex-row items-center",

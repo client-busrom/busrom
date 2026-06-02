@@ -206,14 +206,14 @@ export function FaqTemplate({ locale, data }: FaqTemplateProps) {
 
       {/* Contact Section */}
       {contact && (
-        <div ref={contactRef} id="faq-contact">
+        <div ref={contactRef} id="contact-form">
           <FaqContactSection data={contact} locale={locale} />
         </div>
       )}
 
       {/* Quote Section */}
       {quote && (
-        <div ref={quoteRef} id="faq-quote">
+        <div ref={quoteRef} id="quote-guide">
           <FaqQuoteSection data={quote} locale={locale} />
         </div>
       )}

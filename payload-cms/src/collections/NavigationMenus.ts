@@ -261,6 +261,9 @@ export const NavigationMenus: CollectionConfig = {
         zh: '询单链接',
       },
       admin: {
+        components: {
+          Field: '@/components/fields/SmartLinkField#SmartLinkField',
+        },
         description: {
           en: 'Link for "Inquiry" button (Displayed on children of Product Cards type)',
           zh: '"询单"按钮的链接（仅在其父级菜单为"图文卡片"时有效并在前端显示）',

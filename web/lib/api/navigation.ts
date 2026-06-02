@@ -183,6 +183,14 @@ async function transformNavigationItem(
     order: item.order,
   };
 
+  if ((item as any).linkLabel) {
+    result.linkLabel = (item as any).linkLabel;
+  }
+  
+  if ((item as any).inquiryLabel) {
+    result.inquiryLabel = (item as any).inquiryLabel;
+  }
+
   if (item.inquiryLink) {
     result.inquiryLink = item.inquiryLink;
   }

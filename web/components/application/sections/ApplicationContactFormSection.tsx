@@ -565,6 +565,7 @@ export function ApplicationContactFormSection({
 
   return (
     <section
+      id="contact-form"
       className="relative w-full flex items-start justify-center select-none z-20"
       style={{
         minHeight: isMobile ? "auto" : "900px",
