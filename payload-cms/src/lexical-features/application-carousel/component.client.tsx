@@ -87,10 +87,12 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
     for (const scene of app.sceneGallery) {
       if (scene.images && scene.images.length > 0) {
         for (const img of scene.images) {
-          if (typeof img === 'object' && img.thumbnailURL) {
-            allImages.push(img.thumbnailURL)
-          } else if (typeof img === 'object' && img.url) {
-            allImages.push(img.url)
+          if (typeof img === 'object') {
+            // Prioritize 'card' for better quality, then fallback to 'thumbnail', then original 'url'
+            const thumbUrl = img.sizes?.card?.url || img.sizes?.thumbnail?.url || img.thumbnailURL || img.url
+            if (thumbUrl) {
+              allImages.push(thumbUrl)
+            }
           }
         }
       }
@@ -105,13 +107,21 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
     if (!isEditing && localData.autoplay && applications.length > (localData.itemsPerView || 3)) {
       const interval = setInterval(() => {
         setCurrentSlide((prev) => {
-          const maxSlide = applications.length - (localData.itemsPerView || 3)
+          const maxSlide = Math.max(0, applications.length - (localData.itemsPerView || 3))
           return prev >= maxSlide ? 0 : prev + 1
         })
       }, localData.interval * 1000)
       return () => clearInterval(interval)
     }
   }, [isEditing, localData.autoplay, localData.interval, applications.length, localData.itemsPerView])
+
+  // Ensure currentSlide stays within bounds when itemsPerView or applications.length changes
+  useEffect(() => {
+    const maxSlide = Math.max(0, applications.length - (localData.itemsPerView || 3))
+    if (currentSlide > maxSlide) {
+      setCurrentSlide(maxSlide)
+    }
+  }, [applications.length, localData.itemsPerView, currentSlide])
 
   const updateNode = useCallback(
     (newData: ApplicationCarouselData) => {
@@ -294,11 +304,11 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
                 {/* Image Preview */}
                 <div style={{ marginBottom: '8px' }}>
                   {applicationImages[app.id] ? (
-                    <div style={{ position: 'relative', width: '100%', height: '100px', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: '4px', overflow: 'hidden' }}>
                       <img src={applicationImages[app.id]} alt={app.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', width: '100%', height: '100px', backgroundColor: '#f3f4f6', border: '1px dashed #d1d5db', borderRadius: '4px', fontSize: '11px', color: '#6b7280' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', width: '100%', aspectRatio: '16/9', backgroundColor: '#f3f4f6', border: '1px dashed #d1d5db', borderRadius: '4px', fontSize: '11px', color: '#6b7280' }}>
                       <ImageIcon size={20} />
                       <span>{i18n?.language === 'zh' ? '无图片' : 'No image'}</span>
                     </div>
@@ -411,14 +421,16 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
             display: 'flex',
             gap: '12px',
             transition: 'transform 0.5s ease-in-out',
-            transform: `translateX(-${currentSlide * (100 / itemsPerView + 12 / itemsPerView)}%)`,
+            transform: `translateX(calc(-${currentSlide * (100 / itemsPerView)}% - ${currentSlide * (12 / itemsPerView)}px))`,
           }}
         >
           {applications.map((app) => (
             <div
               key={app.id}
               style={{
+                flex: `0 0 calc(${100 / itemsPerView}% - ${(12 * (itemsPerView - 1)) / itemsPerView}px)`,
                 minWidth: `calc(${100 / itemsPerView}% - ${(12 * (itemsPerView - 1)) / itemsPerView}px)`,
+                maxWidth: `calc(${100 / itemsPerView}% - ${(12 * (itemsPerView - 1)) / itemsPerView}px)`,
                 borderRadius: '6px',
                 overflow: 'hidden',
                 backgroundColor: 'white',
@@ -427,7 +439,7 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
             >
               {applicationImages[app.id] ? (
                 <>
-                  <img src={applicationImages[app.id]} alt={app.name || app.slug} style={{ width: '100%', height: '200px', objectFit: 'cover', display: 'block' }} />
+                  <img src={applicationImages[app.id]} alt={app.name || app.slug} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', display: 'block' }} />
                   <div style={{ padding: '12px' }}>
                     {localData.showTitle && (
                       <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600, color: '#1f2937' }}>
@@ -435,14 +447,14 @@ export const ApplicationCarouselComponent: React.FC<ApplicationCarouselComponent
                       </h3>
                     )}
                     {localData.showDescription && app.shortDescription && (
-                      <p style={{ margin: 0, fontSize: '13px', color: '#6b7280', lineHeight: '1.5', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                      <p style={{ margin: 0, fontSize: '14px', color: '#4b5563', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {app.shortDescription}
                       </p>
                     )}
                   </div>
                 </>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '250px', color: '#9ca3af' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', aspectRatio: '16/9', width: '100%', color: '#9ca3af' }}>
                   <ImageIcon size={32} />
                   <p style={{ marginTop: '8px', fontSize: '12px' }}>
                     {app.name || app.slug}
@@ -761,9 +773,9 @@ export const ApplicationPickerModal: React.FC<ApplicationPickerModalProps> = ({
                     {/* Preview Image */}
                     <div style={{ marginBottom: '8px', flexShrink: 0 }}>
                       {previewImage ? (
-                        <img src={previewImage} alt={app.name || app.slug} style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
+                        <img src={previewImage} alt={app.name || app.slug} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '4px' }} />
                       ) : (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '80px', backgroundColor: '#f3f4f6', borderRadius: '4px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', aspectRatio: '16/9', backgroundColor: '#f3f4f6', borderRadius: '4px' }}>
                           <ImageIcon size={24} color="#9ca3af" />
                         </div>
                       )}
