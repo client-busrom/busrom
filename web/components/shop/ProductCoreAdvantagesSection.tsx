@@ -85,6 +85,32 @@ export function ProductCoreAdvantagesSection({
 
   return (
     <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .hover-show-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: transparent transparent;
+          transition: scrollbar-color 0.3s;
+        }
+        .hover-show-scrollbar:hover {
+          scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        }
+        .hover-show-scrollbar::-webkit-scrollbar {
+          width: 4px;
+          height: 4px;
+        }
+        .hover-show-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .hover-show-scrollbar::-webkit-scrollbar-thumb {
+          background: transparent;
+          border-radius: 4px;
+        }
+        .hover-show-scrollbar:hover::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.2);
+        }
+        `
+      }} />
       {/* Mobile Layout */}
       <section className="md:hidden bg-brand-main px-4 py-8">
         {/* Title */}
@@ -365,7 +391,7 @@ export function ProductCoreAdvantagesSection({
                   {/* Bottom Section: Advantage Cards - 3 columns, 2 rows - 保持原尺寸 */}
                   <div
                     ref={scrollContainerRef}
-                    className="flex flex-col overflow-x-auto [&::-webkit-scrollbar]:hidden"
+                    className="flex flex-col overflow-x-auto hover-show-scrollbar"
                     data-lenis-prevent="true"
                     onMouseDown={handleMouseDown}
                     onMouseMove={handleMouseMove}
@@ -379,6 +405,7 @@ export function ProductCoreAdvantagesSection({
                       gap: rpx(17),
                       cursor: isDragging ? "grabbing" : "grab",
                       userSelect: isDragging ? "none" : "auto",
+                      overscrollBehavior: "contain",
                     }}
                   >
                     {/* Row 1 */}
@@ -401,16 +428,18 @@ export function ProductCoreAdvantagesSection({
                           >
                             {/* Title - top half, text aligned to bottom */}
                             <div
-                              className="flex items-end"
+                              className="flex flex-col overflow-y-auto hover-show-scrollbar"
+                              data-lenis-prevent="true"
                               style={{
                                 height: rpx(100),
                                 paddingLeft: rpx(23),
                                 paddingBottom: rpx(8),
                                 paddingRight: rpx(23),
+                                paddingTop: rpx(16),
                               }}
                             >
                               <h3
-                                className="font-inter font-bold whitespace-pre-line"
+                                className="font-inter font-bold whitespace-pre-line mt-auto"
                                 style={{
                                   fontSize: rpx(24),
                                   lineHeight: rpx(30),
@@ -423,9 +452,9 @@ export function ProductCoreAdvantagesSection({
 
                             {/* Description with gradient background - bottom half, bottom corners rounded */}
                             <div
-                              className="flex items-start overflow-y-auto [&::-webkit-scrollbar]:hidden"
+                              className="flex items-start overflow-y-auto hover-show-scrollbar"
                               data-lenis-prevent="true"
-                              onMouseDown={(e) => e.stopPropagation()}
+
                               style={{
                                 width: rpx(356),
                                 height: rpx(100),
@@ -475,16 +504,18 @@ export function ProductCoreAdvantagesSection({
                           >
                             {/* Title - top half, text aligned to bottom */}
                             <div
-                              className="flex items-end"
+                              className="flex flex-col overflow-y-auto hover-show-scrollbar"
+                              data-lenis-prevent="true"
                               style={{
                                 height: rpx(100),
                                 paddingLeft: rpx(23),
                                 paddingBottom: rpx(8),
                                 paddingRight: rpx(23),
+                                paddingTop: rpx(16),
                               }}
                             >
                               <h3
-                                className="font-inter font-bold whitespace-pre-line"
+                                className="font-inter font-bold whitespace-pre-line mt-auto"
                                 style={{
                                   fontSize: rpx(24),
                                   lineHeight: rpx(30),
@@ -497,9 +528,9 @@ export function ProductCoreAdvantagesSection({
 
                             {/* Description with gradient background - bottom half, bottom corners rounded */}
                             <div
-                              className="flex items-start overflow-y-auto [&::-webkit-scrollbar]:hidden"
+                              className="flex items-start overflow-y-auto hover-show-scrollbar"
                               data-lenis-prevent="true"
-                              onMouseDown={(e) => e.stopPropagation()}
+
                               style={{
                                 width: rpx(356),
                                 height: rpx(100),

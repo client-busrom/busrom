@@ -158,6 +158,8 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
   ],
   'navigation-menus': [
     { name: 'name', labelKey: 'custom:fields:name', type: 'textarea' },
+    { name: 'linkLabel', labelKey: '__inline:链接按钮文本 (Link Button Text)', type: 'textarea' },
+    { name: 'inquiryLabel', labelKey: '__inline:询单按钮文本 (Inquiry Button Text)', type: 'textarea' },
   ],
   'media-categories': [
     { name: 'displayName', labelKey: 'custom:fields:name', type: 'textarea' },

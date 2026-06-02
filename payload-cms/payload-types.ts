@@ -1548,6 +1548,9 @@ export interface NavigationMenu {
    * Bilingual menu name
    */
   name: string;
+  /**
+   * Determines the layout of this menu's children. For child items themselves, always choose "Standard Link".
+   */
   type: 'standard' | 'product_cards' | 'submenu';
   icon?: string | null;
   /**
@@ -1575,9 +1578,17 @@ export interface NavigationMenu {
    */
   link?: string | null;
   /**
-   * Link for "Inquiry" button, only for PRODUCT_CARDS type
+   * Custom text for the main link button (Only applies to children of Product Cards type). Leave empty to use default.
+   */
+  linkLabel?: string | null;
+  /**
+   * Link for "Inquiry" button (Displayed on children of Product Cards type)
    */
   inquiryLink?: string | null;
+  /**
+   * Custom text for the inquiry button (Only applies to children of Product Cards type). Leave empty to use default.
+   */
+  inquiryLabel?: string | null;
   /**
    * Lower number appears first
    */
@@ -2960,7 +2971,9 @@ export interface NavigationMenusSelect<T extends boolean = true> {
   gridSpan?: T;
   parent?: T;
   link?: T;
+  linkLabel?: T;
   inquiryLink?: T;
+  inquiryLabel?: T;
   order?: T;
   isSystem?: T;
   visible?: T;

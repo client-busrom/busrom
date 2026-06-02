@@ -135,12 +135,18 @@ export const NavigationMenus: CollectionConfig = {
         en: 'Menu Type',
         zh: '菜单类型',
       },
+      admin: {
+        description: {
+          en: 'Determines the layout of this menu\'s children. For child items themselves, always choose "Standard Link".',
+          zh: '决定【该菜单的下级子菜单】如何展示。如果是子菜单本身，请一律选择“普通链接”！',
+        },
+      },
       required: true,
       defaultValue: 'standard',
       options: [
-        { label: { en: 'Standard', zh: '普通链接' }, value: 'standard' },
-        { label: { en: 'Product Cards', zh: '图文卡片' }, value: 'product_cards' },
-        { label: { en: 'Submenu', zh: 'Icon+文字子菜单' }, value: 'submenu' },
+        { label: { en: 'Standard Link (Default for child items)', zh: '普通链接（子菜单请选此项）' }, value: 'standard' },
+        { label: { en: 'Parent Only: Displays children as Image Cards', zh: '父级专用：将其子菜单显示为图文卡片' }, value: 'product_cards' },
+        { label: { en: 'Parent Only: Displays children with Icons', zh: '父级专用：将其子菜单显示为Icon+文字' }, value: 'submenu' },
       ],
     },
     // Icon (for SUBMENU type)
@@ -155,7 +161,7 @@ export const NavigationMenus: CollectionConfig = {
         components: {
           Field: '@/components/fields/IconPicker',
         },
-        condition: (data) => data?.type === 'submenu' || data?.parent != null,
+        condition: (data) => Boolean(data?.parent),
       },
     },
     // Card Image (for menu items that need images)
@@ -174,8 +180,8 @@ export const NavigationMenus: CollectionConfig = {
           en: 'Menu card image. Choose manually from media or randomly from a case gallery (Application).',
           zh: '菜单卡片图片。可手动从媒体库选择，或从案例图集中随机选择。',
         },
-        // 显示条件：自身是 product_cards 类型，或者有父级菜单（子菜单）
-        condition: (data) => data?.type === 'product_cards' || data?.parent,
+        // 显示条件：仅子菜单才可以配置图片（父菜单不需要）
+        condition: (data) => Boolean(data?.parent),
       },
     },
     // Grid Span (for product_cards children)
@@ -232,6 +238,22 @@ export const NavigationMenus: CollectionConfig = {
       },
     },
     {
+      name: 'linkLabel',
+      type: 'text',
+      localized: true,
+      label: {
+        en: 'Link Button Text',
+        zh: '链接按钮文本',
+      },
+      admin: {
+        description: {
+          en: 'Custom text for the main link button (Only applies to children of Product Cards type). Leave empty to use default.',
+          zh: '主链接按钮的自定义文本（仅在其父级菜单为"图文卡片"时有效并在前端显示）。留空则使用默认文本。',
+        },
+        condition: (data) => Boolean(data?.parent),
+      },
+    },
+    {
       name: 'inquiryLink',
       type: 'text',
       label: {
@@ -240,10 +262,26 @@ export const NavigationMenus: CollectionConfig = {
       },
       admin: {
         description: {
-          en: 'Link for "Inquiry" button, only for PRODUCT_CARDS type',
-          zh: '"询单"按钮的链接，仅用于 PRODUCT_CARDS 类型',
+          en: 'Link for "Inquiry" button (Displayed on children of Product Cards type)',
+          zh: '"询单"按钮的链接（仅在其父级菜单为"图文卡片"时有效并在前端显示）',
         },
-        condition: (data) => data?.type === 'product_cards',
+        condition: (data) => Boolean(data?.parent),
+      },
+    },
+    {
+      name: 'inquiryLabel',
+      type: 'text',
+      localized: true,
+      label: {
+        en: 'Inquiry Button Text',
+        zh: '询单按钮文本',
+      },
+      admin: {
+        description: {
+          en: 'Custom text for the inquiry button (Only applies to children of Product Cards type). Leave empty to use default.',
+          zh: '询单按钮的自定义文本（仅在其父级菜单为"图文卡片"时有效并在前端显示）。留空则使用默认文本。',
+        },
+        condition: (data) => Boolean(data?.parent),
       },
     },
     // Display Options

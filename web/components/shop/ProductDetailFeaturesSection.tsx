@@ -329,7 +329,7 @@ export function ProductDetailFeaturesSection({
                 return (
                   <motion.div
                     key={index}
-                    className={`${style.bg} flex flex-col justify-between flex-shrink-0`}
+                    className={`${style.bg} flex flex-col flex-shrink-0`}
                     initial={{ opacity: 0, x: -80 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
@@ -347,7 +347,8 @@ export function ProductDetailFeaturesSection({
                     whileTap={{ scale: 0.98 }}
                     style={{
                       width: rpx(600),
-                      height: rpx(150),
+                      minHeight: rpx(150),
+                      height: "auto",
                       borderRadius: rpx(24),
                       padding: rpx(20),
                       paddingBottom: rpx(14),
@@ -360,7 +361,7 @@ export function ProductDetailFeaturesSection({
                       className={`font-inter font-bold ${style.titleColor}`}
                       style={{
                         fontSize: rpx(24),
-                        lineHeight: rpx(24),
+                        lineHeight: rpx(36),
                         marginTop: rpx(4),
                       }}
                     >
@@ -369,8 +370,8 @@ export function ProductDetailFeaturesSection({
 
                     {/* Gradient bar with description */}
                     <div
-                      className="mt-auto"
                       style={{
+                        marginTop: rpx(32),
                         background: style.barGradient,
                         borderRadius: rpx(12),
                         padding: `${rpx(12)} ${rpx(10)}`,
