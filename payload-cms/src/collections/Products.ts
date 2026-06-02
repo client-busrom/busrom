@@ -11,10 +11,10 @@
  * - Tab UI for better organization
  */
 
-import type { 
-  CollectionConfig, 
-  CollectionAfterChangeHook, 
-  CollectionAfterDeleteHook 
+import type {
+  CollectionConfig,
+  CollectionAfterChangeHook,
+  CollectionAfterDeleteHook
 } from 'payload'
 import { autoIndexHook } from '../hooks/autoIndex'
 import { autoIndexDeleteHook } from '../hooks/autoIndexDelete'
@@ -37,8 +37,8 @@ export const Products: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'sku',
-    listSearchableFields: ['sku', 'slug', 'name'],
-    defaultColumns: ['shopOrder', 'order', 'sku', 'name', 'category', 'series', 'status'],
+    listSearchableFields: ['adminLabel', 'sku', 'slug', 'name'],
+    defaultColumns: ['adminLabel', 'shopOrder', 'order', 'sku', 'name', 'category', 'series', 'status'],
     group: {
       en: 'Products',
       zh: '产品管理',
@@ -93,7 +93,17 @@ export const Products: CollectionConfig = {
               },
               index: true,
             },
-
+            {
+              name: 'adminLabel',
+              type: 'text',
+              admin: {
+                position: 'sidebar',
+              },
+              label: {
+                en: 'Internal Admin Label',
+                zh: '内部管理标识',
+              },
+            },
             {
               name: 'name',
               type: 'textarea',
@@ -168,6 +178,21 @@ export const Products: CollectionConfig = {
                   zh: '该产品的主分类（有助于筛选属性和模版）',
                 },
               },
+            },
+            {
+              name: 'slug',
+              type: 'textarea',
+              label: {
+                en: 'Slug',
+                zh: 'URL标识',
+              },
+              admin: {
+                description: {
+                  en: 'This slug is generated from the English product name. Do not modify manually unless necessary.',
+                  zh: '这个 slug 由产品名称的英文(en)自动生成，非必要请不要手动修改。',
+                },
+              },
+              index: true,
             },
           ],
         },
@@ -431,21 +456,7 @@ export const Products: CollectionConfig = {
         },
       ],
     },
-    {
-      name: 'slug',
-      type: 'textarea',
-      label: {
-        en: 'Slug',
-        zh: 'URL标识',
-      },
-      admin: {
-        description: {
-          en: 'This slug is generated from the English product name. Do not modify manually unless necessary.',
-          zh: '这个 slug 由产品名称的英文(en)自动生成，非必要请不要手动修改。',
-        },
-      },
-      index: true,
-    },
+
   ],
   hooks: {
     beforeChange: [
@@ -456,7 +467,7 @@ export const Products: CollectionConfig = {
         // Only generate slug from English name. Prevent other locales from overwriting it.
         if (data.name) {
           let nameToSlugify = '';
-          
+
           if (typeof data.name === 'object' && data.name.en) {
             nameToSlugify = data.name.en;
           } else if (req.locale === 'en' || req.locale === 'all' || !req.locale) {

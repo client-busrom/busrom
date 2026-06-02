@@ -9,9 +9,9 @@ export async function POST(
   try {
     const payload = await getPayload({ config: configPromise })
     const { collection, id } = await params
-    
+
     const body = await req.json()
-    const { locales } = body
+    const { locales, sourceLocale } = body
     console.log(`📡 [save-translations] Incoming request for ${collection}/${id}. Locales count: ${Object.keys(locales || {}).length}`)
     console.log(`📡 [save-translations] Body keys: ${Object.keys(body).join(', ')}`)
 
@@ -23,7 +23,7 @@ export async function POST(
     const i18nReq: any = req
     i18nReq.payload = payload
     i18nReq.context = i18nReq.context || {}
-    
+
     // 尝试获取当前登录用户
     const { user } = await payload.auth(i18nReq)
     i18nReq.user = user
@@ -43,6 +43,15 @@ export async function POST(
     // 使用串行保存，确保数据库稳定性
     for (const [localeCode, data] of Object.entries(locales)) {
       try {
+        // [Bugfix] Clear the transactionID from the request object for each iteration.
+        // In Payload 3.x, `payload.update` mutates `req` by attaching a `transactionID` when it starts a transaction.
+        // It commits the transaction at the end of the update, but leaves the ID on the `req` object.
+        // On subsequent loop iterations, Payload sees the ID, thinks it's an active transaction, and tries to use it.
+        // Postgres then aborts it because the transaction was already committed, causing the "rollback" or "empty translations" bug.
+        if (i18nReq.transactionID) {
+          delete i18nReq.transactionID
+        }
+
         console.log(`[save-translations] ⏳ Saving locale=${localeCode}... Data keys: ${Object.keys(data as any).join(', ')}`)
         
         // 清理数据
@@ -64,13 +73,18 @@ export async function POST(
         i18nReq.context.isSyncing = true
 
         console.log(`📡 [save-translations] ⏳ Updating locale=${localeCode} for ${collection}/${id}. User: ${i18nReq.user?.email || 'Admin'}`)
-        
+
+        // [Bugfix] 如果是源语言（默认语言），必须开启 Hooks 进行保存，否则 Payload 底层会因为缺少 Hook 处理
+        // 而导致默认语言的数据没有正确写入 locale 关联表，导致其凭空变为空值。
+        // 其他目标语言则保持 disableHooks: true 追求极速。
+        const shouldUseHooks = localeCode === sourceLocale;
+
         const updatedDoc = await payload.update({
           collection: collection as any,
           id,
           data: cleanedData,
           locale: localeCode as any,
-          disableHooks: true,
+          disableHooks: !shouldUseHooks,
           req: i18nReq,
         } as any)
 

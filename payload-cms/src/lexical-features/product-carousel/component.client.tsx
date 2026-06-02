@@ -494,7 +494,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                             {getProductImage(product) ? (
                               <img
                                 src={getProductImage(product)!}
-                                alt={product.name || product.sku}
+                                alt={product.adminLabel || product.name || product.sku}
                                 style={{ width: '100%', height: '100px', objectFit: 'cover', display: 'block' }}
                               />
                             ) : (
@@ -521,7 +521,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                             whiteSpace: 'nowrap',
                             marginBottom: '8px',
                           }}>
-                            {product.name || product.sku}
+                            {product.adminLabel || product.name || product.sku}
                           </div>
                           <button
                             type="button"
@@ -1080,7 +1080,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                 {item.selectionMode === 'manual' && product ? (
                   <>
                     {getProductImage(product) ? (
-                      <img src={getProductImage(product)!} alt={product.name || product.sku} style={{ width: '100%', height: '150px', objectFit: 'cover', display: 'block' }} />
+                      <img src={getProductImage(product)!} alt={product.adminLabel || product.name || product.sku} style={{ width: '100%', height: '150px', objectFit: 'cover', display: 'block' }} />
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', backgroundColor: '#f3f4f6' }}>
                         <ImageIcon size={32} color="#9ca3af" />
@@ -1089,7 +1089,7 @@ export const ProductCarouselComponent: React.FC<ProductCarouselComponentProps> =
                     <div style={{ padding: '12px' }}>
                       {item.showName && (
                         <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: 600, color: '#1f2937' }}>
-                          {product.name || product.sku}
+                          {product.adminLabel || product.name || product.sku}
                         </h4>
                       )}
                       {item.showDescription && product.shortDescription && (
@@ -1213,6 +1213,7 @@ const ProductPickerModal: React.FC<ProductPickerModalProps> = ({ isOpen, onClose
       if (searchTerm) {
         params.append('where[or][0][name][contains]', searchTerm)
         params.append('where[or][1][sku][contains]', searchTerm)
+        params.append('where[or][2][adminLabel][contains]', searchTerm)
       }
 
       try {
@@ -1293,14 +1294,14 @@ const ProductPickerModal: React.FC<ProductPickerModalProps> = ({ isOpen, onClose
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e5e7eb' }}
                   >
                     {imageUrl ? (
-                      <img src={imageUrl} alt={product.name || product.sku} style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
+                      <img src={imageUrl} alt={product.adminLabel || product.name || product.sku} style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '80px', backgroundColor: '#f3f4f6', borderRadius: '4px' }}>
                         <ImageIcon size={24} color="#9ca3af" />
                       </div>
                     )}
                     <div style={{ marginTop: '8px', fontSize: '11px', fontWeight: 500, color: '#1f2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {product.name || product.sku}
+                      {product.adminLabel || product.name || product.sku}
                     </div>
                     <div style={{ fontSize: '10px', color: '#6b7280' }}>{product.sku}</div>
                   </div>

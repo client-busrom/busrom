@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
+import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { ImageObject } from "@/lib/content-data"
 import useEmblaCarousel from 'embla-carousel-react'
@@ -165,17 +165,13 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                       className="relative w-full aspect-[1312/1000] bg-brand-cream-light cursor-pointer overflow-hidden"
                       onClick={() => openModal(index)}
                     >
-                      <Image
-                        src={imgUrl}
+                      <OptimizedImage
+                        image={image}
                         alt={image.altText || productName}
-                        fill
                         sizes="(max-width: 768px) 100vw, 60vw"
-                        className="object-cover"
-                        style={{
-                          objectPosition: `${imgFocalPoint.x}% ${imgFocalPoint.y}%`,
-                        }}
+                        className="object-cover absolute inset-0 w-full h-full"
+                        objectPosition={`${imgFocalPoint.x}% ${imgFocalPoint.y}%`}
                         priority={index === 0}
-                        unoptimized
                       />
                     </div>
                   </div>
@@ -216,190 +212,185 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
           )}
         </div>
 
-      {/* Thumbnail Navigation (1:1 Square matching competitor) */}
-      {images.length > 1 && (
-        <div className="flex justify-center">
-          <div className="flex items-center gap-4 max-w-full">
-            {/* Previous Button */}
+        {/* Thumbnail Navigation (1:1 Square matching competitor) */}
+        {images.length > 1 && (
+          <div className="flex justify-center">
+            <div className="flex items-center gap-4 max-w-full">
+              {/* Previous Button */}
+              <button
+                onClick={goToPrevious}
+                className="hidden md:flex flex-shrink-0 w-8 h-8 items-center justify-center rounded-full bg-white border border-gray-100 hover:border-brand-accent-gold transition-colors disabled:opacity-30"
+                disabled={images.length <= 1}
+              >
+                <svg className="w-4 h-4 text-brand-text-main rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              {/* Thumbnails */}
+              <div
+                className="overflow-hidden -my-2 -mx-1"
+                ref={emblaThumbnailRef}
+                style={{
+                  width: `${Math.min(images.length, 5) * 58}px`
+                }}
+              >
+                <div className="flex">
+                  {images.map((image, index) => (
+                    <div key={index} className="flex-shrink-0 px-1 py-2">
+                      <button
+                        onClick={() => onThumbnailClick(index)}
+                        className={cn(
+                          "relative block w-[50px] h-[50px] rounded-md overflow-hidden transition-all duration-300",
+                          selectedIndex === index
+                            ? "ring-2 ring-brand-accent-gold ring-offset-2 scale-100"
+                            : "opacity-60 hover:opacity-100 border border-transparent"
+                        )}
+                      >
+                        <OptimizedImage
+                          image={image}
+                          size="thumbnail"
+                          alt={`${productName} thumbnail ${index + 1}`}
+                          className="object-cover absolute inset-0 w-full h-full"
+                        />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Next Button */}
+              <button
+                onClick={goToNext}
+                className="hidden md:flex flex-shrink-0 w-8 h-8 items-center justify-center rounded-full bg-white border border-gray-100 hover:border-brand-accent-gold transition-colors disabled:opacity-30"
+                disabled={images.length <= 1}
+              >
+                <svg className="w-4 h-4 text-brand-text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* Full-Screen Modal */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
+          onClick={() => setIsModalOpen(false)}
+        >
+          {/* Close Button */}
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-3 transition-colors"
+            aria-label="Close modal"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Image Counter */}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm z-10">
+            {modalIndex + 1} / {images.length}
+          </div>
+
+          {/* Previous Button */}
+          {images.length > 1 && (
             <button
-              onClick={goToPrevious}
-              className="hidden md:flex flex-shrink-0 w-8 h-8 items-center justify-center rounded-full bg-white border border-gray-100 hover:border-brand-accent-gold transition-colors disabled:opacity-30"
-              disabled={images.length <= 1}
+              onClick={(e) => {
+                e.stopPropagation()
+                goToPreviousModal()
+              }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-4 transition-colors z-10"
+              aria-label="Previous image"
             >
-              <svg className="w-4 h-4 text-brand-text-main rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
+          )}
 
-            {/* Thumbnails */}
-            <div 
-              className="overflow-hidden" 
-              ref={emblaThumbnailRef}
-              style={{
-                width: `${Math.min(images.length, 5) * 50 + (Math.min(images.length, 5) - 1) * 8 + 8}px`
-              }}
-            >
-              <div className="flex gap-2 p-1">
+          {/* Main Image Carousel */}
+          <div
+            className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="overflow-hidden w-full h-full" ref={emblaModalRef}>
+              <div className="flex h-full">
                 {images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => onThumbnailClick(index)}
-                    className={cn(
-                      "relative flex-shrink-0 w-[50px] h-[50px] rounded-md overflow-hidden transition-all duration-300",
-                      selectedIndex === index
-                        ? "ring-2 ring-brand-accent-gold ring-offset-2 scale-105"
-                        : "opacity-60 hover:opacity-100 border border-transparent"
-                    )}
-                  >
-                    <Image
-                      src={image.variants?.thumbnail?.url || image.variants?.card?.url || image.url}
-                      alt={`${productName} thumbnail ${index + 1}`}
-                      fill
-                      sizes="50px"
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </button>
+                  <div key={index} className="flex-[0_0_100%] min-w-0 h-full">
+                    <div className="relative w-full h-full">
+                      <OptimizedImage
+                        image={image}
+                        size="xlarge"
+                        alt={image.altText || `${productName} ${index + 1}`}
+                        sizes="100vw"
+                        className="object-contain absolute inset-0 w-full h-full"
+                        objectPosition={
+                          image.cropFocalPoint
+                            ? `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`
+                            : "center"
+                        }
+                        priority={index === modalIndex}
+                      />
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* Next Button */}
+          {/* Next Button */}
+          {images.length > 1 && (
             <button
-              onClick={goToNext}
-              className="hidden md:flex flex-shrink-0 w-8 h-8 items-center justify-center rounded-full bg-white border border-gray-100 hover:border-brand-accent-gold transition-colors disabled:opacity-30"
-              disabled={images.length <= 1}
+              onClick={(e) => {
+                e.stopPropagation()
+                goToNextModal()
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-4 transition-colors z-10"
+              aria-label="Next image"
             >
-              <svg className="w-4 h-4 text-brand-text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
-          </div>
+          )}
+
+          {/* Thumbnail Strip */}
+          {images.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 max-w-4xl z-10 -my-2 -mx-1">
+              <div className="flex overflow-x-auto scrollbar-hide px-3">
+                {images.map((image, index) => (
+                  <div key={index} className="flex-shrink-0 px-1 py-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        emblaModalApi?.scrollTo(index)
+                      }}
+                      className={cn(
+                        "relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all",
+                        modalIndex === index
+                          ? "border-white ring-2 ring-white ring-offset-2 ring-offset-black/50"
+                          : "border-white/30 hover:border-white/60"
+                      )}
+                    >
+                      <OptimizedImage
+                        image={image}
+                        size="thumbnail"
+                        alt={image.altText || `${productName} ${index + 1}`}
+                        className="object-cover absolute inset-0 w-full h-full"
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
-
-    </div>
-
-    {/* Full-Screen Modal */}
-    {isModalOpen && (
-      <div
-        className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
-        onClick={() => setIsModalOpen(false)}
-      >
-        {/* Close Button */}
-        <button
-          onClick={() => setIsModalOpen(false)}
-          className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-3 transition-colors"
-          aria-label="Close modal"
-        >
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        {/* Image Counter */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-white text-sm z-10">
-          {modalIndex + 1} / {images.length}
-        </div>
-
-        {/* Previous Button */}
-        {images.length > 1 && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              goToPreviousModal()
-            }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-4 transition-colors z-10"
-            aria-label="Previous image"
-          >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-        )}
-
-        {/* Main Image Carousel */}
-        <div
-          className="relative w-full h-full flex items-center justify-center p-4 md:p-8"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="overflow-hidden w-full h-full" ref={emblaModalRef}>
-            <div className="flex h-full">
-              {images.map((image, index) => (
-                <div key={index} className="flex-[0_0_100%] min-w-0 h-full">
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={image.variants?.desktop?.url || image.variants?.tablet?.url || image.variants?.card?.url || image.variants?.thumbnail?.url || image.url}
-                      alt={image.altText || `${productName} ${index + 1}`}
-                      fill
-                      sizes="100vw"
-                      className="object-contain"
-                      style={
-                        image.cropFocalPoint
-                          ? {
-                              objectPosition: `${image.cropFocalPoint.x}% ${image.cropFocalPoint.y}%`,
-                            }
-                          : undefined
-                      }
-                      priority={index === modalIndex}
-                      unoptimized
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Next Button */}
-        {images.length > 1 && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              goToNextModal()
-            }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-4 transition-colors z-10"
-            aria-label="Next image"
-          >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        )}
-
-        {/* Thumbnail Strip */}
-        {images.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 max-w-4xl z-10">
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide px-4">
-              {images.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    emblaModalApi?.scrollTo(index)
-                  }}
-                  className={cn(
-                    "relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all",
-                    modalIndex === index
-                      ? "border-white ring-2 ring-white ring-offset-2 ring-offset-black/50"
-                      : "border-white/30 hover:border-white/60"
-                  )}
-                >
-                  <Image
-                    src={image.variants?.thumbnail?.url || image.variants?.card?.url || image.url}
-                    alt={image.altText || `${productName} ${index + 1}`}
-                    fill
-                    sizes="64px"
-                    className="object-cover"
-                    unoptimized
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    )}
     </>
   )
 }

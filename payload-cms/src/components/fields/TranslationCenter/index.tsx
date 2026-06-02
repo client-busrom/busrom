@@ -723,7 +723,7 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
         const saveRes = await fetch(`/api/${activeSlug}/${docId}/save-translations`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ locales: localesPayload }),
+          body: JSON.stringify({ locales: localesPayload, sourceLocale }),
         })
 
         const result = await saveRes.json()
