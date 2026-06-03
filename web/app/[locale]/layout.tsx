@@ -366,11 +366,19 @@ export async function generateMetadata(): Promise<Metadata> {
       card: 'summary_large_image',
       ...(logoUrl && { images: [logoUrl] }),
     },
+    verification: {
+      ...(process.env.GOOGLE_SITE_VERIFICATION 
+          ? { google: process.env.GOOGLE_SITE_VERIFICATION.includes(',') 
+                ? process.env.GOOGLE_SITE_VERIFICATION.split(',').map(s => s.trim()) 
+                : process.env.GOOGLE_SITE_VERIFICATION } 
+          : {}),
+      ...(process.env.YANDEX_VERIFICATION ? { yandex: process.env.YANDEX_VERIFICATION } : {}),
+      other: {
+        ...(process.env.NAVER_SITE_VERIFICATION ? { 'naver-site-verification': process.env.NAVER_SITE_VERIFICATION } : {}),
+      }
+    },
     other: {
       'msapplication-TileImage': finalFaviconUrl,
-      'google-site-verification': process.env.GOOGLE_SITE_VERIFICATION || '',
-      'yandex-verification': process.env.YANDEX_VERIFICATION || '',
-      'naver-site-verification': process.env.NAVER_SITE_VERIFICATION || '',
       'msapplication-TileColor': '#756F3F',
     },
     manifest: '/manifest.json',
