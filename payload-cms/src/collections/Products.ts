@@ -25,6 +25,7 @@ import { autoIndexDeleteHook } from '../hooks/autoIndexDelete'
 
 export const Products: CollectionConfig = {
   slug: 'products',
+  defaultSort: '-shopOrder',
   labels: {
     singular: {
       en: 'Product Detail Page',

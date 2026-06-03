@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     
     const response = await fetch(url, {
       headers: { 'Content-Type': 'application/json' },
-      next: { revalidate: 60 }, // Cache for 60 seconds
+      next: { revalidate: 0 }, // 禁用缓存，确保后台排序立即生效
     })
 
     if (!response.ok) {
@@ -46,10 +46,57 @@ export async function GET(request: NextRequest) {
       }
     })
 
+    // Map flattened sortSettings into the array format expected by the frontend
+    const sortSettings = data.sortSettings || {}
+    const sortOptions = []
+    
+    if (sortSettings.enableSortShopOrder) {
+      sortOptions.push({ value: 'shopOrder', label: sortSettings.labelSortShopOrder || 'Recommended', isDefault: sortSettings.defaultSort === 'shopOrder' })
+    }
+    if (sortSettings.enableSortCreatedAt) {
+      sortOptions.push({ value: 'createdAt', label: sortSettings.labelSortCreatedAt || 'Newest Arrivals', isDefault: sortSettings.defaultSort === 'createdAt' })
+    }
+    if (sortSettings.enableSortNameAsc) {
+      sortOptions.push({ value: 'name_asc', label: sortSettings.labelSortNameAsc || 'Name (A to Z)', isDefault: sortSettings.defaultSort === 'name_asc' })
+    }
+    if (sortSettings.enableSortNameDesc) {
+      sortOptions.push({ value: 'name_desc', label: sortSettings.labelSortNameDesc || 'Name (Z to A)', isDefault: sortSettings.defaultSort === 'name_desc' })
+    }
+
+    const sortGroupTitle = sortSettings.title || 'Sort By'
+
+    // Map buttonLabels
+    const rawButtonLabels = data.buttonLabels || {}
+    const buttonLabels = {
+      viewDetails: rawButtonLabels.viewDetails || 'View Details',
+      sendInquiry: rawButtonLabels.sendInquiry || 'Send Inquiry',
+    }
+
+    // Map filterLabels
+    const rawFilterLabels = data.filterLabels || {}
+    const filterLabels = {
+      applyFilterBtn: rawFilterLabels.applyFilterBtn || 'Apply filter',
+      searchPlaceholder: rawFilterLabels.searchPlaceholder || 'Search products...',
+      title: rawFilterLabels.title || 'Product Status',
+      hotLabel: rawFilterLabels.hotLabel || 'Hot Items',
+      enableHotFilter: rawFilterLabels.enableHotFilter !== false,
+      newLabel: rawFilterLabels.newLabel || 'New Arrivals',
+      enableNewFilter: rawFilterLabels.enableNewFilter !== false,
+      featuredLabel: rawFilterLabels.featuredLabel || 'Featured',
+      enableFeaturedFilter: rawFilterLabels.enableFeaturedFilter !== false,
+    }
+
     return NextResponse.json({
+      title: data.title || '',
       pageSize: data.pageSize || 24,
       showAllTab: data.showAllTab !== false,
-      categories: categories
+      allTabLabel: data.allTabLabel || 'All',
+      allProductsTitle: data.allProductsTitle || 'All Products',
+      categories,
+      sortGroupTitle,
+      sortOptions,
+      filterLabels,
+      buttonLabels,
     })
   } catch (error) {
     console.error('[Shop Config API] Error:', error)

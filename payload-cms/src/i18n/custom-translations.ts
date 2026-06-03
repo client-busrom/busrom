@@ -97,6 +97,20 @@ export const customTranslationsEn = {
       recommendedBlogsTitle: 'Recommended Blogs Title',
       followUsTitle: 'Follow Us Title',
       bottomRecommendedTitle: 'Bottom Recommended Title',
+      // Shop Page Settings
+      allTabText: 'All Tab Text',
+      allProductsTitle: 'All Products Title',
+      recommendedLabel: 'Recommended Label',
+      newArrivalsLabel: 'New Arrivals Label',
+      nameAscLabel: 'Name (A to Z) Label',
+      nameDescLabel: 'Name (Z to A) Label',
+      applyFilterBtn: 'Apply Filter Button',
+      filterGroupTitle: 'Filter Group Title',
+      hotItemsLabel: 'Hot Items Label',
+      featuredLabel: 'Featured Items Label',
+      sortGroupTitle: 'Sort Group Title',
+      viewDetailsBtn: 'View Details Button',
+      sendInquiryBtn: 'Send Inquiry Button',
     },
 
     // ========================================================================
@@ -563,6 +577,20 @@ export const customTranslationsZh = {
       recommendedBlogsTitle: '推荐博文标题',
       followUsTitle: '关注我们标题',
       bottomRecommendedTitle: '底部推荐标题',
+      // Shop Page Settings
+      allTabText: '全部标签文案',
+      allProductsTitle: '全部产品列表标题',
+      recommendedLabel: '推荐排序文案',
+      newArrivalsLabel: '新品选项文案',
+      nameAscLabel: '名称(A-Z)文案',
+      nameDescLabel: '名称(Z-A)文案',
+      applyFilterBtn: '应用过滤按钮',
+      filterGroupTitle: '过滤组标题',
+      featuredLabel: '推荐选项文案',
+      sortGroupTitle: '排序分组标题',
+      viewDetailsBtn: '查看详情按钮',
+      sendInquiryBtn: '发送询盘按钮',
+      hotItemsLabel: '爆品选项文案',
     },
 
     // ========================================================================

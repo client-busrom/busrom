@@ -185,10 +185,12 @@ export async function GET(request: NextRequest) {
 
     // Sorting
     if (sortBy === 'shopOrder') {
-      // 按照 CMS 定义的规则及置顶需求：isHot/isNew 置顶 > Shop权重 > 全局显示顺序 > 更新时间
-      params.append('sort', sortDir === 'desc' ? '-isHot,-isNew,-shopOrder,-order,-updatedAt' : 'isHot,isNew,shopOrder,order,updatedAt')
-    } else if (sortBy === 'order') {
-      params.append('sort', sortDir === 'desc' ? '-order,-updatedAt' : 'order,updatedAt')
+      // 按照 CMS 定义的规则及置顶需求：isHot > isNew > isFeatured > Shop权重 > 全局显示顺序 > 更新时间
+      params.append('sort', sortDir === 'desc' ? '-isHot,-isNew,-isFeatured,-shopOrder,-order,-updatedAt' : 'isHot,isNew,isFeatured,shopOrder,order,updatedAt')
+    } else if (sortBy === 'name_asc') {
+      params.append('sort', 'name')
+    } else if (sortBy === 'name_desc') {
+      params.append('sort', '-name')
     } else {
       const sortField = sortBy === 'createdAt' ? 'createdAt' : 
                        sortBy === 'updatedAt' ? 'updatedAt' : 'order'

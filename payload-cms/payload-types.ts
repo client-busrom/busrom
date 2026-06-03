@@ -3830,7 +3830,42 @@ export interface ShopPageConfig {
    */
   categoryTabs: (number | Category)[];
   showAllTab?: boolean | null;
+  allTabLabel?: string | null;
+  allProductsTitle?: string | null;
   pageSize?: number | null;
+  /**
+   * Configure the sorting options available to visitors. Flat fields for translation compatibility.
+   */
+  sortSettings?: {
+    title?: string | null;
+    defaultSort?: ('shopOrder' | 'createdAt' | 'name_asc' | 'name_desc') | null;
+    enableSortShopOrder?: boolean | null;
+    labelSortShopOrder?: string | null;
+    enableSortCreatedAt?: boolean | null;
+    labelSortCreatedAt?: string | null;
+    enableSortNameAsc?: boolean | null;
+    labelSortNameAsc?: string | null;
+    enableSortNameDesc?: boolean | null;
+    labelSortNameDesc?: string | null;
+  };
+  /**
+   * Customize the text and availability of the filter sidebar.
+   */
+  filterLabels?: {
+    applyFilterBtn?: string | null;
+    searchPlaceholder?: string | null;
+    title?: string | null;
+    enableHotFilter?: boolean | null;
+    hotLabel?: string | null;
+    enableNewFilter?: boolean | null;
+    newLabel?: string | null;
+    enableFeaturedFilter?: boolean | null;
+    featuredLabel?: string | null;
+  };
+  buttonLabels?: {
+    viewDetails?: string | null;
+    sendInquiry?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -4707,7 +4742,42 @@ export interface SocialConfigSelect<T extends boolean = true> {
 export interface ShopPageConfigSelect<T extends boolean = true> {
   categoryTabs?: T;
   showAllTab?: T;
+  allTabLabel?: T;
+  allProductsTitle?: T;
   pageSize?: T;
+  sortSettings?:
+    | T
+    | {
+        title?: T;
+        defaultSort?: T;
+        enableSortShopOrder?: T;
+        labelSortShopOrder?: T;
+        enableSortCreatedAt?: T;
+        labelSortCreatedAt?: T;
+        enableSortNameAsc?: T;
+        labelSortNameAsc?: T;
+        enableSortNameDesc?: T;
+        labelSortNameDesc?: T;
+      };
+  filterLabels?:
+    | T
+    | {
+        applyFilterBtn?: T;
+        searchPlaceholder?: T;
+        title?: T;
+        enableHotFilter?: T;
+        hotLabel?: T;
+        enableNewFilter?: T;
+        newLabel?: T;
+        enableFeaturedFilter?: T;
+        featuredLabel?: T;
+      };
+  buttonLabels?:
+    | T
+    | {
+        viewDetails?: T;
+        sendInquiry?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

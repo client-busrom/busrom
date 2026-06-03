@@ -42,9 +42,10 @@ interface ProductCardProps {
   priority?: boolean
   // 索引 - 用于计算是否需要优先加载
   index?: number
+  buttonLabels?: { viewDetails?: string; sendInquiry?: string }
 }
 
-export function ProductCard({ product, locale, priority, index = 0 }: ProductCardProps) {
+export function ProductCard({ product, locale, priority, index = 0, buttonLabels }: ProductCardProps) {
   // 前8个产品优先加载 (首屏2行 * 4列)
   const shouldPrioritize = priority ?? index < 8
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -145,20 +146,20 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
         )}
 
         {/* Status badges (Hot / New / Featured) */}
-        <div className="absolute top-0 right-0 flex flex-col items-end z-20">
+        <div className="absolute top-0 right-0 flex items-start gap-[1px] z-20">
           {product.isHot && (
-            <div className="bg-[#E63946] text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-tighter mb-px">
+            <div className="bg-[#E63946] text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-tighter">
               HOT
             </div>
           )}
           {product.isNew && (
-            <div className="bg-[#B5964B] text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-tighter mb-px">
+            <div className="bg-[#B5964B] text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-tighter">
               NEW
             </div>
           )}
           {product.isFeatured && (
             <div className="bg-brand-secondary text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-tighter">
-              Featured
+              FEATURED
             </div>
           )}
         </div>
@@ -190,13 +191,13 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
               onMouseEnter={() => setHoveredButton("details")}
               onMouseLeave={() => setHoveredButton(null)}
               className={cn(
-                "px-3 py-2 text-[10px] font-semibold uppercase tracking-wider transition-all duration-300 border",
+                "px-3 py-2 text-[10px] font-semibold tracking-wider transition-all duration-300 border",
                 hoveredButton === "details"
                   ? "bg-brand-secondary text-white border-brand-secondary"
                   : "bg-brand-main text-brand-text-main border-brand-secondary/30"
               )}
             >
-              {t.viewDetails}
+              {buttonLabels?.viewDetails || t.viewDetails}
             </Link>
 
             {/* Send Inquiry Button */}
@@ -205,13 +206,13 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
               onMouseEnter={() => setHoveredButton("inquiry")}
               onMouseLeave={() => setHoveredButton(null)}
               className={cn(
-                "px-3 py-2 text-[10px] font-semibold uppercase tracking-wider transition-all duration-300 border",
+                "px-3 py-2 text-[10px] font-semibold tracking-wider transition-all duration-300 border",
                 hoveredButton === "inquiry"
                   ? "bg-brand-secondary text-white border-brand-secondary"
                   : "bg-brand-main text-brand-text-main border-brand-secondary/30"
               )}
             >
-              {t.sendInquiry}
+              {buttonLabels?.sendInquiry || t.sendInquiry}
             </Link>
           </div>
         </div>
@@ -224,7 +225,7 @@ export function ProductCard({ product, locale, priority, index = 0 }: ProductCar
           href={`/shop/${product.slug}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-anaheim font-bold text-sm text-brand-text-black line-clamp-2 hover:text-brand-secondary transition-colors leading-tight uppercase text-left"
+          className="font-anaheim font-bold text-sm text-brand-text-black line-clamp-2 hover:text-brand-secondary transition-colors leading-tight text-left"
         >
           {displayName}
         </Link>

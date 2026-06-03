@@ -54,9 +54,58 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
 
   const rawCategory = slugMode ? pathSlug : (searchParamsDict.get('category') || "")
   const selectedCategory = useMemo(() => toUrlSlug(rawCategory), [rawCategory])
-  const sortBy = (searchParamsDict.get('sortBy') || 'shopOrder') as ProductSortField
-  const sortDirection = (searchParamsDict.get('sortDir') || 'DESC') as ProductSortDirection
-  const featuredOnly = searchParamsDict.get('featured') === 'true'
+
+  // ============================================================
+  // Data Fetching
+  // ============================================================
+  const { data: configData } = useSWR<{ categories: any[], showAllTab: boolean, allTabLabel?: string, allProductsTitle?: string, title: string, pageSize: number, sortOptions: any[], filterLabels?: any, sortGroupTitle?: string, buttonLabels?: any }>(
+    `/api/shop/config?locale=${locale}`,
+    fetcher,
+    { revalidateOnFocus: false }
+  )
+  const categories = configData?.categories || []
+  const showAllTab = configData?.showAllTab !== false
+  const filterLabels = configData?.filterLabels || {
+    applyFilterBtn: 'Apply filter',
+    title: 'Product Status',
+    hotLabel: 'Hot Items',
+    newLabel: 'New Arrivals',
+    featuredLabel: 'Featured'
+  }
+
+  const apiSortOptions = useMemo(() => {
+    if (!configData?.sortOptions?.length) {
+      return [
+        { label: "Recommended", value: "shopOrder", direction: "DESC" as const, isDefault: true },
+        { label: "Newest Arrivals", value: "createdAt", direction: "DESC" as const },
+        { label: "Name (A to Z)", value: "name_asc", direction: "ASC" as const },
+      ]
+    }
+    return configData.sortOptions.map((opt: any) => {
+      let dir = 'DESC'
+      if (opt.value === 'name_asc') dir = 'ASC'
+      else if (opt.value === 'name_desc') dir = 'DESC'
+      
+      return {
+        label: opt.label,
+        value: opt.value,
+        direction: dir,
+        isDefault: opt.isDefault
+      }
+    })
+  }, [configData])
+
+  const defaultSortOption = useMemo(() => {
+    return apiSortOptions.find((opt: any) => opt.isDefault) || apiSortOptions[0]
+  }, [apiSortOptions])
+
+  const [sortBy, setSortBy] = useState<ProductSortField>('shopOrder')
+  const [sortDirection, setSortDirection] = useState<ProductSortDirection>('DESC')
+  
+  // Status filters
+  const [hotOnly, setHotOnly] = useState(false)
+  const [newOnly, setNewOnly] = useState(false)
+  const [featuredOnly, setFeaturedOnly] = useState(false)
 
   // Local UI state
   const [currentPage, setCurrentPage] = useState(1) // No longer in URL
@@ -67,21 +116,10 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
   // Reset page when anything else changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [selectedCategory, sortBy, sortDirection, featuredOnly, searchQuery])
-
-  // ============================================================
-  // Data Fetching
-  // ============================================================
-  const { data: configData } = useSWR<{ categories: any[], showAllTab: boolean, title: string, pageSize: number }>(
-    `/api/shop/config?locale=${locale}`,
-    fetcher,
-    { revalidateOnFocus: false }
-  )
-  const categories = configData?.categories || []
-  const showAllTab = configData?.showAllTab !== false
+  }, [selectedCategory, sortBy, sortDirection, hotOnly, newOnly, featuredOnly, searchQuery])
 
   // Fetch ALL products once (front-end filtering is fast, avoids round trips per tab click)
-  const productsUrl = `/api/products?locale=${locale}&pageSize=1000&sortBy=${sortBy}&sortDir=${sortDirection.toLowerCase()}${featuredOnly ? '&isFeatured=true' : ''}`
+  const productsUrl = `/api/products?locale=${locale}&pageSize=1000&sortBy=shopOrder&sortDir=desc`
   const { data: productsData, isLoading, isValidating } = useSWR<ProductListResponse>(
     productsUrl,
     fetcher,
@@ -113,54 +151,63 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
   }, [allProducts, selectedCategory])
 
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return categoryFilteredProducts
+    let result = categoryFilteredProducts
+
+    // Apply status filters locally
+    if (hotOnly) result = result.filter((p: any) => p.isHot)
+    if (newOnly) result = result.filter((p: any) => p.isNew)
+    if (featuredOnly) result = result.filter((p: any) => p.isFeatured)
+
+    if (!searchQuery.trim()) return result
+    
     const query = searchQuery.toLowerCase()
-    return categoryFilteredProducts.filter((product: any) => {
+    return result.filter((product: any) => {
       const name = product?.localizedName || product?.name?.[locale] || product?.name || ""
       const sku = product?.sku || ""
       return name.toLowerCase().includes(query) || sku.toLowerCase().includes(query)
     })
-  }, [categoryFilteredProducts, searchQuery, locale])
+  }, [categoryFilteredProducts, searchQuery, locale, hotOnly, newOnly, featuredOnly])
 
   const sortedProducts = useMemo(() => {
     const list = [...filteredProducts]
     list.sort((a: any, b: any) => {
       if (sortBy === 'shopOrder') {
-        // 1. 置顶逻辑：isHot 或 isNew 的产品优先置顶
-        const aPinned = a.isHot || a.isNew ? 1 : 0
-        const bPinned = b.isHot || b.isNew ? 1 : 0
+        // 1. 置顶优先级：isHot(3) > isNew(2) > isFeatured(1) > 普通(0)
+        const getPinWeight = (p: any) => (p.isHot ? 3 : p.isNew ? 2 : p.isFeatured ? 1 : 0)
+        const aPinned = getPinWeight(a)
+        const bPinned = getPinWeight(b)
         if (aPinned !== bPinned) {
-          return bPinned - aPinned // 1 在前，0 在后
+          return bPinned - aPinned // 权重大的在前
         }
 
         // 2. 内部按照 shopOrder > order > updatedAt 排序
         const aShop = a.shopOrder || 0
         const bShop = b.shopOrder || 0
         if (aShop !== bShop) {
-          return sortDirection === 'DESC' ? bShop - aShop : aShop - bShop
+          return sortDirection.toUpperCase() === 'DESC' ? bShop - aShop : aShop - bShop
         }
         const aOrder = a.order || 0
         const bOrder = b.order || 0
         if (aOrder !== bOrder) {
-          return sortDirection === 'DESC' ? bOrder - aOrder : aOrder - bOrder
+          return sortDirection.toUpperCase() === 'DESC' ? bOrder - aOrder : aOrder - bOrder
         }
         const aTime = a.updatedAt ? new Date(a.updatedAt).getTime() : 0
         const bTime = b.updatedAt ? new Date(b.updatedAt).getTime() : 0
-        return sortDirection === 'DESC' ? bTime - aTime : aTime - bTime
+        return sortDirection.toUpperCase() === 'DESC' ? bTime - aTime : aTime - bTime
       } else if (sortBy === 'order') {
         const aOrder = a.order || 0
         const bOrder = b.order || 0
         if (aOrder !== bOrder) {
-          return sortDirection === 'DESC' ? bOrder - aOrder : aOrder - bOrder
+          return sortDirection.toUpperCase() === 'DESC' ? bOrder - aOrder : aOrder - bOrder
         }
         const aTime = a.updatedAt ? new Date(a.updatedAt).getTime() : 0
         const bTime = b.updatedAt ? new Date(b.updatedAt).getTime() : 0
-        return sortDirection === 'DESC' ? bTime - aTime : aTime - bTime
+        return sortDirection.toUpperCase() === 'DESC' ? bTime - aTime : aTime - bTime
       } else {
         const prop = sortBy === 'createdAt' ? 'createdAt' : sortBy === 'updatedAt' ? 'updatedAt' : 'createdAt'
         const aTime = a[prop] ? new Date(a[prop]).getTime() : 0
         const bTime = b[prop] ? new Date(b[prop]).getTime() : 0
-        return sortDirection === 'DESC' ? bTime - aTime : aTime - bTime
+        return sortDirection.toUpperCase() === 'DESC' ? bTime - aTime : aTime - bTime
       }
     })
     return list
@@ -216,9 +263,10 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
-  const handleSortChange = useCallback((newSortBy: string, newSortDir: string) => {
-    updateUrl({ sortBy: newSortBy, sortDir: newSortDir })
-  }, [updateUrl])
+  const handleSortChange = useCallback((newSortBy: ProductSortField, newSortDir: ProductSortDirection) => {
+    setSortBy(newSortBy)
+    setSortDirection(newSortDir)
+  }, [])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -234,17 +282,13 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
   // ============================================================
   // Display helpers
   // ============================================================
-  const displayTitle = useMemo(() => {
-    if (!selectedCategory) return "All Products"
-    const found = categories.find(c => c.slug === selectedCategory || String(c.id) === String(selectedCategory))
-    return found?.name || "All Products"
-  }, [selectedCategory, categories])
-
-  const sortOptions = [
-    { label: "Featured", value: "shopOrder", direction: "DESC" as const },
-    { label: "Newest", value: "createdAt", direction: "DESC" as const },
-    { label: "Default Order", value: "order", direction: "ASC" as const },
-  ]
+  // Derived state for headers
+  const categoryTitle = useMemo(() => {
+    const defaultTitle = configData?.allProductsTitle || "All Products"
+    if (!selectedCategory) return defaultTitle
+    const found = categories.find((c: any) => c.slug === selectedCategory)
+    return found?.name || defaultTitle
+  }, [selectedCategory, categories, configData?.allProductsTitle])
 
   // ============================================================
   // Animation variants
@@ -285,14 +329,14 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
         <div className="relative min-h-[52px] lg:min-h-[68px] flex items-center justify-center">
           <AnimatePresence mode="wait">
             <motion.h1
-              key={displayTitle}
+              key={categoryTitle}
               initial={{ y: 40, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -40, opacity: 0 }}
               transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
               className="font-orbitron font-medium text-4xl lg:text-6xl text-brand-text-black uppercase tracking-wide text-center"
             >
-              {displayTitle}
+              {categoryTitle}
             </motion.h1>
           </AnimatePresence>
         </div>
@@ -314,7 +358,7 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
                       : "text-brand-accent-gold hover:text-brand-text-black"
                   )}
                 >
-                  All
+                  {configData?.allTabLabel || 'All'}
                 </button>
               )}
 
@@ -350,10 +394,10 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
                 onClick={() => setIsFilterSortOpen(!isFilterSortOpen)}
                 className={cn(
                   "flex items-center gap-2 text-sm transition-colors whitespace-nowrap",
-                  (featuredOnly || sortBy !== "shopOrder") ? "text-brand-secondary" : "text-brand-accent-gold hover:text-brand-text-black"
+                  (hotOnly || newOnly || featuredOnly || sortBy !== defaultSortOption.value) ? "text-brand-secondary" : "text-brand-accent-gold hover:text-brand-text-black"
                 )}
               >
-                <span>Apply filter</span>
+                <span>{filterLabels.applyFilterBtn}</span>
                 <svg
                   className={cn("w-4 h-4 transition-transform", isFilterSortOpen && "rotate-180")}
                   fill="none"
@@ -362,7 +406,7 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
-                {(featuredOnly || sortBy !== "shopOrder") && (
+                {(hotOnly || newOnly || featuredOnly || sortBy !== defaultSortOption.value) && (
                   <span className="w-2 h-2 rounded-full bg-brand-secondary"></span>
                 )}
               </button>
@@ -372,25 +416,55 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
                 <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-brand-accent-border shadow-lg z-50 rounded-lg">
                   {/* Filter Section */}
                   <div className="p-3 border-b border-brand-accent-border">
-                    <span className="text-xs font-semibold text-brand-accent-gold uppercase tracking-wider">Filter</span>
-                    <label className="flex items-center gap-3 cursor-pointer group mt-2">
-                      <input
-                        type="checkbox"
-                        checked={featuredOnly}
-                        onChange={(e) => updateUrl({ featured: e.target.checked ? 'true' : null })}
-                        className="w-4 h-4 accent-brand-secondary cursor-pointer"
-                      />
-                      <span className="text-sm text-brand-text-black group-hover:text-brand-secondary transition-colors">
-                        Featured Only
-                      </span>
-                    </label>
+                    <span className="text-xs font-semibold text-brand-accent-gold tracking-wider">{filterLabels.title}</span>
+                    <div className="mt-2 space-y-2">
+                      {filterLabels.enableHotFilter && (
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={hotOnly}
+                            onChange={(e) => setHotOnly(e.target.checked)}
+                            className="w-4 h-4 accent-[#B91C1C] cursor-pointer"
+                          />
+                          <span className="text-sm text-brand-text-black group-hover:text-[#B91C1C] transition-colors">
+                            {filterLabels.hotLabel}
+                          </span>
+                        </label>
+                      )}
+                      {filterLabels.enableNewFilter && (
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={newOnly}
+                            onChange={(e) => setNewOnly(e.target.checked)}
+                            className="w-4 h-4 accent-[#D4AF37] cursor-pointer"
+                          />
+                          <span className="text-sm text-brand-text-black group-hover:text-[#D4AF37] transition-colors">
+                            {filterLabels.newLabel}
+                          </span>
+                        </label>
+                      )}
+                      {filterLabels.enableFeaturedFilter && (
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={featuredOnly}
+                            onChange={(e) => setFeaturedOnly(e.target.checked)}
+                            className="w-4 h-4 accent-brand-secondary cursor-pointer"
+                          />
+                          <span className="text-sm text-brand-text-black group-hover:text-brand-secondary transition-colors">
+                            {filterLabels.featuredLabel}
+                          </span>
+                        </label>
+                      )}
+                    </div>
                   </div>
 
                   {/* Sort Section */}
                   <div className="p-3">
-                    <span className="text-xs font-semibold text-brand-accent-gold uppercase tracking-wider">Sort By</span>
+                    <span className="text-xs font-semibold text-brand-accent-gold tracking-wider">{configData?.sortGroupTitle || 'Sort By'}</span>
                     <div className="mt-2 space-y-1">
-                      {sortOptions.map((option, index) => (
+                      {apiSortOptions.map((option: any, index: number) => (
                         <button
                           key={index}
                           onClick={() => {
@@ -398,10 +472,10 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
                             setIsFilterSortOpen(false)
                           }}
                           className={cn(
-                            "block w-full text-left px-2 py-1.5 text-sm transition-colors rounded",
-                            sortBy === option.value && sortDirection === option.direction
-                              ? "bg-brand-secondary/10 text-brand-secondary"
-                              : "text-brand-text-black hover:bg-gray-50"
+                            "w-full text-left px-4 py-3 text-sm transition-colors duration-200",
+                            sortBy === option.value
+                              ? "bg-[#F4F1ED] text-black font-medium"
+                              : "text-[#8A8A8A] hover:bg-[#F4F1ED]/50 hover:text-black"
                           )}
                         >
                           {option.label}
@@ -423,7 +497,7 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products..."
+                  placeholder={filterLabels.searchPlaceholder || "Search products..."}
                   className="w-full py-1 text-sm bg-transparent focus:outline-none placeholder:text-brand-accent-gold"
                 />
               </div>
@@ -469,7 +543,7 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
             ) : (
               <motion.div
                 // Key changes whenever the visible product set changes — this is the correct trigger
-                key={`${selectedCategory}-${sortBy}-${sortDirection}-${featuredOnly}-${currentPage}-${searchQuery}`}
+                key={`${selectedCategory}-${sortBy}-${sortDirection}-${hotOnly}-${newOnly}-${featuredOnly}-${currentPage}-${searchQuery}`}
                 className="flex flex-wrap justify-center gap-4 lg:gap-6 max-w-[1072px] mx-auto"
                 variants={containerVariants}
                 initial="hidden"
@@ -485,6 +559,7 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
                       product={product}
                       locale={locale}
                       index={index}
+                      buttonLabels={configData?.buttonLabels}
                     />
                   </motion.div>
                 ))}

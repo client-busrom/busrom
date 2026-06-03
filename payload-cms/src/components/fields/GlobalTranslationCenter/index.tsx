@@ -198,6 +198,23 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
       itemLabel: 'Option',
     },
   ],
+  'shop-page-config': [
+    { name: 'allTabLabel', labelKey: 'custom:translationCenter:allTabText', type: 'textarea' },
+    { name: 'allProductsTitle', labelKey: 'custom:translationCenter:allProductsTitle', type: 'textarea' },
+    { name: 'sortSettings.labelSortShopOrder', labelKey: 'custom:translationCenter:recommendedLabel', type: 'textarea' },
+    { name: 'sortSettings.labelSortCreatedAt', labelKey: 'custom:translationCenter:newArrivalsLabel', type: 'textarea' },
+    { name: 'sortSettings.labelSortNameAsc', labelKey: 'custom:translationCenter:nameAscLabel', type: 'textarea' },
+    { name: 'sortSettings.labelSortNameDesc', labelKey: 'custom:translationCenter:nameDescLabel', type: 'textarea' },
+    { name: 'filterLabels.applyFilterBtn', labelKey: 'custom:translationCenter:applyFilterBtn', type: 'textarea' },
+    { name: 'filterLabels.searchPlaceholder', labelKey: 'custom:translationCenter:searchPlaceholder', type: 'textarea' },
+    { name: 'filterLabels.title', labelKey: 'custom:translationCenter:filterGroupTitle', type: 'textarea' },
+    { name: 'filterLabels.hotLabel', labelKey: 'custom:translationCenter:hotItemsLabel', type: 'textarea' },
+    { name: 'filterLabels.newLabel', labelKey: 'custom:translationCenter:newArrivalsLabel', type: 'textarea' },
+    { name: 'filterLabels.featuredLabel', labelKey: 'custom:translationCenter:featuredLabel', type: 'textarea' },
+    { name: 'sortSettings.title', labelKey: 'custom:translationCenter:sortGroupTitle', type: 'textarea' },
+    { name: 'buttonLabels.viewDetails', labelKey: 'custom:translationCenter:viewDetailsBtn', type: 'textarea' },
+    { name: 'buttonLabels.sendInquiry', labelKey: 'custom:translationCenter:sendInquiryBtn', type: 'textarea' },
+  ],
 }
 
 interface FieldValue {
