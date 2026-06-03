@@ -8,8 +8,8 @@ echo "🚀 Starting Payload CMS..."
 echo "Environment: ${NODE_ENV:-production}"
 echo "Port: ${PORT:-3002}"
 
-# Set NODE_OPTIONS to suppress deprecation warnings
-export NODE_OPTIONS="--no-deprecation"
+# Set NODE_OPTIONS to suppress deprecation warnings and increase memory limit for 4GB ECS container
+export NODE_OPTIONS="--no-deprecation --max-old-space-size=3072"
 
 # Check if DATABASE_URI is set
 if [ -z "$DATABASE_URI" ]; then
