@@ -239,38 +239,120 @@ const nextConfig = {
     // 检测是否为开发环境
     const isDev = process.env.NODE_ENV !== 'production'
 
+    // 第三方服务白名单 (Analytics, Chat, CDN, etc.)
+    const thirdPartyScripts = [
+      'https://challenges.cloudflare.com',
+      'https://www.googletagmanager.com',
+      'https://www.google-analytics.com',
+      'https://analytics.google.com',
+      'https://googleads.g.doubleclick.net',
+      'https://connect.facebook.net',
+      'https://www.facebook.com',
+      'https://analytics.tiktok.com',
+      'https://s.tiktok.com',
+      'https://*.clarity.ms',
+      'https://www.clarity.ms',
+      'https://bat.bing.com',
+      'https://mc.yandex.ru',
+      'https://metrika.yandex.ru',
+      'https://*.hotjar.com',
+      'https://cdn.segment.com',
+      'https://cdn.amplitude.com',
+      'https://cdn.mxpnl.com',
+      'https://plausible.io',
+      'https://js.hs-scripts.com',
+      'https://js.hsforms.net',
+      'https://snap.licdn.com',
+      'https://static.ads-twitter.com',
+      'https://www.redditstatic.com',
+      'https://widget.intercom.io',
+      'https://js.intercomcdn.com',
+      'https://embed.tawk.to',
+      'https://cdn.jsdelivr.net',
+    ].join(' ')
+
+    const thirdPartyConnects = [
+      'https://*.amazonaws.com',
+      'https://*.cloudfront.net',
+      'https://cdn.busromhouse.com',
+      'https://challenges.cloudflare.com',
+      'https://cdn.jsdelivr.net',
+      'https://api.iconify.design',
+      'https://www.google-analytics.com',
+      'https://www.googletagmanager.com',
+      'https://analytics.google.com',
+      'https://*.tawk.to',
+      'wss://*.tawk.to',
+      'https://va.tawk.to',
+      'https://*.clarity.ms',
+      'https://*.hotjar.com',
+      'wss://*.hotjar.com',
+      'https://*.hotjar.io',
+      'wss://*.hotjar.io',
+      'https://mc.yandex.ru',
+      'https://analytics.tiktok.com',
+      'https://www.facebook.com',
+      'https://*.intercom.io',
+      'wss://*.intercom.io',
+      'https://api.segment.io',
+      'https://api.amplitude.com',
+      'https://api.mixpanel.com',
+      'https://px.ads.linkedin.com',
+    ].join(' ')
+
+    const thirdPartyImages = [
+      'https://*.amazonaws.com',
+      'https://*.cloudfront.net',
+      'https://cdn.busromhouse.com',
+      'https://unpkg.com',
+      'https://api.iconify.design',
+      'https://www.google-analytics.com',
+      'https://www.googletagmanager.com',
+      'https://*.tawk.to',
+      'https://tawk.link',
+      'https://cdn.jsdelivr.net',
+      'https://*.clarity.ms',
+      'https://c.clarity.ms',
+      'https://www.facebook.com',
+      'https://analytics.tiktok.com',
+      'https://bat.bing.com',
+      'https://mc.yandex.ru',
+    ].join(' ')
+
+    const thirdPartyFrames = [
+      'https://challenges.cloudflare.com',
+      'https://*.tawk.to',
+      'https://www.googletagmanager.com',
+      'https://www.facebook.com',
+      'https://*.hotjar.com',
+    ].join(' ')
+
     // CSP 配置
-    // Note: strict-dynamic 与 Next.js 不兼容 (Next.js 不支持 nonce)
-    // 使用 unsafe-inline 配合严格的 default-src 和其他限制来保护安全
     const cspDirectives = [
       "default-src 'self'",
       // Scripts: unsafe-inline 是 Next.js 必需的，通过限制其他来源来保护安全
-      isDev
-        ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://www.googletagmanager.com https://embed.tawk.to https://cdn.jsdelivr.net"
-        : "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com https://embed.tawk.to https://cdn.jsdelivr.net",
-      // Styles: self + inline (Tailwind/styled-jsx 需要) + Google Fonts + Tawk.to
+      `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ""} ${thirdPartyScripts}`,
+      // Styles: self + inline + Google Fonts + Tawk.to
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tawk.to",
-      // Images: self + data + blob + CDN + unpkg (Globe textures) + Iconify API
-      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://unpkg.com https://api.iconify.design http://localhost:* http://127.0.0.1:* https://www.google-analytics.com https://www.googletagmanager.com https://*.tawk.to https://tawk.link https://cdn.jsdelivr.net",
+      // Images: self + data + blob + CDNs + Trackers
+      `img-src 'self' data: blob: http://localhost:* http://127.0.0.1:* ${thirdPartyImages}`,
       // Fonts: self + CDN + Google Fonts + Tawk.to
-      "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com https://*.tawk.to",
-      // Connect: self + API + CDN + Cloudflare Turnstile + jsdelivr (Three.js fonts) + WebSocket (HMR)
-      isDev
-        ? "connect-src 'self' ws://localhost:* http://localhost:* http://127.0.0.1:* https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com https://*.tawk.to wss://*.tawk.to https://va.tawk.to"
-        : "connect-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com https://challenges.cloudflare.com https://cdn.jsdelivr.net https://api.iconify.design https://www.google-analytics.com https://www.googletagmanager.com https://*.tawk.to wss://*.tawk.to https://va.tawk.to",
+      "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com https://*.tawk.to https://*.hotjar.com",
+      // Connect: self + APIs + CDNs + Websockets + Trackers
+      `connect-src 'self' ${isDev ? "ws://localhost:* http://localhost:* http://127.0.0.1:*" : ""} ${thirdPartyConnects}`,
       // Media: self + CDN
       "media-src 'self' https://*.amazonaws.com https://*.cloudfront.net https://cdn.busromhouse.com http://localhost:* http://127.0.0.1:*",
-      // Frame: Cloudflare Turnstile + Tawk.to
-      "frame-src 'self' https://challenges.cloudflare.com https://*.tawk.to",
-      // Object: none - 防止 Flash/Java 等插件攻击
+      // Frame: Turnstile + Tawk + GTM + Hotjar
+      `frame-src 'self' ${thirdPartyFrames}`,
+      // Object: none
       "object-src 'none'",
-      // Base URI: self - 防止 base tag 注入
+      // Base URI: self
       "base-uri 'self'",
-      // Form action: self - 防止表单劫持
+      // Form action: self
       "form-action 'self'",
-      // Frame ancestors: none - 防止 clickjacking
+      // Frame ancestors: none
       "frame-ancestors 'none'",
-      // Upgrade insecure requests (仅生产环境)
+      // Upgrade insecure requests
       ...(!isDev ? ["upgrade-insecure-requests"] : []),
     ].join('; ')
 
