@@ -72,7 +72,7 @@ export function LenisProvider({ easingKey }: LenisProviderProps) {
             if (target) {
               if (target.getBoundingClientRect().height > 0 || attemptsLeft <= 1) {
                 setTimeout(() => {
-                  lenis.scrollTo(target, { offset: -100 })
+                  lenis.scrollTo(target, { offset: -50, immediate: true })
                 }, 800)
               } else {
                 setTimeout(() => attemptScroll(attemptsLeft - 1), 250)
@@ -128,34 +128,50 @@ export function LenisProvider({ easingKey }: LenisProviderProps) {
 
   // Handle route changes and hash navigation
   useEffect(() => {
+    if (!lenisRef.current) return
+
     const handleHashScroll = () => {
       if (!lenisRef.current) return
+      
       const hash = window.location.hash
-      if (hash) {
-        const attemptScroll = (attemptsLeft: number) => {
-          try {
-            const target = document.querySelector(hash) as HTMLElement | null
-            if (target) {
-              if (target.getBoundingClientRect().height > 0 || attemptsLeft <= 1) {
-                // Wait for dynamic layout (images/fonts) to settle
-                setTimeout(() => {
-                  if (lenisRef.current) {
-                    lenisRef.current.scrollTo(target, { offset: -100 })
-                  }
-                }, 800)
-              } else {
-                setTimeout(() => attemptScroll(attemptsLeft - 1), 250)
-              }
-            } else if (attemptsLeft > 0) {
-              setTimeout(() => attemptScroll(attemptsLeft - 1), 250)
-            }
-          } catch (e) {}
-        }
-        setTimeout(() => attemptScroll(20), 250)
+      
+      if (!hash) {
+        // 如果没有 hash，则回到顶部，防止页面残留前一个页面的滚动位置
+        lenisRef.current.scrollTo(0, { immediate: true })
+        return
       }
+      
+      const attemptScroll = (attemptsLeft: number) => {
+        try {
+          const target = document.querySelector(hash) as HTMLElement | null
+          if (target) {
+            // 只要找到元素，立即瞬间滚动到目标
+            lenisRef.current.scrollTo(target, { offset: -50, immediate: true })
+            
+            // 为了防止图片、字体加载导致布局高度变化（把板块挤下去），在接下来的 800ms 内持续锁定该元素
+            let lockCount = 0
+            const lockInterval = setInterval(() => {
+              if (lenisRef.current) {
+                lenisRef.current.scrollTo(target, { offset: -50, immediate: true })
+              }
+              lockCount++
+              if (lockCount >= 16) { // 16 * 50ms = 800ms
+                clearInterval(lockInterval)
+              }
+            }, 50)
+            
+          } else if (attemptsLeft > 0) {
+            setTimeout(() => attemptScroll(attemptsLeft - 1), 250)
+          }
+        } catch (e) {}
+      }
+      
+      attemptScroll(20)
     }
 
-    handleHashScroll()
+    // 延迟一点执行，确保 Next.js 的 URL 状态（包含 hash）已经完全应用
+    setTimeout(handleHashScroll, 50)
+    
     window.addEventListener('hashchange', handleHashScroll)
     return () => window.removeEventListener('hashchange', handleHashScroll)
   }, [pathname, searchParams])
@@ -180,7 +196,7 @@ export function LenisProvider({ easingKey }: LenisProviderProps) {
           const target = document.querySelector(hash) as HTMLElement | null
           if (target && lenisRef.current) {
             e.preventDefault()
-            lenisRef.current.scrollTo(target, { offset: -100 })
+            lenisRef.current.scrollTo(target, { offset: -50 })
             // Update URL manually
             window.history.pushState(null, '', url.href)
           }

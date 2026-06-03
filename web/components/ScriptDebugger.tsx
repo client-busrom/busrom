@@ -22,7 +22,7 @@ import { useSearchParams } from 'next/navigation'
 
 // Debug token secret - must match the one in CMS
 // In production, this should be set via environment variable
-const DEBUG_TOKEN_SECRET = process.env.NEXT_PUBLIC_DEBUG_TOKEN_SECRET || 'busrom-script-debug-2024'
+const DEBUG_TOKEN_SECRET = process.env.NEXT_PUBLIC_DEBUG_TOKEN_SECRET || 'Kz54hCgcjbq9f7quRmeGEeJ0KebXSF0U'
 
 interface LoadedScript {
   id: string
