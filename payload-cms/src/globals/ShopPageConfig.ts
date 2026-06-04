@@ -75,7 +75,13 @@ export const ShopPageConfig: GlobalConfig = {
               },
             },
             {
-              type: 'row',
+              type: 'collapsible',
+              label: { en: 'Show \"All\" Tab', zh: '显示“全部”标签' },
+              admin: { initCollapsed: false },
+              fields: [
+                {
+                  type: 'row',
+                  
               fields: [
                 {
                   name: 'showAllTab',
@@ -103,6 +109,8 @@ export const ShopPageConfig: GlobalConfig = {
                   defaultValue: 'All Products',
                   label: { en: 'All Products Title', zh: '全部产品列表标题' },
                 },
+              ]
+                }
               ]
             },
           ],
@@ -168,34 +176,62 @@ export const ShopPageConfig: GlobalConfig = {
                 },
                 // --- Recommended ---
                 {
-                  type: 'row',
+                  type: 'collapsible',
+                  label: { en: 'Enable Recommended', zh: '开启推荐排序' },
+                  admin: { initCollapsed: false },
+                  fields: [
+                    {
+                      type: 'row',
                   fields: [
                     { name: 'enableSortShopOrder', type: 'checkbox', defaultValue: true, label: { en: 'Enable Recommended', zh: '开启推荐排序' } },
                     { name: 'labelSortShopOrder', type: 'text', localized: true, defaultValue: 'Recommended', label: { en: 'Recommended Label', zh: '推荐排序文案' } },
                   ]
+                    }
+                  ]
                 },
                 // --- Newest ---
                 {
-                  type: 'row',
+                  type: 'collapsible',
+                  label: { en: 'Enable Newest', zh: '开启最新上架排序' },
+                  admin: { initCollapsed: false },
+                  fields: [
+                    {
+                      type: 'row',
                   fields: [
                     { name: 'enableSortCreatedAt', type: 'checkbox', defaultValue: true, label: { en: 'Enable Newest', zh: '开启最新上架排序' } },
                     { name: 'labelSortCreatedAt', type: 'text', localized: true, defaultValue: 'Newest Arrivals', label: { en: 'Newest Label', zh: '最新上架文案' } },
                   ]
+                    }
+                  ]
                 },
                 // --- Name A-Z ---
                 {
-                  type: 'row',
+                  type: 'collapsible',
+                  label: { en: 'Enable Name A-Z', zh: '开启名称A-Z排序' },
+                  admin: { initCollapsed: false },
+                  fields: [
+                    {
+                      type: 'row',
                   fields: [
                     { name: 'enableSortNameAsc', type: 'checkbox', defaultValue: true, label: { en: 'Enable Name A-Z', zh: '开启名称A-Z排序' } },
                     { name: 'labelSortNameAsc', type: 'text', localized: true, defaultValue: 'Name (A to Z)', label: { en: 'Name A-Z Label', zh: 'A-Z排序文案' } },
                   ]
+                    }
+                  ]
                 },
                 // --- Name Z-A ---
                 {
-                  type: 'row',
+                  type: 'collapsible',
+                  label: { en: 'Enable Name Z-A', zh: '开启名称Z-A排序' },
+                  admin: { initCollapsed: false },
+                  fields: [
+                    {
+                      type: 'row',
                   fields: [
                     { name: 'enableSortNameDesc', type: 'checkbox', defaultValue: true, label: { en: 'Enable Name Z-A', zh: '开启名称Z-A排序' } },
                     { name: 'labelSortNameDesc', type: 'text', localized: true, defaultValue: 'Name (Z to A)', label: { en: 'Z-A排序文案' } },
+                  ]
+                    }
                   ]
                 },
               ],
@@ -244,24 +280,45 @@ export const ShopPageConfig: GlobalConfig = {
                   label: { en: 'Filter Group Title', zh: '过滤分组标题' },
                 },
                 {
-                  type: 'row',
+                  type: 'collapsible',
+                  label: { en: 'Enable Hot Filter', zh: '开启爆品过滤' },
+                  admin: { initCollapsed: false },
+                  fields: [
+                    {
+                      type: 'row',
                   fields: [
                     { name: 'enableHotFilter', type: 'checkbox', defaultValue: true, label: { en: 'Enable Hot Filter', zh: '开启爆品过滤' } },
                     { name: 'hotLabel', type: 'text', localized: true, defaultValue: 'Hot Items', label: { en: 'Hot Items Label', zh: '爆品选项文案' } },
                   ]
+                    }
+                  ]
                 },
                 {
-                  type: 'row',
+                  type: 'collapsible',
+                  label: { en: 'Enable New Filter', zh: '开启新品过滤' },
+                  admin: { initCollapsed: false },
+                  fields: [
+                    {
+                      type: 'row',
                   fields: [
                     { name: 'enableNewFilter', type: 'checkbox', defaultValue: true, label: { en: 'Enable New Filter', zh: '开启新品过滤' } },
                     { name: 'newLabel', type: 'text', localized: true, defaultValue: 'New Arrivals', label: { en: 'New Arrivals Label', zh: '新品选项文案' } },
                   ]
+                    }
+                  ]
                 },
                 {
-                  type: 'row',
+                  type: 'collapsible',
+                  label: { en: 'Enable Featured Filter', zh: '开启推荐过滤' },
+                  admin: { initCollapsed: false },
+                  fields: [
+                    {
+                      type: 'row',
                   fields: [
                     { name: 'enableFeaturedFilter', type: 'checkbox', defaultValue: true, label: { en: 'Enable Featured Filter', zh: '开启推荐过滤' } },
                     { name: 'featuredLabel', type: 'text', localized: true, defaultValue: 'Featured', label: { en: 'Featured Label', zh: '推荐选项文案' } },
+                  ]
+                    }
                   ]
                 },
               ]

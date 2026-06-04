@@ -1992,7 +1992,7 @@ export interface CustomScript {
 export interface SeoSetting {
   id: number;
   /**
-   * Unique identifier for this SEO setting
+   * Internal label used to identify this SEO setting in the admin list (does not affect the frontend)
    */
   identifier: string;
   scope: 'global' | 'page_type' | 'exact_path' | 'path_pattern';

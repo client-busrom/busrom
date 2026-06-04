@@ -65,7 +65,13 @@ export const KnowledgeBaseListPageConfig: GlobalConfig = {
               },
             },
             {
-              type: 'row',
+              type: 'collapsible',
+              label: { en: 'Show \"All\" Tab', zh: '显示“全部”标签' },
+              admin: { initCollapsed: false },
+              fields: [
+                {
+                  type: 'row',
+                  
               fields: [
                 {
                   name: 'showAllTab',
@@ -93,6 +99,8 @@ export const KnowledgeBaseListPageConfig: GlobalConfig = {
                   defaultValue: 'All Articles',
                   label: { en: 'All Articles Title', zh: '全部文章列表标题' },
                 },
+              ]
+                }
               ]
             },
           ],
@@ -151,31 +159,59 @@ export const KnowledgeBaseListPageConfig: GlobalConfig = {
                   ],
                 },
                 {
-                  type: 'row',
+                  type: 'collapsible',
+                  label: { en: 'Enable Newest', zh: '开启最新发布排序' },
+                  admin: { initCollapsed: false },
+                  fields: [
+                    {
+                      type: 'row',
                   fields: [
                     { name: 'enableSortPublishedDesc', type: 'checkbox', defaultValue: true, label: { en: 'Enable Newest', zh: '开启最新发布排序' } },
                     { name: 'labelSortPublishedDesc', type: 'text', localized: true, defaultValue: 'Newest', label: { en: 'Newest Label', zh: '最新发布文案' } },
                   ]
+                    }
+                  ]
                 },
                 {
-                  type: 'row',
+                  type: 'collapsible',
+                  label: { en: 'Enable Oldest', zh: '开启最早发布排序' },
+                  admin: { initCollapsed: false },
+                  fields: [
+                    {
+                      type: 'row',
                   fields: [
                     { name: 'enableSortPublishedAsc', type: 'checkbox', defaultValue: true, label: { en: 'Enable Oldest', zh: '开启最早发布排序' } },
                     { name: 'labelSortPublishedAsc', type: 'text', localized: true, defaultValue: 'Oldest', label: { en: 'Oldest Label', zh: '最早发布文案' } },
                   ]
+                    }
+                  ]
                 },
                 {
-                  type: 'row',
+                  type: 'collapsible',
+                  label: { en: 'Enable Title A-Z', zh: '开启标题A-Z排序' },
+                  admin: { initCollapsed: false },
+                  fields: [
+                    {
+                      type: 'row',
                   fields: [
                     { name: 'enableSortTitleAsc', type: 'checkbox', defaultValue: true, label: { en: 'Enable Title A-Z', zh: '开启标题A-Z排序' } },
                     { name: 'labelSortTitleAsc', type: 'text', localized: true, defaultValue: 'Title (A to Z)', label: { en: 'Title A-Z Label', zh: 'A-Z排序文案' } },
                   ]
+                    }
+                  ]
                 },
                 {
-                  type: 'row',
+                  type: 'collapsible',
+                  label: { en: 'Enable Title Z-A', zh: '开启标题Z-A排序' },
+                  admin: { initCollapsed: false },
+                  fields: [
+                    {
+                      type: 'row',
                   fields: [
                     { name: 'enableSortTitleDesc', type: 'checkbox', defaultValue: true, label: { en: 'Enable Title Z-A', zh: '开启标题Z-A排序' } },
                     { name: 'labelSortTitleDesc', type: 'text', localized: true, defaultValue: 'Title (Z to A)', label: { en: 'Z-A排序文案' } },
+                  ]
+                    }
                   ]
                 },
               ],

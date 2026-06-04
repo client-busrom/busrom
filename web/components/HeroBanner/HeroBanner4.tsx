@@ -184,7 +184,7 @@ const HeroBanner4: FC<HeroBanner4Props> = ({ data, locale }) => {
               (feature, index) => (
                 <MagneticWrapper key={index} strength={0.2}>
                   <div
-                    className="flex items-center"
+                    className="flex items-center hover:scale-105 transition-transform duration-300 cursor-pointer"
                     style={{ 
                       height: rpx(BANNER_4_ASSETS.feature.height),
                       marginLeft: index === 1 ? rpx(16) : index === 2 ? rpx(32) : 0
@@ -298,7 +298,7 @@ const HeroBanner4: FC<HeroBanner4Props> = ({ data, locale }) => {
               (feature, index) => (
                 <div 
                   key={index} 
-                  className="flex items-center h-[44px] md:h-[60px]"
+                  className="flex items-center h-[44px] md:h-[60px] hover:scale-105 transition-transform duration-300 cursor-pointer"
                   style={{
                     marginLeft: index === 1 ? "16px" : index === 2 ? "32px" : "0"
                   }}

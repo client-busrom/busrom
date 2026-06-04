@@ -296,7 +296,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
                 (feature, index) => (
                   <MagneticWrapper key={index} strength={0.3}>
                     <div
-                      className="flex items-center justify-center border-[3px] border-white bg-[#756F3F]"
+                      className="flex items-center justify-center border-[3px] border-white bg-[#756F3F] hover:scale-105 transition-transform duration-300 cursor-pointer"
                       style={{
                         width: rpx(200), // 设计稿精确宽度
                         height: rpx(124), // 设计稿精确高度
@@ -364,7 +364,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
             (feature, index) => (
               <div
                 key={index}
-                className="bg-[#756F3F] text-[#FDF6C2] py-4 rounded-full font-bold border-2 border-white shadow-lg text-lg"
+                className="bg-[#756F3F] text-[#FDF6C2] py-4 rounded-full font-bold border-2 border-white shadow-lg text-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
               >
                 {feature}
               </div>

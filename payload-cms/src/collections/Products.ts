@@ -37,7 +37,7 @@ export const Products: CollectionConfig = {
     },
   },
   admin: {
-    useAsTitle: 'sku',
+    useAsTitle: 'name',
     listSearchableFields: ['adminLabel', 'sku', 'slug', 'name'],
     defaultColumns: ['adminLabel', 'shopOrder', 'order', 'sku', 'name', 'category', 'series', 'status'],
     group: {

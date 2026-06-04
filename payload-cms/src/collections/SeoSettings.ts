@@ -81,15 +81,15 @@ export const SeoSettings: CollectionConfig = {
       name: 'identifier',
       type: 'text',
       label: {
-        en: 'Identifier',
-        zh: '标识符',
+        en: 'Admin Label',
+        zh: '内部管理标识',
       },
       required: true,
       unique: true,
       admin: {
         description: {
-          en: 'Unique identifier for this SEO setting',
-          zh: '此 SEO 配置的唯一标识符',
+          en: 'Internal label used to identify this SEO setting in the admin list (does not affect the frontend)',
+          zh: '仅用于在后台列表中区分和查找，不会影响前台页面的实际展示。',
         },
       },
     },

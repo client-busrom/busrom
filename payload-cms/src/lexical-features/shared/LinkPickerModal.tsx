@@ -433,7 +433,9 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
                     <div style={{ fontSize: '14px', fontWeight: 600, color: '#111827' }}>
-                      {item.adminLabel || item.title || (typeof item.name === 'object' ? item.name?.en || item.name?.zh : item.name) || item.slug}
+                      {item._collectionValue === 'products'
+                        ? ((typeof item.name === 'object' ? item.name?.en || item.name?.zh : item.name) || item.adminLabel || item.slug)
+                        : (item.adminLabel || item.title || (typeof item.name === 'object' ? item.name?.en || item.name?.zh : item.name) || item.slug)}
                     </div>
                     <span style={{
                       padding: '4px 10px',

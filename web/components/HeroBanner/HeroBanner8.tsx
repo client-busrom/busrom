@@ -61,7 +61,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
             </div>
           </div>
           <div className="absolute z-40 flex flex-col pointer-events-auto" style={{ left: rpx(BANNER_8_ASSETS.content.features.x), top: rpx(BANNER_8_ASSETS.content.features.y), gap: rpx(BANNER_8_ASSETS.content.features.gap) }}>
-             {featureCapsules.map((f, i) => (<div key={i} className="bg-[#FFFB1B]/10 border border-[#CFBC37] flex items-center backdrop-blur-sm" style={{ borderRadius: rpx(24), paddingLeft: rpx(32), paddingRight: rpx(32), paddingTop: rpx(8), paddingBottom: rpx(8) }}><span className="font-montserrat font-bold text-[#CFBC37] uppercase tracking-widest" style={{ fontSize: rpx(BANNER_8_ASSETS.content.features.fontSize), textShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>{f}</span></div>))}
+             {featureCapsules.map((f, i) => (<div key={i} className="bg-[#FFFB1B]/10 border border-[#CFBC37] flex items-center backdrop-blur-sm hover:scale-105 transition-transform duration-300 cursor-pointer" style={{ borderRadius: rpx(24), paddingLeft: rpx(32), paddingRight: rpx(32), paddingTop: rpx(8), paddingBottom: rpx(8) }}><span className="font-montserrat font-bold text-[#CFBC37] uppercase tracking-widest" style={{ fontSize: rpx(BANNER_8_ASSETS.content.features.fontSize), textShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>{f}</span></div>))}
           </div>
           <div className="absolute z-40 flex items-end pointer-events-auto" style={{ left: rpx(BANNER_8_ASSETS.bottomImages.x), top: rpx(BANNER_8_ASSETS.bottomImages.y), gap: rpx(BANNER_8_ASSETS.bottomImages.gap) }}>
              {data.images.slice(1, 4).map((img, i) => (<div key={i} className="relative overflow-hidden bg-white shadow-xl" style={{ width: rpx(BANNER_8_ASSETS.bottomImages.width), height: rpx(BANNER_8_ASSETS.bottomImages.height), borderRadius: rpx(34), border: `${rpx(BANNER_8_ASSETS.bottomImages.borderWidth)} solid white` }}><ServerImage image={img} alt="" fill className="object-cover" /></div>))}
@@ -96,7 +96,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
              </h1>
              <div className="flex flex-col gap-2 w-full max-w-[260px] md:max-w-[400px] mt-1">
                 {featureCapsules.map((f, i) => (
-                  <div key={i} className="bg-[#FFFB1B]/10 border border-[#CFBC37] rounded-full px-5 py-1.5 md:py-2 backdrop-blur-md">
+                  <div key={i} className="bg-[#FFFB1B]/10 border border-[#CFBC37] rounded-full px-5 py-1.5 md:py-2 backdrop-blur-md hover:scale-105 transition-transform duration-300 cursor-pointer">
                      <span className="font-montserrat font-bold text-[#CFBC37] text-[10px] md:text-sm uppercase tracking-wider">{f}</span>
                   </div>
                 ))}

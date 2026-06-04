@@ -160,7 +160,7 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
             {[data.features[2], data.features[3], data.features[4]].map(
               (feature, index) => (
                 <MagneticWrapper key={index} strength={0.2}>
-                  <div className="relative group cursor-pointer">
+                  <div className="relative group cursor-pointer hover:scale-105 transition-transform duration-300 cursor-pointer">
                     <div
                       className="absolute inset-0 bg-gradient-to-r from-[#5A4F0E] to-[#C0A91D]/0 group-hover:from-[#5A4F0E] group-hover:to-[#C0A91D]/20 transition-all duration-300"
                       style={{
@@ -289,7 +289,7 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
                 (feature, index) => (
                   <div
                     key={index}
-                    className="relative w-full h-[44px] md:h-[50px] flex items-center justify-center"
+                    className="relative w-full h-[44px] md:h-[50px] flex items-center justify-center hover:scale-105 transition-transform duration-300 cursor-pointer"
                   >
                     <div
                       className="absolute inset-0 bg-gradient-to-r from-[#5A4F0E] to-[#C0A91D]/0"

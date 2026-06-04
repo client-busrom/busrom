@@ -206,7 +206,7 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
           >
             {[data.features[2], data.features[3], data.features[4]].map(
               (f, i) => (
-                <div key={i} className="overflow-hidden w-full">
+                <div key={i} className="overflow-hidden w-full hover:scale-105 transition-transform duration-300 cursor-pointer">
                   <AutoScaleText
                     minScale={0.5}
                     className="font-montserrat font-bold text-[#FFA836]"
@@ -333,7 +333,7 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
               (f, i) => (
                 <h2
                   key={i}
-                  className="font-montserrat font-bold text-[#FFA836] text-[12px] whitespace-nowrap text-center"
+                  className="font-montserrat font-bold text-[#FFA836] text-[12px] whitespace-nowrap text-center hover:scale-105 transition-transform duration-300 cursor-pointer"
                   style={{
                     letterSpacing: "0.01em",
                     WebkitTextStroke: "0.6px #6B4E00",

@@ -170,25 +170,21 @@ export function WhyChooseUsReasonSection({
           {/* Prev Button */}
           <button
             onClick={goToPrev}
-            className="group w-16 h-10 rounded-full border border-[#bab489] flex items-center justify-center transition-all duration-300 hover:bg-brand-secondary hover:border-transparent hover:scale-110 active:scale-95"
+            className="group relative w-16 h-10 flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-105 active:scale-95"
             aria-label="Previous slide"
           >
-            <svg width="40" height="10" viewBox="0 0 76 14" fill="none" className="transition-colors duration-300">
-              <path d="M76 7H7" stroke="currentColor" strokeWidth="2" className="text-[#756F3F] group-hover:text-white transition-colors duration-300" />
-              <path d="M14 13L1 7L14 1" stroke="currentColor" strokeWidth="2" fill="none" className="text-[#756F3F] group-hover:text-white transition-colors duration-300" />
-            </svg>
+            <svg className="absolute inset-0 w-full h-full transition-opacity duration-300 group-hover:opacity-0" viewBox="0 0 148 61" fill="none"><path d="M43.6943 28.2695H126.695V32.7559H43.6943V37.2422L21.2627 30.5127L43.6943 23.7832V28.2695Z" fill="#BAB489"/><rect x="1" y="1" width="146" height="59" rx="29.5" stroke="#BAB489" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6"/></svg>
+            <svg className="absolute inset-0 w-full h-full transition-opacity duration-300 opacity-0 group-hover:opacity-100" viewBox="0 0 148 61" fill="none"><rect x="1" y="1" width="146" height="59" rx="29.5" fill="#756F3F"/><path d="M43.6943 28.2695H126.695V32.7559H43.6943V37.2422L21.2627 30.5127L43.6943 23.7832V28.2695Z" fill="white"/></svg>
           </button>
 
           {/* Next Button */}
           <button
             onClick={goToNext}
-            className="group w-16 h-10 rounded-full border border-[#bab489] bg-transparent flex items-center justify-center transition-all duration-300 hover:bg-brand-secondary hover:border-transparent hover:scale-110 active:scale-95"
+            className="group relative w-16 h-10 flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-105 active:scale-95"
             aria-label="Next slide"
           >
-            <svg width="40" height="10" viewBox="0 0 76 14" fill="none" className="transition-colors duration-300">
-              <path d="M0 7H69" stroke="currentColor" strokeWidth="2" className="text-[#756F3F] group-hover:text-white transition-colors duration-300" />
-              <path d="M62 1L75 7L62 13" stroke="currentColor" strokeWidth="2" fill="none" className="text-[#756F3F] group-hover:text-white transition-colors duration-300" />
-            </svg>
+            <svg className="absolute inset-0 w-full h-full transition-opacity duration-300 group-hover:opacity-0" viewBox="0 0 148 61" fill="none"><path d="M104.306 28.2695H21.3047V32.7559H104.306V37.2422L126.737 30.5127L104.306 23.7832V28.2695Z" fill="#BAB489"/><rect x="1" y="1" width="146" height="59" rx="29.5" stroke="#BAB489" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6"/></svg>
+            <svg className="absolute inset-0 w-full h-full transition-opacity duration-300 opacity-0 group-hover:opacity-100" viewBox="0 0 148 61" fill="none"><rect x="1" y="1" width="146" height="59" rx="29.5" fill="#756F3F"/><path d="M104.306 28.2695H21.3047V32.7559H104.306V37.2422L126.737 30.5127L104.306 23.7832V28.2695Z" fill="white"/></svg>
           </button>
         </div>
 
@@ -242,7 +238,7 @@ export function WhyChooseUsReasonSection({
           {/* Next Arrow Button (Right arrow) - same row as description start, offset to the right */}
           <button
             onClick={goToNext}
-            className="absolute group cursor-pointer transition-transform duration-300 hover:scale-110 active:scale-95"
+            className="absolute group cursor-pointer z-10 transition-transform duration-300 hover:scale-105 active:scale-95"
             style={{
               left: rpx(150),
               top: rpx(420),
@@ -251,34 +247,8 @@ export function WhyChooseUsReasonSection({
             }}
             aria-label="Next slide"
           >
-            <div
-              className="w-full h-full flex items-center justify-center transition-all duration-300 border border-[#bab489] bg-transparent group-hover:bg-brand-secondary group-hover:border-transparent"
-              style={{ borderRadius: srpx(45) }}
-            >
-              {/* Right Arrow Icon */}
-              <svg
-                width="76"
-                height="14"
-                viewBox="0 0 76 14"
-                fill="none"
-                className="transition-transform duration-300 group-hover:translate-x-1"
-                style={{ width: srpx(76), height: srpx(14) }}
-              >
-                <path
-                  d="M0 7H69"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="text-[#756F3F] group-hover:text-white transition-colors duration-300"
-                />
-                <path
-                  d="M62 1L75 7L62 13"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  className="text-[#756F3F] group-hover:text-white transition-colors duration-300"
-                />
-              </svg>
-            </div>
+            <svg className="absolute inset-0 w-full h-full transition-opacity duration-300 group-hover:opacity-0" viewBox="0 0 148 61" fill="none"><path d="M104.306 28.2695H21.3047V32.7559H104.306V37.2422L126.737 30.5127L104.306 23.7832V28.2695Z" fill="#BAB489"/><rect x="1" y="1" width="146" height="59" rx="29.5" stroke="#BAB489" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6"/></svg>
+            <svg className="absolute inset-0 w-full h-full transition-opacity duration-300 opacity-0 group-hover:opacity-100" viewBox="0 0 148 61" fill="none"><rect x="1" y="1" width="146" height="59" rx="29.5" fill="#756F3F"/><path d="M104.306 28.2695H21.3047V32.7559H104.306V37.2422L126.737 30.5127L104.306 23.7832V28.2695Z" fill="white"/></svg>
           </button>
 
           {/* Description - to the right of next button */}
@@ -307,7 +277,7 @@ export function WhyChooseUsReasonSection({
           {/* Prev Arrow Button (Left arrow) - below next button */}
           <button
             onClick={goToPrev}
-            className="absolute group cursor-pointer transition-transform duration-300 hover:scale-110 active:scale-95"
+            className="absolute group cursor-pointer z-10 transition-transform duration-300 hover:scale-105 active:scale-95"
             style={{
               left: 0,
               top: rpx(500),
@@ -316,34 +286,8 @@ export function WhyChooseUsReasonSection({
             }}
             aria-label="Previous slide"
           >
-            <div
-              className="w-full h-full flex items-center justify-center transition-all duration-300 border border-[#bab489] bg-transparent group-hover:bg-brand-secondary group-hover:border-transparent"
-              style={{ borderRadius: srpx(29.5) }}
-            >
-              {/* Left Arrow Icon */}
-              <svg
-                width="76"
-                height="14"
-                viewBox="0 0 76 14"
-                fill="none"
-                className="transition-transform duration-300 group-hover:-translate-x-1"
-                style={{ width: srpx(76), height: srpx(14) }}
-              >
-                <path
-                  d="M76 7H7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="text-[#756F3F] group-hover:text-white transition-colors duration-300"
-                />
-                <path
-                  d="M14 13L1 7L14 1"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  className="text-[#756F3F] group-hover:text-white transition-colors duration-300"
-                />
-              </svg>
-            </div>
+            <svg className="absolute inset-0 w-full h-full transition-opacity duration-300 group-hover:opacity-0" viewBox="0 0 148 61" fill="none"><path d="M43.6943 28.2695H126.695V32.7559H43.6943V37.2422L21.2627 30.5127L43.6943 23.7832V28.2695Z" fill="#BAB489"/><rect x="1" y="1" width="146" height="59" rx="29.5" stroke="#BAB489" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 6"/></svg>
+            <svg className="absolute inset-0 w-full h-full transition-opacity duration-300 opacity-0 group-hover:opacity-100" viewBox="0 0 148 61" fill="none"><rect x="1" y="1" width="146" height="59" rx="29.5" fill="#756F3F"/><path d="M43.6943 28.2695H126.695V32.7559H43.6943V37.2422L21.2627 30.5127L43.6943 23.7832V28.2695Z" fill="white"/></svg>
           </button>
 
           {/* Right Side - Images (scaled) */}

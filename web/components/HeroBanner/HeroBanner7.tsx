@@ -137,7 +137,7 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
 
         <div className="absolute z-40 flex flex-col pointer-events-auto" style={{ left: rpx(BANNER_7_ASSETS.content.featureGroup.x), top: rpx(BANNER_7_ASSETS.content.featureGroup.y), gap: rpx(24) }}>
           {data.features.slice(2, 5).map((feature, idx) => (
-            <div key={idx} className="flex items-center justify-center bg-[#E9E2A0] rounded-[50%] px-12" style={{ width: rpx(455), height: rpx(111) }}>
+            <div key={idx} className="flex items-center justify-center bg-[#E9E2A0] rounded-[50%] px-12 hover:scale-105 transition-transform duration-300 cursor-pointer" style={{ width: rpx(455), height: rpx(111) }}>
               <div className="w-full text-center">
                 <AutoScaleText minScale={0.3}>
                   <span className="font-montserrat font-bold text-black" style={{ fontSize: rpx(30), letterSpacing: '0.06em' }}>{feature}</span>

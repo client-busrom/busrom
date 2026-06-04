@@ -5,6 +5,7 @@ import { Locale } from "@/i18n.config";
 import { ServerImage } from "@/components/ui/ServerImage";
 import { AutoScaleText } from "@/components/ui/AutoScaleText";
 import { AutoScrollText } from "@/components/ui/AutoScrollText";
+import MagneticWrapper from "./MagneticWrapper";
 
 // 处理换行符
 const formatText = (text: string | undefined) =>
@@ -121,10 +122,14 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
           >
             <div className="relative">
               {[data.features[2], data.features[3], data.features[4]].map((feature, index) => (
-                <div key={index} className="absolute flex items-center justify-end bg-[#756F3F] overflow-hidden" style={{ left: rpx([0, 180, 360][index]), top: rpx([0, 0, 0][index]), width: rpx(740), height: rpx(100), borderRadius: rpx(71), transform: `rotate(-60deg)`, transformOrigin: "left center", paddingRight: rpx(40) }}>
-                  <div className="overflow-hidden" style={{ maxWidth: rpx(300) }}>
-                    <AutoScrollText text={feature} className="font-montserrat font-bold text-[#FFF5AD]" style={{ fontSize: rpx(24) }} />
-                  </div>
+                <div key={index} className="absolute" style={{ left: rpx([0, 180, 360][index]), top: rpx([0, 0, 0][index]), transform: `rotate(-60deg)`, transformOrigin: "left center" }}>
+                  <MagneticWrapper strength={0.2}>
+                    <div className="flex items-center justify-end bg-[#756F3F] overflow-hidden hover:scale-105 hover:bg-[#A39958] transition-all duration-300 cursor-pointer shadow-lg" style={{ width: rpx(740), height: rpx(100), borderRadius: rpx(71), paddingRight: rpx(40) }}>
+                      <div className="overflow-hidden" style={{ maxWidth: rpx(300) }}>
+                        <AutoScrollText text={feature} className="font-montserrat font-bold text-[#FFF5AD]" style={{ fontSize: rpx(24) }} />
+                      </div>
+                    </div>
+                  </MagneticWrapper>
                 </div>
               ),
               )}
@@ -183,7 +188,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
             {[data.features[2], data.features[3], data.features[4]].map((feature, idx) => (
               <div
                 key={idx}
-                className="bg-[#756F3F] px-5 py-2 rounded-full text-[#FFF5AD] shadow-md border border-[#FFF5AD]/10 flex items-center justify-center"
+                className="bg-[#756F3F] px-5 py-2 rounded-full text-[#FFF5AD] shadow-md border border-[#FFF5AD]/10 flex items-center justify-center hover:scale-105 transition-transform duration-300 cursor-pointer"
               >
                 <span className="font-montserrat font-bold text-[10px] sm:text-xs tracking-wider block text-left">
                   {feature}

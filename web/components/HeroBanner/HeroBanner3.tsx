@@ -62,7 +62,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
           <h1 className="font-poller-one font-regular text-black whitespace-pre-line leading-[1.1]" style={{ fontSize: rpx(90), WebkitTextStroke: `${rpx(6)} #FDF6C2`, paintOrder: "stroke fill", marginBottom: rpx(48) }}>{formatText(data.features[0])}</h1>
           <div className="flex flex-col" style={{ gap: rpx(24), marginLeft: rpx(48) }}>
             {featureCapsules.map((feature, index) => (
-                <div key={index} className="relative flex items-center justify-center overflow-hidden shadow-lg" style={{ width: rpx(500), height: rpx(80), background: index % 2 === 0 ? "linear-gradient(90deg, rgba(249, 133, 56) 0%, rgba(249, 133, 56) 100%)" : "linear-gradient(90deg, rgba(73, 69, 38) 0%, rgba(73, 69, 38) 100%)", borderRadius: rpx(40) }}>
+                <div key={index} className="relative flex items-center justify-center overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer" style={{ width: rpx(500), height: rpx(80), background: index % 2 === 0 ? "linear-gradient(90deg, rgba(249, 133, 56) 0%, rgba(249, 133, 56) 100%)" : "linear-gradient(90deg, rgba(73, 69, 38) 0%, rgba(73, 69, 38) 100%)", borderRadius: rpx(40) }}>
                   <p className="font-montserrat font-bold text-[#FFF5AD]" style={{ fontSize: rpx(30), letterSpacing: "0.05em" }}>{feature}</p>
                 </div>
             ))}
@@ -92,7 +92,7 @@ const HeroBanner3: FC<BannerProps> = ({ data }) => {
             <h1 className="font-paytone-one text-black whitespace-pre-line leading-[1.1] mb-6 md:mb-10" style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", WebkitTextStroke: "2px #FDF6C2", paintOrder: "stroke fill" }}>{formatText(data.features[0])}</h1>
             <div className="flex flex-col gap-3 w-full max-w-[280px] md:max-w-[450px]">
               {featureCapsules.map((feature, index) => (
-                  <div key={index} className="relative flex items-center justify-center h-10 md:h-12 px-6 overflow-hidden shadow-sm backdrop-blur-md" style={{ background: index % 2 === 0 ? "linear-gradient(90deg, rgba(249, 133, 56, 0.9) 0%, rgba(249, 133, 56, 0.7) 100%)" : "linear-gradient(90deg, rgba(73, 69, 38, 0.9) 0%, rgba(73, 69, 38, 0.7) 100%)", borderRadius: "999px" }}>
+                  <div key={index} className="relative flex items-center justify-center h-10 md:h-12 px-6 overflow-hidden shadow-sm backdrop-blur-md hover:scale-105 transition-transform duration-300 cursor-pointer" style={{ background: index % 2 === 0 ? "linear-gradient(90deg, rgba(249, 133, 56, 0.9) 0%, rgba(249, 133, 56, 0.7) 100%)" : "linear-gradient(90deg, rgba(73, 69, 38, 0.9) 0%, rgba(73, 69, 38, 0.7) 100%)", borderRadius: "999px" }}>
                     <p className="font-montserrat font-bold text-[#FFF5AD]" style={{ fontSize: "clamp(0.75rem, 2vw, 1rem)" }}>{feature}</p>
                   </div>
               ))}
