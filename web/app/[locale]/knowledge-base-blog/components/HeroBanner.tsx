@@ -17,7 +17,7 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
   const localePrefix = locale === 'en' ? '' : `/${locale}`;
 
   return (
-    <section className="pt-24">
+    <section className="pt-24 lg:pt-[3vw]">
       <div className="mx-auto w-full px-3 md:px-6 lg:max-w-[1024px] xl:max-w-[1280px]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch">
           {/* LEFT COLUMN - HEADER & METADATA (7 Columns) */}
@@ -145,11 +145,12 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
             <span className="absolute top-0 right-0 z-20 flex items-center justify-center bg-[#F6F4ED] rounded-bl-xl md:rounded-bl-2xl pl-2 pb-2">
               {/* 右上角内容：显示文章的 blogTag */}
               <Link
-                href={
-                  hero.post.tags?.[0]?.slug
-                    ? `${localePrefix}/knowledge-base-blogs?tag=${hero.post.tags[0].slug}`
-                    : `${localePrefix}/knowledge-base-blogs`
-                }
+                href={`${localePrefix}/knowledge-base-blogs`}
+                onClick={() => {
+                  if (typeof window !== 'undefined' && hero.post.tags?.[0]?.slug) {
+                    sessionStorage.setItem('pendingBlogTag', hero.post.tags[0].slug);
+                  }
+                }}
                 className="border-2 border-[#756f3f] transition duration-300 hover:text-white hover:border-[#756f3f] text-dark bg-transparent hover:bg-[#756f3f] rounded-[8px] px-5 py-2 text-[14px] font-bold tracking-widest inline-flex"
               >
                 {hero.post.tags?.[0]?.name || "Featured"}

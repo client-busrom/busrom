@@ -91,28 +91,45 @@ export function BlogListPageClient({ locale, slugMode = false }: BlogListPageCli
 
   // Tag filters
   const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const tagParam = searchParamsDict.get('tag')
+  
+  const isFromSessionRef = useRef(false)
 
   useEffect(() => {
-    if (tagParam && allTags.length > 0) {
-      const paramTags = tagParam.split(',')
-      const matchedTagIds = paramTags.map(param => {
-        const matched = allTags.find((t: any) => t.slug === param || String(t.id) === param)
-        return matched ? String(matched.id) : null
-      }).filter(Boolean) as string[]
+    if (allTags.length > 0) {
+      const tagParam = searchParamsDict.get('tag')
+      const pendingTag = typeof window !== 'undefined' ? sessionStorage.getItem('pendingBlogTag') : null;
 
-      if (matchedTagIds.length > 0) {
-        setSelectedTags(prev => {
-          if (prev.length === matchedTagIds.length && prev.every((v, i) => v === matchedTagIds[i])) {
-            return prev
-          }
-          return matchedTagIds
-        })
+      if (pendingTag) {
+        // 隐式传参：从 sessionStorage 加载
+        isFromSessionRef.current = true
+        const paramTags = pendingTag.split(',')
+        const matchedTagIds = paramTags.map(param => {
+          const matched = allTags.find((t: any) => t.slug === param || String(t.id) === param)
+          return matched ? String(matched.id) : null
+        }).filter(Boolean) as string[]
+
+        if (matchedTagIds.length > 0) {
+          setSelectedTags(matchedTagIds)
+        }
+        sessionStorage.removeItem('pendingBlogTag')
+      } else if (tagParam) {
+        // URL 传参
+        isFromSessionRef.current = false
+        const paramTags = tagParam.split(',')
+        const matchedTagIds = paramTags.map(param => {
+          const matched = allTags.find((t: any) => t.slug === param || String(t.id) === param)
+          return matched ? String(matched.id) : null
+        }).filter(Boolean) as string[]
+
+        if (matchedTagIds.length > 0) {
+          setSelectedTags(matchedTagIds)
+        }
+      } else if (!isFromSessionRef.current) {
+        // 仅当既不是从 session 来，也不是 URL 参数时，才清空
+        setSelectedTags([])
       }
-    } else if (!tagParam && selectedTags.length > 0 && allTags.length > 0) {
-      setSelectedTags([])
     }
-  }, [tagParam, allTags, selectedTags.length])
+  }, [searchParamsDict, allTags]) // 重点：移除了 selectedTags.length 避免无限重置
 
   // Local UI state
   const [currentPage, setCurrentPage] = useState(1)
@@ -258,7 +275,7 @@ export function BlogListPageClient({ locale, slugMode = false }: BlogListPageCli
         return t ? (t.slug || t.id) : id
       })
       updateUrl({ tag: nextSlugs.length > 0 ? nextSlugs.join(',') : null })
-      
+
       return next
     })
   }
