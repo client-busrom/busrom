@@ -91,6 +91,28 @@ export function BlogListPageClient({ locale, slugMode = false }: BlogListPageCli
 
   // Tag filters
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const tagParam = searchParamsDict.get('tag')
+
+  useEffect(() => {
+    if (tagParam && allTags.length > 0) {
+      const paramTags = tagParam.split(',')
+      const matchedTagIds = paramTags.map(param => {
+        const matched = allTags.find((t: any) => t.slug === param || String(t.id) === param)
+        return matched ? String(matched.id) : null
+      }).filter(Boolean) as string[]
+
+      if (matchedTagIds.length > 0) {
+        setSelectedTags(prev => {
+          if (prev.length === matchedTagIds.length && prev.every((v, i) => v === matchedTagIds[i])) {
+            return prev
+          }
+          return matchedTagIds
+        })
+      }
+    } else if (!tagParam && selectedTags.length > 0 && allTags.length > 0) {
+      setSelectedTags([])
+    }
+  }, [tagParam, allTags, selectedTags.length])
 
   // Local UI state
   const [currentPage, setCurrentPage] = useState(1)
@@ -225,11 +247,20 @@ export function BlogListPageClient({ locale, slugMode = false }: BlogListPageCli
   }, [])
 
   const toggleTag = (tagId: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tagId)
+    setSelectedTags(prev => {
+      const next = prev.includes(tagId)
         ? prev.filter(t => t !== tagId)
         : [...prev, tagId]
-    )
+
+      // Sync with URL
+      const nextSlugs = next.map(id => {
+        const t = allTags.find((tag: any) => String(tag.id) === id)
+        return t ? (t.slug || t.id) : id
+      })
+      updateUrl({ tag: nextSlugs.length > 0 ? nextSlugs.join(',') : null })
+      
+      return next
+    })
   }
 
   // Close dropdown when clicking outside
