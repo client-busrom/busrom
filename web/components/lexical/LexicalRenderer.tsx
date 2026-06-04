@@ -11,6 +11,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { IconifyIcon } from "@/components/ui/IconifyIcon";
 import {
@@ -1222,6 +1223,34 @@ function IconListBlock({ node }: { node: any }) {
 /**
  * Custom JSX Converters for our Lexical nodes
  */
+const TagInterceptLink = ({ finalUrl, isExternal, children }: any) => {
+  const router = useRouter();
+  const isTagLink = finalUrl.includes('/knowledge-base-blogs?tag=');
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    if (isTagLink) {
+      const match = finalUrl.match(/\?tag=([^&]+)/);
+      if (match && match[1]) {
+        e.preventDefault();
+        sessionStorage.setItem('pendingBlogTag', match[1]);
+        router.push('/knowledge-base-blogs');
+      }
+    }
+  };
+
+  return (
+    <Link
+      href={finalUrl}
+      target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noopener noreferrer" : undefined}
+      className="text-[#B06E4E] underline underline-offset-8 decoration-1 decoration-[#B06E4E]/40 font-semibold hover:text-[#756F3F] hover:decoration-[#756F3F] transition-all"
+      onClick={handleClick}
+    >
+      {children}
+    </Link>
+  );
+};
+
 export const customConverters: JSXConverters = {
   text: ({ node }: any) => {
     let text = node.text;
@@ -1446,14 +1475,9 @@ export const customConverters: JSXConverters = {
     const isExternal = finalUrl.startsWith('http');
 
     return (
-      <Link
-        href={finalUrl}
-        target={isExternal ? "_blank" : undefined}
-        rel={isExternal ? "noopener noreferrer" : undefined}
-        className="text-[#B06E4E] underline underline-offset-8 decoration-1 decoration-[#B06E4E]/40 font-semibold hover:text-[#756F3F] hover:decoration-[#756F3F] transition-all"
-      >
+      <TagInterceptLink finalUrl={finalUrl} isExternal={isExternal}>
         {nodesToJSX({ nodes: node.children })}
-      </Link>
+      </TagInterceptLink>
     );
   },
   upload: ({ node }: any) => {

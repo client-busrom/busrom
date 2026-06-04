@@ -354,6 +354,7 @@ export function parseHomeData(data: any, locale: string, strategy?: string, seoK
     title: data.featuredProducts.title || '',
     description: data.featuredProducts.description || '',
     viewAllButton: data.featuredProducts.viewAllButtonText || '',
+    viewAllButtonUrl: data.featuredProducts.viewAllButtonUrl || '/shop',
     categories: '',
     series: (data.featuredProducts.series || []).map((s: any) => ({
       seriesTitle: s.seriesTitle || '',
