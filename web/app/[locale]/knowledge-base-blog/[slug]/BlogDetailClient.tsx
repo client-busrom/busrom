@@ -66,7 +66,7 @@ export function BlogDetailClient({ locale, slug, blog, config }: BlogDetailClien
             {locale === "zh" ? "文章未找到" : "Blog Post Not Found"}
           </h1>
           <p className="text-gray-500 mb-8">{error}</p>
-          <Link href={`/${locale}/blog`} className="inline-block px-8 py-3 bg-[#B06E4E] text-white rounded-full">
+          <Link href={`/${locale}/knowledge-base-blog`} className="inline-block px-8 py-3 bg-[#B06E4E] text-white rounded-full">
             {locale === "zh" ? "返回博客" : "Back to Blog"}
           </Link>
         </div>

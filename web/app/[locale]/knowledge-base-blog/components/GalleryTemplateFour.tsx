@@ -20,7 +20,7 @@ export function GalleryTemplateFour({ section, items, locale }: any) {
             
             <Link 
               className="inline-flex items-center gap-4 px-8 py-4 border border-[#060C14]/10 rounded-full uppercase text-[10px] font-black tracking-[0.2em] text-[#060C14] hover:bg-[#060C14] hover:text-white transition-all group shadow-sm bg-white/50 backdrop-blur"
-              href={section.buttonLink || "/blog"}
+              href={section.buttonLink || "/knowledge-base-blog"}
             >
               {section.buttonText || "Discover More"}
               <svg className="w-3 h-3 group-hover:rotate-45 transition-transform" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -167,14 +167,14 @@ export function MobileMenu({ isOpen, onClose, navigationItems = [], onContactCli
                             }}
                             className="block w-full text-left px-4 py-3 text-base font-medium text-foreground hover:bg-accent rounded-lg transition-colors"
                           >
-                            {item.label}
+                            <span className="whitespace-pre-line text-left">{item.label}</span>
                           </button>
                         ) : (
                           <Link
                             href={item.url}
                             className="block px-4 py-3 text-base font-medium text-foreground hover:bg-accent rounded-lg transition-colors"
                           >
-                            {item.label}
+                            <span className="whitespace-pre-line text-left">{item.label}</span>
                           </Link>
                         )
                       )}
@@ -188,7 +188,7 @@ export function MobileMenu({ isOpen, onClose, navigationItems = [], onContactCli
                               href={item.url}
                               className="flex-1 px-4 py-3 text-base font-medium text-foreground hover:bg-accent rounded-lg transition-colors"
                             >
-                              {item.label}
+                              <span className="whitespace-pre-line text-left">{item.label}</span>
                             </Link>
 
                             {/* 下拉按钮 - 点击展开子菜单 */}
@@ -252,7 +252,7 @@ export function MobileMenu({ isOpen, onClose, navigationItems = [], onContactCli
                                           <span className="text-[10px] text-muted-foreground">No img</span>
                                         </div>
                                       )}
-                                      <span>{child.label}</span>
+                                      <span className="whitespace-pre-line">{child.label}</span>
                                     </Link>
                                   )
                                 })}

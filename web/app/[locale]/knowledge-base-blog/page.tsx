@@ -20,7 +20,7 @@ export async function generateMetadata({
     description: "Latest news, insights, and updates from Busrom",
   }
 
-  return getPageMetadata('/blog', 'blog_list', locale, defaultMetadata)
+  return getPageMetadata('/knowledge-base-blog', 'blog_list', locale, defaultMetadata)
 }
 
 async function BlogContentLoader({ locale }: { locale: Locale }) {
@@ -51,9 +51,9 @@ export default async function BlogPage({
 
   return (
     <>
-      <PageScripts path="/blog" pageType="blog_list" position="header" />
-      <PageScripts path="/blog" pageType="blog_list" position="body_start" />
-      <PageSeoInjector path="/blog" pageType="blog_list" locale={locale} />
+      <PageScripts path="/knowledge-base-blog" pageType="blog_list" position="header" />
+      <PageScripts path="/knowledge-base-blog" pageType="blog_list" position="body_start" />
+      <PageSeoInjector path="/knowledge-base-blog" pageType="blog_list" locale={locale} />
       
       <Suspense fallback={
         <div className="min-h-screen bg-white pt-20 flex items-center justify-center">
@@ -63,7 +63,7 @@ export default async function BlogPage({
         <BlogContentLoader locale={locale} />
       </Suspense>
 
-      <PageScripts path="/blog" pageType="blog_list" position="footer" />
+      <PageScripts path="/knowledge-base-blog" pageType="blog_list" position="footer" />
     </>
   )
 }

@@ -35,7 +35,7 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
               <div className="hidden lg:block">
                 <Link 
                   className="inline-flex items-center gap-4 px-10 py-5 border border-[#DBD8BD] rounded-full uppercase text-[10px] font-black tracking-[0.2em] text-[#060C14] hover:bg-[#060C14] hover:text-white hover:border-[#060C14] transition-all group"
-                  href={section.buttonLink || "/blog"}
+                  href={section.buttonLink || "/knowledge-base-blog"}
                 >
                   {section.buttonText || "All Posts"}
                   <svg className="w-3 h-3 group-hover:rotate-45 transition-transform" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -110,7 +110,7 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
             <div className="mt-16 text-center lg:hidden">
               <Link 
                 className="inline-flex items-center gap-4 px-10 py-5 border border-[#DBD8BD] rounded-full uppercase text-[10px] font-black tracking-[0.2em] text-[#060C14]"
-                href={section.buttonLink || "/blog"}
+                href={section.buttonLink || "/knowledge-base-blog"}
               >
                 {section.buttonText || "All Posts"}
               </Link>

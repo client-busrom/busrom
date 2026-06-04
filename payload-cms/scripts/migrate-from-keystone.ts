@@ -488,7 +488,7 @@ async function migrateNavigationMenus(payload: any) {
 
   const aboutChildren = [
     { slug: 'our-story', name: { en: 'Our Story', zh: '我们的故事' }, icon: 'BookOpen', link: '/about/story' },
-    { slug: 'blog', name: { en: 'Blog', zh: '博客' }, icon: 'FileText', link: '/blog' },
+    { slug: 'blog', name: { en: 'Blog', zh: '博客' }, icon: 'FileText', link: '/knowledge-base-blog' },
     { slug: 'support', name: { en: 'Support', zh: '技术支持' }, icon: 'Headphones', link: '/support' },
     { slug: 'privacy-policy', name: { en: 'Privacy Policy', zh: '隐私政策' }, icon: 'Shield', link: '/privacy-policy' },
     { slug: 'fraud-notice', name: { en: 'Fraud Notice', zh: '防诈骗声明' }, icon: 'AlertTriangle', link: '/fraud-notice' },

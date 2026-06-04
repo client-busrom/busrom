@@ -69,8 +69,8 @@ export async function getFeedItems(type: FeedType, limit: number, locale: string
 
   return blogs.map((blog: any) => ({
     title: blog.name,
-    link: `/blog/${blog.slug}`,
-    guid: `/blog/${blog.slug}`,
+    link: `/knowledge-base-blog/${blog.slug}`,
+    guid: `/knowledge-base-blog/${blog.slug}`,
     pubDate: new Date(blog.updatedAt).toUTCString(),
     description: blog.shortDescription || '',
   }))

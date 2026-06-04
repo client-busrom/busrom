@@ -215,6 +215,19 @@ const TRANSLATABLE_FIELDS: Record<string, TranslatableFieldConfig[]> = {
     { name: 'buttonLabels.viewDetails', labelKey: 'custom:translationCenter:viewDetailsBtn', type: 'textarea' },
     { name: 'buttonLabels.sendInquiry', labelKey: 'custom:translationCenter:sendInquiryBtn', type: 'textarea' },
   ],
+  'knowledge-base-list-page-config': [
+    { name: 'allTabLabel', labelKey: 'custom:translationCenter:allTabText', type: 'textarea' },
+    { name: 'allProductsTitle', labelKey: 'custom:translationCenter:allProductsTitle', type: 'textarea' },
+    { name: 'sortSettings.title', labelKey: 'custom:translationCenter:sortGroupTitle', type: 'textarea' },
+    { name: 'sortSettings.labelSortPublishedDesc', labelKey: 'custom:translationCenter:newArrivalsLabel', type: 'textarea' },
+    { name: 'sortSettings.labelSortPublishedAsc', labelKey: 'Oldest Label', type: 'textarea' },
+    { name: 'sortSettings.labelSortTitleAsc', labelKey: 'custom:translationCenter:nameAscLabel', type: 'textarea' },
+    { name: 'sortSettings.labelSortTitleDesc', labelKey: 'custom:translationCenter:nameDescLabel', type: 'textarea' },
+    { name: 'filterLabels.applyFilterBtn', labelKey: 'custom:translationCenter:applyFilterBtn', type: 'textarea' },
+    { name: 'filterLabels.searchPlaceholder', labelKey: 'custom:translationCenter:searchPlaceholder', type: 'textarea' },
+    { name: 'filterLabels.tagsTitle', labelKey: 'custom:translationCenter:filterGroupTitle', type: 'textarea' },
+    { name: 'buttonLabels.readMore', labelKey: 'Read More Button', type: 'textarea' },
+  ],
 }
 
 interface FieldValue {

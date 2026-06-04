@@ -36,8 +36,8 @@ export function BlogListClient({
 }: BlogListClientProps) {
   const [blogs, setBlogs] = useState<any[]>(initialBlogs || []);
   const [config, setConfig] = useState<any>(initialConfig || null);
+  const [hydratedPosts, setHydratedPosts] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(!initialConfig);
-  const [activeCategory, setActiveCategory] = useState<string>("all");
 
   useEffect(() => {
     // If we have no config or blogs, try a fresh fetch
@@ -71,24 +71,74 @@ export function BlogListClient({
     }
   }, [locale, config, blogs.length, initialBlogs]);
 
+  // Hydrate missing cover images for preview posts that only have IDs (due to depth limits)
+  useEffect(() => {
+    if (!config?.kbCategoryTabs) return;
+
+    const missingIds: string[] = [];
+    config.kbCategoryTabs.forEach((tab: any) => {
+      const postsList = tab.blogPosts?.docs || (Array.isArray(tab.blogPosts) ? tab.blogPosts : []);
+      
+      postsList.forEach((postItem: any) => {
+        const pId = typeof postItem === 'object' && postItem !== null ? postItem.id : postItem;
+        if (pId) {
+          const alreadyPopulated = blogs.find(b => String(b.id) === String(pId));
+          if (!alreadyPopulated && !hydratedPosts[pId] && !missingIds.includes(String(pId))) {
+            missingIds.push(String(pId));
+          }
+        }
+      });
+    });
+
+    if (missingIds.length > 0) {
+      // Use Payload's comma-separated syntax for 'in' operator to avoid query parameter parsing issues
+      const idsQuery = `where[id][in]=${missingIds.join(',')}&where[status][equals]=published`;
+      fetch(`/api/payload/blogs?locale=${locale}&${idsQuery}&depth=1&t=${Date.now()}`)
+        .then(res => res.ok ? res.json() : { docs: [] })
+        .then(data => {
+          if (data?.docs?.length > 0) {
+            setHydratedPosts(prev => {
+              const next = { ...prev };
+              data.docs.forEach((doc: any) => { next[doc.id] = doc; next[String(doc.id)] = doc; });
+              return next;
+            });
+          }
+        })
+        .catch(err => console.error("Error hydrating missing cover images:", err));
+    }
+  }, [config, blogs, locale]);
+
   // Create a flattened articles pool from categories for tag-based filtering
   const articlePool = useMemo(() => {
-    if (!config?.kbCategoryTabs) return [];
-    const allPosts: any[] = [];
-    const seenIds = new Set();
+    const allPosts: any[] = [...blogs];
+    const seenIds = new Set(blogs.map(b => String(b.id)));
 
-    config.kbCategoryTabs.forEach((tab: any) => {
-      if (Array.isArray(tab.blogPosts)) {
-        tab.blogPosts.forEach((post: any) => {
-          if (post && post.id && !seenIds.has(post.id)) {
-            allPosts.push(post);
-            seenIds.add(post.id);
-          }
-        });
+    // Add hydrated posts
+    Object.values(hydratedPosts).forEach((post: any) => {
+      if (post && post.id && !seenIds.has(String(post.id))) {
+        allPosts.push(post);
+        seenIds.add(String(post.id));
       }
     });
+
+    if (config?.kbCategoryTabs) {
+      config.kbCategoryTabs.forEach((tab: any) => {
+        const posts = tab.blogPosts?.docs || tab.blogPosts || [];
+        if (Array.isArray(posts)) {
+          posts.forEach((post: any) => {
+            const pId = typeof post === 'object' && post !== null ? post.id : post;
+            const fullPost = typeof post === 'object' && post !== null ? post : hydratedPosts[pId];
+            
+            if (fullPost && fullPost.id && !seenIds.has(String(fullPost.id))) {
+              allPosts.push(fullPost);
+              seenIds.add(String(fullPost.id));
+            }
+          });
+        }
+      });
+    }
     return allPosts;
-  }, [config?.kbCategoryTabs]);
+  }, [config?.kbCategoryTabs, blogs, hydratedPosts]);
 
   // Process sections and inject items based on tags
   const processedSections = useMemo(() => {
@@ -263,7 +313,11 @@ export function BlogListClient({
                 {/* Simple Category Badge */}
                 <div className="absolute bottom-8 left-8 z-20">
                   <Link
-                    href={`/${locale}/blog/category/${hero.post.categories?.[0]?.slug || "all"}`}
+                    href={
+                      hero.post.categories?.[0]?.slug
+                        ? `/${locale}/knowledge-base-blogs/${hero.post.categories[0].slug}`
+                        : `/${locale}/knowledge-base-blogs`
+                    }
                     className="inline-block px-8 py-3 bg-white/90 backdrop-blur-md rounded-full uppercase text-[11px] font-bold tracking-widest text-[#060C14] hover:bg-[#060C14] hover:text-white transition-colors border border-black/5"
                   >
                     {hero.post.categories?.[0]?.name || "Uncategorized"}
@@ -280,19 +334,19 @@ export function BlogListClient({
         <div className="container mx-auto px-6">
           <div className="mb-14 text-center">
             <h2 className="text-xs uppercase font-bold tracking-[0.3em] inline-flex items-center text-[#060C14] pl-4 relative after:absolute after:rounded-full after:content-[''] after:h-2 after:w-2 after:bg-[#ff4848] after:left-0">
-              POPULAR TOPICS
+              {config?.navTitle || "POPULAR TOPICS"}
             </h2>
           </div>
 
           <ul className="text-center flex flex-wrap justify-center gap-x-4 gap-y-8 sm:gap-x-10 lg:gap-x-14 font-prata text-black">
             {/* ALL Category */}
             <li className="relative group transition-all duration-300 list-none">
-              <button
-                onClick={() => setActiveCategory("all")}
+              <Link
+                href={`/${locale}/knowledge-base-blogs`}
                 className="inline-block relative"
               >
                 <span
-                  className={`transition-all duration-100 relative z-30 text-3xl sm:text-4xl lg:text-5xl capitalize ${activeCategory === "all" ? "text-[#ff4848]" : "group-hover:text-white group-hover:drop-shadow-lg"}`}
+                  className={`transition-all duration-100 relative z-30 text-3xl sm:text-4xl lg:text-5xl capitalize group-hover:text-white group-hover:drop-shadow-lg`}
                 >
                   {allLabel || "all"}
                 </span>
@@ -305,38 +359,51 @@ export function BlogListClient({
                     className="object-cover h-full w-full scale-125 group-hover:scale-100 transition-all duration-300"
                   />
                 </span>
-              </button>
+              </Link>
               <span className="ml-4 sm:ml-10 lg:ml-14 opacity-10 text-3xl sm:text-4xl lg:text-5xl font-light">
                 /
               </span>
             </li>
 
             {categoryTabs.map((tab: any, idx: number) => {
-              const previewPost = tab.blogPosts?.[0];
+              const postsList = tab.blogPosts?.docs || (Array.isArray(tab.blogPosts) ? tab.blogPosts : []);
+              const previewId = typeof postsList[0] === 'object' && postsList[0] !== null ? postsList[0].id : postsList[0];
+              
+              let previewPost = previewId 
+                ? (blogs.find(b => String(b.id) === String(previewId)) || hydratedPosts[previewId])
+                : null;
+              
+              // If previewPost is still missing but we had a fallback object from earlier bad types
+              if (!previewPost && typeof postsList[0] === 'object') {
+                previewPost = postsList[0];
+              }
+              
               return (
                 <li
                   key={tab.id}
                   className="relative group transition-all duration-300 list-none"
                 >
-                  <button
-                    onClick={() => setActiveCategory(tab.id)}
+                  <Link
+                    href={`/${locale}/knowledge-base-blogs/${tab.slug}`}
                     className="inline-block relative"
                   >
                     <span
-                      className={`transition-all duration-100 relative z-30 text-3xl sm:text-4xl lg:text-5xl capitalize ${activeCategory === tab.id ? "text-[#ff4848]" : "group-hover:text-white group-hover:drop-shadow-lg"}`}
+                      className={`transition-all duration-100 relative z-30 text-3xl sm:text-4xl lg:text-5xl capitalize group-hover:text-white group-hover:drop-shadow-lg`}
                     >
                       {tab.name}
                     </span>
                     {/* Floating Preview Image */}
-                    <span className="absolute h-[100px] lg:h-[130px] w-[200px] lg:w-[250px] left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 opacity-0 invisible scale-90 -rotate-12 transition-all duration-300 group-hover:opacity-100 group-hover:visible group-hover:scale-100 overflow-hidden rounded-2xl z-20 pointer-events-none mt-4 group-hover:mt-0 shadow-2xl">
-                      <OptimizedImage
-                        image={safeImage(previewPost?.coverImage)}
-                        alt={tab.name}
-                        size="medium"
-                        className="object-cover h-full w-full scale-125 group-hover:scale-100 transition-all duration-300"
-                      />
-                    </span>
-                  </button>
+                    {previewPost?.coverImage && (
+                      <span className="absolute h-[100px] lg:h-[130px] w-[200px] lg:w-[250px] left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 opacity-0 invisible scale-90 -rotate-12 transition-all duration-300 group-hover:opacity-100 group-hover:visible group-hover:scale-100 overflow-hidden rounded-2xl z-20 pointer-events-none mt-4 group-hover:mt-0 shadow-2xl">
+                        <OptimizedImage
+                          image={safeImage(previewPost?.coverImage)}
+                          alt={tab.name}
+                          size="medium"
+                          className="object-cover h-full w-full scale-125 group-hover:scale-100 transition-all duration-300"
+                        />
+                      </span>
+                    )}
+                  </Link>
                   {idx < categoryTabs.length - 1 && (
                     <span className="ml-4 sm:ml-10 lg:ml-14 opacity-10 text-3xl sm:text-4xl lg:text-5xl font-light">
                       /

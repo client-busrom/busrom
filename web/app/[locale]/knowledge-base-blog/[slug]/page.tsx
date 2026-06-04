@@ -19,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale; slug: string }>
 }): Promise<Metadata> {
   const { locale, slug } = await params
-  const path = `/blog/${slug}`
+  const path = `/knowledge-base-blog/${slug}`
 
   // Format slug for display (e.g., "my-blog-post" -> "My Blog Post")
   const title = slug
@@ -45,7 +45,7 @@ export default async function BlogDetailPage({
   params: Promise<{ locale: Locale; slug: string }>
 }) {
   const { locale, slug } = await params
-  const path = `/blog/${slug}`
+  const path = `/knowledge-base-blog/${slug}`
 
   // 1. Fetch Blog Data server-side
   const blogData = await getBlogBySlug(slug, locale)

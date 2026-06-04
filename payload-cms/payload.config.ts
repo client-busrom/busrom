@@ -277,6 +277,7 @@ import { PreloaderConfig } from './src/globals/PreloaderConfig'
 import { WaterfallConfig } from './src/globals/WaterfallConfig'
 import { SocialConfig } from './src/globals/SocialConfig'
 import { ShopPageConfig } from './src/globals/ShopPageConfig'
+import { KnowledgeBaseListPageConfig } from './src/globals/KnowledgeBaseListPageConfig'
 import { KnowledgeBaseSettings } from './src/globals/KnowledgeBaseSettings'
 // Globals - Homepage Sections (ordered to match frontend)
 import { ProductSeriesCarousel } from './src/globals/ProductSeriesCarousel'
@@ -430,6 +431,7 @@ export default buildConfig({
     WaterfallConfig,
     SocialConfig,
     ShopPageConfig,
+    KnowledgeBaseListPageConfig,
     KnowledgeBaseSettings,
     // Homepage Sections (ordered to match frontend HomePageClient.tsx)
     // Note: HeroBanner (1) and SeriesIntro (6) are Collections, not Globals

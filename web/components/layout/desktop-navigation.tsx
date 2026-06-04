@@ -209,7 +209,7 @@ export function DesktopNavigation({
                     hoverColor,
                   )}
                 >
-                  {item.label}
+                  <span className="whitespace-pre-line text-left">{item.label}</span>
                 </button>
               ) : (
                 <Link
@@ -222,7 +222,7 @@ export function DesktopNavigation({
                     isActive && "text-brand-secondary",
                   )}
                 >
-                  {item.label}
+                  <span className="whitespace-pre-line text-left">{item.label}</span>
                   {/* 箭头图标（有子菜单时显示） */}
                   {hasChildren && (
                     <ChevronDown
@@ -324,7 +324,7 @@ export function DesktopNavigation({
                                 </div>
 
                                 <div className="absolute top-4 left-4 z-10">
-                                  <p className="text-lg font-montserrat font-bold text-white drop-shadow-lg">
+                                  <p className="text-lg font-montserrat font-bold text-white drop-shadow-lg whitespace-pre-line">
                                     {child.label}
                                   </p>
                                 </div>
@@ -378,7 +378,7 @@ export function DesktopNavigation({
                                   />
                                 )}
                               </div>
-                              <span className="text-lg font-montserrat font-bold text-muted-foreground group-hover:text-brand-accent-gold text-center transition-colors whitespace-nowrap">
+                              <span className="text-lg font-montserrat font-bold text-muted-foreground group-hover:text-brand-accent-gold text-center transition-colors whitespace-pre-line">
                                 {child.label}
                               </span>
                             </Link>
@@ -397,7 +397,7 @@ export function DesktopNavigation({
                             className="group px-4 py-3 rounded-md transition-colors"
                             onClick={() => setActiveMenuId(null)}
                           >
-                            <span className="text-lg font-montserrat font-bold text-muted-foreground group-hover:text-brand-accent-gold transition-colors">
+                            <span className="text-lg font-montserrat font-bold text-muted-foreground group-hover:text-brand-accent-gold transition-colors whitespace-pre-line">
                               {child.label}
                             </span>
                           </Link>

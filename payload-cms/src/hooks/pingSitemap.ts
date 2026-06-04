@@ -24,7 +24,7 @@ export const pingSitemap: CollectionAfterChangeHook = async ({
     let pagePath = ''
     const slug = collection.slug as string
     if (slug === 'products') pagePath = `/shop/${doc.slug}`
-    else if (slug === 'blogs') pagePath = `/blog/${doc.slug}`
+    else if (slug === 'blogs') pagePath = `/knowledge-base-blog/${doc.slug}`
     else if (slug === 'applications') pagePath = `/application`
     else if (slug === 'product-series') pagePath = `/products/${doc.slug}`
     else if (slug === 'pages') {

@@ -193,7 +193,7 @@ function getStaticRoutes(): { path: string; changefreq: SitemapUrl['changefreq']
     { path: '/shop', changefreq: 'weekly', priority: 0.9 },
 
     // Blog list page
-    { path: '/blog', changefreq: 'weekly', priority: 0.8 },
+    { path: '/knowledge-base-blog', changefreq: 'weekly', priority: 0.8 },
 
     // Application list page
     { path: '/application', changefreq: 'weekly', priority: 0.8 },
@@ -321,7 +321,7 @@ export async function getSitemapUrlsForLocale(locale: string, baseUrl: string): 
     for (const blog of blogs) {
       urls.push(
         generateUrlWithAlternates(
-          `/blog/${blog.slug}`,
+          `/knowledge-base-blog/${blog.slug}`,
           blog.updatedAt,
           'weekly',
           0.7,
@@ -410,7 +410,7 @@ export async function getAllSitemapUrls(): Promise<SitemapUrl[]> {
     // Add blogs -> /blog/[slug]
     for (const blog of blogs) {
       urls.push({
-        url: `/blog/${blog.slug}`,
+        url: `/knowledge-base-blog/${blog.slug}`,
         lastmod: blog.updatedAt,
         changefreq: 'weekly',
         priority: 0.7,

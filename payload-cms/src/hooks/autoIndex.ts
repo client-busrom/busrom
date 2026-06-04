@@ -29,7 +29,7 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
         let path = ''
         switch (collection) {
           case 'blogs':
-            path = `/blog/${document.slug}`
+            path = `/knowledge-base-blog/${document.slug}`
             break
           case 'products':
             path = `/shop/${document.slug}`

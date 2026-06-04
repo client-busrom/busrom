@@ -5,8 +5,8 @@
 
 export const APP_ROUTES = {
   HOME: '/',
-  BLOG_INDEX: '/blog',
-  BLOG_DETAIL: (slug: string) => `/blog/${slug}`,
+  BLOG_INDEX: '/knowledge-base-blog',
+  BLOG_DETAIL: (slug: string) => `/knowledge-base-blog/${slug}`,
   SHOP_INDEX: '/shop',
   PRODUCT_DETAIL: (slug: string) => `/products/${slug}`,
   APPLICATION_INDEX: '/applications',

@@ -240,6 +240,7 @@ export interface Config {
     'waterfall-config': WaterfallConfig;
     'social-config': SocialConfig;
     'shop-page-config': ShopPageConfig;
+    'knowledge-base-list-page-config': KnowledgeBaseListPageConfig;
     'knowledge-base-settings': KnowledgeBaseSetting;
     'product-series-carousel': ProductSeriesCarousel;
     'service-features': ServiceFeature;
@@ -267,6 +268,7 @@ export interface Config {
     'waterfall-config': WaterfallConfigSelect<false> | WaterfallConfigSelect<true>;
     'social-config': SocialConfigSelect<false> | SocialConfigSelect<true>;
     'shop-page-config': ShopPageConfigSelect<false> | ShopPageConfigSelect<true>;
+    'knowledge-base-list-page-config': KnowledgeBaseListPageConfigSelect<false> | KnowledgeBaseListPageConfigSelect<true>;
     'knowledge-base-settings': KnowledgeBaseSettingsSelect<false> | KnowledgeBaseSettingsSelect<true>;
     'product-series-carousel': ProductSeriesCarouselSelect<false> | ProductSeriesCarouselSelect<true>;
     'service-features': ServiceFeaturesSelect<false> | ServiceFeaturesSelect<true>;
@@ -3870,6 +3872,49 @@ export interface ShopPageConfig {
   createdAt?: string | null;
 }
 /**
+ * Independent management of the Knowledge Base list page, including category tabs and filter settings.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledge-base-list-page-config".
+ */
+export interface KnowledgeBaseListPageConfig {
+  id: number;
+  /**
+   * Select and order the blog categories to display in the Knowledge Base top navigation.
+   */
+  categoryTabs: (number | Category)[];
+  showAllTab?: boolean | null;
+  allTabLabel?: string | null;
+  allProductsTitle?: string | null;
+  pageSize?: number | null;
+  sortSettings?: {
+    title?: string | null;
+    defaultSort?: ('publishedAt_desc' | 'publishedAt_asc' | 'title_asc' | 'title_desc') | null;
+    enableSortPublishedDesc?: boolean | null;
+    labelSortPublishedDesc?: string | null;
+    enableSortPublishedAsc?: boolean | null;
+    labelSortPublishedAsc?: string | null;
+    enableSortTitleAsc?: boolean | null;
+    labelSortTitleAsc?: string | null;
+    enableSortTitleDesc?: boolean | null;
+    labelSortTitleDesc?: string | null;
+  };
+  filterLabels?: {
+    applyFilterBtn?: string | null;
+    searchPlaceholder?: string | null;
+    tagsTitle?: string | null;
+    /**
+     * Dynamically fetches and displays all blog tags as filter options.
+     */
+    enableTagsFilter?: boolean | null;
+  };
+  buttonLabels?: {
+    readMore?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "knowledge-base-settings".
  */
@@ -4777,6 +4822,47 @@ export interface ShopPageConfigSelect<T extends boolean = true> {
     | {
         viewDetails?: T;
         sendInquiry?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "knowledge-base-list-page-config_select".
+ */
+export interface KnowledgeBaseListPageConfigSelect<T extends boolean = true> {
+  categoryTabs?: T;
+  showAllTab?: T;
+  allTabLabel?: T;
+  allProductsTitle?: T;
+  pageSize?: T;
+  sortSettings?:
+    | T
+    | {
+        title?: T;
+        defaultSort?: T;
+        enableSortPublishedDesc?: T;
+        labelSortPublishedDesc?: T;
+        enableSortPublishedAsc?: T;
+        labelSortPublishedAsc?: T;
+        enableSortTitleAsc?: T;
+        labelSortTitleAsc?: T;
+        enableSortTitleDesc?: T;
+        labelSortTitleDesc?: T;
+      };
+  filterLabels?:
+    | T
+    | {
+        applyFilterBtn?: T;
+        searchPlaceholder?: T;
+        tagsTitle?: T;
+        enableTagsFilter?: T;
+      };
+  buttonLabels?:
+    | T
+    | {
+        readMore?: T;
       };
   updatedAt?: T;
   createdAt?: T;

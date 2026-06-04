@@ -20,7 +20,7 @@ export const autoIndexDeleteHook = (collectionSlug: string): CollectionAfterDele
         let path = ''
         switch (collectionSlug) {
           case 'blogs':
-            path = `/blog/${doc.slug}`
+            path = `/knowledge-base-blog/${doc.slug}`
             break
           case 'products':
             path = `/shop/${doc.slug}`
