@@ -41,6 +41,7 @@ export async function POST(
     const systemFields = ['id', 'createdAt', 'updatedAt', 'status', 'publishedAt', 'User', 'Operation', 'author', 'adminLabel', 'slug']
 
     // 使用串行保存，确保数据库稳定性
+    const startTime = performance.now();
     for (const [localeCode, data] of Object.entries(locales)) {
       try {
         // [Bugfix] Clear the transactionID from the request object for each iteration.
@@ -79,6 +80,7 @@ export async function POST(
         // 其他目标语言则保持 disableHooks: true 追求极速。
         const shouldUseHooks = localeCode === 'en' || localeCode === sourceLocale;
 
+        const localeStartTime = performance.now();
         const updatedDoc = await payload.update({
           collection: collection as any,
           id,
@@ -87,6 +89,8 @@ export async function POST(
           disableHooks: !shouldUseHooks,
           req: i18nReq,
         } as any)
+        const localeEndTime = performance.now();
+        console.log(`[save-translations] ✅ Saved locale=${localeCode} in ${(localeEndTime - localeStartTime).toFixed(2)}ms (hooks: ${shouldUseHooks ? 'enabled' : 'disabled'})`);
 
         // [SQL FORCE] 物理层确保状态不丢失 (针对 Blog 集合)
         if (collection === 'blogs' && currentDoc.status === 'published') {
@@ -104,6 +108,8 @@ export async function POST(
       }
     }
 
+    const endTime = performance.now();
+    console.log(`📡 [save-translations] 🏁 Finished saving ${results.length} locales in ${(endTime - startTime).toFixed(2)}ms`);
     return NextResponse.json({ success: true, results })
   } catch (error: any) {
     console.error('[save-translations] Global Error:', error)
