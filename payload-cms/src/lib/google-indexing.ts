@@ -16,11 +16,12 @@ export async function notifyGoogleOfUpdate(url: string, type: 'URL_UPDATED' | 'U
 
   try {
     const credentials = JSON.parse(credentialsJson)
+    const privateKey = credentials.private_key.replace(/\\n/g, '\n')
     
     // 1. Initialize Auth
     const auth = new google.auth.JWT({
       email: credentials.client_email,
-      key: credentials.private_key,
+      key: privateKey,
       scopes: ['https://www.googleapis.com/auth/indexing'],
     })
 
