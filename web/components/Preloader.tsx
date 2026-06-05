@@ -74,6 +74,13 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
 
     // --- 资源加载 ---
     const loadingManager = new THREE.LoadingManager();
+    
+    // 提前绑定回调，防止因为缓存引发的异步时序问题
+    loadingManager.onLoad = () => {
+      fontAndLogoReady = true;
+      checkAndStartEndAnimation();
+    };
+
     const fontLoader = new FontLoader(loadingManager);
     const textureLoader = new THREE.TextureLoader(loadingManager); 
     const svgLoader = new SVGLoader(loadingManager); 
@@ -94,14 +101,16 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
       for (let i = 0; i < paths.length; i++) {
           const path = paths[i];
           const fillColor = path.userData?.style.fill;
-          const material = new THREE.MeshBasicMaterial({ color: new THREE.Color().setStyle(fillColor).convertSRGBToLinear(), opacity: path.userData?.style.fillOpacity, transparent: true, side: THREE.DoubleSide, depthWrite: false });
-          const shapes = SVGLoader.createShapes(path);
-          for (let j = 0; j < shapes.length; j++) {
-              const shape = shapes[j];
-              const extrudeSettings = { depth: 24, bevelEnabled: false };
-              const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-              const mesh = new THREE.Mesh(geometry, material);
-              group.add(mesh);
+          if (fillColor !== undefined && fillColor !== 'none' && fillColor !== '') {
+              const material = new THREE.MeshBasicMaterial({ color: new THREE.Color().setStyle(fillColor).convertSRGBToLinear(), opacity: path.userData?.style.fillOpacity, transparent: true, side: THREE.DoubleSide, depthWrite: false });
+              const shapes = SVGLoader.createShapes(path);
+              for (let j = 0; j < shapes.length; j++) {
+                  const shape = shapes[j];
+                  const extrudeSettings = { depth: 24, bevelEnabled: false };
+                  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                  const mesh = new THREE.Mesh(geometry, material);
+                  group.add(mesh);
+              }
           }
       }
       
@@ -128,7 +137,7 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
     const MIN_LOADING_TIME = 1500; // 最小加载时间 1.5 秒
 
     // 设置最小显示时间
-    setTimeout(() => {
+    const minTimer = setTimeout(() => {
       minTimeElapsed = true;
       checkAndStartEndAnimation();
     }, MIN_LOADING_TIME);
@@ -136,7 +145,7 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
     // --- 新增：硬超时机制 (Hard Timeout) ---
     // 为中国大陆等网络环境优化的“兜底”逻辑：如果 6 秒后还没加载完，强制解锁
     const HARD_TIMEOUT = 8000; 
-    setTimeout(() => {
+    const hardTimer = setTimeout(() => {
       if (!allImagesLoaded || !fontAndLogoReady) {
         console.warn("[Preloader] Hard timeout reached. Forcing site entry...");
         allImagesLoaded = true;
@@ -167,29 +176,37 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
     };
 
 
+    let endAnimTimer: NodeJS.Timeout;
+
     // 检查是否可以开始结束动画
     const checkAndStartEndAnimation = () => {
       // 已经完成过则直接跳过
       if (completedRef.current) return;
 
-      // 需要满足三个条件：图片加载完成、字体和Logo准备好、最小时间已过
-      if (allImagesLoaded && fontAndLogoReady && minTimeElapsed) {
+      // 只需要满足两个核心条件：字体和Logo准备好、最小时间已过 (不再强制等待所有背景图下载)
+      if (fontAndLogoReady && minTimeElapsed) {
         completedRef.current = true; // 锁定状态
         
-        // 确保进度显示为 100%
-        realProgress.value = 100;
-        updatePercentageDisplay();
-
-        // 开始结束动画
-        setTimeout(() => {
-          if (endTimeline) endTimeline.play();
-        }, 300); // 短待延迟让用户看到 100%
+        // 真实加载完毕，让进度条迅速走到 100%
+        gsap.to(realProgress, {
+          value: 100,
+          duration: 0.4,
+          ease: "power2.inOut",
+          onUpdate: updatePercentageDisplay,
+          onComplete: () => {
+            // 开始结束动画
+            endAnimTimer = setTimeout(() => {
+              if (endTimeline) endTimeline.play();
+            }, 150); // 短待延迟让用户看清 100%
+          }
+        });
       }
     };
 
     // 加载图片并跟踪进度
     const loadImagesWithProgress = () => {
       const validImages = config.images.filter(img => img !== null);
+      console.log("[Preloader] 正在使用的图片配置:", validImages);
       const totalImages = validImages.length;
 
       if (totalImages === 0) {
@@ -198,9 +215,9 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
         return;
       }
 
-      // 启动平滑进度动画（在最小时间内从 0 到 100）
+      // 启动平滑进度动画（在最小时间内先从 0 跑到 90%，剩下的等真实加载完毕）
       gsap.to(realProgress, {
-        value: 100,
+        value: 90,
         duration: MIN_LOADING_TIME / 1000,
         ease: "power1.out",
         onUpdate: updatePercentageDisplay,
@@ -233,10 +250,10 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
 
       // 显示初始 0%
       updatePercentageDisplay();
-
-      // 开始加载图片
-      loadImagesWithProgress();
     });
+
+    // 开始加载图片 (与字体加载并行)
+    loadImagesWithProgress();
 
     // --- 结束动画 (图片加载完成后播放) ---
     const endTimeline = gsap.timeline({ paused: true });
@@ -263,12 +280,6 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
     });
 
     endTimeline.to({}, { duration: config.logoAnimationDuration, onComplete: onLoadingComplete });
-
-    // 字体和 Logo 加载完成的回调
-    loadingManager.onLoad = () => {
-      fontAndLogoReady = true;
-      checkAndStartEndAnimation();
-    };
 
     gsap.to(loadingMaterial.uniforms.uProgressShine, {
       value: 1,
@@ -325,7 +336,21 @@ export function Preloader({ onLoadingComplete, config }: PreloaderProps) {
       const extension = renderer.getContext().getExtension('WEBGL_lose_context');
       if (extension) extension.loseContext();
       renderer.forceContextLoss();
-      gsap.killTweensOf("*");
+      
+      // 精确清理 GSAP 动画，避免杀掉主站其它组件的动画
+      gsap.killTweensOf(realProgress);
+      gsap.killTweensOf(loadingMaterial.uniforms.uProgressShine);
+      if (logoMesh) {
+        gsap.killTweensOf(logoMesh.scale);
+        gsap.killTweensOf(logoMesh.rotation);
+      }
+      if (endTimeline) endTimeline.kill();
+
+      // 清理定时器
+      clearTimeout(minTimer);
+      clearTimeout(hardTimer);
+      clearTimeout(endAnimTimer);
+
       console.log("[Preloader] Cleanup/Unmounted");
     };
   }, [onLoadingComplete, config]);

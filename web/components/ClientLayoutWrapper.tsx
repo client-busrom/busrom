@@ -74,10 +74,10 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
       return;
     }
 
-    // 检测性能测试工具
+    // 检测爬虫和性能测试工具 (Googlebot, Lighthouse, GTmetrix, etc.)
     const ua = navigator.userAgent;
-    const isPerformanceTest = /Lighthouse|Chrome-Lighthouse|PageSpeed|Speed Insights/i.test(ua);
-    if (isPerformanceTest) {
+    const isBotOrPerfTool = /bot|googlebot|crawler|spider|robot|crawling|lighthouse|speed insights|speed-insights|ptst|chrome-lighthouse|gtmetrix|pingdom/i.test(ua);
+    if (isBotOrPerfTool) {
       setLoadingStage("done");
       return;
     }

@@ -369,6 +369,7 @@ export function parseHomeData(data: any, locale: string, strategy?: string, seoK
     title: '',
     description: '',
     viewAllButton: '',
+    viewAllButtonUrl: '',
     categories: '',
     series: []
   };
