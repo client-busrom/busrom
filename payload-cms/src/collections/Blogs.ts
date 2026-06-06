@@ -314,7 +314,7 @@ export const Blogs: CollectionConfig = {
     },
     {
       name: 'adminLabel',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Admin Identification (Internal Use)',
         zh: '内部管理标识（不影响URL）',

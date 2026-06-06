@@ -99,7 +99,7 @@ export const NavigationMenus: CollectionConfig = {
     // Basic Information
     {
       name: 'adminLabel',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Admin Label',
         zh: '内部管理标识',

@@ -96,7 +96,7 @@ export const Products: CollectionConfig = {
             },
             {
               name: 'adminLabel',
-              type: 'text',
+              type: 'textarea',
               admin: {
                 position: 'sidebar',
               },

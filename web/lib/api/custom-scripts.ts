@@ -53,6 +53,9 @@ const ALLOWED_SCRIPT_DOMAINS = [
   'www.redditstatic.com', // Reddit
   'widget.intercom.io', // Intercom
   'js.intercomcdn.com',
+  // Commerce
+  'sdks.shopifycdn.com', // Shopify
+  'cdn.shopify.com',
 ]
 
 // ============================================================================

@@ -52,6 +52,9 @@ export const ALLOWED_SCRIPT_DOMAINS = [
   'www.redditstatic.com', // Reddit
   'widget.intercom.io', // Intercom
   'js.intercomcdn.com',
+  // Commerce
+  'sdks.shopifycdn.com', // Shopify
+  'cdn.shopify.com',
 ]
 
 // ============================================================================
@@ -126,6 +129,92 @@ src="https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1"/></noscript>
 }(window, document, 'ttq');
 </script>
 <!-- End TikTok Pixel Code -->`,
+  },
+  linkedin_insight: {
+    name: 'LinkedIn Insight Tag',
+    description: 'LinkedIn analytics and conversion tracking',
+    placeholder: 'XXXXXXX',
+    template: (id: string) => `<!-- LinkedIn Insight Tag -->
+<script type="text/javascript">
+_linkedin_partner_id = "${id}";
+window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+</script><script type="text/javascript">
+(function(l) {
+if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
+window.lintrk.q=[]}
+var s = document.getElementsByTagName("script")[0];
+var b = document.createElement("script");
+b.type = "text/javascript";b.async = true;
+b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+s.parentNode.insertBefore(b, s);})(window.lintrk);
+</script>
+<noscript>
+<img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=${id}&fmt=gif" />
+</noscript>
+<!-- End LinkedIn Insight Tag -->`,
+  },
+  twitter_pixel: {
+    name: 'Twitter (X) Pixel',
+    description: 'Twitter website tag for tracking conversions',
+    placeholder: 'XXXXX',
+    template: (id: string) => `<!-- Twitter conversion tracking event code -->
+<script type="text/javascript">
+  !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+  },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
+  a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+  twq('config','${id}');
+</script>
+<!-- End Twitter conversion tracking event code -->`,
+  },
+  reddit_pixel: {
+    name: 'Reddit Pixel',
+    description: 'Reddit conversion tracking pixel',
+    placeholder: 't2_XXXXXXX',
+    template: (id: string) => `<!-- Reddit Pixel -->
+<script>
+!function(w,d){if(!w.rdt){var p=w.rdt=function(){p.sendEvent?p.sendEvent.apply(p,arguments):p.callQueue.push(arguments)};p.callQueue=[];var t=d.createElement("script");t.src="https://www.redditstatic.com/ads/pixel.js",t.async=!0;var s=d.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}}(window,document);
+rdt('init','${id}');
+rdt('track', 'PageVisit');
+</script>
+<!-- End Reddit Pixel -->`,
+  },
+  hubspot_tracking: {
+    name: 'HubSpot Tracking Code',
+    description: 'HubSpot analytics and forms',
+    placeholder: 'XXXXXXX',
+    template: (id: string) => `<!-- Start of HubSpot Embed Code -->
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/${id}.js"></script>
+<!-- End of HubSpot Embed Code -->`,
+  },
+  intercom_messenger: {
+    name: 'Intercom Messenger',
+    description: 'Intercom live chat widget',
+    placeholder: 'XXXXXXXX',
+    template: (id: string) => `<!-- Intercom Messenger -->
+<script>
+  window.intercomSettings = {
+    api_base: "https://api-iam.intercom.io",
+    app_id: "${id}"
+  };
+</script>
+<script>
+(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',w.intercomSettings);}else{var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.Intercom=i;var l=function(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/${id}';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);};if(document.readyState==='complete'){l();}else{if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}}})();
+</script>
+<!-- End Intercom Messenger -->`,
+  },
+  segment_analytics: {
+    name: 'Segment Analytics.js',
+    description: 'Twilio Segment event tracking',
+    placeholder: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    template: (id: string) => `<!-- Segment Analytics -->
+<script>
+  !function(){var i="analytics",analytics=window[i]=window[i]||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","screen","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware","register"];analytics.factory=function(e){return function(){if(window[i].initialized)return window[i][e].apply(window[i],arguments);var n=Array.prototype.slice.call(arguments);if(["track","screen","alias","group","page","identify"].indexOf(e)>-1){var c=document.querySelector("link[rel='canonical']");n.push({__t:"bpc",c:c&&c.getAttribute("href")||void 0,p:location.pathname,u:location.href,s:location.search,t:document.title,r:document.referrer})}n.unshift(e);analytics.push(n);return analytics}};for(var n=0;n<analytics.methods.length;n++){var key=analytics.methods[n];analytics[key]=analytics.factory(key)}analytics.load=function(key,n){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.setAttribute("data-global-segment-analytics-key",i);t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r);analytics._loadOptions=n};analytics._writeKey="${id}";;analytics.SNIPPET_VERSION="5.2.0";
+  analytics.load("${id}");
+  analytics.page();
+  }}();
+</script>
+<!-- End Segment Analytics -->`,
   },
   microsoft_clarity: {
     name: 'Microsoft Clarity',
@@ -210,6 +299,22 @@ src="https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1"/></noscript>
     placeholder: 'XXXXXXXXXXXXXXXX',
     template: (id: string) => `<!-- Yandex Webmaster Verification -->
 <meta name="yandex-verification" content="${id}" />`,
+  },
+  shopify_buy_button: {
+    name: 'Shopify Buy Button (SDK Loader)',
+    description: 'Loads the Shopify JS SDK for embedding products',
+    placeholder: 'Leave blank or enter store domain',
+    template: (id: string) => `<!-- Shopify Buy Button SDK -->
+<script type="text/javascript">
+  var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
+  if (window.ShopifyBuy && window.ShopifyBuy.UI) {} else {
+    var script = document.createElement('script');
+    script.async = true;
+    script.src = scriptURL;
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);
+  }
+</script>
+<!-- End Shopify Buy Button SDK -->`,
   },
 }
 
@@ -365,8 +470,20 @@ export const CustomScripts: CollectionConfig = {
         { label: 'Google Tag Manager (noscript)', value: 'google_tag_manager_noscript' },
         { label: 'Facebook Pixel', value: 'facebook_pixel' },
         { label: 'TikTok Pixel', value: 'tiktok_pixel' },
+        { label: 'LinkedIn Insight Tag', value: 'linkedin_insight' },
+        { label: 'Twitter (X) Pixel', value: 'twitter_pixel' },
+        { label: 'Reddit Pixel', value: 'reddit_pixel' },
+        { label: 'HubSpot Tracking Code', value: 'hubspot_tracking' },
+        { label: 'Intercom Messenger', value: 'intercom_messenger' },
+        { label: 'Segment Analytics.js', value: 'segment_analytics' },
         { label: 'Microsoft Clarity', value: 'microsoft_clarity' },
         { label: 'Hotjar', value: 'hotjar' },
+        { label: 'Bing UET', value: 'bing_uet' },
+        { label: 'Yandex Metrica', value: 'yandex_metrica' },
+        { label: 'Google Search Console Verification', value: 'google_search_console' },
+        { label: 'Bing Webmaster Verification', value: 'bing_webmaster' },
+        { label: 'Yandex Webmaster Verification', value: 'yandex_webmaster' },
+        { label: 'Shopify Buy Button (SDK)', value: 'shopify_buy_button' },
       ],
       admin: {
         condition: (data) => data.scriptType === 'template',

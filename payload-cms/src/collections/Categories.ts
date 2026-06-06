@@ -189,7 +189,7 @@ export const Categories: CollectionConfig = {
     },
     {
       name: 'adminLabel',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Admin Identification',
         zh: '内部管理标识',

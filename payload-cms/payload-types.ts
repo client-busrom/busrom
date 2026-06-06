@@ -1932,8 +1932,20 @@ export interface CustomScript {
         | 'google_tag_manager_noscript'
         | 'facebook_pixel'
         | 'tiktok_pixel'
+        | 'linkedin_insight'
+        | 'twitter_pixel'
+        | 'reddit_pixel'
+        | 'hubspot_tracking'
+        | 'intercom_messenger'
+        | 'segment_analytics'
         | 'microsoft_clarity'
         | 'hotjar'
+        | 'bing_uet'
+        | 'yandex_metrica'
+        | 'google_search_console'
+        | 'bing_webmaster'
+        | 'yandex_webmaster'
+        | 'shopify_buy_button'
       )
     | null;
   /**

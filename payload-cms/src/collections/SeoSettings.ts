@@ -79,7 +79,7 @@ export const SeoSettings: CollectionConfig = {
     // ==================================================================
     {
       name: 'identifier',
-      type: 'text',
+      type: 'textarea',
       label: {
         en: 'Admin Label',
         zh: '内部管理标识',
