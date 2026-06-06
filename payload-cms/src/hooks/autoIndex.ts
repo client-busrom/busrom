@@ -73,15 +73,16 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
       const urls = getUrls(doc, collectionSlug)
       console.log(`📡 [AutoIndex] ${collectionSlug} published: ${doc.slug}. Notifying updates...`)
       
-      // Check credentials once to avoid 24 identical warnings
+      // Check credentials once to avoid identical warnings
       if (!process.env.GOOGLE_INDEXING_CREDENTIALS) {
         console.log('⚠️ [Google Indexing] Credentials not found. Skipping.')
       } else {
-        urls.forEach(url => {
-          notifyGoogleOfUpdate(url, 'URL_UPDATED')
-            .then(res => logToDb(url, 'google', 'update', res))
-            .catch(e => logToDb(url, 'google', 'update', { success: false, message: e.message }))
-        })
+        // OPTIMIZATION: Only send the first/primary language (e.g. 'en') to Google Indexing API
+        // This saves the 200/day quota limit. Googlebot will discover other languages via hreflang tags.
+        const primaryUrl = urls[0]
+        notifyGoogleOfUpdate(primaryUrl, 'URL_UPDATED')
+          .then(res => logToDb(primaryUrl, 'google', 'update', res))
+          .catch(e => logToDb(primaryUrl, 'google', 'update', { success: false, message: e.message }))
       }
       
       const indexNowTarget = urls.length > 1 ? `${urls.length} URLs (e.g. ${urls[0]})` : urls[0]
@@ -98,11 +99,10 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
       if (!process.env.GOOGLE_INDEXING_CREDENTIALS) {
         console.log('⚠️ [Google Indexing] Credentials not found. Skipping.')
       } else {
-        urls.forEach(url => {
-          notifyGoogleOfUpdate(url, 'URL_DELETED')
-            .then(res => logToDb(url, 'google', 'delete', res))
-            .catch(e => logToDb(url, 'google', 'delete', { success: false, message: e.message }))
-        })
+        const primaryUrl = urls[0]
+        notifyGoogleOfUpdate(primaryUrl, 'URL_DELETED')
+          .then(res => logToDb(primaryUrl, 'google', 'delete', res))
+          .catch(e => logToDb(primaryUrl, 'google', 'delete', { success: false, message: e.message }))
       }
       
       const indexNowTarget = urls.length > 1 ? `${urls.length} URLs (e.g. ${urls[0]})` : urls[0]

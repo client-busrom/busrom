@@ -40,7 +40,9 @@ export const autoIndexDeleteHook = (collectionSlug: string): CollectionAfterDele
 
       console.log(`📡 [AutoIndex] ${collectionSlug} deleted: ${doc.slug}. Notifying search engines...`)
 
-      Promise.all(urls.map(url => notifyGoogleOfUpdate(url, 'URL_DELETED'))).catch(e => {
+      // OPTIMIZATION: Only send the first language (e.g. 'en') to Google Indexing to save quota
+      const primaryUrl = urls[0]
+      notifyGoogleOfUpdate(primaryUrl, 'URL_DELETED').catch(e => {
         console.error('[AutoIndex] Google Delete error:', e.message)
       })
 
