@@ -1,3 +1,4 @@
+import { safeBulkStatusEndpoint } from "./src/endpoints/bulkStatus"
 /**
  * Payload CMS Configuration
  *
@@ -750,6 +751,7 @@ export default buildConfig({
   // Custom Endpoints
   // ==================================================================
   endpoints: [
+    safeBulkStatusEndpoint,
     // Home Page Content API (REST)
     {
       path: '/home',

@@ -37,9 +37,12 @@ export const Products: CollectionConfig = {
     },
   },
   admin: {
+    pagination: { defaultLimit: 100 },
     useAsTitle: 'name',
     listSearchableFields: ['adminLabel', 'sku', 'slug', 'name'],
     defaultColumns: ['adminLabel', 'shopOrder', 'order', 'sku', 'name', 'category', 'series', 'status'],
+    components: {
+    },
     group: {
       en: 'Products',
       zh: '产品管理',

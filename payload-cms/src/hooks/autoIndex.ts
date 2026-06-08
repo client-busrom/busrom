@@ -1,4 +1,5 @@
-import { CollectionAfterChangeHook } from 'payload'
+import { CollectionAfterChangeHook, getPayload } from 'payload'
+import configPromise from '@payload-config'
 import { notifyGoogleOfUpdate } from '../lib/google-indexing'
 import { notifyIndexNow } from '../lib/index-now'
 
@@ -51,12 +52,13 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
 
     const logToDb = async (url: string, engine: 'google' | 'indexnow', action: 'update' | 'delete', result: any) => {
       try {
-        // NOTE: Do NOT pass `req` to payload.create here.
+        // NOTE: Use the global payload instance instead of `req.payload`.
         // During bulk operations, multiple afterChange hooks run concurrently sharing the same
-        // `req` object. Passing it to nested payload operations causes internal Drizzle state
-        // corruption: "TypeError: Cannot use 'in' operator to search for '_rels' in undefined".
-        // Using overrideAccess: true without req is the safe approach for background logging.
-        await req.payload.create({
+        // `req` object. Using `req.payload.create` causes internal Drizzle state/transaction
+        // pool corruption: "TypeError: Cannot use 'in' operator to search for '_rels' in undefined".
+        // Accessing the root/global payload instance bypasses request transaction context completely.
+        const globalPayload = await getPayload({ config: configPromise })
+        await globalPayload.create({
           collection: 'indexing-logs',
           overrideAccess: true,
           data: {
