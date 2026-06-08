@@ -87,11 +87,16 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
     cropData: any,
     alt: string,
     className: string = "",
+    priority: boolean = false
   ) => {
     if (!image) return null;
 
     const cropStyles = getCropStyles(cropData);
     const imageUrl = getCropImageUrl(image, cropData);
+
+    const imgProps = priority 
+      ? { fetchPriority: "high" as const, decoding: "sync" as const }
+      : { decoding: "async" as const };
 
     if (cropStyles) {
       return (
@@ -101,6 +106,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
             alt={alt}
             className={className}
             style={cropStyles.image}
+            {...imgProps}
           />
         </div>
       );
@@ -112,6 +118,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
         alt={alt}
         className={`w-full h-full object-cover ${className}`}
         style={{ objectPosition: getObjectPosition(image) }}
+        {...imgProps}
       />
     );
   };
@@ -204,6 +211,8 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
                   data.images[1],
                   data.imageCropDataList?.[1],
                   "Frame 1 Content",
+                  "",
+                  true
                 )}
               </div>
             </div>
@@ -241,6 +250,8 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
                   data.images[2],
                   data.imageCropDataList?.[2],
                   "Frame 2 Content",
+                  "",
+                  true
                 )}
               </div>
             </div>

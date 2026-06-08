@@ -33,7 +33,7 @@ export const withBulkUpdateProtection = (collections: CollectionConfig[]): Colle
             ...collection.admin?.components,
             beforeListTable: [
               ...beforeListTable,
-              '/src/components/SafeBulkStatus/index.tsx#SafeBulkStatus'
+              '@/components/SafeBulkStatus/index#SafeBulkStatus'
             ]
           }
         }

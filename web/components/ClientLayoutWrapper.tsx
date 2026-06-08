@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { SWRConfig } from 'swr';
 import dynamic from 'next/dynamic';
 import type { PreloaderConfigData } from "@/lib/api/preloader-config";
+import { setPreloaderDone } from "@/lib/preloader-state";
 
 // 动态加载 Preloader 和 ImageWall，避免阻塞首屏渲染
 const Preloader = dynamic(
@@ -50,8 +51,14 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
 
   // 初始状态：服务端渲染和客户端初始渲染必须完全一致，以防止 Hydration Mismatch
   const [loadingStage, setLoadingStage] = useState<LoadingStage>(() => {
-    if (!preloaderConfig.enabled) return "done";
-    if (!isHomePage(pathname)) return "done";
+    if (!preloaderConfig.enabled) {
+      setPreloaderDone();
+      return "done";
+    }
+    if (!isHomePage(pathname)) {
+      setPreloaderDone();
+      return "done";
+    }
     return "loading"; // 首页始终以 loading 作为初始状态，客户端再通过 useEffect 快速跳转
   });
   const [isMounted, setIsMounted] = useState(false);
@@ -64,12 +71,14 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
 
     // 检查是否已经在内存或 session 中显示过
     if (globalPreloaderShown || sessionStorage.getItem(PRELOADER_SHOWN_KEY) === 'true') {
+      setPreloaderDone();
       setLoadingStage("done");
       return;
     }
 
     // 非首页 → 直接跳过
     if (!isHomePage(pathname)) {
+      setPreloaderDone();
       setLoadingStage("done");
       return;
     }
@@ -78,6 +87,7 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
     const ua = navigator.userAgent;
     const isBotOrPerfTool = /bot|googlebot|crawler|spider|robot|crawling|lighthouse|speed insights|speed-insights|ptst|chrome-lighthouse|gtmetrix|pingdom/i.test(ua);
     if (isBotOrPerfTool) {
+      setPreloaderDone();
       setLoadingStage("done");
       return;
     }
@@ -99,6 +109,7 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
       setLoadingStage("imageWall");
     } else {
       markPreloaderShown();
+      setPreloaderDone();
       setLoadingStage("done");
     }
   }, [preloaderConfig.imageWallEnabled, preloaderConfig.images.length, markPreloaderShown]);
@@ -106,6 +117,7 @@ export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutW
   // ImageWall 完成后进入 done 阶段
   const handleImageWallComplete = useCallback(() => {
     markPreloaderShown();
+    setPreloaderDone();
     setLoadingStage("done");
   }, [markPreloaderShown]);
 

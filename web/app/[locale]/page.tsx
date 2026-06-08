@@ -5,6 +5,7 @@ import { HomeContent } from "@/lib/content-data"
 import { getHomeRawData } from "@/lib/api/home"
 import { parseHomeData } from "@/lib/parsers/home-parser"
 import { getHomePageSeo, buildMetadata } from "@/lib/api/seo-settings"
+import { getVariantUrl } from "@/lib/utils"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { HomePageClient } from "./HomePageClient"
@@ -34,7 +35,7 @@ export async function generateMetadata({
 }
 
 // Helper: Extract LCP image URLs for preloading
-function getLCPImageUrls(content: HomeContent): string[] {
+function getLCPImageUrls(content: HomeContent, strategy?: string): string[] {
   const urls: string[] = []
   const firstBanner = content.heroBanner?.[0]
   if (!firstBanner?.images) return urls
@@ -43,8 +44,13 @@ function getLCPImageUrls(content: HomeContent): string[] {
   for (let i = 0; i < Math.min(3, firstBanner.images.length); i++) {
     const image = firstBanner.images[i]
     if (!image) continue
-    const url = image.variants?.large || image.variants?.desktop || image.url
-    if (typeof url === 'string') urls.push(url)
+    
+    const size = firstBanner.imageCropDataList?.[i]?.variant === 'original' 
+      ? 'xlarge' 
+      : (firstBanner.imageCropDataList?.[i]?.variant || 'large')
+
+    const url = getVariantUrl(image, size, strategy)
+    if (url) urls.push(url)
   }
 
   return urls
@@ -84,7 +90,7 @@ async function HomeContentLoader({ locale }: { locale: Locale }) {
 
   // 3. Parse Data on Server with SEO Keywords + EN reference for auto line-breaking
   const content = parseHomeData(rawData, locale, strategy, seoKeywords, enRawData)
-  const lcpImageUrls = getLCPImageUrls(content)
+  const lcpImageUrls = getLCPImageUrls(content, strategy)
 
   // 4. Get Globe Translations
   const messages = await getMessages(locale)

@@ -23,6 +23,7 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import { isPreloaderDone, PRELOADER_EVENT } from "@/lib/preloader-state";
 
 // ⚡ 首屏 Banner 直接导入（只加载第1个）
 import HeroBanner1 from "@/components/HeroBanner/HeroBanner1";
@@ -82,6 +83,15 @@ export default function HeroBanner({
   const progressBarRef = useRef<HTMLDivElement>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isMounted = useRef(true);
+  const [isPreloaderReady, setIsPreloaderReady] = useState(() => isPreloaderDone());
+
+  useEffect(() => {
+    if (isPreloaderReady) return;
+    
+    const onPreloaderDone = () => setIsPreloaderReady(true);
+    window.addEventListener(PRELOADER_EVENT, onPreloaderDone);
+    return () => window.removeEventListener(PRELOADER_EVENT, onPreloaderDone);
+  }, [isPreloaderReady]);
 
   // --- 关键：动态计算 --rpx-hero 比例系数 (基于 1920x922) ---
   useEffect(() => {
@@ -197,18 +207,19 @@ export default function HeroBanner({
     return () => observer.disconnect();
   }, []);
 
-  // 自动播放控制
+  // 自动播放控制 - 只有当 Preloader 完成且可见时才播放
   useEffect(() => {
     if (!api || !data || data.length === 0) return;
+    
     const autoplay = autoplayPlugin.current;
     if (autoplay && typeof autoplay.play === "function") {
-      if (isVisible) {
+      if (isVisible && isPreloaderReady) {
         autoplay.play();
       } else {
         autoplay.stop();
       }
     }
-  }, [api, isVisible, data]);
+  }, [api, isVisible, isPreloaderReady, data]);
 
   // Carousel API 事件
   useEffect(() => {
@@ -249,7 +260,7 @@ export default function HeroBanner({
 
   // 进度条动画 - 使用 direct DOM 操作避免 React state 频繁重渲染引发卡顿
   useEffect(() => {
-    if (!isVisible || !data || data.length <= 1) {
+    if (!isVisible || !isPreloaderReady || !data || data.length <= 1) {
       if (progressBarRef.current) progressBarRef.current.style.width = "0%";
       return;
     }
@@ -277,7 +288,7 @@ export default function HeroBanner({
         clearInterval(progressIntervalRef.current);
       }
     };
-  }, [isVisible, currentSlide, data]);
+  }, [isVisible, isPreloaderReady, currentSlide, data]);
 
   const scrollTo = useCallback((index: number) => api?.scrollTo(index), [api]);
 

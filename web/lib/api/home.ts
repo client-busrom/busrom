@@ -18,7 +18,7 @@ const CMS_URL = process.env.CMS_GRAPHQL_URL
 export async function getHomeRawData(locale: string = 'en'): Promise<any> {
   try {
     const response = await fetch(`${CMS_URL}/api/home?locale=${locale}`, {
-      cache: 'no-store', // Disable cache to see backend changes immediately
+      next: { revalidate: 60, tags: ['home'] }, // Cache for 60 seconds to optimize TTFB
     })
 
     if (!response.ok) {
