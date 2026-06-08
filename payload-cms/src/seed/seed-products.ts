@@ -25,6 +25,8 @@ const mainImageIds = [1789, 1788, 1787, 1786, 1785, 1793, 1792, 1791, 1790]
 async function seed() {
   console.log('Initializing Payload...')
   const payload = await getPayload({ config })
+  const users = await payload.find({ collection: 'users', limit: 1 })
+  const reqUser = users.docs[0] ? { user: users.docs[0] } : undefined
 
   const products: Array<{
     sku: string
@@ -59,7 +61,7 @@ async function seed() {
         series: s.id,
         isFeatured: false,
         order: parseInt(num),
-        status: 'DRAFT',
+        status: 'draft',
       })
     }
   })
@@ -97,6 +99,7 @@ async function seed() {
       }
 
       await payload.create({
+        req: reqUser,
         collection: 'products',
         data: {
           ...product,

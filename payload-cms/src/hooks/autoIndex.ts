@@ -49,17 +49,22 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
       })
     }
 
-    // Log function
     const logToDb = async (url: string, engine: 'google' | 'indexnow', action: 'update' | 'delete', result: any) => {
       try {
+        // NOTE: Do NOT pass `req` to payload.create here.
+        // During bulk operations, multiple afterChange hooks run concurrently sharing the same
+        // `req` object. Passing it to nested payload operations causes internal Drizzle state
+        // corruption: "TypeError: Cannot use 'in' operator to search for '_rels' in undefined".
+        // Using overrideAccess: true without req is the safe approach for background logging.
         await req.payload.create({
           collection: 'indexing-logs',
+          overrideAccess: true,
           data: {
             targetUrl: url,
             engine,
             action,
             status: result?.success ? 'success' : (result?.message?.includes('Credentials') || result?.message?.includes('Key') ? 'failed_keys' : 'failed_network'),
-            triggerUser: req.user?.id || null,
+            ...(req.user?.id ? { triggerUser: req.user.id } : {}),
             rawResponse: result,
           }
         })

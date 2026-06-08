@@ -461,9 +461,15 @@ export const Products: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
-      async ({ data, req }) => {
+      async ({ data, req, originalDoc, operation }) => {
         const isTranslation = req.context?.isTranslationSave || req.context?.isSyncing
         if (isTranslation) return data
+
+        // ----------------------------------------------------------------------
+        // BULK UPDATE PROTECTION
+        // ----------------------------------------------------------------------
+
+        // ----------------------------------------------------------------------
 
         // Only generate slug from English name. Prevent other locales from overwriting it.
         if (data.name) {

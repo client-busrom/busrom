@@ -45,6 +45,17 @@ export const FaqItems: CollectionConfig = {
     update: ({ req }) => !!req.user,
     delete: ({ req }) => !!req.user,
   },
+  
+  hooks: {
+    beforeChange: [
+      ({ data, req, originalDoc }) => {
+        const isTranslation = req.context?.isTranslationSave || req.context?.isSyncing
+        if (isTranslation) return data
+
+        return data;
+      }
+    ]
+  },
 
   // 版本控制 - 保留修改历史
   // versions: {

@@ -63,6 +63,7 @@ import { IconListFeature } from './src/lexical-features/icon-list'
 import { FaqSelectionFeatureDefinition } from './src/lexical-features/faq-selection'
 import { FaqCarouselFeature } from './src/lexical-features/faq-carousel'
 import { s3Storage } from '@payloadcms/storage-s3'
+import { withBulkUpdateProtection } from "./src/utilities/withBulkUpdateProtection"
 
 import { auditorPlugin } from 'payload-auditor'
 
@@ -374,7 +375,7 @@ export default buildConfig({
   // ==================================================================
   // Collections
   // ==================================================================
-  collections: augmentTrackedCollections([
+  collections: withBulkUpdateProtection(augmentTrackedCollections([
     // Core
     Users,
     Media,
@@ -416,7 +417,7 @@ export default buildConfig({
     SmtpConfigs,
     IndexingLogs,
     NotFoundPages,
-  ]),
+  ])),
 
   // ==================================================================
   // Globals (Singleton configs)
