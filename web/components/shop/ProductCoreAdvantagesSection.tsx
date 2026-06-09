@@ -452,32 +452,43 @@ export function ProductCoreAdvantagesSection({
 
                             {/* Description with gradient background - bottom half, bottom corners rounded */}
                             <div
-                              className="flex items-start overflow-y-auto hover-show-scrollbar"
-                              data-lenis-prevent="true"
-
+                              className="flex flex-col"
                               style={{
                                 width: rpx(356),
                                 height: rpx(100),
                                 background: `linear-gradient(to bottom, ${style.gradientFrom}, ${style.gradientTo})`,
                                 borderBottomLeftRadius: rpx(31),
                                 borderBottomRightRadius: rpx(31),
-                                padding: rpx(15),
+                                paddingLeft: rpx(23),
+                                paddingRight: rpx(15),
+                                paddingTop: rpx(15),
+                                paddingBottom: rpx(15),
                                 marginTop: 'auto',
-                                overscrollBehavior: "contain",
                               }}
                             >
-                              {item.description && (
-                                <p
-                                  className="font-inter whitespace-pre-line w-full"
-                                  style={{
-                                    fontSize: rpx(16),
-                                    lineHeight: rpx(23),
-                                    color: style.descColor,
-                                  }}
-                                >
-                                  {item.description}
-                                </p>
-                              )}
+                              <div
+                                className="flex items-start overflow-y-auto hover-show-scrollbar"
+                                data-lenis-prevent="true"
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  overscrollBehavior: "contain",
+                                  paddingRight: rpx(8),
+                                }}
+                              >
+                                {item.description && (
+                                  <p
+                                    className="font-inter whitespace-pre-line w-full"
+                                    style={{
+                                      fontSize: rpx(16),
+                                      lineHeight: rpx(23),
+                                      color: style.descColor,
+                                    }}
+                                  >
+                                    {item.description}
+                                  </p>
+                                )}
+                              </div>
                             </div>
                           </motion.div>
                         )
@@ -528,32 +539,43 @@ export function ProductCoreAdvantagesSection({
 
                             {/* Description with gradient background - bottom half, bottom corners rounded */}
                             <div
-                              className="flex items-start overflow-y-auto hover-show-scrollbar"
-                              data-lenis-prevent="true"
-
+                              className="flex flex-col"
                               style={{
                                 width: rpx(356),
                                 height: rpx(100),
                                 background: `linear-gradient(to bottom, ${style.gradientFrom}, ${style.gradientTo})`,
                                 borderBottomLeftRadius: rpx(31),
                                 borderBottomRightRadius: rpx(31),
-                                padding: rpx(15),
+                                paddingLeft: rpx(23),
+                                paddingRight: rpx(15),
+                                paddingTop: rpx(15),
+                                paddingBottom: rpx(15),
                                 marginTop: 'auto',
-                                overscrollBehavior: "contain",
                               }}
                             >
-                              {item.description && (
-                                <p
-                                  className="font-inter whitespace-pre-line w-full"
-                                  style={{
-                                    fontSize: rpx(16),
-                                    lineHeight: rpx(23),
-                                    color: style.descColor,
-                                  }}
-                                >
-                                  {item.description}
-                                </p>
-                              )}
+                              <div
+                                className="flex items-start overflow-y-auto hover-show-scrollbar"
+                                data-lenis-prevent="true"
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  overscrollBehavior: "contain",
+                                  paddingRight: rpx(8),
+                                }}
+                              >
+                                {item.description && (
+                                  <p
+                                    className="font-inter whitespace-pre-line w-full"
+                                    style={{
+                                      fontSize: rpx(16),
+                                      lineHeight: rpx(23),
+                                      color: style.descColor,
+                                    }}
+                                  >
+                                    {item.description}
+                                  </p>
+                                )}
+                              </div>
                             </div>
                           </motion.div>
                         )
