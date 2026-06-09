@@ -923,3 +923,16 @@
     scrollbar-color: #888 #f1f1f1;
   }
 }
+
+/* 
+  Bot / Performance Tool Optimizations
+  Applied by inline script in layout.tsx to skip preloader visually
+*/
+html.is-bot body {
+  overflow: auto !important;
+}
+
+html.is-bot #preloader-root,
+html.is-bot .fixed.inset-0.z-\[30\] {
+  display: none !important;
+}

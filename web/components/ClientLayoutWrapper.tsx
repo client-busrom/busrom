@@ -39,7 +39,6 @@ function isHomePage(pathname: string | null | undefined): boolean {
 interface ClientLayoutWrapperProps {
   children: React.ReactNode;
   preloaderConfig: PreloaderConfigData;
-  isBotOrPerfTest?: boolean;
 }
 
 type LoadingStage = "loading" | "imageWall" | "done";
@@ -47,12 +46,12 @@ type LoadingStage = "loading" | "imageWall" | "done";
 // 模块级变量，用于在 React 热更新或单页跳转时保持状态
 let globalPreloaderShown = false;
 
-export function ClientLayoutWrapper({ children, preloaderConfig, isBotOrPerfTest }: ClientLayoutWrapperProps) {
+export function ClientLayoutWrapper({ children, preloaderConfig }: ClientLayoutWrapperProps) {
   const pathname = usePathname();
 
   // 初始状态：服务端渲染和客户端初始渲染必须完全一致，以防止 Hydration Mismatch
   const [loadingStage, setLoadingStage] = useState<LoadingStage>(() => {
-    if (!preloaderConfig.enabled || isBotOrPerfTest) {
+    if (!preloaderConfig.enabled) {
       setPreloaderDone();
       return "done";
     }
