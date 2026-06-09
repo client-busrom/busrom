@@ -47,7 +47,8 @@ function getLCPImageUrls(content: HomeContent, strategy?: string): string[] {
   // Preload first 3 images (background + decorative elements)
   for (let i = 0; i < Math.min(3, firstBanner.images.length); i++) {
     const image = firstBanner.images[i]
-    const cropData = firstBanner.imageCropDataList?.[i]
+    // 添加显式类型断言以修复 IDE 中 "never" 的类型推断错误
+    const cropData = firstBanner.imageCropDataList?.[i] as any
     if (!image) continue
     
     let url: string | undefined

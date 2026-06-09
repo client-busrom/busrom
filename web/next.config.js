@@ -313,6 +313,7 @@ const nextConfig = {
       'https://cdn.jsdelivr.net',
       'https://*.clarity.ms',
       'https://c.clarity.ms',
+      'https://c.bing.com',
       'https://www.facebook.com',
       'https://analytics.tiktok.com',
       'https://bat.bing.com',

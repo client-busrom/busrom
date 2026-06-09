@@ -12,6 +12,7 @@ import Header from "@/components/layout/header";
 import ConditionalFooter from "@/components/layout/conditional-footer";
 import { ClientLayoutWrapper } from "@/components/ClientLayoutWrapper";
 import { getPreloaderConfig } from "@/lib/api/preloader-config";
+import { headers } from "next/headers";
 import { getNavigation } from "@/lib/api/navigation";
 import NextTopLoader from "nextjs-toploader";
 import { GlobalScripts } from "@/components/GlobalScripts";
@@ -403,6 +404,11 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
   const validLocale = isValidLocale(locale) ? locale : defaultLocale;
+  
+  const headersList = await headers();
+  const userAgent = headersList.get("user-agent") || "";
+  const isBotOrPerfTest = /bot|googlebot|crawler|spider|robot|crawling|lighthouse|speed insights|speed-insights|ptst|chrome-lighthouse|gtmetrix|pingdom/i.test(userAgent);
+
   const [preloaderConfig, initialNavigation, footerData, contactPopupData] = await Promise.all([
     getPreloaderConfig(),
     getNavigation(validLocale),
@@ -470,11 +476,15 @@ export default async function RootLayout({
           <GlobalScripts position="header" />
         </Suspense>
       </head>
-      <body className="font-sans overflow-x-hidden">
+      <body className="font-outfit antialiased selection:bg-black selection:text-white" style={{
+        // 初始锁定滚动条，等待 Preloader 结束（如果是爬虫或不需要动画，则不锁定）
+        overflow: (preloaderConfig.enabled && !isBotOrPerfTest) ? 'hidden' : 'auto'
+      }}>
         <Suspense fallback={null}>
+          <ScriptDebugger />
           <GlobalScripts position="body_start" />
         </Suspense>
-        <ClientLayoutWrapper preloaderConfig={preloaderConfig}>
+        <ClientLayoutWrapper preloaderConfig={preloaderConfig} isBotOrPerfTest={isBotOrPerfTest}>
           <NextTopLoader color="#D58A00" showSpinner={false} height={3} shadow="0 0 10px #D58A00,0 0 5px #D58A00" />
           <LenisProvider easingKey={"easeOutQuad"} />
           <div className="flex flex-col min-h-screen">

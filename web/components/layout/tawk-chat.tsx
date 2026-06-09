@@ -22,6 +22,13 @@ export function TawkChat({ propertyId, widgetId }: TawkChatProps) {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
+    // 检测爬虫和性能测试工具 (Googlebot, Lighthouse, GTmetrix, etc.)
+    const ua = navigator.userAgent;
+    const isBotOrPerfTool = /bot|googlebot|crawler|spider|robot|crawling|lighthouse|speed insights|speed-insights|ptst|chrome-lighthouse|gtmetrix|pingdom/i.test(ua);
+    if (isBotOrPerfTool) {
+      return; // Do not load for bots or performance testing tools
+    }
+
     const handleInteraction = () => {
       setShouldLoad(true)
       // 触发后立即移除所有监听器

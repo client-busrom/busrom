@@ -69,16 +69,17 @@ export async function POST(
         cleanedData.status = currentDoc.status
         cleanedData.publishedAt = currentDoc.publishedAt
 
-        // 在请求上下文中注入标记，确保审计插件能够识别并跳过
-        i18nReq.context.isTranslationSave = true
-        i18nReq.context.isSyncing = true
-
         console.log(`📡 [save-translations] ⏳ Updating locale=${localeCode} for ${collection}/${id}. User: ${i18nReq.user?.email || 'Admin'}`)
 
         // [Bugfix] 如果是源语言或默认语言(en)，必须开启 Hooks 进行保存，否则 Payload 底层会因为缺少 Hook 处理
         // 而导致默认语言的数据没有正确写入 locale 关联表，导致其凭空变为空值。
         // 其他目标语言则保持 disableHooks: true 追求极速。
         const shouldUseHooks = localeCode === 'en' || localeCode === sourceLocale;
+
+        // 确保 Hook 里能拿到 context 标识以跳过 Auditor 和其他同步逻辑
+        if (!i18nReq.context) i18nReq.context = {};
+        i18nReq.context.isTranslationSave = true;
+        i18nReq.context.isSyncing = true;
 
         const localeStartTime = performance.now();
         const updatedDoc = await payload.update({
@@ -87,7 +88,12 @@ export async function POST(
           data: cleanedData,
           locale: localeCode as any,
           disableHooks: !shouldUseHooks,
+          user: i18nReq.user,
           req: i18nReq,
+          context: {
+            isTranslationSave: true,
+            isSyncing: true,
+          },
         } as any)
         const localeEndTime = performance.now();
         console.log(`[save-translations] ✅ Saved locale=${localeCode} in ${(localeEndTime - localeStartTime).toFixed(2)}ms (hooks: ${shouldUseHooks ? 'enabled' : 'disabled'})`);

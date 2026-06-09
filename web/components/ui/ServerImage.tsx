@@ -49,8 +49,17 @@ export function ServerImage({
   const altText = alt || image?.altText || ''
   const srcSet = getSrcSet(image)
 
-  // Check if we need CSS fallback crop (if the returned URL is the original uncropped image)
-  const isOriginalUrl = src === image?.url || src === (image as any)?.fileUrl || src === (image as any)?.file?.url || !src.includes('-');
+  // Check if we need CSS fallback crop
+  // In Payload, if a variant exists, its filename typically has dimensions appended like "-1920x1080.webp"
+  // If getCropImageUrl returns the exact original URL (possibly CDN prefixed), we need to apply CSS cropping.
+  // A robust check is to see if the filename in src exactly matches the original filename, 
+  // or if src doesn't contain a typical dimension suffix like "-\d+x\d+\.".
+  const originalFilename = image?.url?.split('/').pop() || '';
+  const isOriginalUrl = 
+    src === image?.url || 
+    (originalFilename && src.endsWith(originalFilename)) || 
+    !/-\d+x\d+\.[a-zA-Z0-9]+$/.test(src);
+    
   const needsCssCrop = cropData && cropData.croppedAreaPixels && isOriginalUrl;
 
   // Common style for fill mode
