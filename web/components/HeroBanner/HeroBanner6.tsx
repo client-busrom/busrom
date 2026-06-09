@@ -36,6 +36,26 @@ const BANNER_6_ASSETS = {
 };
 
 const HeroBanner6: FC<BannerProps> = ({ data }) => {
+  const renderImage = (
+    image: any,
+    cropData: any,
+    alt: string,
+    className: string = "",
+    priority: boolean = false
+  ) => {
+    if (!image) return null;
+    return (
+      <ServerImage
+        image={image}
+        cropData={cropData}
+        alt={alt}
+        fill
+        className={className || "object-cover"}
+        priority={priority}
+      />
+    );
+  };
+
   const titleParts = formatText(data.features[0])
     .split("\n")
     .map((s) => s.trim())
@@ -67,7 +87,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
             }}
           >
             <div className="w-full h-full bg-white blur-[10px]">
-              <ServerImage image={data.images[1] || data.images[0]} alt="" fill size="medium" className="object-cover opacity-60" />
+              {renderImage(data.images[1] || data.images[0], data.imageCropDataList?.[1] || data.imageCropDataList?.[0], "", "object-cover opacity-60")}
             </div>
           </div>
           <div
@@ -80,7 +100,7 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
               maskSize: "100% 100%",
             }}
           >
-            <ServerImage image={data.images[0]} alt="" fill size="large" className="object-cover" priority />
+            {renderImage(data.images[0], data.imageCropDataList?.[0], "", "object-cover", true)}
           </div>
           <div
             className="absolute left-1/2 top-1/2 z-30 opacity-80"
@@ -200,10 +220,10 @@ const HeroBanner6: FC<BannerProps> = ({ data }) => {
           {/* 图像区域 (直接渲染在文字下方，不带SVG蒙版，左右对称圆角) */}
           <div className="flex gap-4 justify-center w-full px-6 z-10 mt-2 pb-4 shrink-0">
             <div className="relative w-[48%] aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border-2 border-white bg-white/20">
-              <ServerImage image={data.images[0]} alt="" fill size="medium" className="object-cover" />
+              {renderImage(data.images[0], data.imageCropDataList?.[0], "")}
             </div>
             <div className="relative w-[48%] aspect-[4/3] rounded-2xl overflow-hidden shadow-lg border-2 border-white bg-white/20">
-              <ServerImage image={data.images[1] || data.images[0]} alt="" fill size="medium" className="object-cover" />
+              {renderImage(data.images[1] || data.images[0], data.imageCropDataList?.[1] || data.imageCropDataList?.[0], "")}
             </div>
           </div>
 

@@ -64,7 +64,7 @@ function ShrinkableTitle({ text, className, style }: { text: string; className?:
   }, [text]);
 
   return (
-    <h3
+    <h2
       ref={containerRef}
       className={cn("text-center whitespace-normal break-words", className)}
       style={{
@@ -75,7 +75,7 @@ function ShrinkableTitle({ text, className, style }: { text: string; className?:
       }}
     >
       {text}
-    </h3>
+    </h2>
   );
 }
 
@@ -461,9 +461,9 @@ export default function ProductSeriesCarousel({
               className="absolute w-full max-w-[320px] flex flex-col items-center justify-center cursor-grab active:cursor-grabbing"
             >
               {/* 产品名称 */}
-              <h3 className="font-anaheim font-extrabold text-white text-xl mb-4 tracking-wide text-center">
+              <h2 className="font-anaheim font-extrabold text-white text-xl mb-4 tracking-wide text-center">
                 {data[currentIndex]?.name}
-              </h3>
+              </h2>
 
               {/* 封面图片 */}
               <Link
@@ -668,6 +668,7 @@ export default function ProductSeriesCarousel({
               <Link
                 href={item.href}
                 className="block w-full h-full cursor-none"
+                aria-label={item.name}
               >
                 {(() => {
                   const cropData = item.imageCropDataList?.[0];

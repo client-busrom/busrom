@@ -46,7 +46,7 @@ export default function FooterBottom({ footerData, siteLogoUrl, centered = false
         width={60}
         height={18}
         className="object-contain"
-        style={{ width: "auto", height: "auto" }}
+        style={{ width: "60px", height: "18px" }}
         unoptimized={!!siteLogoUrl}
       />
       <div className="text-brand-text-inverse/60 text-sm font-anaheim flex flex-col sm:flex-row justify-center items-center gap-y-2 sm:gap-y-0 sm:gap-x-3 leading-[1.8]">

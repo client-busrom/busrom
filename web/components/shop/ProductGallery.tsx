@@ -327,7 +327,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                         image={image}
                         size="xlarge"
                         alt={image.altText || `${productName} ${index + 1}`}
-                        sizes="100vw"
+                        sizes="(max-width: 768px) 100vw, 80vw"
                         className="object-contain absolute inset-0 w-full h-full"
                         objectPosition={
                           image.cropFocalPoint

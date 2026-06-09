@@ -963,7 +963,7 @@ export interface Blog {
    */
   author?: (number | null) | Author;
   /**
-   * This is automatically generated from Admin Identification and used for URLs.
+   * This slug is generated from the English Blog Title. Do not modify manually unless necessary.
    */
   slug?: string | null;
   /**

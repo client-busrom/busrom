@@ -335,7 +335,7 @@ export function DesktopNavigation({
                                     className="flex-1 py-2 px-4 text-center text-sm font-montserrat font-bold bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
                                     onClick={() => setActiveMenuId(null)}
                                   >
-                                    {child.linkLabel || "Learn More"}
+                                    {child.linkLabel || "View Products"}
                                   </Link>
                                   <Link
                                     href={child.inquiryLink || "/contact-us"}

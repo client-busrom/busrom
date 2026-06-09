@@ -178,6 +178,7 @@ export default function Header({ locale, initialNavigation, contactPopupData }: 
                 headerTextColor,
                 headerHoverBg,
               )}
+              aria-label="Toggle menu"
             >
               <Menu className="w-5 h-5" />
             </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { FC } from "react";
+import { ServerImage } from "@/components/ui/ServerImage";
 import { getObjectPosition, getCropStyles, getCropImageUrl } from "@/lib/utils";
 import MagneticWrapper from "./MagneticWrapper";
 import { HomeContent } from "@/lib/content-data";
@@ -74,34 +75,17 @@ const HeroBanner4: FC<HeroBanner4Props> = ({ data, locale }) => {
     cropData: any,
     alt: string,
     className: string = "",
+    priority: boolean = false
   ) => {
     if (!image) return null;
-
-    const cropStyles = getCropStyles(cropData);
-    if (cropStyles && cropData?.croppedAreaPixels) {
-      return (
-        <div className={`relative w-full h-full ${className}`}>
-          <div
-            className="absolute inset-0 w-full h-full"
-            style={cropStyles.container}
-          >
-            <img
-              src={getCropImageUrl(image, cropData)}
-              alt={alt}
-              style={cropStyles.image}
-              className="max-w-none"
-            />
-          </div>
-        </div>
-      );
-    }
-
     return (
-      <img
-        src={image.url || image}
+      <ServerImage
+        image={image}
+        cropData={cropData}
         alt={alt}
-        className={`w-full h-full object-cover ${className}`}
-        style={{ objectPosition: getObjectPosition(image) }}
+        fill
+        className={className || "object-cover"}
+        priority={priority}
       />
     );
   };

@@ -5,7 +5,7 @@ import { HomeContent } from "@/lib/content-data"
 import { getHomeRawData } from "@/lib/api/home"
 import { parseHomeData } from "@/lib/parsers/home-parser"
 import { getHomePageSeo, buildMetadata } from "@/lib/api/seo-settings"
-import { getVariantUrl } from "@/lib/utils"
+import { getVariantUrl, getCropImageUrl } from "@/lib/utils"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import { HomePageClient } from "./HomePageClient"
@@ -30,8 +30,12 @@ export async function generateMetadata({
       : 'Leading manufacturer of premium glass hardware products for global markets.',
   }
 
-  const { setting } = await getHomePageSeo(locale)
-  return buildMetadata(setting, defaultMetadata)
+  try {
+    const { setting } = await getHomePageSeo(locale)
+    return buildMetadata(setting, defaultMetadata)
+  } catch {
+    return defaultMetadata
+  }
 }
 
 // Helper: Extract LCP image URLs for preloading
@@ -43,13 +47,18 @@ function getLCPImageUrls(content: HomeContent, strategy?: string): string[] {
   // Preload first 3 images (background + decorative elements)
   for (let i = 0; i < Math.min(3, firstBanner.images.length); i++) {
     const image = firstBanner.images[i]
+    const cropData = firstBanner.imageCropDataList?.[i]
     if (!image) continue
     
-    const size = firstBanner.imageCropDataList?.[i]?.variant === 'original' 
-      ? 'xlarge' 
-      : (firstBanner.imageCropDataList?.[i]?.variant || 'large')
+    let url: string | undefined
+    
+    if (cropData) {
+      url = getCropImageUrl(image, cropData)
+    } else {
+      // 如果没有裁剪数据，默认加载 large 尺寸的原图变体
+      url = getVariantUrl(image, 'large', strategy)
+    }
 
-    const url = getVariantUrl(image, size, strategy)
     if (url) urls.push(url)
   }
 

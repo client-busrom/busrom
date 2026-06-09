@@ -286,11 +286,15 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
           <img
             src="/CenterLabel1.svg"
             alt="Bus - Buffer & Bridge"
+            width={180}
+            height={80}
             className="h-auto w-[42%] max-w-[180px]"
           />
           <img
             src="/CenterLabel2.svg"
             alt="rom - Room & Space"
+            width={180}
+            height={80}
             className="h-auto w-[42%] max-w-[180px]"
           />
         </div>
@@ -502,12 +506,16 @@ export default function BrandAnalysis({ data, headerTheme, className }: Props) {
           <img
             src="/CenterLabel1.svg"
             alt="Bus - Buffer & Bridge"
+            width={293}
+            height={127}
             className="h-full w-auto object-contain"
           />
           {/* CenterLabel2: rom + Room & Space (右侧) */}
           <img
             src="/CenterLabel2.svg"
             alt="rom - Room & Space"
+            width={333}
+            height={127}
             className="h-full w-auto object-contain"
           />
         </div>

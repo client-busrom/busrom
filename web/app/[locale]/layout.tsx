@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
-import { Agbalumo, Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash, Cherry_Bomb_One, Amarante, Quicksand, Lemon, Lobster, Katibeh, Prata, Lexend_Deca, Anton, Abhaya_Libre, Tenor_Sans } from "next/font/google";
+import { Agbalumo, Fredericka_the_Great, Amiri, Black_Han_Sans, Berkshire_Swash, Cherry_Bomb_One, Amarante, Quicksand, Lemon, Lobster, Katibeh, Prata, Lexend_Deca, Anton, Abhaya_Libre, Tenor_Sans, Kavivanar } from "next/font/google";
 import dynamic from "next/dynamic";
 import "../globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -269,6 +269,14 @@ const agbalumo = Agbalumo({
   preload: false,
 });
 
+const kavivanar = Kavivanar({
+  weight: "400",
+  variable: "--font-kavivanar",
+  display: "swap",
+  subsets: ["latin"],
+  preload: false,
+});
+
 const bagelFatOne = localFont({
   src: "../../public/fonts/BagelFatOne-Regular.ttf",
   weight: "400",
@@ -341,6 +349,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(siteUrl),
+    description: siteConfig.siteDescription || 'Busrom - Premium architectural hardware manufacturer specializing in glass fittings, door hardware, and custom OEM/ODM solutions for global projects.',
     alternates: {
       canonical: './',
       languages: alternates,
@@ -443,6 +452,7 @@ export default async function RootLayout({
         ${gwendolyn.variable}
         ${academyEngraved.variable}
         ${acme.variable}
+        ${kavivanar.variable}
         antialiased
       `}
     >
@@ -451,6 +461,8 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://cdn.busromhouse.com" />
         <link rel="preconnect" href="https://d2kqew3hn5wphn.cloudfront.net" />
         <link rel="dns-prefetch" href="https://d2kqew3hn5wphn.cloudfront.net" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <Suspense fallback={null}>
           <OrganizationSchema locale={validLocale} />
         </Suspense>

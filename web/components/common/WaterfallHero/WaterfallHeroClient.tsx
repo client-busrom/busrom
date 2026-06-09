@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { motion, useAnimation } from "framer-motion";
 import type { WaterfallConfigData } from "@/lib/api/waterfall-config";
 
@@ -17,12 +18,29 @@ export default function WaterfallHeroClient({
   title,
   subtitle,
 }: WaterfallHeroClientProps) {
+  const pathname = usePathname();
+  const sessionKey = `waterfall-played:${pathname}`;
+
   const [isDone, setIsDone] = useState(false);
   const containerControls = useAnimation();
   const textControls = useAnimation();
   const imageControls = useAnimation();
 
   useEffect(() => {
+    // Check session storage on the client
+    let played = false;
+    try {
+      if (sessionStorage.getItem(sessionKey)) {
+        played = true;
+      }
+    } catch {}
+
+    // Skip entirely if already played this session
+    if (played) {
+      setIsDone(true);
+      return;
+    }
+
     // Disable scrolling while animation is playing
     document.body.style.overflow = "hidden";
 
@@ -88,6 +106,7 @@ export default function WaterfallHeroClient({
 
       // Done
       document.body.style.overflow = "";
+      try { sessionStorage.setItem(sessionKey, "1"); } catch {}
       setIsDone(true);
     };
 
@@ -96,7 +115,7 @@ export default function WaterfallHeroClient({
     return () => {
       document.body.style.overflow = "";
     };
-  }, [config, containerControls, textControls, imageControls]);
+  }, [config, containerControls, textControls, imageControls, sessionKey]);
 
   if (isDone) return null;
 
@@ -104,9 +123,13 @@ export default function WaterfallHeroClient({
   // Desktop: 1920x500
   // Tablet: 768x500
   // Mobile: 390x265
+  const containerId = `waterfall-container-${pathname.replace(/[^a-zA-Z0-9]/g, '-')}`;
+
   return (
-    <motion.div
-      initial={{ y: "0%" }}
+    <>
+      <motion.div
+        id={containerId}
+        initial={{ y: "0%" }}
       animate={containerControls}
       className="fixed top-0 left-0 right-0 w-full z-40 bg-[#f6f4ed] overflow-hidden flex items-center justify-center
                  h-[265px] md:h-[500px] xl:h-[500px]"
@@ -222,5 +245,16 @@ export default function WaterfallHeroClient({
         </motion.div>
       </div>
     </motion.div>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('${sessionKey}')) {
+              var el = document.getElementById('${containerId}');
+              if (el) el.style.display = 'none';
+            }
+          `
+        }}
+      />
+    </>
   );
 }

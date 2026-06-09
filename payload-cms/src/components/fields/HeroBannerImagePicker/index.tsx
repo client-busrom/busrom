@@ -9,9 +9,9 @@
  * 预设映射规则：
  * - order=1 (Banner1): image1→背景(通用), image2→Frame1, image3→Frame2
  * - order=2 (Banner2): image1→背景(通用), image2→大图, image3→小图
- * - order=3 (Banner3): image2→列图
- * - order=4 (Banner4): image2→列图
- * - order=5 (Banner5): image2→列图
+ * - order=3 (Banner3): image2, image3, image4 → 列图
+ * - order=4 (Banner4): image2, image3, image4 → 列图
+ * - order=5 (Banner5): image2→主图, image3, image4 → 小图
  * - order=6 (Banner6): image1→背景(通用), image2→左侧, image3→右侧
  * - order=7 (Banner7): image1→背景(通用), image2→主图, image3→菱形Top, image4→菱形Mid
  * - order=8 (Banner8): image1→背景(通用), image2→主图, image3→小图
@@ -47,9 +47,19 @@ function getContextPreset(order: number, fieldName: string): string | undefined 
       if (fieldName === 'image3') return 'HeroBanner2'
       return undefined
     case 3:
-    case 4:
-    case 5:
       if (fieldName === 'image2') return 'HeroBanner3'
+      if (fieldName === 'image3') return 'HeroBanner3'
+      if (fieldName === 'image4') return 'HeroBanner3'
+      return undefined
+    case 4:
+      if (fieldName === 'image2') return 'HeroBanner4'
+      if (fieldName === 'image3') return 'HeroBanner4'
+      if (fieldName === 'image4') return 'HeroBanner4'
+      return undefined
+    case 5:
+      if (fieldName === 'image2') return 'HeroBanner5'
+      if (fieldName === 'image3') return 'HeroBanner5'
+      if (fieldName === 'image4') return 'HeroBanner5'
       return undefined
     case 6:
       if (fieldName === 'image2') return 'HeroBanner6'

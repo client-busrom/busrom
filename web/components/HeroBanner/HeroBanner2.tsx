@@ -32,18 +32,31 @@ const BANNER_2_ASSETS = {
 };
 
 const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
+  const renderImage = (
+    image: any,
+    cropData: any,
+    alt: string,
+    className: string = "",
+    priority: boolean = false
+  ) => {
+    if (!image) return null;
+    return (
+      <ServerImage
+        image={image}
+        cropData={cropData}
+        alt={alt}
+        fill
+        className={className || "object-cover"}
+        priority={priority}
+      />
+    );
+  };
   return (
     <section className="relative w-full h-full overflow-hidden bg-[#756F3F]">
       {/* 0. 底层：清晰背景图 (保持 59% 透明度) */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 w-full h-full opacity-[0.59]">
-          <ServerImage
-            image={data.images[0]}
-            alt=""
-            fill
-            className="object-cover"
-            priority
-          />
+          {renderImage(data.images[0], data.imageCropDataList?.[0], "", "object-cover", true)}
         </div>
       </div>
 
@@ -209,12 +222,7 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
             border: `${rpx(20)} solid white`,
           }}
         >
-          <ServerImage
-            image={data.images[1]}
-            alt=""
-            fill
-            className="object-cover"
-          />
+          {renderImage(data.images[1], data.imageCropDataList?.[1], "Hero Banner Image 1")}
         </div>
         <div
           className="absolute overflow-hidden shadow-2xl z-20"
@@ -227,12 +235,7 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
             border: `${rpx(17)} solid white`,
           }}
         >
-          <ServerImage
-            image={data.images[2]}
-            alt=""
-            fill
-            className="object-cover"
-          />
+          {renderImage(data.images[2], data.imageCropDataList?.[2], "Hero Banner Image 2")}
         </div>
       </div>
 
@@ -247,20 +250,10 @@ const HeroBanner2: FC<HeroBanner2Props> = ({ data, locale }) => {
             </p>
             <div className="relative w-full max-w-[220px] md:max-w-[420px] h-[150px] md:h-[260px] mb-4">
               <div className="absolute left-0 top-0 w-[75%] h-[85%] border-2 md:border-4 border-white shadow-lg overflow-hidden rounded-xl">
-                <ServerImage
-                  image={data.images[1]}
-                  alt=""
-                  fill
-                  className="object-cover"
-                />
+                {renderImage(data.images[1], data.imageCropDataList?.[1], "Hero Banner Image 1")}
               </div>
               <div className="absolute right-0 bottom-0 w-[55%] h-[65%] border-2 md:border-4 border-white shadow-xl overflow-hidden z-10 translate-x-2 translate-y-2 md:translate-x-3 md:translate-y-3 rounded-lg">
-                <ServerImage
-                  image={data.images[2]}
-                  alt=""
-                  fill
-                  className="object-cover"
-                />
+                {renderImage(data.images[2], data.imageCropDataList?.[2], "Hero Banner Image 2")}
               </div>
             </div>
           </div>

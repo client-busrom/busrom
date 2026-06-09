@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { ServerImage } from "@/components/ui/ServerImage";
 import { getObjectPosition, getCropStyles, getCropImageUrl } from "@/lib/utils";
 import MagneticWrapper from "./MagneticWrapper";
 
@@ -90,35 +91,14 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
     priority: boolean = false
   ) => {
     if (!image) return null;
-
-    const cropStyles = getCropStyles(cropData);
-    const imageUrl = getCropImageUrl(image, cropData);
-
-    const imgProps = priority 
-      ? { fetchPriority: "high" as const, decoding: "sync" as const }
-      : { decoding: "async" as const };
-
-    if (cropStyles) {
-      return (
-        <div style={cropStyles.container} className="w-full h-full">
-          <img
-            src={imageUrl}
-            alt={alt}
-            className={className}
-            style={cropStyles.image}
-            {...imgProps}
-          />
-        </div>
-      );
-    }
-
     return (
-      <img
-        src={imageUrl}
+      <ServerImage
+        image={image}
+        cropData={cropData}
         alt={alt}
-        className={`w-full h-full object-cover ${className}`}
-        style={{ objectPosition: getObjectPosition(image) }}
-        {...imgProps}
+        fill
+        className={className || "object-cover"}
+        priority={priority}
       />
     );
   };
@@ -136,6 +116,8 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
             data.images[0],
             data.imageCropDataList?.[0],
             "Background",
+            "",
+            true
           )}
         </div>
       </div>
@@ -276,7 +258,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
               {formatText(data.features[1])}
             </p>
 
-            <h2
+            <h1
               className="font-paytone-one text-black text-center whitespace-nowrap leading-none"
               style={{
                 fontSize: rpx(72),
@@ -285,10 +267,10 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
               }}
             >
               {formatText(data.features[0])?.split("\n")[0]}
-            </h2>
+            </h1>
 
-            <h1
-              className="font-paytone-one text-black text-center whitespace-nowrap leading-none"
+            <span
+              className="font-paytone-one text-black text-center whitespace-nowrap leading-none block"
               style={{
                 fontSize: rpx(96),
                 marginTop: rpx(16),
@@ -297,7 +279,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
               }}
             >
               {formatText(data.features[0])?.split("\n").slice(1).join(" ")}
-            </h1>
+            </span>
 
             <div
               className="flex pointer-events-auto"
@@ -315,7 +297,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
                       }}
                     >
                       <p
-                        className="font-montserrat font-bold text-[#FDF6C2] text-center whitespace-pre-line"
+                        className="font-montserrat font-bold text-white text-center whitespace-pre-line"
                         style={{
                           fontSize: rpx(24),
                           lineHeight: "1.4",
@@ -375,7 +357,7 @@ const HeroBanner1: React.FC<HeroBanner1Props> = ({ data }) => {
             (feature, index) => (
               <div
                 key={index}
-                className="bg-[#756F3F] text-[#FDF6C2] py-4 rounded-full font-bold border-2 border-white shadow-lg text-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
+                className="bg-[#756F3F] text-white py-4 rounded-full font-bold border-2 border-white shadow-lg text-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
               >
                 {feature}
               </div>

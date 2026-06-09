@@ -154,7 +154,7 @@ export default function LocaleSwitcher({ activeTheme }: LocaleSwitcherProps) {
             "flex items-center space-x-1.5 group transition-opacity hover:opacity-80",
             buttonTextColor
         )}
-        aria-label="Select country and language"
+        title="Select country and language"
       >
         <CountryFlag countryCode={selectedCountry?.code || "US"} className="w-5 h-4 rounded-sm" />
         {/* 移动端：缩写 */}

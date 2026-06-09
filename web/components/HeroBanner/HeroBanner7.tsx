@@ -73,6 +73,26 @@ const BANNER_7_ASSETS = {
 };
 
 const HeroBanner7: FC<BannerProps> = ({ data }) => {
+  const renderImage = (
+    image: any,
+    cropData: any,
+    alt: string,
+    className: string = "",
+    priority: boolean = false
+  ) => {
+    if (!image) return null;
+    return (
+      <ServerImage
+        image={image}
+        cropData={cropData}
+        alt={alt}
+        fill
+        className={className || "object-cover"}
+        priority={priority}
+      />
+    );
+  };
+
   const titleParts = formatText(data.features[0]).split("\n");
   const subtitleParts = formatText(data.features[1]).split("\n");
   const featuresList = data.features.slice(2, 5).filter((f) => f && f.trim());
@@ -89,7 +109,7 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
 
         {/* 左侧主图 */}
         <div className="absolute z-10" style={{ left: rpx(BANNER_7_ASSETS.imageMain.x), top: "50%", transform: "translateY(-50%)", width: rpx(BANNER_7_ASSETS.imageMain.width), height: rpx(BANNER_7_ASSETS.imageMain.height), maskImage: `url(${BANNER_7_ASSETS.imageMain.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.imageMain.mask})`, maskSize: "100% 100%" }}>
-          <ServerImage image={data.images[0]} alt="" fill className="object-cover" priority />
+          {renderImage(data.images[0], data.imageCropDataList?.[0], "", "object-cover", true)}
         </div>
 
         {/* 右侧菱形群 */}
@@ -116,7 +136,7 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
                   transform: diamond.innerAlignY === "center" ? "translate(-50%, -50%)" : "translateX(-50%)",
                   maskImage: `url(${diamond.mask})`, WebkitMaskImage: `url(${diamond.mask})`, maskSize: "100% 100%",
                }}>
-                  <ServerImage image={data.images[diamond.src_idx]} alt="" fill className="object-cover" />
+                  {renderImage(data.images[diamond.src_idx], data.imageCropDataList?.[diamond.src_idx], "")}
                </div>
             </div>
           ))}
@@ -180,19 +200,19 @@ const HeroBanner7: FC<BannerProps> = ({ data }) => {
             <div className="relative" style={{ width: "min(75vw, 260px)", height: "min(75vw, 260px)" }}>
                 {/* 上 */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2" style={{ width: BANNER_7_ASSETS.mobile.diamondSize, height: BANNER_7_ASSETS.mobile.diamondSize, maskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, maskSize: "100% 100%" }}>
-                  <ServerImage image={data.images[0]} alt="" fill className="object-cover" />
+                  {renderImage(data.images[0], data.imageCropDataList?.[0], "")}
                 </div>
                 {/* 下 */}
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2" style={{ width: BANNER_7_ASSETS.mobile.diamondSize, height: BANNER_7_ASSETS.mobile.diamondSize, maskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, maskSize: "100% 100%" }}>
-                  <ServerImage image={data.images[1]} alt="" fill className="object-cover" />
+                  {renderImage(data.images[1], data.imageCropDataList?.[1], "")}
                 </div>
                 {/* 左 */}
                 <div className="absolute top-1/2 left-0 -translate-y-1/2" style={{ width: BANNER_7_ASSETS.mobile.diamondSize, height: BANNER_7_ASSETS.mobile.diamondSize, maskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, maskSize: "100% 100%" }}>
-                  <ServerImage image={data.images[2]} alt="" fill className="object-cover" />
+                  {renderImage(data.images[2], data.imageCropDataList?.[2], "")}
                 </div>
                 {/* 右 */}
                 <div className="absolute top-1/2 right-0 -translate-y-1/2" style={{ width: BANNER_7_ASSETS.mobile.diamondSize, height: BANNER_7_ASSETS.mobile.diamondSize, maskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, WebkitMaskImage: `url(${BANNER_7_ASSETS.mobile.mask})`, maskSize: "100% 100%" }}>
-                  <ServerImage image={data.images[3]} alt="" fill className="object-cover" />
+                  {renderImage(data.images[3], data.imageCropDataList?.[3], "")}
                 </div>
             </div>
           </div>

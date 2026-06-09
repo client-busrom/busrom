@@ -90,7 +90,7 @@ export function FaqSearchSection({
 
   return (
     <section
-      className="relative w-full flex items-center justify-center z-[100]"
+      className="relative w-full flex items-center justify-center z-[10]"
       style={{ padding: isMobile ? `${mvw(40)} 0` : `${vw(100)} 0` }}
     >
       <div
@@ -101,8 +101,8 @@ export function FaqSearchSection({
         }}
       >
         {/* Background Wrapper - Only this handles clipping for BG elements */}
-        <div 
-          className="absolute inset-0 overflow-hidden" 
+        <div
+          className="absolute inset-0 overflow-hidden"
           style={{ borderRadius: isMobile ? mvw(30) : vw(60) }}
         >
           {/* Background Image & Overlay */}
@@ -153,10 +153,10 @@ export function FaqSearchSection({
         {/* Content Layer - No overflow hidden here */}
         <div
           className="relative z-20 h-full flex flex-col items-center justify-between"
-          style={{ 
-            padding: isMobile 
-              ? `${mvw(60)} ${mvw(16)} ${mvw(32)}` 
-              : `${vw(80)} ${vw(24)} ${vw(40)}` 
+          style={{
+            padding: isMobile
+              ? `${mvw(60)} ${mvw(16)} ${mvw(32)}`
+              : `${vw(80)} ${vw(24)} ${vw(40)}`
           }}
         >
           {/* Section Title */}
@@ -185,9 +185,9 @@ export function FaqSearchSection({
           )}
 
           {/* Search Bar Group - Relative to this div */}
-          <div 
-            ref={containerRef} 
-            className="relative w-full" 
+          <div
+            ref={containerRef}
+            className="relative w-full"
             style={{ maxWidth: isMobile ? "100%" : vw(1604) }}
           >
             <motion.div
@@ -268,8 +268,8 @@ export function FaqSearchSection({
                   animate={{ opacity: 1, y: 10 }}
                   exit={{ opacity: 0, y: -10 }}
                   className="absolute left-0 right-0 bg-white/95 backdrop-blur-xl shadow-2xl z-50 overflow-hidden"
-                  style={{ 
-                    borderRadius: isMobile ? mvw(16) : vw(24), 
+                  style={{
+                    borderRadius: isMobile ? mvw(16) : vw(24),
                     padding: rvw(16),
                     top: "100%",
                     marginTop: rvw(10)

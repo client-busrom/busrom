@@ -377,6 +377,7 @@ export default function ServiceFeatures({
                               left: `${dotPosition}%`,
                               transform: "translateX(-50%)",
                             }}
+                            aria-label={feature.title}
                           >
                             <motion.span
                               className={cn(

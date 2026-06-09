@@ -243,6 +243,8 @@ const MarqueeText = ({
           <img
             src={finalIconUrl}
             alt=""
+            width={32}
+            height={24}
             className="h-5 lg:h-6 w-auto object-contain block"
           />
         ) : null}

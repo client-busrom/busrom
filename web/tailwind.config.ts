@@ -185,7 +185,7 @@ const config: Config = {
         'bagel-fat-one': ['var(--font-bagel-fat-one)', 'cursive'],
         'limelight': ['var(--font-limelight)', 'cursive'],
         'katibeh': ['var(--font-katibeh)', 'cursive'],
-        'kavivanar': ['Kavivanar', 'cursive'],
+        'kavivanar': ['var(--font-kavivanar)', 'Kavivanar', 'cursive'],
         'acme': ['var(--font-acme)', 'sans-serif'],
 
         // --- 系统字体 (直接使用名字) ---

@@ -31,6 +31,26 @@ const BANNER_8_ASSETS = {
 };
 
 const HeroBanner8: FC<BannerProps> = ({ data }) => {
+  const renderImage = (
+    image: any,
+    cropData: any,
+    alt: string,
+    className: string = "",
+    priority: boolean = false
+  ) => {
+    if (!image) return null;
+    return (
+      <ServerImage
+        image={image}
+        cropData={cropData}
+        alt={alt}
+        fill
+        className={className || "object-cover"}
+        priority={priority}
+      />
+    );
+  };
+
   const titleLines = formatText(data.features[0]).split("\n");
   const subtitle = data.features[1];
   const featureCapsules = data.features.slice(2, 5).filter(f => f && f.trim());
@@ -43,7 +63,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" style={{ width: rpx(1920), height: rpx(922) }}>
           <div className="absolute inset-0 z-0 opacity-60"><img src={BANNER_8_ASSETS.decorator.src} className="w-full h-full object-cover" alt="" /></div>
           <div className="absolute right-0 top-0 h-full z-10" style={{ width: rpx(BANNER_8_ASSETS.bgFrame.width) }}><img src={BANNER_8_ASSETS.bgFrame.src} className="w-full h-full object-fill" alt="" /></div>
-          <div className="absolute right-0 top-0 h-full z-20" style={{ width: rpx(BANNER_8_ASSETS.mainImage.width), maskImage: `url(${BANNER_8_ASSETS.mainImage.mask})`, WebkitMaskImage: `url(${BANNER_8_ASSETS.mainImage.mask})`, maskSize: "100% 100%", maskRepeat: "no-repeat" }}><ServerImage image={data.images[0]} alt="" fill className="object-cover" priority /></div>
+          <div className="absolute right-0 top-0 h-full z-20" style={{ width: rpx(BANNER_8_ASSETS.mainImage.width), maskImage: `url(${BANNER_8_ASSETS.mainImage.mask})`, WebkitMaskImage: `url(${BANNER_8_ASSETS.mainImage.mask})`, maskSize: "100% 100%", maskRepeat: "no-repeat" }}>{renderImage(data.images[0], data.imageCropDataList?.[0], "", "object-cover", true)}</div>
           <div className="absolute z-30" style={{ left: rpx(BANNER_8_ASSETS.content.title.x), top: rpx(BANNER_8_ASSETS.content.title.y), maxWidth: rpx(800) }}>
             <h1 className="font-paytone-one leading-[1.1] pointer-events-auto" style={{ fontSize: rpx(BANNER_8_ASSETS.content.title.fontSize) }}>
               {titleLines.map((line, idx) => (
@@ -64,7 +84,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
              {featureCapsules.map((f, i) => (<div key={i} className="bg-[#FFFB1B]/10 border border-[#CFBC37] flex items-center backdrop-blur-sm hover:scale-105 transition-transform duration-300 cursor-pointer" style={{ borderRadius: rpx(24), paddingLeft: rpx(32), paddingRight: rpx(32), paddingTop: rpx(8), paddingBottom: rpx(8) }}><span className="font-montserrat font-bold text-[#CFBC37] uppercase tracking-widest" style={{ fontSize: rpx(BANNER_8_ASSETS.content.features.fontSize), textShadow: "0 4px 12px rgba(0,0,0,0.5)" }}>{f}</span></div>))}
           </div>
           <div className="absolute z-40 flex items-end pointer-events-auto" style={{ left: rpx(BANNER_8_ASSETS.bottomImages.x), top: rpx(BANNER_8_ASSETS.bottomImages.y), gap: rpx(BANNER_8_ASSETS.bottomImages.gap) }}>
-             {data.images.slice(1, 4).map((img, i) => (<div key={i} className="relative overflow-hidden bg-white shadow-xl" style={{ width: rpx(BANNER_8_ASSETS.bottomImages.width), height: rpx(BANNER_8_ASSETS.bottomImages.height), borderRadius: rpx(34), border: `${rpx(BANNER_8_ASSETS.bottomImages.borderWidth)} solid white` }}><ServerImage image={img} alt="" fill className="object-cover" /></div>))}
+             {data.images.slice(1, 4).map((img, i) => (<div key={i} className="relative overflow-hidden bg-white shadow-xl" style={{ width: rpx(BANNER_8_ASSETS.bottomImages.width), height: rpx(BANNER_8_ASSETS.bottomImages.height), borderRadius: rpx(34), border: `${rpx(BANNER_8_ASSETS.bottomImages.borderWidth)} solid white` }}>{renderImage(img, data.imageCropDataList?.[i + 1], "")}</div>))}
           </div>
         </div>
       </div>
@@ -73,7 +93,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
       <div className="md:hidden absolute inset-0 z-20 flex flex-col items-center justify-center w-full h-full">
         <div className="absolute inset-0 z-0">
            <div className="absolute inset-0 z-0 scale-110 opacity-40 blur-[10px] brightness-[0.6]">
-              <ServerImage image={data.images[0]} alt="" fill className="object-cover" />
+              {renderImage(data.images[0], data.imageCropDataList?.[0], "")}
            </div>
            <div className="absolute inset-0 z-10 bg-black/20" />
         </div>
@@ -108,7 +128,7 @@ const HeroBanner8: FC<BannerProps> = ({ data }) => {
              {data.images.slice(1, 4).map((img, i) => (
                <div key={i} className="relative w-full pb-[100%] h-0 rounded-xl border-2 md:border-4 border-white overflow-hidden shadow-2xl bg-white/10">
                   <div className="absolute inset-0">
-                    <ServerImage image={img} alt="" fill className="object-cover" />
+                    {renderImage(img, data.imageCropDataList?.[i + 1], "")}
                   </div>
                </div>
              ))}

@@ -65,7 +65,9 @@ const RenderCroppedImage = ({
     );
   }
   return (
-    <ServerImage image={image} alt={alt} fill className={className} priority />
+    <ServerImage
+        cropData={cropData}
+        image={image} alt={alt} fill className={className} priority />
   );
 };
 
@@ -321,10 +323,10 @@ const HeroBanner9: FC<HeroBanner9Props> = ({ data, locale }) => {
               maskRepeat: "no-repeat",
             }}
           >
-            <ServerImage
+            <RenderCroppedImage
               image={data.images[1]}
+              cropData={data.imageCropDataList?.[1]}
               alt="Mobile Feature Focus"
-              fill
               className="object-cover"
             />
           </div>

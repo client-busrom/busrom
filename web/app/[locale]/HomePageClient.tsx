@@ -141,6 +141,8 @@ const MemoizedDeferredSphere3D = memo(function DeferredSphere3D({
 
 // 使用 memo 包装纯展示组件，避免父组件更新时不必要的重渲染
 // 注意：动态导入的组件已内置缓存，不需要额外 memo
+const MemoizedProductSeriesCarousel = memo(ProductSeriesCarousel);
+const MemoizedServiceFeatures = memo(ServiceFeatures);
 const MemoizedSimpleCta = memo(SimpleCta);
 const MemoizedSeriesIntro = memo(SeriesIntro);
 const MemoizedBrandAdvantages = memo(BrandAdvantages);
@@ -192,29 +194,29 @@ export function HomePageClient({
         className="relative z-20 mt-[46px] lg:mt-[2.4vw]"
       />
 
-      {/* 模块 2: 产品系列轮播 */}
-      <ProductSeriesCarousel
-        data={content.productSeriesCarousel}
-        locale={currentLanguage}
-        headerTheme="transparent"
-        className="relative z-10"
-      />
-
-      {/* 模块 3: 服务特色 */}
-      <ServiceFeatures
-        data={content.serviceFeatures}
-        headerTheme="light"
-        className="relative z-10 bg-brand-main"
-      />
-
-      {/* 模块 4: 3D 地球 */}
-      <MemoizedDeferredSphere3D
-        data={content.sphere3d}
-        headerTheme="transparent"
-      />
-
-      {/* 首屏之后的内容 - 延迟加载，z-0 确保在首屏下层 */}
+      {/* 首屏之后的内容 - 延迟加载 */}
       <DeferredContent>
+        {/* 模块 2: 产品系列轮播 */}
+        <MemoizedProductSeriesCarousel
+          data={content.productSeriesCarousel}
+          locale={currentLanguage}
+          headerTheme="transparent"
+          className="relative z-10"
+        />
+
+        {/* 模块 3: 服务特色 */}
+        <MemoizedServiceFeatures
+          data={content.serviceFeatures}
+          headerTheme="light"
+          className="relative z-10 bg-brand-main"
+        />
+
+        {/* 模块 4: 3D 地球 */}
+        <MemoizedDeferredSphere3D
+          data={content.sphere3d}
+          headerTheme="transparent"
+        />
+
         {/* 模块 5: 简易表单跳转 */}
         {content.simpleCta?.images && (
           <MemoizedSimpleCta data={content.simpleCta} headerTheme="light" />

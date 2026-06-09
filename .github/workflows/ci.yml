@@ -104,8 +104,8 @@ jobs:
           file: ./Dockerfile.payload-cms
           push: false
           tags: busrom-payload-cms:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=payload-cms
+          cache-to: type=gha,mode=min,scope=payload-cms
 
       - name: Build Web Docker image
         uses: docker/build-push-action@v5
@@ -114,8 +114,8 @@ jobs:
           file: ./Dockerfile.web
           push: false
           tags: busrom-web:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=min,scope=web
 
   # ==================== Security Scan ====================
   security:

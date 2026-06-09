@@ -12,7 +12,7 @@
  */
 
 import type { ImageObject } from '@/lib/content-data'
-import { getVariantUrl, getSrcSet } from '@/lib/utils'
+import { getVariantUrl, getSrcSet, getCropImageUrl, getCropStyles } from '@/lib/utils'
 
 type ServerImageProps = {
   image: ImageObject | null | undefined
@@ -45,9 +45,13 @@ export function ServerImage({
   style,
   cropData,
 }: ServerImageProps) {
-  const src = getVariantUrl(image, size)
+  const src = cropData ? getCropImageUrl(image, cropData) : getVariantUrl(image, size)
   const altText = alt || image?.altText || ''
   const srcSet = getSrcSet(image)
+
+  // Check if we need CSS fallback crop (if the returned URL is the original uncropped image)
+  const isOriginalUrl = src === image?.url || src === (image as any)?.fileUrl || src === (image as any)?.file?.url || !src.includes('-');
+  const needsCssCrop = cropData && cropData.croppedAreaPixels && isOriginalUrl;
 
   // Common style for fill mode
   const fillStyle: React.CSSProperties = fill
@@ -65,16 +69,14 @@ export function ServerImage({
         ...style,
       }
 
-  // For LCP images with priority, use simple img tag with correct size
-  // For non-priority images, use srcset for responsive loading
-  return (
+  const imgTag = (
     <img
       src={src}
       srcSet={priority ? undefined : srcSet}
       sizes={priority ? undefined : "100vw"}
       alt={altText}
-      width={fill ? undefined : (width || 1920)}
-      height={fill ? undefined : (height || 1080)}
+      width={width || 1920}
+      height={height || 1080}
       loading={priority ? 'eager' : 'lazy'}
       fetchPriority={priority ? 'high' : undefined}
       decoding={priority ? 'sync' : 'async'}
@@ -82,6 +84,28 @@ export function ServerImage({
       style={fillStyle}
     />
   )
+
+  if (needsCssCrop) {
+    const cropStyles = getCropStyles(cropData);
+    if (cropStyles) {
+      return (
+        <div style={cropStyles.container} className={`w-full h-full ${className}`}>
+          <img
+            src={src}
+            alt={altText}
+            style={cropStyles.image}
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : undefined}
+            decoding={priority ? 'sync' : 'async'}
+            width={cropData.variantWidth}
+            height={cropData.variantHeight}
+          />
+        </div>
+      );
+    }
+  }
+
+  return imgTag;
 }
 
 export default ServerImage

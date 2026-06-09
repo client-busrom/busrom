@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useCallback, useState } from 'react'
+import Script from 'next/script'
 
 interface TawkChatProps {
   propertyId?: string
@@ -15,25 +16,45 @@ declare global {
 }
 
 export function TawkChat({ propertyId, widgetId }: TawkChatProps) {
-  const [isClient, setIsClient] = useState(false)
+  const [shouldLoad, setShouldLoad] = useState(false)
 
+  // 监听用户的第一次交互（滚动、点击、鼠标移动等），只有在真实用户交互后才加载 Tawk
   useEffect(() => {
-    setIsClient(true)
+    if (typeof window === 'undefined') return
+
+    const handleInteraction = () => {
+      setShouldLoad(true)
+      // 触发后立即移除所有监听器
+      window.removeEventListener('scroll', handleInteraction)
+      window.removeEventListener('mousemove', handleInteraction)
+      window.removeEventListener('touchstart', handleInteraction)
+      window.removeEventListener('click', handleInteraction)
+      window.removeEventListener('keydown', handleInteraction)
+    }
+
+    window.addEventListener('scroll', handleInteraction, { passive: true })
+    window.addEventListener('mousemove', handleInteraction, { passive: true })
+    window.addEventListener('touchstart', handleInteraction, { passive: true })
+    window.addEventListener('click', handleInteraction, { passive: true })
+    window.addEventListener('keydown', handleInteraction, { passive: true })
+
+    // 如果用户一直没有交互，可以在 10 秒后强制加载作为兜底
+    const fallbackTimer = setTimeout(() => {
+      handleInteraction()
+    }, 10000)
+
+    return () => {
+      window.removeEventListener('scroll', handleInteraction)
+      window.removeEventListener('mousemove', handleInteraction)
+      window.removeEventListener('touchstart', handleInteraction)
+      window.removeEventListener('click', handleInteraction)
+      window.removeEventListener('keydown', handleInteraction)
+      clearTimeout(fallbackTimer)
+    }
   }, [])
 
   useEffect(() => {
-    console.log('[TawkChat] Effect triggered:', { isClient, propertyId, widgetId })
-    if (!isClient || !propertyId || !widgetId) {
-      console.log('[TawkChat] Missing props, skipping')
-      return
-    }
-
-    // Check if script already exists
-    const existingScript = document.querySelector(`script[src*="${propertyId}"]`)
-    if (existingScript) {
-      console.log('[TawkChat] Script already exists')
-      return
-    }
+    if (!shouldLoad || !propertyId || !widgetId) return
 
     window.Tawk_API = window.Tawk_API || {}
     window.Tawk_LoadStart = new Date()
@@ -54,29 +75,29 @@ export function TawkChat({ propertyId, widgetId }: TawkChatProps) {
       }
     }
 
-    const script = document.createElement('script')
-    script.async = true
-    script.src = `https://embed.tawk.to/${propertyId}/${widgetId}`
-    script.charset = 'UTF-8'
-    script.setAttribute('crossorigin', '*')
+    // Fix Lighthouse warning: <iframe> elements missing title
+    const titleInterval = setInterval(() => {
+      const iframes = document.querySelectorAll('iframe[src*="tawk.to"], iframe[name*="tawk"]');
+      iframes.forEach((iframe) => {
+        if (!iframe.getAttribute('title')) {
+          iframe.setAttribute('title', 'Tawk Chat Widget');
+        }
+      });
+    }, 2000);
 
-    console.log('[TawkChat] Loading script:', script.src)
+    return () => clearInterval(titleInterval);
+  }, [shouldLoad, propertyId, widgetId])
 
-    const firstScript = document.getElementsByTagName('script')[0]
-    if (firstScript?.parentNode) {
-      firstScript.parentNode.insertBefore(script, firstScript)
-    } else {
-      document.head.appendChild(script)
-    }
+  if (!shouldLoad || !propertyId || !widgetId) return null
 
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script)
-      }
-    }
-  }, [isClient, propertyId, widgetId])
-
-  return null
+  return (
+    <Script
+      id="tawk-script"
+      strategy="lazyOnload"
+      src={`https://embed.tawk.to/${propertyId}/${widgetId}`}
+      crossOrigin="anonymous"
+    />
+  )
 }
 
 export function useTawkChat() {

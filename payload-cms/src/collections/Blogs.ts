@@ -50,7 +50,7 @@ export const Blogs: CollectionConfig = {
     beforeChange: [
       async ({ data, originalDoc, operation, req }) => {
         const isTranslation = req.context?.isTranslationSave || req.context?.isSyncing
-        
+
         // [DEBUG] Check context and user
         console.log(`🕵️ [Blogs Hook] Op: ${operation}, User: ${req.user?.email || 'N/A'}, IsTranslation: ${isTranslation}`)
 
@@ -60,9 +60,30 @@ export const Blogs: CollectionConfig = {
           data.status = originalDoc.status
         }
 
+        // [AUTO SLUG] Only generate slug from English title. Prevent other locales or translations from overwriting it.
+        if (data.title && !isTranslation) {
+          let titleToSlugify = '';
+
+          if (typeof data.title === 'object' && data.title.en) {
+            titleToSlugify = data.title.en;
+          } else if (req.locale === 'en' || req.locale === 'all' || !req.locale) {
+            titleToSlugify = typeof data.title === 'string' ? data.title : '';
+          }
+
+          if (titleToSlugify) {
+            data.slug = titleToSlugify
+              .toLowerCase()
+              .trim()
+              .replace(/\s+/g, '-')
+              .replace(/[^a-z0-9-]/g, '')
+              .replace(/-+/g, '-')
+              .replace(/^-|-$/g, '');
+          }
+        }
+
         const status = data.status;
         const prevStatus = originalDoc?.status;
-        
+
         if (status === 'published' && !data.publishedAt && prevStatus !== 'published') {
           console.log('📡 [Blogs] Publishing: setting publishedAt')
           data.publishedAt = new Date().toISOString()
@@ -77,7 +98,7 @@ export const Blogs: CollectionConfig = {
       async ({ doc, req, query }) => {
         // Optimization: Skip heavy relational lookups during translation saves, syncs, or depth=0 queries
         const currentDepth = req?.query?.depth ?? query?.depth;
-        
+
         if (req?.context?.isTranslationSave || req?.context?.isSyncing || String(currentDepth) === '0') {
           return doc
         }
@@ -131,16 +152,16 @@ export const Blogs: CollectionConfig = {
         // This ensures the frontend 'posts' array is populated if empty and logic is set
         const urlId = req?.routeParams?.id
         const isMainDoc = urlId === String(doc.id) || urlId === doc.slug
-        
+
         // Only resolve complex logic for the main document to save performance
         if (isMainDoc) {
           const resolveRecommendations = async (moduleName: string) => {
             const mode = doc[`kb_${moduleName}_mode`];
-            
+
             if (mode === 'override') {
               const posts = doc[`kb_${moduleName}_posts`];
               const logic = doc[`kb_${moduleName}_logic`];
-              
+
               if ((!posts || posts.length === 0) && logic) {
                 try {
                   const where: any = {
@@ -162,7 +183,7 @@ export const Blogs: CollectionConfig = {
                     depth: 0,
                     select: { title: true, slug: true, coverImage: true, publishedAt: true }
                   });
-                  
+
                   doc[`kb_${moduleName}_posts`] = recommendedDocs.docs;
                 } catch (e) {
                   console.error(`Error resolving recommendations for ${moduleName}:`, e);
@@ -204,7 +225,7 @@ export const Blogs: CollectionConfig = {
         // 重要：如果当前是后台管理人员（req.user 存在），或者是主文档请求，则不剔除数据
         // 注意：isMainDoc 在上方第 109 行已经定义过，这里直接使用并增强
         const finalIsMainDoc = isMainDoc || req?.query?.depth === '0'
-        
+
         if (!req?.user && !finalIsMainDoc && !req?.query?.full) {
           delete doc.content
           // flattened fields (kb_*) are small enough to keep or we can delete them individually if needed
@@ -243,7 +264,7 @@ export const Blogs: CollectionConfig = {
       handler: async (req) => {
         const { payload, user, routeParams } = req
         if (!user) return new Response('Unauthorized', { status: 401 })
-        
+
         const id = routeParams?.id
         if (!id) return new Response('Missing ID', { status: 400 })
 
@@ -264,13 +285,13 @@ export const Blogs: CollectionConfig = {
           // Actually, let's call the indexing logic.
           // Note: In a real deployment, web and cms might be on different servers, 
           // but they usually share the same environment variables.
-          
+
           const { notifyGoogleOfUpdate } = await import('../lib/google-indexing')
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
-          
+
           const results: any[] = []
           const locales = ['en', 'zh', 'ar', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'pt', 'ru', 'vi', 'th', 'id', 'tr', 'nl', 'pl', 'sv', 'da', 'fi', 'no', 'cs', 'el', 'hu']
-          
+
           for (const locale of locales) {
             const url = `${siteUrl}/${locale}/blog/${doc.slug}`
             const res = await notifyGoogleOfUpdate(url)
@@ -411,18 +432,14 @@ export const Blogs: CollectionConfig = {
               name: 'slug',
               type: 'text',
               label: {
-                en: 'Technical Slug (URL Anchor)',
-                zh: '技术标识 (自动生成)',
-              },
-              hooks: {
-                beforeValidate: [formatSlug('adminLabel')],
+                en: 'Slug (URL Anchor)',
+                zh: 'URL (自动生成)',
               },
               unique: true,
               admin: {
-                readOnly: true,
                 description: {
-                  en: 'This is automatically generated from Admin Identification and used for URLs.',
-                  zh: '此字段自动由内部管理标识生成，用于前台URL，不可手动修改。',
+                  en: 'This slug is generated from the English Blog Title. Do not modify manually unless necessary.',
+                  zh: '这个 slug 由博客标题的英文(en)自动生成，非必要请不要手动修改。',
                 },
               },
             },

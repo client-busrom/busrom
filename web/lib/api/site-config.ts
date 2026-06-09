@@ -26,6 +26,7 @@ export interface MediaImage {
 export interface SiteConfigData {
   siteName?: string
   siteTagline?: string
+  siteDescription?: string
   logo?: MediaImage | null
   favicon?: MediaImage | null
   turnstile: TurnstileConfig
@@ -47,6 +48,7 @@ export async function getSiteConfig(): Promise<SiteConfigData> {
     return {
       siteName: data.siteName || 'Busrom',
       siteTagline: data.siteTagline || '',
+      siteDescription: data.siteDescription || '',
       logo: data.logo || null,
       favicon: data.favicon || null,
       turnstile: {
@@ -66,6 +68,7 @@ function getDefaultConfig(): SiteConfigData {
   return {
     siteName: 'Busrom',
     siteTagline: '',
+    siteDescription: '',
     logo: null,
     favicon: null,
     turnstile: {

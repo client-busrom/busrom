@@ -341,6 +341,19 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
       ],
     },
     {
+      label: 'HeroBanner4',
+      options: [
+        { label: '列图 (549×727)', w: 549, h: 727 },
+      ],
+    },
+    {
+      label: 'HeroBanner5',
+      options: [
+        { label: '主图 (981×922)', w: 981, h: 922 },
+        { label: '小图 (488×369)', w: 488, h: 369 },
+      ],
+    },
+    {
       label: 'HeroBanner6',
       options: [
         { label: '左侧 (1253×922)', w: 1253, h: 922 },

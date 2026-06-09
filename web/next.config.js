@@ -316,6 +316,7 @@ const nextConfig = {
       'https://www.facebook.com',
       'https://analytics.tiktok.com',
       'https://bat.bing.com',
+      'https://c.bing.com',
       'https://mc.yandex.ru',
     ].join(' ')
 

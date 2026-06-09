@@ -145,9 +145,26 @@ export function getCropImageUrl(
   image: ImageObject | null | undefined,
   cropData: ImageCropData | null | undefined,
 ): string {
-  if (!image) return ''
-  const size = cropData?.variant === 'original' ? 'xlarge' : (cropData?.variant || 'large')
-  return getVariantUrl(image, size)
+  if (!image) return '';
+
+  let size = cropData?.variant || 'large';
+  const sizeLower = size.toLowerCase();
+  
+  if (sizeLower.includes('original') || sizeLower.includes('xlarge')) {
+    size = 'xlarge';
+  } else if (sizeLower.includes('card')) {
+    size = 'card';
+  } else if (sizeLower.includes('thumbnail')) {
+    size = 'thumbnail';
+  } else if (sizeLower.includes('desktop') || sizeLower.includes('large')) {
+    size = 'large';
+  } else if (sizeLower.includes('tablet') || sizeLower.includes('medium')) {
+    size = 'medium';
+  } else if (sizeLower.includes('small')) {
+    size = 'small';
+  }
+
+  return getVariantUrl(image, size);
 }
 
 export function getLocalizedName(

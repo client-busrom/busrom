@@ -268,6 +268,7 @@ export default function BrandAdvantages({ data, headerTheme, className }: Props)
             fill
             sizes="100vw"
             className="object-cover"
+            priority
           />
         </div>
 
