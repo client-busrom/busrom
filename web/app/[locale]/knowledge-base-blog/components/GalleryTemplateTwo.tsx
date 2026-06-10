@@ -144,6 +144,15 @@ export function GalleryTemplateTwo({ section, items, locale }: any) {
                         </h3>
 
                         <div className="flex items-center justify-center gap-4 mb-8 text-gray-400">
+                          {item.author?.avatar && (
+                            <OptimizedImage
+                              image={safeImage(item.author.avatar)}
+                              alt={item.author.name}
+                              size="small"
+                              objectFit="contain"
+                              className="w-10 h-10 border border-gray-800"
+                            />
+                          )}
                           <span className="text-[12px] font-bold tracking-widest">{item.author?.name || "Nilima"}</span>
                         </div>
 

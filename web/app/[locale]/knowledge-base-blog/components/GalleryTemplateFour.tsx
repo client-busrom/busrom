@@ -134,19 +134,20 @@ export function GalleryTemplateFour({ section, items, locale }: any) {
                     </span>
                   </h3>
 
-                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 mb-12">
-                    <div className="flex items-center gap-3">
-                      {item.author?.avatar && (
-                        <OptimizedImage
-                          image={safeImage(item.author.avatar)}
-                          alt={item.author.name}
-                          size="small"
-                          className="w-8 h-8 rounded-full border border-white"
-                        />
-                      )}
-                      <span className="text-[12px] font-black text-[#060C14] uppercase tracking-widest">{item.author?.name || "Admin"}</span>
+                    <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 mb-12">
+                      <div className="flex items-center gap-3">
+                        {item.author?.avatar && (
+                          <OptimizedImage
+                            image={safeImage(item.author.avatar)}
+                            alt={item.author.name}
+                            size="small"
+                            objectFit="contain"
+                            className="w-10 h-10 border border-white"
+                          />
+                        )}
+                        <span className="text-[12px] font-black text-[#060C14] uppercase tracking-widest">{item.author?.name || "Admin"}</span>
+                      </div>
                     </div>
-                  </div>
 
                   <span
                     className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#060C14] text-white group-hover:bg-primary transition-all duration-300 group-hover:rotate-45 relative z-0"

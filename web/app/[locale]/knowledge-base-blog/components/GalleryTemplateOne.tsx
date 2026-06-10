@@ -130,7 +130,8 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
                           image={safeImage(item.author.avatar)}
                           alt={item.author.name}
                           size="small"
-                          className="w-6 h-6 rounded-full border border-gray-100"
+                          objectFit="contain"
+                          className="w-10 h-10 border border-gray-100"
                         />
                       )}
                       <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">{item.author?.name || "Nilima"}</span>

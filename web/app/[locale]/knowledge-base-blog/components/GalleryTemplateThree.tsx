@@ -6,8 +6,9 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage"
 const safeImage = (img: any) => (typeof img === 'number' ? null : img)
 
 export function GalleryTemplateThree({ section, items, locale }: any) {
-  const leftItems = items.slice(0, Math.ceil(items.length / 2))
-  const rightItems = items.slice(Math.ceil(items.length / 2))
+  // Assign item 0 to right, item 1 to left, item 2 to right...
+  const rightItems = items.filter((_: any, idx: number) => idx % 2 === 0)
+  const leftItems = items.filter((_: any, idx: number) => idx % 2 !== 0)
   const localePrefix = locale === "en" ? "" : `/${locale}`
   let fallbackLink = `${localePrefix}/knowledge-base-blogs`;
   let fallbackTag = '';
@@ -71,15 +72,27 @@ export function GalleryTemplateThree({ section, items, locale }: any) {
               </div>
               </div>
 
-              {leftItems.map((item: any, idx: number) => (
-                <div key={item.id || idx} className={`${idx === 0 ? 'w-4/5 mx-auto' : 'w-full ml-auto'}`}>
-                  <PostCard item={item} locale={locale} />
-                </div>
-              ))}
+              {/* Desktop Left Items */}
+              <div className="hidden lg:flex flex-col gap-20">
+                {leftItems.map((item: any, idx: number) => (
+                  <div key={item.id || idx} className={`${idx === 0 ? 'w-4/5 mx-auto' : 'w-full ml-auto'}`}>
+                    <PostCard item={item} locale={locale} />
+                  </div>
+                ))}
+              </div>
+
+              {/* Mobile All Items (Chronological) */}
+              <div className="flex lg:hidden flex-col gap-16">
+                {items.map((item: any, idx: number) => (
+                  <div key={item.id || idx} className="w-full">
+                    <PostCard item={item} locale={locale} />
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* RIGHT COLUMN */}
-            <div className="w-full lg:w-1/2 flex flex-col gap-20 lg:pt-32">
+            <div className="hidden lg:flex w-full lg:w-1/2 flex-col gap-20 lg:pt-32">
               {rightItems.map((item: any, idx: number) => (
                 <div key={item.id || idx} className={`${idx === 1 ? 'w-4/5 ml-auto' : 'w-full'}`}>
                   <PostCard item={item} locale={locale} />
@@ -162,6 +175,15 @@ function PostCard({ item, locale }: any) {
         </h3>
 
         <div className="flex items-center justify-center gap-4 mb-8 text-gray-500">
+          {item.author?.avatar && (
+            <OptimizedImage
+              image={safeImage(item.author.avatar)}
+              alt={item.author.name}
+              size="small"
+              objectFit="contain"
+              className="w-10 h-10 border border-gray-100"
+            />
+          )}
           <span className="text-[12px] font-bold tracking-widest">{item.author?.name || "Kathryn"}</span>
         </div>
 
