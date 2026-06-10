@@ -1,0 +1,519 @@
+网页索引编制
+
+重复网页，用户未选定规范网页
+
+验证详情
+
+验证失败
+开始日期：2026/6/2
+失败日期：2026/6/2
+站点地图：所有已知网页
+示例
+
+网址	上次抓取日期
+https://www.busromhouse.com/ar/blog	2026年5月30日
+https://www.busromhouse.com/pl/blog?category=kaidelasiklipsi	2026年5月29日
+https://www.busromhouse.com/sv/blog?category=glass-fence-spigot	2026年5月29日
+https://www.busromhouse.com/nl/blog	2026年5月29日
+https://www.busromhouse.com/da/contact-us	2026年5月25日
+https://www.busromhouse.com/de/support	2026年5月24日
+https://www.busromhouse.com/da/blog?category=lasin-tuki	2026年5月10日
+https://www.busromhouse.com/da/blog?category=kaidelasiklipsi	2026年5月10日
+https://www.busromhouse.com/da/blog?category=lasiliitos	2026年5月10日
+https://www.busromhouse.com/no/support	2026年5月7日
+https://www.busromhouse.com/fi/service/overview	2026年5月7日
+https://www.busromhouse.com/it/service/overview	2026年5月7日
+https://www.busromhouse.com/tr/service/oem-odm	2026年5月6日
+https://www.busromhouse.com/pl/support	2026年5月6日
+https://www.busromhouse.com/fi/blog	2026年5月6日
+https://www.busromhouse.com/sv/service/oem-odm	2026年5月6日
+https://www.busromhouse.com/fr/blog	2026年5月6日
+https://www.busromhouse.com/it/blog	2026年5月6日
+https://www.busromhouse.com/nl/products	2026年5月5日
+https://www.busromhouse.com/de/service/overview	2026年5月4日
+https://www.busromhouse.com/nl/support	2026年5月4日
+https://www.busromhouse.com/nl/service/oem-odm	2026年5月4日
+https://www.busromhouse.com/ru/service/oem-odm	2026年5月4日
+https://www.busromhouse.com/ko/support	2026年5月4日
+https://www.busromhouse.com/pl/service/oem-odm	2026年5月4日
+https://www.busromhouse.com/ar/service/oem-odm	2026年5月2日
+https://www.busromhouse.com/no/service/oem-odm	2026年5月1日
+https://www.busromhouse.com/de/service/oem-odm	2026年5月1日
+https://www.busromhouse.com/ja/service/oem-odm	2026年4月29日
+https://www.busromhouse.com/it/products	2026年4月29日
+https://www.busromhouse.com/fr/products	2026年4月29日
+https://www.busromhouse.com/es/support	2026年4月28日
+https://www.busromhouse.com/es/service/oem-odm	2026年4月28日
+
+网页索引编制
+
+重复网页，用户未选定规范网页
+
+验证详情
+
+验证失败
+开始日期：2026/6/2
+失败日期：2026/6/2
+站点地图：所有已知网页
+示例
+
+网址	上次抓取日期
+https://www.busromhouse.com/ar/products	2026年6月3日
+https://www.busromhouse.com/ar/blog?category=glass-standoff	2026年6月2日
+https://www.busromhouse.com/es/blog?category=glass-fence-spigot	2026年6月2日
+https://www.busromhouse.com/ar/blog?category=glass-connected-fitting	2026年6月2日
+https://www.busromhouse.com/en/blog?category=kaidelasiklipsi	2026年6月2日
+https://www.busromhouse.com/de/blog?category=glass-connected-fitting	2026年6月2日
+https://www.busromhouse.com/sv/our-story	2026年6月2日
+https://www.busromhouse.com/de/blog?category=glass-fence-spigot	2026年6月2日
+https://www.busromhouse.com/fi/contact-us	2026年6月2日
+https://www.busromhouse.com/fi/blog?category=glass-connected-fitting	2026年6月2日
+https://www.busromhouse.com/de/test-page-47	2026年6月2日
+https://www.busromhouse.com/pl/our-story	2026年6月2日
+https://www.busromhouse.com/ar/blog?category=kaidelasiklipsi	2026年6月2日
+每页行数：
+第 1-13 行，共 13 行
+
+
+网页索引编制
+
+网页会自动重定向
+
+验证详情
+
+验证失败
+开始日期：2026/6/2
+失败日期：2026/6/2
+站点地图：所有已知网页
+示例
+
+网址	上次抓取日期
+https://www.busromhouse.com/no/	2026年6月2日
+https://www.busromhouse.com/pl/	2026年6月1日
+https://www.busromhouse.com/fr/	2026年5月31日
+https://www.busromhouse.com/tr/	2026年5月30日
+https://www.busromhouse.com/ko/	2026年5月29日
+https://www.busromhouse.com/ja/	2026年5月28日
+https://www.busromhouse.com/sv/	2026年5月28日
+https://www.busromhouse.com/es/	2026年5月26日
+https://www.busromhouse.com/ru/	2026年5月25日
+https://www.busromhouse.com/da/	2026年5月24日
+https://www.busromhouse.com/nl/	2026年5月24日
+https://www.busromhouse.com/en	2026年5月8日
+https://www.busromhouse.com/en/application	2026年5月6日
+每页行数：
+第 1-13 行，共 13 行
+
+
+网页索引编制
+
+网页会自动重定向
+
+验证详情
+
+验证失败
+开始日期：2026/6/2
+失败日期：2026/6/2
+站点地图：所有已知网页
+示例
+
+网址	上次抓取日期
+https://www.busromhouse.com/zh/	2026年6月2日
+https://www.busromhouse.com/fi/	2026年6月2日
+https://www.busromhouse.com/pt/	2026年6月2日
+每页行数：
+第 1-3 行，共 3 行
+
+
+网页索引编制
+
+未找到 (404)
+
+验证详情
+
+验证失败
+开始日期：2026/6/2
+失败日期：2026/6/2
+站点地图：所有已知网页
+示例
+
+网址	上次抓取日期
+https://www.busromhouse.com/da/products/bathroom-glass-clip-test-001	2026年6月2日
+https://www.busromhouse.com/no/products/bathroom-glass-clip-test-001	2026年6月1日
+https://www.busromhouse.com/en/blog/test-template-3	2026年6月1日
+https://www.busromhouse.com/bathroom-handle	2026年6月1日
+https://www.busromhouse.com/ko/blog/test-template-1	2026年5月31日
+https://www.busromhouse.com/ko/blog/category/glass-standoff	2026年5月31日
+https://www.busromhouse.com/sliding-door-kit	2026年5月31日
+https://www.busromhouse.com/ja/blog/category/glass-standoff	2026年5月29日
+https://www.busromhouse.com/en/product/new-design-304-stainless-steel-glass-connector-conference-room-bracket-stair-balusters-structural-glass-fittings	2026年5月29日
+https://www.busromhouse.com/en/product/tailor-made-stainless-steel-glass-bracket-shopping-mall-railing-retainer-clip-stable-panel-clamp	2026年5月29日
+https://www.busromhouse.com/glass-connected-fitting	2026年5月29日
+https://www.busromhouse.com/en/product/hot-selling-stainless-steel-budget-shower-door-kit-waterproof-rustproof-bathroom-sliding-hardware	2026年5月25日
+https://www.busromhouse.com/en/product/high-rated-shower-enclosure-commercial-glass-clamp-round-panel-fastener-heavy-duty-hardware-clips	2026年5月10日
+https://www.busromhouse.com/lasin-tuki	2026年5月10日
+https://www.busromhouse.com/en/blog/category/lasin-tuki	2026年5月10日
+https://www.busromhouse.com/en/product	2026年5月8日
+https://www.busromhouse.com/da/pages/service-overview	2026年5月8日
+https://www.busromhouse.com/arhttps://www.busromhouse.com/shop	2026年5月8日
+https://www.busromhouse.com/ar/pages/contact-us	2026年5月8日
+https://www.busromhouse.com/da/pages/contact-us	2026年5月8日
+https://www.busromhouse.com/fi/pages/contact-us	2026年5月8日
+https://www.busromhouse.com/fihttps://www.busromhouse.com/shop	2026年5月8日
+https://www.busromhouse.com/de/pages/contact-us	2026年5月8日
+https://www.busromhouse.com/en/faq	2026年5月7日
+https://www.busromhouse.com/en/product/architectural-square-glass-railing-clamp-bracket-commercial-balustrade-fitting	2026年5月7日
+https://www.busromhouse.com/en/product/commercial-glass-mounted-handrail-bracket-stainless-steel-tube-support-connector	2026年5月7日
+https://www.busromhouse.com/en/product/hot-selling-shower-enclosure-glass-clip-commercial-waterproof-panel-bracket-household-clamp	2026年5月7日
+https://www.busromhouse.com/en/product/hot-rated-glass-hinge-for-modern-bathroom-door	2026年5月7日
+https://www.busromhouse.com/en/product/soft-close-frameless-glass-sliding-door-track-roller-hardware-kit-shower	2026年5月7日
+https://www.busromhouse.com/en/product/heavy-duty-frameless-glass-pool-fence-spigot-outdoor-balustrade-base-clamp	2026年5月7日
+https://www.busromhouse.com/en/product/modern-commercial-entrance-glass-door-pull-handle-architectural-push-pull	2026年5月7日
+https://www.busromhouse.com/en/product/hot-selling-cnc-machined-glass-standoff-interior-stair-standoffs-pin-uv-resistant-mounting-hardware	2026年5月7日
+https://www.busromhouse.com/enhttps://www.busromhouse.com/shop	2026年5月7日
+https://www.busromhouse.com/ar/product	2026年5月7日
+https://www.busromhouse.com/en/product/minimalist-retractable-hidden-wall-coat-hook-foldable-heavy-duty-cloakroom	2026年5月7日
+https://www.busromhouse.com/es/pages/service-overview	2026年5月7日
+https://www.busromhouse.com/arhttps://www.busromhouse.com	2026年5月7日
+https://www.busromhouse.com/en/blog/category/glass-standoff	2026年5月7日
+https://www.busromhouse.com/es/pages/contact-us	2026年5月6日
+https://www.busromhouse.com/dahttps://www.busromhouse.com	2026年5月6日
+https://www.busromhouse.com/dehttps://www.busromhouse.com	2026年5月5日
+https://www.busromhouse.com/fi/product	2026年5月5日
+https://www.busromhouse.com/eshttps://www.busromhouse.com	2026年5月5日
+https://www.busromhouse.com/ar/pages/service-overview	2026年5月5日
+https://www.busromhouse.com/dahttps://www.busromhouse.com/shop	2026年5月4日
+https://www.busromhouse.com/fr/product	2026年5月3日
+https://www.busromhouse.com/fihttps://www.busromhouse.com	2026年5月3日
+https://www.busromhouse.com/da/product	2026年5月2日
+https://www.busromhouse.com/service/one-stop-shop	2026年4月9日
+每页行数：
+第 1-49 行，共 49 行
+
+
+网页索引编制
+
+未找到 (404)
+
+验证详情
+
+验证失败
+开始日期：2026/6/2
+失败日期：2026/6/2
+站点地图：所有已知网页
+示例
+
+网址	上次抓取日期
+https://www.busromhouse.com/product-series/glass-standoff	2026年6月2日
+https://www.busromhouse.com/kohttps://www.busromhouse.com	2026年6月2日
+https://www.busromhouse.com/eshttps://www.busromhouse.com/shop	2026年6月2日
+https://www.busromhouse.com/bathroom-glass-clip	2026年6月2日
+https://www.busromhouse.com/svhttps://www.busromhouse.com	2026年6月2日
+https://www.busromhouse.com/tr/shop/hot-rated-glass-hinge-for-modern-bathroom-door	2026年6月2日
+https://www.busromhouse.com/it/shop/hot-sale-glass-standoff-for-glass-staircase-and-handrail	2026年6月2日
+https://www.busromhouse.com/ithttps://www.busromhouse.com	2026年6月2日
+https://www.busromhouse.com/product-series/glass-hinge	2026年6月2日
+https://www.busromhouse.com/nlhttps://www.busromhouse.com	2026年6月2日
+https://www.busromhouse.com/pthttps://www.busromhouse.com	2026年6月2日
+https://www.busromhouse.com/ja/products/glass-clip	2026年6月2日
+https://www.busromhouse.com/shop/glass-hinge-002	2026年6月2日
+https://www.busromhouse.com/shop/hot-sale-glass-standoff-for-glass-staircase-and-handrail	2026年6月2日
+https://www.busromhouse.com/trhttps://www.busromhouse.com	2026年6月2日
+https://www.busromhouse.com/pages/contact-us	2026年6月2日
+https://www.busromhouse.com/product/glass-hinge	2026年6月2日
+每页行数：
+第 1-17 行，共 17 行
+
+
+网页索引编制
+
+备用网页（有适当的规范标记）
+
+验证详情
+
+验证失败
+开始日期：2026/6/2
+失败日期：2026/6/2
+站点地图：所有已知网页
+示例
+
+网址	上次抓取日期
+https://www.busromhouse.com/fi/blog/guardrail-glass-clip-blog-1	2026年6月2日
+https://www.busromhouse.com/no	2026年6月2日
+https://www.busromhouse.com/fr/privacy-policy	2026年5月31日
+https://www.busromhouse.com/fr	2026年5月31日
+https://www.busromhouse.com/tr	2026年5月30日
+https://www.busromhouse.com/en/blog/hidden-hook-blog-1	2026年5月29日
+https://www.busromhouse.com/en/blog/door-handle-blog-1	2026年5月29日
+https://www.busromhouse.com/en/blog/bathroom-handle-blog-1	2026年5月29日
+https://www.busromhouse.com/fi/fraud-notice	2026年5月29日
+https://www.busromhouse.com/da/fraud-notice	2026年5月29日
+https://www.busromhouse.com/es/privacy-policy	2026年5月28日
+https://www.busromhouse.com/ar/privacy-policy	2026年5月27日
+https://www.busromhouse.com/es	2026年5月26日
+https://www.busromhouse.com/ar/application	2026年5月26日
+https://www.busromhouse.com/fi/blog/glass-hinge-blog-1	2026年5月25日
+每页行数：
+第 1-15 行，共 15 行
+
+
+网页索引编制
+
+备用网页（有适当的规范标记）
+
+验证详情
+
+验证失败
+开始日期：2026/6/2
+失败日期：2026/6/2
+站点地图：所有已知网页
+示例
+
+网址	上次抓取日期
+https://www.busromhouse.com/no/privacy-policy	2026年6月3日
+https://www.busromhouse.com/da/application	2026年6月3日
+https://www.busromhouse.com/tr/fraud-notice	2026年6月3日
+https://www.busromhouse.com/zh/blog/bathroom-handle-blog-1	2026年6月3日
+https://www.busromhouse.com/fi/application	2026年6月2日
+https://www.busromhouse.com/it/blog/guardrail-glass-clip-blog-1	2026年6月2日
+https://www.busromhouse.com/es/fraud-notice	2026年6月2日
+https://www.busromhouse.com/fr/blog/glass-fence-spigot-blog-1	2026年6月2日
+https://www.busromhouse.com/fr/blog/glass-standoff-blog-1	2026年6月2日
+https://www.busromhouse.com/en/blog/glass-hinge-blog-1	2026年6月2日
+https://www.busromhouse.com/es/blog/glass-standoff-blog-1	2026年6月2日
+https://www.busromhouse.com/fi	2026年6月2日
+https://www.busromhouse.com/pt	2026年6月2日
+每页行数：
+第 1-13 行，共 13 行
+
+
+网页索引编制
+
+已抓取 - 尚未编入索引
+
+验证详情
+
+验证失败
+开始日期：2026/6/2
+失败日期：2026/6/2
+站点地图：所有已知网页
+示例
+
+网址	上次抓取日期
+https://www.busromhouse.com/de/	2026年6月1日
+https://www.busromhouse.com/blog	2026年5月29日
+https://www.busromhouse.com/ja/blog?category=glass-standoff	2026年5月29日
+https://www.busromhouse.com/nl	2026年5月24日
+https://www.busromhouse.com/fi/products/glass-fence-spigot	2026年5月11日
+https://www.busromhouse.com/fi/products/bathroom-glass-clip	2026年5月10日
+https://www.busromhouse.com/en/shop/new-design-304-stainless-steel-glass-connector-conference-room-bracket-stair-balusters-structural-glass-fittings	2026年5月10日
+https://www.busromhouse.com/fi/products/glass-connected-fitting	2026年5月9日
+https://www.busromhouse.com/service/oem-odm	2026年5月7日
+https://www.busromhouse.com/ru/products/bathroom-glass-clip-test-001	2026年5月6日
+https://www.busromhouse.com/pt/service/oem-odm	2026年5月5日
+https://www.busromhouse.com/fi/shop/hot-selling-cnc-machined-glass-standoff-interior-stair-standoffs-pin-uv-resistant-mounting-hardware	2026年5月5日
+https://www.busromhouse.com/da/products/glass-hinge	2026年5月5日
+https://www.busromhouse.com/privacy-policy	2026年4月28日
+https://www.busromhouse.com/favicon.ico	2026年2月12日
+每页行数：
+第 1-15 行，共 15 行
+
+
+网页索引编制
+
+已抓取 - 尚未编入索引
+
+验证详情
+
+验证失败
+开始日期：2026/6/2
+失败日期：2026/6/2
+站点地图：所有已知网页
+示例
+
+网址	上次抓取日期
+https://www.busromhouse.com/fi/blog/bathroom-glass-clip-blog-1	2026年6月3日
+https://www.busromhouse.com/tr/shop/luxury-frameless-shower-glass-clamp-wall-panel-bracket-bathroom-enclosure	2026年6月3日
+https://www.busromhouse.com/ja/shop/luxury-frameless-shower-glass-clamp-wall-panel-bracket-bathroom-enclosure	2026年6月3日
+https://www.busromhouse.com/da/shop/luxury-frameless-shower-glass-clamp-wall-panel-bracket-bathroom-enclosure	2026年6月3日
+https://www.busromhouse.com/ko/shop/hot-selling-stainless-steel-budget-shower-door-kit-waterproof-rustproof-bathroom-sliding-hardware	2026年6月3日
+https://www.busromhouse.com/no/shop/hot-selling-stainless-steel-budget-shower-door-kit-waterproof-rustproof-bathroom-sliding-hardware	2026年6月3日
+https://www.busromhouse.com/es/products/bathroom-glass-clip	2026年6月3日
+https://www.busromhouse.com/sv/shop/unique-design-corrosion-resistant-frameless-door-hardware-90-degree-glass-hinge-180-degree-patch-fitting	2026年6月3日
+https://www.busromhouse.com/de/test-page-3	2026年6月3日
+https://www.busromhouse.com/nl/shop/hot-selling-stainless-steel-budget-shower-door-kit-waterproof-rustproof-bathroom-sliding-hardware	2026年6月3日
+https://www.busromhouse.com/zh/products/bathroom-glass-clip	2026年6月3日
+https://www.busromhouse.com/ru/products/glass-standoff	2026年6月3日
+https://www.busromhouse.com/tr/blog/glass-hinge-blog-1	2026年6月3日
+https://www.busromhouse.com/pl/shop/unique-design-corrosion-resistant-frameless-door-hardware-90-degree-glass-hinge-180-degree-patch-fitting	2026年6月3日
+https://www.busromhouse.com/nl/blog/guardrail-glass-clip-blog-1	2026年6月3日
+https://www.busromhouse.com/zh/products/hidden-hook	2026年6月3日
+https://www.busromhouse.com/zh/shop/friendly-budget-luster-retention-door-handle-easy-clean-surface-u-shape-long-pull-hardware-back-to-back-handles	2026年6月3日
+https://www.busromhouse.com/nl/blog/glass-hinge-blog-1	2026年6月3日
+https://www.busromhouse.com/no/blog/glass-standoff-blog-1	2026年6月3日
+https://www.busromhouse.com/ko/blog/bathroom-glass-clip-blog-1	2026年6月3日
+https://www.busromhouse.com/fr/blog/glass-hinge-blog-1	2026年6月3日
+https://www.busromhouse.com/pt/shop/heavy-duty-frameless-glass-standoff-staircase-balcony-terrace-mounting-hardware	2026年6月3日
+https://www.busromhouse.com/ru/shop/bathroom-handle	2026年6月3日
+https://www.busromhouse.com/pl/blog	2026年6月3日
+https://www.busromhouse.com/ja/blog/guardrail-glass-clip-blog-1	2026年6月3日
+https://www.busromhouse.com/no/shop/hot-selling-cnc-machined-glass-standoff-interior-stair-standoffs-pin-uv-resistant-mounting-hardware	2026年6月3日
+https://www.busromhouse.com/de/shop/hot-selling-cnc-machined-glass-standoff-interior-stair-standoffs-pin-uv-resistant-mounting-hardware	2026年6月3日
+https://www.busromhouse.com/de/products/glass-standoff	2026年6月3日
+https://www.busromhouse.com/en/shop/high-quality-screw-mounted-hidden-hook-space-saving-coat-storage-adjustable-angle-flush-mount-rotating-hooks	2026年6月3日
+https://www.busromhouse.com/de/blog/glass-connected-fitting-blog-1	2026年6月3日
+https://www.busromhouse.com/pl/blog/glass-hinge-blog-1	2026年6月3日
+https://www.busromhouse.com/pt/shop/friendly-budget-luster-retention-door-handle-easy-clean-surface-u-shape-long-pull-hardware-back-to-back-handles	2026年6月3日
+https://www.busromhouse.com/it/shop/friendly-budget-luster-retention-door-handle-easy-clean-surface-u-shape-long-pull-hardware-back-to-back-handles	2026年6月3日
+https://www.busromhouse.com/ar/shop/friendly-budget-luster-retention-door-handle-easy-clean-surface-u-shape-long-pull-hardware-back-to-back-handles	2026年6月2日
+https://www.busromhouse.com/ko/shop/heavy-duty-frameless-glass-standoff-staircase-balcony-terrace-mounting-hardware	2026年6月2日
+https://www.busromhouse.com/pt/shop/hot-selling-cnc-machined-glass-standoff-interior-stair-standoffs-pin-uv-resistant-mounting-hardware	2026年6月2日
+https://www.busromhouse.com/en/blog?category=glass-standoff	2026年6月2日
+https://www.busromhouse.com/nl/shop/friendly-budget-luster-retention-door-handle-easy-clean-surface-u-shape-long-pull-hardware-back-to-back-handles	2026年6月2日
+https://www.busromhouse.com/ru/service/one-stop-solution	2026年6月2日
+https://www.busromhouse.com/fr/shop/friendly-budget-luster-retention-door-handle-easy-clean-surface-u-shape-long-pull-hardware-back-to-back-handles	2026年6月2日
+https://www.busromhouse.com/pl/blog/glass-standoff-blog-1	2026年6月2日
+https://www.busromhouse.com/ru/products/glass-hinge	2026年6月2日
+https://www.busromhouse.com/fr/products/bathroom-handle	2026年6月2日
+https://www.busromhouse.com/nl/shop/hot-sale-glass-panel-spigot-commercial-stair-connector-waterproof-frameless-railing-spigots	2026年6月2日
+https://www.busromhouse.com/no/shop/hot-sale-glass-panel-spigot-commercial-stair-connector-waterproof-frameless-railing-spigots	2026年6月2日
+https://www.busromhouse.com/pl/contact-us	2026年6月2日
+https://www.busromhouse.com/it/shop/hot-sale-glass-panel-spigot-commercial-stair-connector-waterproof-frameless-railing-spigots	2026年6月2日
+https://www.busromhouse.com/ru/shop/hot-sale-glass-panel-spigot-commercial-stair-connector-waterproof-frameless-railing-spigots	2026年6月2日
+https://www.busromhouse.com/blog/glass-standoff-blog-1	2026年6月2日
+https://www.busromhouse.com/ko/shop/hot-sale-glass-panel-spigot-commercial-stair-connector-waterproof-frameless-railing-spigots	2026年6月2日
+https://www.busromhouse.com/es/test-page-3	2026年6月2日
+https://www.busromhouse.com/pt/test-page-3	2026年6月2日
+https://www.busromhouse.com/it/our-story	2026年6月2日
+https://www.busromhouse.com/sv/shop/hot-sale-glass-panel-spigot-commercial-stair-connector-waterproof-frameless-railing-spigots	2026年6月2日
+https://www.busromhouse.com/ar/faq-frequently-asked-questions	2026年6月2日
+https://www.busromhouse.com/nl/products/glass-hinge	2026年6月2日
+https://www.busromhouse.com/ja/products/glass-fence-spigot	2026年6月2日
+https://www.busromhouse.com/shop/hot-sale-glass-standoff-staircase-standoff-pin-hotel-handrail-mounting-hardware	2026年6月2日
+https://www.busromhouse.com/tr/products/glass-fence-spigot	2026年6月2日
+https://www.busromhouse.com/ru/blog/glass-hinge-blog-1	2026年6月2日
+https://www.busromhouse.com/no/blog/bathroom-glass-clip-blog-1	2026年6月2日
+https://www.busromhouse.com/fraud-notice	2026年6月2日
+https://www.busromhouse.com/products/bathroom-handle	2026年6月2日
+https://www.busromhouse.com/en/products	2026年6月2日
+https://www.busromhouse.com/pl/faq-frequently-asked-questions	2026年6月2日
+https://www.busromhouse.com/es/faq-frequently-asked-questions	2026年6月2日
+https://www.busromhouse.com/de/blog/glass-standoff-blog-1	2026年6月2日
+https://www.busromhouse.com/de/service/one-stop-solution	2026年6月2日
+https://www.busromhouse.com/ar/test-page-47	2026年6月2日
+https://www.busromhouse.com/sv/shop/friendly-budget-luster-retention-door-handle-easy-clean-surface-u-shape-long-pull-hardware-back-to-back-handles	2026年6月2日
+https://www.busromhouse.com/fi/blog/door-handle-blog-1	2026年6月2日
+https://www.busromhouse.com/pl/shop/friendly-budget-luster-retention-door-handle-easy-clean-surface-u-shape-long-pull-hardware-back-to-back-handles	2026年6月2日
+https://www.busromhouse.com/fi/shop/friendly-budget-luster-retention-door-handle-easy-clean-surface-u-shape-long-pull-hardware-back-to-back-handles	2026年6月2日
+https://www.busromhouse.com/fr/fraud-notice	2026年6月2日
+https://www.busromhouse.com/tr/shop/friendly-budget-luster-retention-door-handle-easy-clean-surface-u-shape-long-pull-hardware-back-to-back-handles	2026年6月2日
+https://www.busromhouse.com/faq-frequently-asked-questions	2026年6月2日
+https://www.busromhouse.com/ko/blog/glass-hinge-blog-1	2026年6月2日
+https://www.busromhouse.com/ja/shop/hot-selling-cnc-machined-glass-standoff-interior-stair-standoffs-pin-uv-resistant-mounting-hardware	2026年6月2日
+https://www.busromhouse.com/no/products/glass-fence-spigot	2026年6月2日
+https://www.busromhouse.com/es/products/glass-standoff	2026年6月2日
+https://www.busromhouse.com/it/blog/glass-hinge-blog-1	2026年6月2日
+https://www.busromhouse.com/de/blog?category=glass-standoff	2026年6月2日
+https://www.busromhouse.com/fi/oem-odm	2026年6月2日
+https://www.busromhouse.com/no/fraud-notice	2026年6月2日
+https://www.busromhouse.com/ja/products/sliding-door-kit	2026年6月2日
+https://www.busromhouse.com/pl/shop/heavy-duty-frameless-glass-standoff-staircase-balcony-terrace-mounting-hardware	2026年6月2日
+https://www.busromhouse.com/tr/our-story	2026年6月2日
+https://www.busromhouse.com/es/blog/guardrail-glass-clip-blog-1	2026年6月2日
+https://www.busromhouse.com/fi/products/glass-standoff	2026年6月2日
+https://www.busromhouse.com/da/test-page-47	2026年6月2日
+https://www.busromhouse.com/pl/test-page-47	2026年6月2日
+https://www.busromhouse.com/nl/test-page-47	2026年6月2日
+https://www.busromhouse.com/es/test-page-47	2026年6月2日
+https://www.busromhouse.com/tr/test-page-47	2026年6月2日
+https://www.busromhouse.com/fi/test-page-47	2026年6月2日
+https://www.busromhouse.com/zh/test-page-47	2026年6月2日
+https://www.busromhouse.com/ko/blog/guardrail-glass-clip-blog-1	2026年6月2日
+https://www.busromhouse.com/ru/test-page-47	2026年6月2日
+https://www.busromhouse.com/sv/test-page-47	2026年6月2日
+https://www.busromhouse.com/ja/fraud-notice	2026年6月2日
+https://www.busromhouse.com/pt/test-page-47	2026年6月2日
+https://www.busromhouse.com/shop/heavy-duty-frameless-glass-standoff-staircase-balcony-terrace-mounting-hardware	2026年6月2日
+https://www.busromhouse.com/ja/test-page-47	2026年6月2日
+https://www.busromhouse.com/de	2026年6月2日
+https://www.busromhouse.com/_next/static/media/992c38ee52335162-s.p.woff2	2026年6月2日
+https://www.busromhouse.com/da/shop/friendly-budget-luster-retention-door-handle-easy-clean-surface-u-shape-long-pull-hardware-back-to-back-handles	2026年6月2日
+https://www.busromhouse.com/it/test-page-47	2026年6月2日
+https://www.busromhouse.com/fr/test-page-47	2026年6月2日
+https://www.busromhouse.com/fi/blog/sliding-door-kit-blog-1	2026年6月2日
+https://www.busromhouse.com/no/test-page-47	2026年6月2日
+https://www.busromhouse.com/pt/blog	2026年6月2日
+https://www.busromhouse.com/test-page-47	2026年6月2日
+https://www.busromhouse.com/zh/blog/door-handle-blog-1	2026年6月2日
+https://www.busromhouse.com/ru/blog/bathroom-glass-clip-blog-1	2026年6月2日
+https://www.busromhouse.com/shop?category=glass-hinge	2026年6月2日
+https://www.busromhouse.com/shop?category=glass-connected-fitting	2026年6月2日
+https://www.busromhouse.com/fr/blog/guardrail-glass-clip-blog-1	2026年6月2日
+https://www.busromhouse.com/zh/blog/hidden-hook-blog-1	2026年6月2日
+https://www.busromhouse.com/no/products/glass-standoff	2026年6月2日
+每页行数：
+第 1-119 行，共 119 行
+
+
+
+网页索引编制
+上次更新日期：2026/6/1
+展示
+网页
+2026/3/12
+2026/3/23
+2026/4/3
+2026/4/14
+2026/4/25
+2026/5/6
+2026/5/17
+2026/5/28
+900
+600
+300
+0
+3
+2
+1
+2
+1
+info_filled
+网页未被编入索引的原因
+未编入索引的网页无法显示在 Google 中
+原因	来源
+
+验证	趋势	网页
+未找到 (404)	网站	
+
+失败
+66
+重复网页，用户未选定规范网页	网站	
+
+失败
+46
+备用网页（有适当的规范标记）	网站	
+
+失败
+28
+网页会自动重定向	网站	
+
+失败
+16
+已抓取 - 尚未编入索引	Google 系统	
+
+失败
+134
+软 404	网站	
+
+已开始
+71
+已被 robots.txt 屏蔽	网站	
+
+已开始
+27
+已发现 - 尚未编入索引	Google 系统	
+
+已开始
+133
+每页行数：
+第 1-8 行，共 8 行

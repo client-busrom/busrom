@@ -224,10 +224,16 @@ export function buildMetadata(
       languages: getAlternateLanguages(actualPath || seoSetting.exactPath || '/'),
     }
   } else {
-    // Even if no canonical is set in CMS, we should still provide hreflang for the current path
+    // Even if no canonical is set in CMS, we explicitly set it to the clean path
+    // This prevents query parameters from generating duplicate canonicals
+    const cleanPath = actualPath || seoSetting.exactPath || '/';
+    // Ensure we don't have double slashes if baseUrl has trailing slash or cleanPath has leading slash
+    const finalCanonical = `${baseUrl.replace(/\/$/, '')}${cleanPath.startsWith('/') ? '' : '/'}${cleanPath}`;
+    
     metadata.alternates = {
       ...metadata.alternates,
-      languages: getAlternateLanguages(actualPath || seoSetting.exactPath || '/'),
+      canonical: finalCanonical,
+      languages: getAlternateLanguages(cleanPath),
     }
   }
 

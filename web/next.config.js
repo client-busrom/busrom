@@ -215,6 +215,18 @@ const nextConfig = {
   productionBrowserSourceMaps: true,
 
   /**
+   * Redirects - Handled from GSC 404s
+   */
+  async redirects() {
+    try {
+      const redirects = require('../redirects.json');
+      return redirects;
+    } catch (e) {
+      return [];
+    }
+  },
+
+  /**
    * Rewrites - Used for SEO and legacy URL handling
    */
   async rewrites() {

@@ -1,0 +1,667 @@
+[
+  {
+    "source": "/product-series/glass-standoff",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ko",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/es",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/bathroom-glass-clip",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/sv",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/tr/shop/hot-rated-glass-hinge-for-modern-bathroom-door",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/it/shop/hot-sale-glass-standoff-for-glass-staircase-and-handrail",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/it",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/product-series/glass-hinge",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/nl",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/pt",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/ja/products/glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/shop/glass-hinge-002",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/shop/hot-sale-glass-standoff-for-glass-staircase-and-handrail",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/tr",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/pages/contact-us",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/product/glass-hinge",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/da/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/no/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/blog/test-template-3",
+    "destination": "/blog",
+    "permanent": true
+  },
+  {
+    "source": "/bathroom-handle",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/ko/blog/test-template-1",
+    "destination": "/blog",
+    "permanent": true
+  },
+  {
+    "source": "/ko/blog/category/glass-standoff",
+    "destination": "/blog",
+    "permanent": true
+  },
+  {
+    "source": "/sliding-door-kit",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/ja/blog/category/glass-standoff",
+    "destination": "/blog",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/new-design-304-stainless-steel-glass-connector-conference-room-bracket-stair-balusters-structural-glass-fittings",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/tailor-made-stainless-steel-glass-bracket-shopping-mall-railing-retainer-clip-stable-panel-clamp",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/glass-connected-fitting",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/hot-selling-stainless-steel-budget-shower-door-kit-waterproof-rustproof-bathroom-sliding-hardware",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/high-rated-shower-enclosure-commercial-glass-clamp-round-panel-fastener-heavy-duty-hardware-clips",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/lasin-tuki",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/en/blog/category/lasin-tuki",
+    "destination": "/blog",
+    "permanent": true
+  },
+  {
+    "source": "/en/product",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/da/pages/service-overview",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/ar",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ar/pages/contact-us",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/da/pages/contact-us",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/fi/pages/contact-us",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/fi",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/de/pages/contact-us",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/en/faq",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/architectural-square-glass-railing-clamp-bracket-commercial-balustrade-fitting",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/commercial-glass-mounted-handrail-bracket-stainless-steel-tube-support-connector",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/hot-selling-shower-enclosure-glass-clip-commercial-waterproof-panel-bracket-household-clamp",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/hot-rated-glass-hinge-for-modern-bathroom-door",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/soft-close-frameless-glass-sliding-door-track-roller-hardware-kit-shower",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/heavy-duty-frameless-glass-pool-fence-spigot-outdoor-balustrade-base-clamp",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/modern-commercial-entrance-glass-door-pull-handle-architectural-push-pull",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/hot-selling-cnc-machined-glass-standoff-interior-stair-standoffs-pin-uv-resistant-mounting-hardware",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ar/product",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/product/minimalist-retractable-hidden-wall-coat-hook-foldable-heavy-duty-cloakroom",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/es/pages/service-overview",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/en/blog/category/glass-standoff",
+    "destination": "/blog",
+    "permanent": true
+  },
+  {
+    "source": "/es/pages/contact-us",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/da",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/de",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/fi/product",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ar/pages/service-overview",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/fr/product",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/da/product",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/service/one-stop-shop",
+    "destination": "/",
+    "permanent": true
+  },
+  {
+    "source": "/es/products/guardrail-glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/blog/guardrail-glass-clip-blog-1",
+    "destination": "/blog",
+    "permanent": true
+  },
+  {
+    "source": "/pt/products/glass-fence-spigot",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/pt/products/sliding-door-kit",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/de/shop/heavy-duty-frameless-glass-standoff-staircase-balcony-terrace-mounting-hardware",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/shop",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/da/shop/hot-sale-glass-standoff-for-glass-staircase-and-handrail",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ar/products/glass-connected-fitting",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/de/products/guardrail-glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/es/products/glass-hinge",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ar/products/glass-hinge",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/de/products/hidden-hook",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/da/shop/hot-selling-cnc-machined-glass-standoff-interior-stair-standoffs-pin-uv-resistant-mounting-hardware",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/fi/products/bathroom-door-handle",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ar/products/glass-standoff",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ko/products/glass-connected-fitting",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/pt/products/bathroom-glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ko/products/glass-hinge",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/sv/products/bathroom-glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ko/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/sv/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/pl/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/fr/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/de/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/es/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/fi/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ar/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/pt/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/pt/products/glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ko/products/glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/products/guardrail-glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/products/glass-hinge",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/products/bathroom-glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/products/hidden-hook",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/products/glass-fence-spigot",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/products/bathroom-door-handle",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/products/glass-standoff",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/fi/products/hidden-hook",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/es/shop/hot-selling-cnc-machined-glass-standoff-interior-stair-standoffs-pin-uv-resistant-mounting-hardware",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/es/products/glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/de/products/glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ar/products/glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/shop/architectural-square-glass-railing-clamp-bracket-commercial-balustrade-fitting",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/shop/hot-rated-glass-hinge-for-modern-bathroom-door",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/de/products/glass-hinge",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/da/shop/heavy-duty-frameless-glass-standoff-staircase-balcony-terrace-mounting-hardware",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/de/shop/hot-sale-glass-standoff-for-glass-staircase-and-handrail",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/es/products/hidden-hook",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/shop/soft-close-frameless-glass-sliding-door-track-roller-hardware-kit-shower",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/shop/minimalist-retractable-hidden-wall-coat-hook-foldable-heavy-duty-cloakroom",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/shop/modern-commercial-entrance-glass-door-pull-handle-architectural-push-pull",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/shop/commercial-glass-mounted-handrail-bracket-stainless-steel-tube-support-connector",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/shop/hot-selling-shower-enclosure-glass-clip-commercial-waterproof-panel-bracket-household-clamp",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ar/products/guardrail-glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/de/blog/Guardrail%20Glass%20Clip-Blog-1",
+    "destination": "/blog",
+    "permanent": true
+  },
+  {
+    "source": "/en/products/sliding-door-kit",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/fr/products/bathroom-glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/en/products/glass-connected-fitting",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/fr/products/guardrail-glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/pl/products/guardrail-glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/pt/products/glass-hinge",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/pt/products/glass-connected-fitting",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/products/bathroom-glass-clip-test-001",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ar/shop",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/de/shop",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/ar/shop/heavy-duty-frameless-glass-standoff-staircase-balcony-terrace-mounting-hardware",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/pl/products/bathroom-glass-clip",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/es/products/sliding-door-kit",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/es/products/glass-connected-fitting",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/es/products/bathroom-door-handle",
+    "destination": "/shop",
+    "permanent": true
+  },
+  {
+    "source": "/de/products/glass-connected-fitting",
+    "destination": "/shop",
+    "permanent": true
+  }
+]

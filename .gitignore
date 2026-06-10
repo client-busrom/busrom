@@ -104,3 +104,4 @@ payload-cms/src/scripts/*.mjs
 
 # Payload auto-generated schema (contains DB structure details)
 payload-cms/src/payload-generated-schema.ts
+.gcp-keys/
