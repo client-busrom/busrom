@@ -32,9 +32,9 @@ export const Blogs: CollectionConfig = {
     },
   },
   admin: {
-    useAsTitle: 'adminLabel',
-    listSearchableFields: ['adminLabel', 'slug', 'title'],
-    defaultColumns: ['adminLabel', 'slug', 'status', 'author', 'publishedAt', 'updatedAt'],
+    useAsTitle: 'title',
+    listSearchableFields: ['title', 'adminLabel', 'slug'],
+    defaultColumns: ['title', 'adminLabel', 'slug', 'status', 'author', 'publishedAt', 'updatedAt'],
     group: {
       en: 'Content',
       zh: '内容管理',
