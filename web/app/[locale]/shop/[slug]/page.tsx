@@ -1,3 +1,4 @@
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Locale } from "@/i18n.config"
 import { ProductDetailClient } from "./ProductDetailClient"
 import { ShopPageClient } from "../ShopPageClient"
@@ -83,8 +84,18 @@ export default async function ShopSlugPage({
 
   if (category) {
     // Render as shop list page with category pre-selected
-    return (
-      <>
+    
+  let seoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo(path, "shop_list", locale);
+    seoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', path, e);
+  }
+
+  return (
+    <>
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
         <PageScripts path={path} pageType="shop_list" position="header" />
         <PageScripts path={path} pageType="shop_list" position="body_start" />
         <PageSeoInjector path={path} pageType="shop_list" locale={locale} />
@@ -94,8 +105,9 @@ export default async function ShopSlugPage({
           slugMode={true}
         />
         <PageScripts path={path} pageType="shop_list" position="footer" />
-      </>
-    )
+      </SeoKeywordProvider>
+    </>
+  )
   }
 
   // Not a category, render as product detail
@@ -109,13 +121,23 @@ export default async function ShopSlugPage({
   const messages = (await import(`@/messages/${locale}.json`)).default
   const footerHint = messages.shop?.inquiryFooterHint
 
+  let productSeoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo(path, "shop_detail", locale);
+    productSeoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', path, e);
+  }
+
   return (
     <>
-      <PageScripts path={path} pageType="shop_detail" position="header" />
-      <PageScripts path={path} pageType="shop_detail" position="body_start" />
-      <PageSeoInjector path={path} pageType="shop_detail" locale={locale} />
-      <ProductDetailClient locale={locale} slug={slug} initialData={productData} footerHint={footerHint} />
-      <PageScripts path={path} pageType="shop_detail" position="footer" />
+      <SeoKeywordProvider keywords={productSeoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, productSeoKeywords.length))} fallback="">
+        <PageScripts path={path} pageType="shop_detail" position="header" />
+        <PageScripts path={path} pageType="shop_detail" position="body_start" />
+        <PageSeoInjector path={path} pageType="shop_detail" locale={locale} />
+        <ProductDetailClient locale={locale} slug={slug} initialData={productData} footerHint={footerHint} />
+        <PageScripts path={path} pageType="shop_detail" position="footer" />
+      </SeoKeywordProvider>
     </>
   )
 }

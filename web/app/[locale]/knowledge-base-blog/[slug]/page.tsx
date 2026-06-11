@@ -1,8 +1,9 @@
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Locale } from "@/i18n.config"
 import { BlogDetailClient } from "./BlogDetailClient"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
-import { getPageMetadata } from "@/lib/api/seo-settings"
+import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 import { getBlogBySlug, getBlogSettings } from "@/lib/api/blog"
 import { getAlternateLanguages } from "@/lib/seo-utils"
 import { notFound } from "next/navigation"
@@ -57,13 +58,24 @@ export default async function BlogDetailPage({
   // 2. Fetch Settings Data server-side
   const configData = await getBlogSettings(locale)
 
+  
+  let seoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo(path, "blog_detail", locale);
+    seoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', path, e);
+  }
+
   return (
     <>
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
       <PageScripts path={path} pageType="blog_detail" position="header" />
       <PageScripts path={path} pageType="blog_detail" position="body_start" />
       <PageSeoInjector path={path} pageType="blog_detail" locale={locale} />
       <BlogDetailClient locale={locale} slug={slug} blog={blogData} config={configData} />
       <PageScripts path={path} pageType="blog_detail" position="footer" />
+          </SeoKeywordProvider>
     </>
   )
 }

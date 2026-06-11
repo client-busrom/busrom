@@ -81,7 +81,7 @@ export function GalleryTemplateFour({ section, items, locale }: any) {
               key={item.id || idx}
               className={`grid grid-cols-1 lg:grid-cols-12 items-center transition-all duration-500 group relative`}
             >
-              <Link href={`/${locale}/blog/${item.slug}`} className="absolute inset-0 z-10 rounded-xl lg:rounded-2xl" aria-label={item.title}></Link>
+              <Link href={`${localePrefix}/knowledge-base-blog/${item.slug}`} className="absolute inset-0 z-10 rounded-xl lg:rounded-2xl" aria-label={item.title}></Link>
               {/* Image Box - 6 Columns */}
               <div className={`lg:col-span-6 aspect-square lg:aspect-auto self-stretch py-4 lg:py-0 ${isRight ? 'lg:order-2' : 'lg:order-1'}`}>
                 <div className="relative h-full group">
@@ -142,7 +142,7 @@ export function GalleryTemplateFour({ section, items, locale }: any) {
                             alt={item.author.name}
                             size="small"
                             objectFit="contain"
-                            className="w-10 h-10 border border-white"
+                            className="w-10 h-10"
                           />
                         )}
                         <span className="text-[12px] font-black text-[#060C14] uppercase tracking-widest">{item.author?.name || "Admin"}</span>

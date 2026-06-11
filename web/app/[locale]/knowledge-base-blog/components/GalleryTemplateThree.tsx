@@ -132,7 +132,7 @@ function PostCard({ item, locale }: any) {
   const localePrefix = locale === "en" ? "" : `/${locale}`;
   return (
     <article className="post-card group relative flex flex-col text-center">
-      <Link href={`/${locale}/blog/${item.slug}`} className="absolute inset-0 z-10" aria-label={item.title}></Link>
+      <Link href={`${localePrefix}/knowledge-base-blog/${item.slug}`} className="absolute inset-0 z-10" aria-label={item.title}></Link>
       <div className="relative aspect-[3/4] mb-8 group">
         <div className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden">
           <OptimizedImage
@@ -181,7 +181,7 @@ function PostCard({ item, locale }: any) {
               alt={item.author.name}
               size="small"
               objectFit="contain"
-              className="w-10 h-10 border border-gray-100"
+              className="w-10 h-10"
             />
           )}
           <span className="text-[12px] font-bold tracking-widest">{item.author?.name || "Kathryn"}</span>

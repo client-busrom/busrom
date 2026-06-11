@@ -80,7 +80,7 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
               </div>
 
               {/* Stretched link for the entire card (z-10). It sits below the tag (z-20) */}
-              <Link href={`${localePrefix}/blog/${hero.post.slug}`} className="absolute inset-0 z-10" aria-label={hero.post.title}></Link>
+              <Link href={`${localePrefix}/knowledge-base-blog/${hero.post.slug}`} className="absolute inset-0 z-10" aria-label={hero.post.title}></Link>
 
               <div className="mt-6 text-white">
 
@@ -97,7 +97,7 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
                         image={safeImage(hero.post.author.avatar)}
                         alt={hero.post.author.name}
                         size="small"
-                        className="h-6 w-6 border border-[#ABABAB] rounded-full mr-2 object-cover"
+                        className="h-6 w-6 rounded-full mr-2 object-cover"
                       />
                     )}
                     {hero.post.author?.name || "Kathryn Jackson"}
@@ -106,7 +106,7 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
 
                 <Link
                   className="h-12 sm:h-14 w-12 sm:w-14 m-auto flex items-center justify-center text-white group-hover:text-white group-hover:bg-white/10 bg-white/30 sm:bg-transparent rounded-full transition-all duration-300 p-[17px] sm:p-0 group-hover:rotate-45 relative z-10"
-                  href={`${localePrefix}/blog/${hero.post.slug}`}
+                  href={`${localePrefix}/knowledge-base-blog/${hero.post.slug}`}
                 >
                   <svg
                     width="20"
@@ -130,20 +130,19 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
 
           {/* RIGHT COLUMN - SIMPLE IMAGE & CATEGORY (5 Columns) */}
           <div className="lg:col-span-5 relative hidden lg:flex flex-col h-full ml-0 lg:ml-4">
-            {/* Main Cover Image */}
-            <div className="absolute inset-0 w-full h-full rounded-xl md:rounded-2xl overflow-hidden">
+            <Link href={`${localePrefix}/knowledge-base-blog/${hero.post.slug}`} className="absolute inset-0 z-10" aria-label={hero.post.title}></Link>
+            {/* Image with Parallax & Hover Effect */}
+            <div className="absolute inset-0 w-full h-full rounded-[16px] lg:rounded-[32px] overflow-hidden group">
               <OptimizedImage
                 image={safeImage(hero.post.coverImage)}
                 alt={hero.post.title}
-                size="xlarge"
-                className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105"
+                size="large"
                 priority
+                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none rounded-[16px] lg:rounded-[32px]"></div>
             </div>
-
-            {/* Top-Right Squircle Cutout Effect */}
-            <span className="absolute top-0 right-0 z-20 flex items-center justify-center bg-[#F6F4ED] rounded-bl-xl md:rounded-bl-2xl pl-2 pb-2">
-              {/* 右上角内容：显示文章的 blogTag */}
+            <span className="absolute top-0 right-0 z-20 flex items-center justify-center bg-[#F6F4ED] rounded-bl-[16px] lg:rounded-bl-[32px] pl-[10px] pb-[10px] lg:pl-[24px] lg:pb-[24px] pointer-events-auto">
               <Link
                 href={`${localePrefix}/knowledge-base-blogs`}
                 onClick={() => {

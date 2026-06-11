@@ -1,8 +1,9 @@
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Locale } from "@/i18n.config"
 import { TemplatePage } from "@/components/templates/TemplatePage"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
-import { getPageMetadata } from "@/lib/api/seo-settings"
+import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 import type { Metadata } from "next"
 import { PAGE_TEMPLATES, PAGE_SLUGS } from "@/lib/constants"
 
@@ -28,13 +29,24 @@ export default async function FraudNoticePage({
 }) {
   const { locale } = await params
 
+  
+  let seoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo("/fraud-notice", "fraud_notice", locale);
+    seoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', "/fraud-notice", e);
+  }
+
   return (
     <>
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
       <PageScripts path="/fraud-notice" pageType="fraud_notice" position="header" />
       <PageScripts path="/fraud-notice" pageType="fraud_notice" position="body_start" />
       <PageSeoInjector path="/fraud-notice" pageType="fraud_notice" locale={locale} />
       <TemplatePage locale={locale} slug={PAGE_SLUGS.FRAUD_NOTICE} template={PAGE_TEMPLATES.FRAUD_NOTICE} />
       <PageScripts path="/fraud-notice" pageType="fraud_notice" position="footer" />
+          </SeoKeywordProvider>
     </>
   )
 }

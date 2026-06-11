@@ -10,6 +10,7 @@ import AutoScroll from "embla-carousel-auto-scroll"
 import { cn } from "@/lib/utils"
 import type { MoreSeriesData, MoreSeriesItem } from "@/lib/content-parser"
 
+
 /**
  * More Series Section
  *
@@ -42,6 +43,7 @@ interface MoreSeriesProps {
 }
 
 export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
+  
   if (!data) return null
 
   const { title = 'More series', series: dataSeries = [] } = data
@@ -246,7 +248,7 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
                         >
                           <OptimizedImage
                             image={item.image}
-                            alt={item.name}
+                            alt=""
                             size="small"
                             className="absolute inset-0 w-full h-full object-contain"
                           />

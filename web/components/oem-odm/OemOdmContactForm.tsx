@@ -521,9 +521,9 @@ export function OemOdmContactForm({
                   initial={{ opacity: 0, x: -30 }}
                   whileInView={{ opacity: 1, x: 0 }}
                 >
-                  <h1 className="text-xl md:text-5xl font-extrabold text-white leading-tight whitespace-pre-line">
+                  <h2 className="text-xl md:text-5xl font-extrabold text-white leading-tight whitespace-pre-line">
                     {title}
-                  </h1>
+                  </h2>
                   {/* Decorative Circles */}
                   <div className="absolute -bottom-4 -right-4 md:-bottom-6 md:-right-10">
                     <LoadingCircles />

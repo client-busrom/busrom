@@ -603,6 +603,8 @@ const GenericPickerModal = ({ title, collection, isZh, onClose, onSelect, select
   const [page, setPage] = useState(1)
   const [hasNext, setHasNext] = useState(false)
 
+  const filterStr = JSON.stringify(filter || {})
+
   useEffect(() => {
     const fetchItems = async () => {
       setLoading(true)
@@ -615,7 +617,8 @@ const GenericPickerModal = ({ title, collection, isZh, onClose, onSelect, select
       })
 
       // Add filters
-      Object.entries(filter).forEach(([key, val]: any) => {
+      const parsedFilter = JSON.parse(filterStr)
+      Object.entries(parsedFilter).forEach(([key, val]: any) => {
         Object.entries(val).forEach(([op, opVal]: any) => {
           params.append(`where[${key}][${op}]`, opVal)
         })
@@ -637,7 +640,7 @@ const GenericPickerModal = ({ title, collection, isZh, onClose, onSelect, select
       setLoading(false)
     }
     fetchItems()
-  }, [searchTerm, page, collection, filter])
+  }, [searchTerm, page, collection, filterStr, i18n?.language])
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>

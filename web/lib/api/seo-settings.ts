@@ -174,9 +174,22 @@ export function buildMetadata(
   baseUrl: string = 'https://www.busromhouse.com',
   actualPath?: string
 ): Metadata {
-  if (!seoSetting) return baseMetadata
-
   const metadata: Metadata = { ...baseMetadata }
+
+  // Default cleanPath from actualPath if available
+  const cleanPath = actualPath || (seoSetting ? seoSetting.exactPath : null) || '/';
+  
+  if (!seoSetting) {
+    // Even if there is no CMS SEO setting, we MUST generate the correct canonical URL
+    // Otherwise, Next.js falls back to layout.tsx's canonical ('./') which breaks SEO
+    const finalCanonical = `${baseUrl.replace(/\/$/, '')}${cleanPath.startsWith('/') ? '' : '/'}${cleanPath}`;
+    metadata.alternates = {
+      ...metadata.alternates,
+      canonical: finalCanonical,
+      languages: getAlternateLanguages(cleanPath),
+    }
+    return metadata;
+  }
 
   // Basic SEO
   if (seoSetting.metaTitle) {

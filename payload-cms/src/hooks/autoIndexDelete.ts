@@ -35,7 +35,8 @@ export const autoIndexDeleteHook = (collectionSlug: string): CollectionAfterDele
             path = `/${doc.slug}`
         }
         const cleanPath = path.startsWith('/') ? path : `/${path}`
-        return `${siteUrl}/${locale}${cleanPath}`
+        const prefix = locale === 'en' ? '' : `/${locale}`
+        return `${siteUrl}${prefix}${cleanPath}`
       })
 
       console.log(`📡 [AutoIndex] ${collectionSlug} deleted: ${doc.slug}. Notifying search engines...`)

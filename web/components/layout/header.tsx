@@ -188,14 +188,14 @@ export default function Header({ locale, initialNavigation, contactPopupData }: 
               href={`/${locale}`}
               className="absolute left-1/2 -translate-x-1/2"
             >
-              <h1
+              <div
                 className={cn(
                   "text-2xl tracking-wider font-paytone-one transition-colors duration-300",
                   headerTextColor,
                 )}
               >
                 Busrom
-              </h1>
+              </div>
             </Link>
 
             {/* 右侧：语言选择 */}
@@ -207,14 +207,14 @@ export default function Header({ locale, initialNavigation, contactPopupData }: 
             {/* 左侧：Logo */}
             <div className="flex items-center h-full">
               <Link href={`/${locale}`}>
-                <h1
+                <div
                   className={cn(
                     "text-[1.56vw] leading-[1.88vw] tracking-wider font-paytone-one transition-colors duration-300",
                     headerTextColor,
                   )}
                 >
                   Busrom
-                </h1>
+                </div>
               </Link>
             </div>
 

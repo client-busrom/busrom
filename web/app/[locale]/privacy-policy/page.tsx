@@ -1,8 +1,9 @@
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Locale } from "@/i18n.config"
 import { TemplatePage } from "@/components/templates/TemplatePage"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
-import { getPageMetadata } from "@/lib/api/seo-settings"
+import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 import type { Metadata } from "next"
 import { PAGE_TEMPLATES, PAGE_SLUGS } from "@/lib/constants"
 
@@ -28,13 +29,24 @@ export default async function PrivacyPolicyPage({
 }) {
   const { locale } = await params
 
+  
+  let seoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo("/privacy-policy", "privacy_policy", locale);
+    seoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', "/privacy-policy", e);
+  }
+
   return (
     <>
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
       <PageScripts path="/privacy-policy" pageType="privacy_policy" position="header" />
       <PageScripts path="/privacy-policy" pageType="privacy_policy" position="body_start" />
       <PageSeoInjector path="/privacy-policy" pageType="privacy_policy" locale={locale} />
       <TemplatePage locale={locale} slug={PAGE_SLUGS.PRIVACY_POLICY} template={PAGE_TEMPLATES.PRIVACY_POLICY} />
       <PageScripts path="/privacy-policy" pageType="privacy_policy" position="footer" />
+          </SeoKeywordProvider>
     </>
   )
 }

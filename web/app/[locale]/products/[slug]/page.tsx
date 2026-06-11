@@ -1,10 +1,11 @@
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Locale } from "@/i18n.config"
 import { ProductSeriesDetailClient } from "./ProductSeriesDetailClient"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
 import type { Metadata } from "next"
-import { getAlternateLanguages } from "@/lib/seo-utils"
 import { getProductSeriesBySlug } from "@/lib/api/product-series"
+import { getNonHomePageSeo, buildMetadata } from "@/lib/api/seo-settings"
 import { notFound } from "next/navigation"
 
 export async function generateMetadata({
@@ -14,6 +15,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, slug } = await params
   const series = await getProductSeriesBySlug(slug, locale)
+  const path = `/products/${slug}`
   
   // SEO Protection: If not translated, set to noindex
   let robots: any = undefined
@@ -30,13 +32,19 @@ export async function generateMetadata({
     }
   }
 
-  return {
+  const defaultMetadata: Metadata = {
     title: `${series.name} | Busrom Products`,
     description: series.description || `Explore ${series.name} - High-quality glass hardware solutions from Busrom`,
-    alternates: {
-      languages: getAlternateLanguages(`/products/${slug}`),
-    },
-    ...(robots ? { robots } : {})
+  }
+
+  try {
+    const { setting } = await getNonHomePageSeo(path, 'product_series_detail', locale)
+    const metadata = buildMetadata(setting, defaultMetadata, 'https://www.busromhouse.com', path)
+    if (robots) metadata.robots = robots
+    return metadata
+  } catch {
+    if (robots) defaultMetadata.robots = robots
+    return defaultMetadata
   }
 }
 
@@ -54,13 +62,23 @@ export default async function ProductSeriesDetailPage({
     notFound()
   }
 
+  let seoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo(path, "product_series_detail", locale);
+    seoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', path, e);
+  }
+
   return (
     <>
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
       <PageScripts path={path} pageType="product_series_detail" position="header" />
       <PageScripts path={path} pageType="product_series_detail" position="body_start" />
       <PageSeoInjector path={path} pageType="product_series_detail" locale={locale} />
-      <ProductSeriesDetailClient locale={locale} slug={slug} initialData={seriesData} />
+      <ProductSeriesDetailClient locale={locale} slug={slug} initialData={seriesData} seoKeywords={seoKeywords} />
       <PageScripts path={path} pageType="product_series_detail" position="footer" />
+          </SeoKeywordProvider>
     </>
   )
 }

@@ -21,7 +21,7 @@ export async function getBlogSettings(locale: Locale) {
 
 export async function getInitialBlogs(locale: Locale, limit = 10) {
   try {
-    const res = await fetch(`${PAYLOAD_URL}/api/blogs?locale=${locale}&limit=${limit}&where[status][equals]=published`, {
+    const res = await fetch(`${PAYLOAD_URL}/api/blogs?locale=${locale}&limit=${limit}&where[status][equals]=published&depth=1`, {
       next: { revalidate: 60 }
     })
     if (!res.ok) return []

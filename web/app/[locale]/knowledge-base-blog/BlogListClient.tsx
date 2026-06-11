@@ -66,6 +66,8 @@ export function BlogListClient({
   }, [locale, config, blogs.length, initialBlogs]);
 
   // Hydrate missing cover images for preview posts that only have IDs (due to depth limits)
+  const [hydratedAuthors, setHydratedAuthors] = useState<Record<string, any>>({});
+
   useEffect(() => {
     if (!config?.kbCategoryTabs) return;
 
@@ -101,6 +103,49 @@ export function BlogListClient({
         .catch(err => console.error("Error hydrating missing cover images:", err));
     }
   }, [config, blogs, locale]);
+
+  // Hydrate missing authors/avatars
+  useEffect(() => {
+    const missingAuthorIds = new Set<string>();
+
+    const checkAuthor = (p: any) => {
+      if (p?.author) {
+        if (typeof p.author === 'number' || typeof p.author === 'string') {
+          missingAuthorIds.add(String(p.author));
+        } else if (typeof p.author === 'object' && p.author.id && (typeof p.author.avatar === 'number' || typeof p.author.avatar === 'string')) {
+          missingAuthorIds.add(String(p.author.id));
+        }
+      }
+    };
+
+    blogs.forEach(checkAuthor);
+    Object.values(hydratedPosts).forEach(checkAuthor);
+
+    if (config?.sectionsData) {
+      let rawSections = config.sectionsData[locale] || config.sectionsData["en"] || [];
+      if (Array.isArray(config.sectionsData)) rawSections = config.sectionsData;
+      (rawSections as any[]).forEach((s: any) => {
+        if (s?.items) s.items.forEach(checkAuthor);
+      });
+    }
+
+    const toFetch = Array.from(missingAuthorIds).filter(id => !hydratedAuthors[id]);
+
+    if (toFetch.length > 0) {
+      fetch(`/api/payload/authors?locale=${locale}&where[id][in]=${toFetch.join(',')}&depth=1`)
+        .then(res => res.ok ? res.json() : { docs: [] })
+        .then(data => {
+          if (data?.docs?.length > 0) {
+            setHydratedAuthors(prev => {
+              const next = { ...prev };
+              data.docs.forEach((doc: any) => { next[doc.id] = doc; next[String(doc.id)] = doc; });
+              return next;
+            });
+          }
+        })
+        .catch(err => console.error("Error hydrating authors:", err));
+    }
+  }, [blogs, hydratedPosts, config, locale]);
 
   // Create a flattened articles pool from categories for tag-based filtering
   const articlePool = useMemo(() => {
@@ -138,9 +183,35 @@ export function BlogListClient({
   const processedSections = useMemo(() => {
     if (!config?.sectionsData) return [];
 
+    // Build a global author dictionary to fix Payload's reference deduplication
+    // (Payload only populates the first occurrence of a related document)
+    const authorMap: Record<string, any> = {};
+    
+    // add from hydratedAuthors first so they take precedence!
+    Object.values(hydratedAuthors).forEach(a => {
+      if (a && a.id) authorMap[a.id] = a;
+    });
+
+    // Only save authors that have their avatar populated as an object!
+    const addAuthor = (p: any) => {
+      if (p?.author && typeof p.author === 'object' && p.author.id) {
+        if (!authorMap[p.author.id] || typeof p.author.avatar === 'object') {
+          authorMap[p.author.id] = p.author;
+        }
+      }
+    };
+
+    articlePool.forEach(addAuthor);
+
     let rawSections =
       config.sectionsData[locale] || config.sectionsData["en"] || [];
     if (Array.isArray(config.sectionsData)) rawSections = config.sectionsData;
+
+    (rawSections as any[]).forEach((s: any) => {
+      if (s?.items) {
+        s.items.forEach(addAuthor);
+      }
+    });
 
     return (rawSections as any[])
       .filter((s) => !!s) // Remove any null/undefined holes
@@ -166,6 +237,17 @@ export function BlogListClient({
             );
           });
         }
+
+        // Re-hydrate authors to fix deduplication missing avatars
+        items = items.map((p: any) => {
+          if (p && p.author) {
+            const aId = typeof p.author === 'object' ? p.author.id : p.author;
+            if (authorMap[aId]) {
+              return { ...p, author: authorMap[aId] };
+            }
+          }
+          return p;
+        });
 
         // Also support direct template names like "Template 1"
         if (template?.toLowerCase().includes("1")) template = "template1";
@@ -194,6 +276,8 @@ export function BlogListClient({
       className="min-h-screen bg-[#F6F4ED] font-lexend-deca antialiased selection:bg-[#ff4848] selection:text-white"
       data-header-theme="light"
     >
+      <h1 className="sr-only">Busrom Knowledge Base & Blog</h1>
+      
       {/* 1. HERO BANNER - SPLIT LAYOUT */}
       <HeroBanner hero={hero} locale={locale} />
 

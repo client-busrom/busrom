@@ -101,7 +101,7 @@ export function GalleryTemplateTwo({ section, items, locale }: any) {
                     className={`w-full lg:w-4/5 ${isOdd ? 'lg:mr-auto lg:pr-10' : 'lg:ml-auto lg:pl-10'}`}
                   >
                     <article className="post-card group relative flex flex-col items-center text-center">
-                      <Link href={`/${locale}/blog/${item.slug}`} className="absolute inset-0 z-10" aria-label={item.title}></Link>
+                      <Link href={`${localePrefix}/knowledge-base-blog/${item.slug}`} className="absolute inset-0 z-10" aria-label={item.title}></Link>
                       <div className="relative w-full aspect-[16/10] mb-8 group">
                         <div className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden">
                           <OptimizedImage
@@ -150,7 +150,7 @@ export function GalleryTemplateTwo({ section, items, locale }: any) {
                               alt={item.author.name}
                               size="small"
                               objectFit="contain"
-                              className="w-10 h-10 border border-gray-800"
+                              className="w-10 h-10"
                             />
                           )}
                           <span className="text-[12px] font-bold tracking-widest">{item.author?.name || "Nilima"}</span>

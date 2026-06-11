@@ -1,8 +1,9 @@
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Locale } from "@/i18n.config"
 import { ApplicationTemplate } from "@/components/templates/ApplicationTemplate"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
-import { getPageMetadata } from "@/lib/api/seo-settings"
+import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 import type { Metadata } from "next"
 import { fetchPageData } from "@/lib/api/pages"
 import { parseApplicationData } from "@/lib/parsers/application-parser"
@@ -73,8 +74,18 @@ export default async function ApplicationsPage({
     }
   }).filter(Boolean)
 
+  
+  let seoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo("/application", "application", locale);
+    seoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', "/application", e);
+  }
+
   return (
     <>
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
       <PageScripts path="/application" pageType="application" position="header" />
       <PageScripts path="/application" pageType="application" position="body_start" />
       <PageSeoInjector path="/application" pageType="application" locale={locale} />
@@ -87,6 +98,7 @@ export default async function ApplicationsPage({
       />
       
       <PageScripts path="/application" pageType="application" position="footer" />
+          </SeoKeywordProvider>
     </>
   )
 }

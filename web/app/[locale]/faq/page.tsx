@@ -1,3 +1,4 @@
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import type { Locale } from "@/i18n.config"
@@ -7,7 +8,7 @@ import { FaqTemplate } from "@/components/templates/FaqTemplate"
 import { PAGE_SLUGS } from "@/lib/constants"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
-import { getPageMetadata } from "@/lib/api/seo-settings"
+import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 
 export async function generateMetadata({
   params,
@@ -41,8 +42,18 @@ export default async function FaqPage({
   // 2. Parse the data into structured sections
   const parsedData = parseFaqData(locale, rawData)
 
+  
+  let seoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo("/faq", "faq", locale);
+    seoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', "/faq", e);
+  }
+
   return (
     <>
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
       <PageScripts path="/faq" pageType="faq" position="header" />
       <PageScripts path="/faq" pageType="faq" position="body_start" />
       <PageSeoInjector path="/faq" pageType="faq" locale={locale} />
@@ -50,6 +61,7 @@ export default async function FaqPage({
       <FaqTemplate locale={locale} data={parsedData} />
       
       <PageScripts path="/faq" pageType="faq" position="footer" />
+          </SeoKeywordProvider>
     </>
   )
 }

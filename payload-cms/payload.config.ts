@@ -43,7 +43,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 // Custom Features
 import { ImageGalleryFeature } from './src/lexical-features/image-gallery'
-import { DemoHRFeature } from './src/lexical-features/demo-hr'
+
 import { BlocksToolbarDropdownFeature } from './src/lexical-features/blocks-toolbar-dropdown'
 import { SingleImageFeature } from './src/lexical-features/single-image'
 import { VideoEmbedFeature } from './src/lexical-features/video-embed'
@@ -587,7 +587,7 @@ export default buildConfig({
         // ==========================================
         // 🎨 Custom WYSIWYG Features
         // ==========================================
-        DemoHRFeature(), // 官方示例 - 测试 Custom Features 是否工作
+
         ImageGalleryFeature(), // Custom Feature 图片画廊 - WYSIWYG
         SingleImageFeature(), // Custom Feature 单张图片 - WYSIWYG
         VideoEmbedFeature(), // Custom Feature 视频嵌入 - WYSIWYG

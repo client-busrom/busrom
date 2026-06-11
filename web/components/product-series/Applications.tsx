@@ -7,6 +7,7 @@ import AutoScroll from "embla-carousel-auto-scroll"
 import { cn } from "@/lib/utils"
 import type { ApplicationsData } from "@/lib/content-parser"
 
+
 /**
  * Applications Carousel Section
  *
@@ -35,6 +36,7 @@ interface ApplicationsProps {
 }
 
 export function Applications({ data, className }: ApplicationsProps) {
+  
   if (!data) return null
 
   const images = data.images || []

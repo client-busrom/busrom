@@ -43,8 +43,8 @@ export const GoogleIndexingButton: React.FC = () => {
     }
   }, [id, collectionSlug, isZh])
 
-  // Only show for blogs collection and when doc is saved
-  if (collectionSlug !== 'blogs' || !id) return null
+  // Only show for supported collections and when doc is saved
+  if (!collectionSlug || !['blogs', 'products', 'product-series', 'pages'].includes(collectionSlug as string) || !id) return null
 
   return (
     <div className="google-indexing-field">

@@ -46,6 +46,49 @@ export const ProductSeries: CollectionConfig = {
     update: ({ req: { user } }) => !!user,
     delete: ({ req: { user } }) => user?.isAdmin === true,
   },
+  endpoints: [
+    {
+      path: '/:id/notify-google',
+      method: 'post',
+      handler: async (req) => {
+        const { payload, user, routeParams } = req
+        if (!user) return new Response('Unauthorized', { status: 401 })
+
+        const id = routeParams?.id
+        if (!id) return new Response('Missing ID', { status: 400 })
+
+        try {
+          // 1. Fetch the doc to get slug
+          const doc = await payload.findByID({
+            collection: 'product-series',
+            id: id as string,
+            depth: 0,
+          })
+
+          if (!doc || doc.status !== 'published') {
+            return new Response(JSON.stringify({ error: 'Only published series can be indexed.' }), { status: 400 })
+          }
+
+          const { notifyGoogleOfUpdate } = await import('../lib/google-indexing')
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
+
+          const results: any[] = []
+          const locales = ['en', 'zh', 'ar', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'pt', 'ru', 'vi', 'th', 'id', 'tr', 'nl', 'pl', 'sv', 'da', 'fi', 'no', 'cs', 'el', 'hu']
+
+          for (const locale of locales) {
+            const prefix = locale === 'en' ? '' : `/${locale}`
+            const url = `${siteUrl}${prefix}/products/${doc.slug}`
+            const res = await notifyGoogleOfUpdate(url)
+            results.push({ locale, ...res })
+          }
+
+          return new Response(JSON.stringify({ success: true, results }), { status: 200 })
+        } catch (e: any) {
+          return new Response(JSON.stringify({ error: e.message }), { status: 500 })
+        }
+      },
+    },
+  ],
   fields: [
     {
       type: 'row',

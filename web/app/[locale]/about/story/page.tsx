@@ -1,7 +1,8 @@
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Locale } from "@/i18n.config"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
-import { getPageMetadata } from "@/lib/api/seo-settings"
+import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 import type { Metadata } from "next"
 import { fetchPageData } from "@/lib/api/pages"
 import { parseOurStoryData } from "@/lib/parsers/our-story-parser"
@@ -65,8 +66,18 @@ export default async function OurStoryPage({
     }
   }).filter(Boolean)
 
+  
+  let seoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo("/about/story", "our_story", locale);
+    seoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', "/about/story", e);
+  }
+
   return (
     <>
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
       <PageScripts path="/about/story" pageType="our_story" position="header" />
       <PageScripts path="/about/story" pageType="our_story" position="body_start" />
       <PageSeoInjector path="/about/story" pageType="our_story" locale={locale} />
@@ -79,6 +90,7 @@ export default async function OurStoryPage({
       />
       
       <PageScripts path="/about/story" pageType="our_story" position="footer" />
+          </SeoKeywordProvider>
     </>
   )
 }

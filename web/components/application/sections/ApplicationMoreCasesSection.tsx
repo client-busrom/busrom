@@ -192,7 +192,7 @@ export function ApplicationMoreCasesSection({
                 height: vw(154.7),
                 opacity: 1,
               }}
-              alt=""
+              alt="More Cases Decoration"
             />
             <div
               className="absolute"

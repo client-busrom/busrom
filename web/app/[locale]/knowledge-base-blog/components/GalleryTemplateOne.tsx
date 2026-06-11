@@ -81,7 +81,7 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16">
               {items.map((item: any, idx: number) => (
                 <article key={item.id || idx} className="post-card group relative flex flex-col h-full">
-                  <Link href={`/${locale}/blog/${item.slug}`} className="absolute inset-0 z-10" aria-label={item.title}></Link>
+                  <Link href={`/${localePrefix}/knowledge-base-blog/${item.slug}`} className="absolute inset-0 z-10" aria-label={item.title}></Link>
                   {/* Image Container with Corner Logic */}
                   <div className="relative aspect-[4/3] mb-6 group">
                     <div className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden">
@@ -93,8 +93,8 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
                       />
                     </div>
                     <span className="absolute top-0 right-0 z-20 flex items-center justify-center bg-[#F6F4ED] rounded-bl-xl pl-2 pb-2 pointer-events-auto">
-                      <Link 
-                        href={`${localePrefix}/knowledge-base-blogs`}
+                      <Link
+                        href={`/${localePrefix}/knowledge-base-blogs`}
                         onClick={() => {
                           if (typeof window !== 'undefined' && item.tags?.[0]?.slug) {
                             sessionStorage.setItem('pendingBlogTag', item.tags[0].slug);
@@ -131,7 +131,7 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
                           alt={item.author.name}
                           size="small"
                           objectFit="contain"
-                          className="w-10 h-10 border border-gray-100"
+                          className="w-10 h-10"
                         />
                       )}
                       <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">{item.author?.name || "Nilima"}</span>

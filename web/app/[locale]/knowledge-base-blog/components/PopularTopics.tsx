@@ -16,6 +16,8 @@ export function PopularTopics({
     return "";
   };
 
+  const localePrefix = locale === "en" ? "" : `/${locale}`;
+
   return (
     <section className="bg-transparent py-24 sm:py-32 overflow-hidden">
       <div className="container mx-auto px-6">
@@ -29,7 +31,7 @@ export function PopularTopics({
           {/* ALL Category */}
           <li className="relative group transition-all duration-300 list-none">
             <Link
-              href={`/${locale}/knowledge-base-blogs`}
+              href={`${localePrefix}/knowledge-base-blogs`}
               className="inline-block relative"
             >
               <span
@@ -77,7 +79,7 @@ export function PopularTopics({
                 className="relative group transition-all duration-300 list-none"
               >
                 <Link
-                  href={`/${locale}/knowledge-base-blogs/${tab.slug}`}
+                  href={`${localePrefix}/knowledge-base-blogs/${tab.slug}`}
                   className="inline-block relative"
                 >
                   <span

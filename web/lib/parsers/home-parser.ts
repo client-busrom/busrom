@@ -15,18 +15,10 @@ const toImageObject = (
   seoKeywords: string[] = [],
   keywordIndexRef: { current: number } = { current: 0 }
 ): ImageObject => {
-  // Determine the SEO alt text - Distribute ALL keywords across available images
+  // Determine the SEO alt text - Assign EXACTLY ONE keyword per image to prevent keyword stuffing (White Hat SEO)
   let seoAlt = alt;
   if (seoKeywords.length > 0) {
-    // We want to use all 1500 keywords across the images on the page.
-    // Assuming an average of 50-100 images per page, each image gets a chunk.
-    const totalImages = 50; // Conservative estimate for chunking
-    const chunkSize = Math.max(1, Math.ceil(seoKeywords.length / totalImages));
-    const start = (keywordIndexRef.current * chunkSize) % seoKeywords.length;
-    const chunk = seoKeywords.slice(start, start + chunkSize);
-    
-    // Join chunked keywords with commas for the alt tag
-    seoAlt = chunk.join(', ');
+    seoAlt = seoKeywords[keywordIndexRef.current % seoKeywords.length];
     keywordIndexRef.current++;
   }
 
@@ -63,7 +55,7 @@ const toImageObject = (
 export function parseHomeData(data: any, locale: string, strategy?: string, seoKeywords: string[] = [], enData?: any): HomeContent {
   if (!data) return {} as HomeContent;
 
-  const keywordIndexRef = { current: 0 };
+  const keywordIndexRef = { current: seoKeywords.length > 0 ? Math.floor(Math.random() * seoKeywords.length) : 0 };
   
   // Wrap toImageObject to include the keywords and counter automatically
   const autoSeoImage = (mediaData: any, fallbackAlt: string = '') => 

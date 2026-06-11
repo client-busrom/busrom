@@ -54,10 +54,29 @@ export const safeBulkStatusEndpoint: Endpoint = {
       // Perform individual updates to safely bypass Payload/Drizzle bulk overwrite bugs
       for (const id of targetIds) {
         try {
+          const existingDoc = await req.payload.findByID({
+            collection: collectionSlug as any,
+            id,
+            depth: 0,
+          })
+
+          // To prevent Payload/Drizzle from wiping out hasMany relationships (like categories and tags)
+          // when only updating the status, we spread the existing document's data back into the update payload.
+          // We must remove standard meta fields like id, createdAt, updatedAt to avoid errors.
+          const { id: _id, createdAt, updatedAt, ...safeData } = existingDoc
+
+          console.log(`[SafeBulkStatus] Fetched existing doc (ID: ${id}), fields present:`, Object.keys(existingDoc))
+          if (safeData.categories || safeData.tags) {
+            console.log(`[SafeBulkStatus] Preserving relations - Categories: ${safeData.categories?.length || 0}, Tags: ${safeData.tags?.length || 0}`)
+          }
+
           await req.payload.update({
             collection: collectionSlug as any,
             id,
-            data: { status },
+            data: {
+              ...safeData,
+              status,
+            },
             user: req.user,
           })
           successCount++

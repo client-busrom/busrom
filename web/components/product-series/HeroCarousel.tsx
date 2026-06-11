@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { HeroCarouselData } from "@/lib/content-parser"
+import type { ProductSeriesData } from "@/lib/content-parser"
 import { IconifyIcon } from "../ui/IconifyIcon"
 
 /**
@@ -30,7 +31,7 @@ const POSITIONS: Record<number, { left: number; top: number; width: number; heig
 }
 
 // 独立的虚拟影子卡片组件 (Ghost Card) - 用于承载平滑的离场与入场过渡，彻底消除跨屏飞行的残影
-function GhostCard({ url, fromPos, toPos }: { url: string; fromPos: number; toPos: number }) {
+function GhostCard({ url, fromPos, toPos, alt }: { url: string; fromPos: number; toPos: number; alt: string }) {
   const [pos, setPos] = React.useState(fromPos)
 
   React.useEffect(() => {
@@ -60,7 +61,7 @@ function GhostCard({ url, fromPos, toPos }: { url: string; fromPos: number; toPo
     >
       <OptimizedImage
         image={url}
-        alt=""
+        alt={alt}
         size="medium"
         className="absolute inset-0 w-full h-full object-cover"
       />
@@ -70,15 +71,16 @@ function GhostCard({ url, fromPos, toPos }: { url: string; fromPos: number; toPo
 
 interface HeroCarouselProps {
   data: HeroCarouselData
+  onQuoteClick?: () => void
   className?: string
 }
 
-export function HeroCarousel({ data, className }: HeroCarouselProps) {
+export function HeroCarousel({ data, onQuoteClick, className }: HeroCarouselProps) {
   const [currentSlide, setCurrentSlide] = React.useState(0)
   const autoplayRef = React.useRef<NodeJS.Timeout | null>(null)
 
   // 虚拟影子节点队列
-  const [ghosts, setGhosts] = React.useState<Array<{ id: string; url: string; fromPos: number; toPos: number }>>([])
+  const [ghosts, setGhosts] = React.useState<Array<{ id: string; url: string; fromPos: number; toPos: number; alt: string }>>([])
 
   // 记录正在隐藏的真实 DOM 节点（避免它们在瞬移重置时产生残影）
   const [hiddenRealSlides, setHiddenRealSlides] = React.useState<Record<number, boolean>>({})
@@ -93,7 +95,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
   // 添加 Ghost 节点助手函数
   const addGhost = React.useCallback((url: string, fromPos: number, toPos: number) => {
     const id = `${Date.now()}-${Math.random()}`
-    setGhosts((prev) => [...prev, { id, url, fromPos, toPos }])
+    setGhosts((prev) => [...prev, { id, url, fromPos, toPos, alt: "" }])
 
     // 将 Ghost 存活时间延长至 680ms，为真实 DOM 卡片留出 180ms 的重叠交接缓冲期！
     setTimeout(() => {
@@ -279,7 +281,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
             }}
           >
             {currentData.title.map((line, lineIndex) => (
-              <h1
+              <h2
                 key={lineIndex}
                 className={cn(
                   "font-josefin-sans text-white",
@@ -295,7 +297,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
                 }}
               >
                 {line}
-              </h1>
+              </h2>
             ))}
           </div>
         </div>
@@ -448,6 +450,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
                   url={ghost.url}
                   fromPos={ghost.fromPos}
                   toPos={ghost.toPos}
+                  alt={ghost.alt}
                 />
               ))}
             </div>
@@ -544,7 +547,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
         {/* 主标题区 - 设定固定高度 h-24 (96px) 配合 flex 居中与紧凑字号，完美容纳3行标题且绝不截断、绝不跳动！ */}
         <div className="h-24 flex flex-col justify-center items-center text-center mb-3 overflow-hidden px-2">
           {currentData.title.map((line, lineIndex) => (
-            <h1
+            <h2
               key={lineIndex}
               className={cn(
                 "font-josefin-sans text-white leading-none tracking-tight",
@@ -554,7 +557,7 @@ export function HeroCarousel({ data, className }: HeroCarouselProps) {
               )}
             >
               {line}
-            </h1>
+            </h2>
           ))}
         </div>
 

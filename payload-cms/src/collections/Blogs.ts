@@ -252,6 +252,7 @@ export const Blogs: CollectionConfig = {
           }
         }
       },
+      autoIndexHook('blogs')
     ],
     afterDelete: [
       autoIndexDeleteHook('blogs'),
@@ -293,7 +294,8 @@ export const Blogs: CollectionConfig = {
           const locales = ['en', 'zh', 'ar', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'pt', 'ru', 'vi', 'th', 'id', 'tr', 'nl', 'pl', 'sv', 'da', 'fi', 'no', 'cs', 'el', 'hu']
 
           for (const locale of locales) {
-            const url = `${siteUrl}/${locale}/blog/${doc.slug}`
+            const prefix = locale === 'en' ? '' : `/${locale}`
+            const url = `${siteUrl}${prefix}/knowledge-base-blog/${doc.slug}`
             const res = await notifyGoogleOfUpdate(url)
             results.push({ locale, ...res })
           }

@@ -41,12 +41,14 @@ interface ProductSeriesDetailClientProps {
   locale: Locale;
   slug: string;
   initialData?: ProductSeriesData | null;
+  seoKeywords?: string[];
 }
 
 export function ProductSeriesDetailClient({
   locale,
   slug,
   initialData,
+  seoKeywords = [],
 }: ProductSeriesDetailClientProps) {
   const [seriesData, setSeriesData] = useState<ProductSeriesData | null>(
     initialData || null,
@@ -247,9 +249,11 @@ export function ProductSeriesDetailClient({
 
   // Render product series content with sections
   return (
-    <div className="min-h-screen bg-background" data-header-theme="light">
-      {/* Hero Carousel Section */}
-      {parsedContent.heroCarousel && (
+      <div className="min-h-screen bg-background" data-header-theme="light">
+        <h1 className="sr-only">{seriesData.name} - Busrom Hardware</h1>
+
+        {/* Hero Carousel Section */}
+        {parsedContent.heroCarousel && (
         <HeroCarousel data={parsedContent.heroCarousel} />
       )}
 
@@ -315,5 +319,6 @@ export function ProductSeriesDetailClient({
         </div>
       )}
     </div>
+    
   );
 }

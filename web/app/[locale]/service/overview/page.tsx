@@ -1,8 +1,9 @@
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Locale } from "@/i18n.config"
 import { ServiceOverviewTemplate } from "@/components/templates/ServiceOverviewTemplate"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
-import { getPageMetadata } from "@/lib/api/seo-settings"
+import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 import { fetchPageData } from "@/lib/api/pages"
 import { parseServiceOverviewData } from "@/lib/parsers/service-overview-parser"
 import type { Metadata } from "next"
@@ -44,8 +45,18 @@ export default async function ServiceOverviewPage({
   // 2. 服务端运行解析逻辑 (原本在 Template 里的 useMemo)
   const parsedData = parseServiceOverviewData(pageData)
 
+  
+  let seoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo("/service/overview", "service_overview", locale);
+    seoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', "/service/overview", e);
+  }
+
   return (
     <>
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
       <PageScripts path="/service/overview" pageType="service_overview" position="header" />
       <PageScripts path="/service/overview" pageType="service_overview" position="body_start" />
       <PageSeoInjector path="/service/overview" pageType="service_overview" locale={locale} />
@@ -54,6 +65,7 @@ export default async function ServiceOverviewPage({
       <ServiceOverviewTemplate locale={locale} data={parsedData} />
       
       <PageScripts path="/service/overview" pageType="service_overview" position="footer" />
+          </SeoKeywordProvider>
     </>
   )
 }

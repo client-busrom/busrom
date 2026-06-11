@@ -8,6 +8,7 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { ProductOverviewData } from "@/lib/content-parser"
 
+
 /**
  * Figma Design Specs (1920x968):
  *
@@ -60,6 +61,7 @@ const IMAGE_POSITIONS = {
 }
 
 export function ProductOverview({ data, className }: ProductOverviewProps) {
+  
   if (!data) return null
 
   const { titleLines = [], subtitleLines = [], brandName = '', description = '', images = [], ctaButton } = data

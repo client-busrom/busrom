@@ -32,7 +32,6 @@ import { CtaButtonFeatureClient as CtaButtonFeatureClient_3428a4bb12af3d9391a6a9
 import { VideoEmbedFeatureClient as VideoEmbedFeatureClient_398e5ae8cabe06b39a8ec7ab3a2cda7d } from '@/lexical-features/video-embed/feature.client'
 import { SingleImageFeatureClient as SingleImageFeatureClient_56cd8b9c02f32fe7a8c2dd570c73ecae } from '@/lexical-features/single-image/feature.client'
 import { ImageGalleryFeatureClient as ImageGalleryFeatureClient_d4329b5e36bdaa02a713429ad9db291d } from '@/lexical-features/image-gallery/feature.client'
-import { DemoHRFeatureClient as DemoHRFeatureClient_b6df3213e17bf950024b31ddcd8d5a54 } from '@/lexical-features/demo-hr/feature.client'
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { IndentFeatureClient as IndentFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { AlignFeatureClient as AlignFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -127,7 +126,6 @@ export const importMap = {
   "@/lexical-features/video-embed/feature.client#VideoEmbedFeatureClient": VideoEmbedFeatureClient_398e5ae8cabe06b39a8ec7ab3a2cda7d,
   "@/lexical-features/single-image/feature.client#SingleImageFeatureClient": SingleImageFeatureClient_56cd8b9c02f32fe7a8c2dd570c73ecae,
   "@/lexical-features/image-gallery/feature.client#ImageGalleryFeatureClient": ImageGalleryFeatureClient_d4329b5e36bdaa02a713429ad9db291d,
-  "@/lexical-features/demo-hr/feature.client#DemoHRFeatureClient": DemoHRFeatureClient_b6df3213e17bf950024b31ddcd8d5a54,
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#IndentFeatureClient": IndentFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#AlignFeatureClient": AlignFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,

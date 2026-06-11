@@ -46,7 +46,9 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
         }
         // Ensure path starts with / but not //
         const cleanPath = path.startsWith('/') ? path : `/${path}`
-        return `${siteUrl}/${locale}${cleanPath}`
+        // Default locale 'en' is hidden in frontend URLs
+        const prefix = locale === 'en' ? '' : `/${locale}`
+        return `${siteUrl}${prefix}${cleanPath}`
       })
     }
 

@@ -1,7 +1,8 @@
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Locale } from "@/i18n.config"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
-import { getPageMetadata } from "@/lib/api/seo-settings"
+import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 import { fetchPageData } from "@/lib/api/pages"
 import { parseContactUsData } from "@/lib/parsers/contact-us-parser"
 import { ContactUsTemplate } from "@/components/templates/ContactUsTemplate"
@@ -48,8 +49,18 @@ export default async function ContactPage({
     formConfig: pageData.formConfig
   }
 
+  
+  let seoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo("/contact-us", "contact_us", locale);
+    seoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', "/contact-us", e);
+  }
+
   return (
     <>
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
       <PageScripts path="/contact-us" pageType="contact_us" position="header" />
       <PageScripts path="/contact-us" pageType="contact_us" position="body_start" />
       <PageSeoInjector path="/contact-us" pageType="contact_us" locale={locale} />
@@ -59,6 +70,7 @@ export default async function ContactPage({
         ssrData={ssrData}
       />
       <PageScripts path="/contact-us" pageType="contact_us" position="footer" />
+          </SeoKeywordProvider>
     </>
   )
 }

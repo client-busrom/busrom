@@ -9,6 +9,7 @@ import {
   type MediaImage,
 } from '@/lib/image-utils'
 import type { ImageObject } from '@/lib/content-data'
+import { useSeoAlt } from '@/components/product-series/SeoKeywordProvider'
 
 /**
  * Size presets for common use cases
@@ -117,6 +118,8 @@ export function OptimizedImage({
   onLoad,
   onError,
 }: OptimizedImageProps) {
+  const getSeoAlt = useSeoAlt()
+  const [autoAlt] = useState(() => getSeoAlt())
   const [hasError, setHasError] = useState(false)
   
   const normalizedMedia = normalizeImage(image) || media
@@ -131,7 +134,7 @@ export function OptimizedImage({
   }
 
   const loadingStrategy = priority ? 'eager' : (loading || 'lazy')
-  const altText = alt || getImageAlt(normalizedMedia?.altText, locale) || normalizedMedia?.filename || ''
+  const altText = alt || autoAlt || getImageAlt(normalizedMedia?.altText, locale) || normalizedMedia?.filename || ''
 
   // Dimensions
   const imgWidth = width ?? normalizedMedia?.file?.width

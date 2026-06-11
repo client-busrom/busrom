@@ -45,6 +45,7 @@ export function OurStoryTemplate({
 
   return (
     <div className="min-h-screen bg-[#f6f4ed]" data-header-theme="dark">
+      <h1 className="sr-only">Our Story | Busrom</h1>
       <StoryHeroSection data={data.hero} />
       <StoryWhoWeAreSection data={data.whoWeAre} />
       <StoryBrandPositionSection data={data.brandPosition} />

@@ -54,6 +54,10 @@ import { BlocksToolbarDropdownFeature } from '../blocks-toolbar-dropdown'
 import { ApplicationCarouselFeature } from '../application-carousel'
 import { ProductCarouselFeature } from '../product-carousel'
 import { IconListFeature } from '../icon-list'
+import { FaqSelectionFeatureDefinition as FaqSelectionFeature } from '../faq-selection'
+import { FaqCarouselFeature } from '../faq-carousel'
+import { ProductReusableBlockFeature } from '../product-reusable-block'
+import { SeriesReusableBlockFeature } from '../series-reusable-block'
 
 /**
  * Get base text formatting and structure features
@@ -131,6 +135,10 @@ export const getCustomContentFeatures = () => [
   ApplicationCarouselFeature(),
   ProductCarouselFeature(),
   IconListFeature(),
+  FaqSelectionFeature(),
+  FaqCarouselFeature(),
+  ProductReusableBlockFeature(),
+  SeriesReusableBlockFeature(),
 ]
 
 /**

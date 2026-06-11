@@ -1,7 +1,8 @@
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Locale } from "@/i18n.config"
 import { PageScripts } from "@/components/PageScripts"
 import { PageSeoInjector } from "@/components/seo"
-import { getPageMetadata } from "@/lib/api/seo-settings"
+import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 import type { Metadata } from "next"
 import { fetchPageData } from "@/lib/api/pages"
 import { parseSupportData } from "@/lib/parsers/support-parser"
@@ -59,8 +60,18 @@ export default async function SupportPage({
     }
   }).filter(Boolean)
 
+  
+  let seoKeywords: string[] = [];
+  try {
+    const { distributedKeywords } = await getNonHomePageSeo("/support", "support", locale);
+    seoKeywords = distributedKeywords?.imgAlts || [];
+  } catch (e) {
+    console.error('Failed to fetch seo keywords for', "/support", e);
+  }
+
   return (
     <>
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
       <PageScripts path="/support" pageType="support" position="header" />
       <PageScripts path="/support" pageType="support" position="body_start" />
       <PageSeoInjector path="/support" pageType="support" locale={locale} />
@@ -72,6 +83,7 @@ export default async function SupportPage({
       />
       
       <PageScripts path="/support" pageType="support" position="footer" />
+          </SeoKeywordProvider>
     </>
   )
 }

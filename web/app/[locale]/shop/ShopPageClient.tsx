@@ -384,7 +384,7 @@ export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps
 
       {/* Main Content */}
       <main className="container mx-auto px-4 lg:px-8 pt-[60px] lg:pt-[100px] pb-8 lg:pb-12">
-
+        <h1 className="sr-only">{pageTitle}</h1>
         {/* Filter Toolbar */}
         <div className="bg-white rounded-lg shadow-sm px-4 py-3 mb-[39px] lg:mb-[65px] max-w-[1072px] mx-auto">
           <div className="flex items-center gap-4">

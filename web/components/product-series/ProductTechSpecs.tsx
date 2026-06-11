@@ -7,6 +7,7 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { ProductTechSpecsData } from "@/lib/content-parser"
 
+
 // ============================================================================
 // 甲方提供的系列渐变色与主题色配置表 (Series Color Chart)
 // ============================================================================
@@ -129,6 +130,7 @@ interface ProductTechSpecsProps {
 }
 
 export function ProductTechSpecs({ data, seriesName, currentSlug, className }: ProductTechSpecsProps) {
+  
   if (!data) return null
 
   const {
