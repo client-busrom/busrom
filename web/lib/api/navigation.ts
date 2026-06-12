@@ -235,38 +235,57 @@ async function transformNavigationItem(
  * 服务端获取导航数据
  * 直接调用 CMS API，用于 SSR 预取
  */
-export async function getNavigation(locale: string): Promise<NavItem[]> {
-  try {
-    // 直接调用 CMS API，而不是自己的 API 路由
-    const response = await fetch(
-      `${CMS_URL}/api/navigation-menus?where[visible][equals]=true&limit=1000&locale=${locale}&depth=2`,
-      {
-        headers: { 'Content-Type': 'application/json' },
-        next: { revalidate: 300 }, // 缓存 5 分钟
-      }
-    );
+let navPromiseCache: Record<string, Promise<NavItem[]> | undefined> = {};
+let navCacheTime: Record<string, number> = {};
+const CACHE_TTL = 5 * 60 * 1000;
 
-    if (!response.ok) {
-      console.error('[getNavigation] CMS error:', response.status);
+/**
+ * 服务端获取导航数据
+ * 直接调用 CMS API，用于 SSR 预取
+ */
+export async function getNavigation(locale: string): Promise<NavItem[]> {
+  const now = Date.now();
+  if (navPromiseCache[locale] && now - (navCacheTime[locale] || 0) < CACHE_TTL) {
+    return navPromiseCache[locale]!;
+  }
+
+  const fetchPromise = (async () => {
+    try {
+      // 直接调用 CMS API，而不是自己的 API 路由
+      const response = await fetch(
+        `${CMS_URL}/api/navigation-menus?where[visible][equals]=true&limit=1000&locale=${locale}&depth=2`,
+        {
+          headers: { 'Content-Type': 'application/json' },
+          next: { revalidate: 300 }, // 缓存 5 分钟
+        }
+      );
+
+      if (!response.ok) {
+        console.error('[getNavigation] CMS error:', response.status);
+        return [];
+      }
+
+      const data = await response.json();
+      const allMenus = data.docs as PayloadNavMenu[];
+
+      // 过滤出顶级菜单
+      const topLevelMenus = allMenus.filter(menu => !menu.parent);
+
+      // 转换数据
+      const transformedData = await Promise.all(
+        topLevelMenus
+          .sort((a, b) => a.order - b.order)
+          .map(item => transformNavigationItem(item, locale, allMenus))
+      );
+
+      return transformedData;
+    } catch (error) {
+      console.error('[getNavigation] Error:', error);
       return [];
     }
+  })();
 
-    const data = await response.json();
-    const allMenus = data.docs as PayloadNavMenu[];
-
-    // 过滤出顶级菜单
-    const topLevelMenus = allMenus.filter(menu => !menu.parent);
-
-    // 转换数据
-    const transformedData = await Promise.all(
-      topLevelMenus
-        .sort((a, b) => a.order - b.order)
-        .map(item => transformNavigationItem(item, locale, allMenus))
-    );
-
-    return transformedData;
-  } catch (error) {
-    console.error('[getNavigation] Error:', error);
-    return [];
-  }
+  navPromiseCache[locale] = fetchPromise;
+  navCacheTime[locale] = now;
+  return fetchPromise;
 }

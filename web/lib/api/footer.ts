@@ -8,7 +8,7 @@ const getCmsUrl = () => {
 /**
  * Server-side utility to fetch footer data directly from Payload CMS.
  */
-let footerPromiseCache: Record<string, Promise<any>> = {};
+let footerPromiseCache: Record<string, Promise<any> | undefined> = {};
 let footerCacheTime: Record<string, number> = {};
 const CACHE_TTL = 5 * 60 * 1000;
 

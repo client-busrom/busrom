@@ -57,7 +57,7 @@ interface SeoSettingsResponse {
 }
 
 // Cache for SEO settings (revalidate every 5 minutes)
-let seoPromiseCache: Record<string, Promise<SeoSetting[]>> = {}
+let seoPromiseCache: Record<string, Promise<SeoSetting[]> | undefined> = {}
 let seoCacheTime: Record<string, number> = {}
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
