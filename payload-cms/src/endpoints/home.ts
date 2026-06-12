@@ -192,7 +192,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       safeFetch(() => payload.find({
         collection: 'hero-banner-items',
         locale,
-        depth: 2,
+        depth: 1,
         where: {
           status: { equals: 'published' },
         },
@@ -204,30 +204,30 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       safeFetch(() => payload.findGlobal({
         slug: 'product-series-carousel',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       safeFetch(() => payload.findGlobal({
         slug: 'service-features',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       // Sphere 3D
       safeFetch(() => payload.findGlobal({
         slug: 'sphere-3d',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       safeFetch(() => payload.findGlobal({
         slug: 'simple-cta',
         locale,
-        depth: 2,
+        depth: 1,
       })),
 
       // Series Intro Items Collection
       safeFetch(() => payload.find({
         collection: 'series-intro-items',
         locale,
-        depth: 2,
+        depth: 1,
         where: {
           status: { equals: 'published' },
         },
@@ -237,52 +237,52 @@ export const homeContentHandler: PayloadHandler = async (req) => {
       safeFetch(() => payload.findGlobal({
         slug: 'featured-products',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       safeFetch(() => payload.findGlobal({
         slug: 'brand-advantages',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       safeFetch(() => payload.findGlobal({
         slug: 'oem-odm',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       safeFetch(() => payload.findGlobal({
         slug: 'quote-steps',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       safeFetch(() => payload.findGlobal({
         slug: 'main-form',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       safeFetch(() => payload.findGlobal({
         slug: 'why-choose-busrom',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       safeFetch(() => payload.findGlobal({
         slug: 'case-studies',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       safeFetch(() => payload.findGlobal({
         slug: 'brand-analysis',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       safeFetch(() => payload.findGlobal({
         slug: 'brand-value',
         locale,
-        depth: 2,
+        depth: 1,
       })),
       safeFetch(() => payload.findGlobal({
         slug: 'footer',
         locale,
-        depth: 2,
+        depth: 1,
       })),
     ])
 
@@ -427,7 +427,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
             const productsResult = await payload.find({
               collection: 'products',
               locale,
-              depth: 2,
+              depth: 1,
               where: {
                 series: { equals: seriesId },
                 status: { equals: 'published' },
@@ -595,7 +595,7 @@ export const homeContentHandler: PayloadHandler = async (req) => {
         const applicationsResult = await payload.find({
           collection: 'applications',
           locale,
-          depth: 2,
+          depth: 1,
           where: {
             id: { in: selectedAppIds },
             status: { equals: 'published' },
