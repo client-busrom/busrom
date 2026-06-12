@@ -8,23 +8,33 @@ const getCmsUrl = () => {
 /**
  * Server-side utility to fetch footer data directly from Payload CMS.
  */
+let footerPromiseCache: Record<string, Promise<any>> = {};
+let footerCacheTime: Record<string, number> = {};
+const CACHE_TTL = 5 * 60 * 1000;
+
 export async function getFooterData(locale: string = 'en') {
-  const CMS_URL = getCmsUrl();
-  try {
-    const [footerRes, socialRes] = await Promise.all([
-      fetch(`${CMS_URL}/api/globals/footer?locale=${locale}&depth=2`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        next: { revalidate: 3600 },
-      }),
-      fetch(`${CMS_URL}/api/globals/social-config?locale=${locale}&depth=2`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        next: { revalidate: 3600 },
-      }),
-    ]);
+  const now = Date.now();
+  if (footerPromiseCache[locale] && now - (footerCacheTime[locale] || 0) < CACHE_TTL) {
+    return footerPromiseCache[locale];
+  }
+
+  const fetchPromise = (async () => {
+    const CMS_URL = getCmsUrl();
+    try {
+      const [footerRes, socialRes] = await Promise.all([
+        fetch(`${CMS_URL}/api/globals/footer?locale=${locale}&depth=2`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          next: { revalidate: 3600 },
+        }),
+        fetch(`${CMS_URL}/api/globals/social-config?locale=${locale}&depth=2`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          next: { revalidate: 3600 },
+        }),
+      ]);
 
     if (!footerRes.ok) return null;
     const data = await footerRes.json();
@@ -105,8 +115,13 @@ export async function getFooterData(locale: string = 'en') {
         url: link.url,
       })),
     };
-  } catch (error) {
-    console.error('[Footer API Helper] Error:', error);
-    return null;
-  }
+    } catch (error) {
+      console.error('[Footer API Helper] Error:', error);
+      return null;
+    }
+  })();
+
+  footerPromiseCache[locale] = fetchPromise;
+  footerCacheTime[locale] = now;
+  return fetchPromise;
 }

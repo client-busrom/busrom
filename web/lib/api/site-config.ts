@@ -32,36 +32,51 @@ export interface SiteConfigData {
   turnstile: TurnstileConfig
 }
 
-export async function getSiteConfig(): Promise<SiteConfigData> {
-  try {
-    const response = await fetch(`${CMS_URL}/api/globals/site-config`, {
-      next: { revalidate: 300 }, // Cache for 5 minutes
-    })
+let siteConfigPromise: Promise<SiteConfigData> | null = null;
+let siteConfigTime: number = 0;
+const CACHE_TTL = 5 * 60 * 1000;
 
-    if (!response.ok) {
-      console.error('Failed to fetch site config:', response.status)
+export async function getSiteConfig(): Promise<SiteConfigData> {
+  const now = Date.now();
+  if (siteConfigPromise && now - siteConfigTime < CACHE_TTL) {
+    return siteConfigPromise;
+  }
+
+  const fetchPromise = (async () => {
+    try {
+      const response = await fetch(`${CMS_URL}/api/globals/site-config`, {
+        next: { revalidate: 300 }, // Cache for 5 minutes
+      })
+
+      if (!response.ok) {
+        console.error('Failed to fetch site config:', response.status)
+        return getDefaultConfig()
+      }
+
+      const data = await response.json()
+
+      return {
+        siteName: data.siteName || 'Busrom',
+        siteTagline: data.siteTagline || '',
+        siteDescription: data.siteDescription || '',
+        logo: data.logo || null,
+        favicon: data.favicon || null,
+        turnstile: {
+          enabled: data.turnstileEnabled || false,
+          siteKey: data.turnstileSiteKey || '',
+          secretKey: data.turnstileSecretKey || '',
+          threshold: data.turnstileThreshold || 2,
+        },
+      }
+    } catch (error) {
+      console.error('Error fetching site config:', error)
       return getDefaultConfig()
     }
+  })();
 
-    const data = await response.json()
-
-    return {
-      siteName: data.siteName || 'Busrom',
-      siteTagline: data.siteTagline || '',
-      siteDescription: data.siteDescription || '',
-      logo: data.logo || null,
-      favicon: data.favicon || null,
-      turnstile: {
-        enabled: data.turnstileEnabled || false,
-        siteKey: data.turnstileSiteKey || '',
-        secretKey: data.turnstileSecretKey || '',
-        threshold: data.turnstileThreshold || 2,
-      },
-    }
-  } catch (error) {
-    console.error('Error fetching site config:', error)
-    return getDefaultConfig()
-  }
+  siteConfigPromise = fetchPromise;
+  siteConfigTime = now;
+  return fetchPromise;
 }
 
 function getDefaultConfig(): SiteConfigData {

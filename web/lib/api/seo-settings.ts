@@ -57,7 +57,7 @@ interface SeoSettingsResponse {
 }
 
 // Cache for SEO settings (revalidate every 5 minutes)
-let seoCache: Record<string, SeoSetting[]> = {}
+let seoPromiseCache: Record<string, Promise<SeoSetting[]>> = {}
 let seoCacheTime: Record<string, number> = {}
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
@@ -67,32 +67,37 @@ const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 export async function getAllSeoSettings(locale: string = 'en'): Promise<SeoSetting[]> {
   const now = Date.now()
 
-  // Return cached data if still valid for this specific locale
-  if (seoCache[locale] && now - (seoCacheTime[locale] || 0) < CACHE_TTL) {
-    return seoCache[locale]
+  // Return cached promise if still valid for this specific locale
+  if (seoPromiseCache[locale] && now - (seoCacheTime[locale] || 0) < CACHE_TTL) {
+    return seoPromiseCache[locale]
   }
 
-  try {
-    const response = await fetch(
-      `${CMS_URL}/api/seo-settings?locale=${locale}&limit=500&depth=1`,
-      {
-        next: { revalidate: 300 }, // 5 minutes
+  // Create fetch promise and immediately cache it to prevent Cache Stampede
+  const fetchPromise = (async () => {
+    try {
+      const response = await fetch(
+        `${CMS_URL}/api/seo-settings?locale=${locale}&limit=500&depth=1`,
+        {
+          next: { revalidate: 300 }, // 5 minutes
+        }
+      )
+
+      if (!response.ok) {
+        console.error('[SeoSettings] Failed to fetch:', response.status)
+        return []
       }
-    )
 
-    if (!response.ok) {
-      console.error('[SeoSettings] Failed to fetch:', response.status)
-      return seoCache[locale] || []
+      const data: SeoSettingsResponse = await response.json()
+      return data.docs || []
+    } catch (error) {
+      console.error('[SeoSettings] Error fetching SEO settings:', error)
+      return []
     }
+  })();
 
-    const data: SeoSettingsResponse = await response.json()
-    seoCache[locale] = data.docs || []
-    seoCacheTime[locale] = now
-    return seoCache[locale]
-  } catch (error) {
-    console.error('[SeoSettings] Error fetching SEO settings:', error)
-    return seoCache[locale] || []
-  }
+  seoPromiseCache[locale] = fetchPromise
+  seoCacheTime[locale] = now
+  return fetchPromise
 }
 
 /**
