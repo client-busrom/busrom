@@ -412,6 +412,7 @@ export const Users: CollectionConfig = {
           data: {
             lastLogin: new Date().toISOString(),
           },
+          req, // Crucial for Postgres transaction joining to prevent deadlocks
         })
       },
     ],
