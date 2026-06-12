@@ -34,6 +34,12 @@ export default async function OurStoryPage({
   const { locale } = await params
   const rawData = await fetchPageData(PAGE_SLUGS.OUR_STORY, locale)
 
+  const defaultMetadata: Metadata = {
+    title: "Our Story | Busrom",
+  }
+  const metadata = await getPageMetadata('/about/story', PAGE_SLUGS.OUR_STORY, locale, defaultMetadata)
+  const pageTitle = String(metadata.title || "Our Story | Busrom")
+
   if (!rawData) {
     return notFound()
   }
@@ -87,6 +93,7 @@ export default async function OurStoryPage({
         data={parsedData} 
         applications={applications as any[]} 
         sphere3dData={sphere3dData}
+        pageTitle={pageTitle}
       />
       
       <PageScripts path="/about/story" pageType="our_story" position="footer" />

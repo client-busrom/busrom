@@ -214,7 +214,10 @@ export function buildMetadata(
   }
 
   // Canonical - ensure it's an absolute URL
-  if (seoSetting.canonicalUrl) {
+  // Only use explicitly set canonical URL if this is an EXACT PATH match
+  // Global or Pattern matches should dynamically generate the canonical URL based on the actual path
+  // to prevent canonical duplication across multiple pages
+  if (seoSetting.canonicalUrl && seoSetting.scope === 'exact_path') {
     let canonicalUrl = seoSetting.canonicalUrl.trim()
 
     // If it doesn't start with http(s), make it absolute
@@ -237,9 +240,9 @@ export function buildMetadata(
       languages: getAlternateLanguages(actualPath || seoSetting.exactPath || '/'),
     }
   } else {
-    // Even if no canonical is set in CMS, we explicitly set it to the clean path
-    // This prevents query parameters from generating duplicate canonicals
-    const cleanPath = actualPath || seoSetting.exactPath || '/';
+    // Dynamically generate the canonical URL using the clean path
+    // This correctly handles global settings falling back to the current page's URL
+    const cleanPath = actualPath || (seoSetting ? seoSetting.exactPath : null) || '/';
     // Ensure we don't have double slashes if baseUrl has trailing slash or cleanPath has leading slash
     const finalCanonical = `${baseUrl.replace(/\/$/, '')}${cleanPath.startsWith('/') ? '' : '/'}${cleanPath}`;
     

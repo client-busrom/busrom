@@ -458,6 +458,7 @@ export default async function RootLayout({
       `}
     >
       <head>
+        <meta httpEquiv="content-language" content={validLocale} />
         <link rel="preconnect" href="https://cdn.busromhouse.com" />
         <link rel="dns-prefetch" href="https://cdn.busromhouse.com" />
         <link rel="preconnect" href="https://d2kqew3hn5wphn.cloudfront.net" />

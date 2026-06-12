@@ -14,6 +14,7 @@ interface BlogListClientProps {
   initialConfig?: any;
   initialBlogs?: any[];
   allLabel?: string;
+  pageTitle?: string;
 }
 
 // Helper to prevent OptimizedImage from crashing on raw IDs (numbers)
@@ -27,6 +28,7 @@ export function BlogListClient({
   initialConfig,
   initialBlogs,
   allLabel,
+  pageTitle,
 }: BlogListClientProps) {
   const [blogs, setBlogs] = useState<any[]>(initialBlogs || []);
   const [config, setConfig] = useState<any>(initialConfig || null);
@@ -276,7 +278,7 @@ export function BlogListClient({
       className="min-h-screen bg-[#F6F4ED] font-lexend-deca antialiased selection:bg-[#ff4848] selection:text-white"
       data-header-theme="light"
     >
-      <h1 className="sr-only">Busrom Knowledge Base & Blog</h1>
+      <h1 className="sr-only">{pageTitle || "Busrom Knowledge Base & Blog"}</h1>
       
       {/* 1. HERO BANNER - SPLIT LAYOUT */}
       <HeroBanner hero={hero} locale={locale} />

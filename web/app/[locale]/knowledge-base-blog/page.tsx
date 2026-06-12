@@ -24,7 +24,7 @@ export async function generateMetadata({
   return getPageMetadata('/knowledge-base-blog', 'blog_list', locale, defaultMetadata)
 }
 
-async function BlogContentLoader({ locale }: { locale: Locale }) {
+async function BlogContentLoader({ locale, pageTitle }: { locale: Locale, pageTitle: string }) {
   const [config, blogs, messages] = await Promise.all([
     getBlogSettings(locale),
     getInitialBlogs(locale),
@@ -39,6 +39,7 @@ async function BlogContentLoader({ locale }: { locale: Locale }) {
       initialConfig={config} 
       initialBlogs={blogs} 
       allLabel={allLabel}
+      pageTitle={pageTitle}
     />
   )
 }
@@ -49,6 +50,12 @@ export default async function BlogPage({
   params: Promise<{ locale: Locale }>
 }) {
   const { locale } = await params
+
+  const defaultMetadata: Metadata = {
+    title: "Blog | Busrom",
+  }
+  const metadata = await getPageMetadata('/knowledge-base-blog', 'blog_list', locale, defaultMetadata)
+  const pageTitle = String(metadata.title || "Blog | Busrom")
 
   
   let seoKeywords: string[] = [];
@@ -71,7 +78,7 @@ export default async function BlogPage({
           <div className="w-12 h-12 border-2 border-[#ff4848] border-t-transparent rounded-full animate-spin"></div>
         </div>
       }>
-        <BlogContentLoader locale={locale} />
+        <BlogContentLoader locale={locale} pageTitle={pageTitle} />
       </Suspense>
 
       <PageScripts path="/knowledge-base-blog" pageType="blog_list" position="footer" />

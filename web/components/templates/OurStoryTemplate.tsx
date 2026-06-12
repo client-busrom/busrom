@@ -25,6 +25,7 @@ interface OurStoryTemplateProps {
   data: OurStoryData;
   applications: any[];
   sphere3dData: { title: string; description: string };
+  pageTitle?: string;
 }
 
 export function OurStoryTemplate({
@@ -32,6 +33,7 @@ export function OurStoryTemplate({
   data,
   applications,
   sphere3dData,
+  pageTitle,
 }: OurStoryTemplateProps) {
   // Combine extracted data with resolved applications for the applications section
   const applicationsDataWithItems = {
@@ -45,7 +47,7 @@ export function OurStoryTemplate({
 
   return (
     <div className="min-h-screen bg-[#f6f4ed]" data-header-theme="dark">
-      <h1 className="sr-only">Our Story | Busrom</h1>
+      <h1 className="sr-only">{pageTitle || "Our Story | Busrom"}</h1>
       <StoryHeroSection data={data.hero} />
       <StoryWhoWeAreSection data={data.whoWeAre} />
       <StoryBrandPositionSection data={data.brandPosition} />

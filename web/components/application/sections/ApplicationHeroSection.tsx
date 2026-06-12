@@ -193,6 +193,7 @@ export function ApplicationHeroSection({
     >
       {/* Dynamic top padding for desktop scaling visibility */}
       <div className="hidden lg:block h-[2.3958vw]" />
+      <h1 className="sr-only">{slides[0]?.mainTitle || title}</h1>
       {/* ============ DESKTOP ============ */}
       <div className="hidden lg:block absolute inset-0">
         {/* Scaling wrapper taking up 80% to fit neatly */}
@@ -429,7 +430,7 @@ export function ApplicationHeroSection({
                 </svg>
 
                 {/* Gold main title */}
-                <h1
+                <h2
                   className="font-jomhuria whitespace-pre-line"
                   style={{
                     fontSize: vw(128),
@@ -441,7 +442,7 @@ export function ApplicationHeroSection({
                   }}
                 >
                   {slide.mainTitle}
-                </h1>
+                </h2>
 
                 {/* Subtitle with vertical line */}
                 <div className="flex">
@@ -625,7 +626,7 @@ export function ApplicationHeroSection({
         </AnimatePresence>
 
         <AnimatePresence mode="wait">
-          <motion.h1
+          <motion.h2
             key={`mm-${activeSlide}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -633,7 +634,7 @@ export function ApplicationHeroSection({
             className="font-jomhuria text-[#FFF17C] text-[52px] leading-[0.9] -mt-2 mb-4 w-[85%] whitespace-pre-line"
           >
             {slide.mainTitle}
-          </motion.h1>
+          </motion.h2>
         </AnimatePresence>
 
         {/* Main image */}
