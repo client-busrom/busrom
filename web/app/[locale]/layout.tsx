@@ -334,9 +334,7 @@ const acme = localFont({
 });
 
 export function generateStaticParams() {
-  // Only build 'en' at build time to prevent CMS overload. 
-  // Other locales will be statically generated on-demand (ISR) when visited.
-  return [{ locale: 'en' }];
+  return locales.map(locale => ({ locale }));
 }
 
 export async function generateMetadata(): Promise<Metadata> {
