@@ -95,7 +95,7 @@ export default async function ShopSlugPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
         <PageScripts path={path} pageType="shop_list" position="header" />
         <PageScripts path={path} pageType="shop_list" position="body_start" />
         <PageSeoInjector path={path} pageType="shop_list" locale={locale} />
@@ -131,7 +131,7 @@ export default async function ShopSlugPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={productSeoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, productSeoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={productSeoKeywords} startIndex={0} fallback="">
         <PageScripts path={path} pageType="shop_detail" position="header" />
         <PageScripts path={path} pageType="shop_detail" position="body_start" />
         <PageSeoInjector path={path} pageType="shop_detail" locale={locale} />

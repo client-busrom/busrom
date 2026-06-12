@@ -68,7 +68,7 @@ export default async function BlogPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/knowledge-base-blog" pageType="blog_list" position="header" />
       <PageScripts path="/knowledge-base-blog" pageType="blog_list" position="body_start" />
       <PageSeoInjector path="/knowledge-base-blog" pageType="blog_list" locale={locale} />

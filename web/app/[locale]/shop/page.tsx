@@ -42,7 +42,7 @@ export default async function ShopPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/shop" pageType="shop_list" position="header" />
       <PageScripts path="/shop" pageType="shop_list" position="body_start" />
       <PageSeoInjector path="/shop" pageType="shop_list" locale={locale} />

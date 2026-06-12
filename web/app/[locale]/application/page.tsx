@@ -85,7 +85,7 @@ export default async function ApplicationsPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/application" pageType="application" position="header" />
       <PageScripts path="/application" pageType="application" position="body_start" />
       <PageSeoInjector path="/application" pageType="application" locale={locale} />

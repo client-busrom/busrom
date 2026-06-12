@@ -66,7 +66,7 @@ export default async function DynamicPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path={path} pageType={pageType} position="header" />
       <PageScripts path={path} pageType={pageType} position="body_start" />
       <PageSeoInjector path={path} pageType={pageType} locale={locale} />

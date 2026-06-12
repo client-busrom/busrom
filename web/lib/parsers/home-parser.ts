@@ -18,7 +18,11 @@ const toImageObject = (
   // Determine the SEO alt text - Assign EXACTLY ONE keyword per image to prevent keyword stuffing (White Hat SEO)
   let seoAlt = alt;
   if (seoKeywords.length > 0) {
-    seoAlt = seoKeywords[keywordIndexRef.current % seoKeywords.length];
+    const totalImages = 30;
+    const chunkSize = Math.max(1, Math.ceil(seoKeywords.length / totalImages));
+    const start = (keywordIndexRef.current * chunkSize) % seoKeywords.length;
+    const chunk = seoKeywords.slice(start, start + chunkSize);
+    seoAlt = chunk.join(', ');
     keywordIndexRef.current++;
   }
 
@@ -55,7 +59,7 @@ const toImageObject = (
 export function parseHomeData(data: any, locale: string, strategy?: string, seoKeywords: string[] = [], enData?: any): HomeContent {
   if (!data) return {} as HomeContent;
 
-  const keywordIndexRef = { current: seoKeywords.length > 0 ? Math.floor(Math.random() * seoKeywords.length) : 0 };
+  const keywordIndexRef = { current: 0 };
   
   // Wrap toImageObject to include the keywords and counter automatically
   const autoSeoImage = (mediaData: any, fallbackAlt: string = '') => 

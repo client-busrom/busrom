@@ -71,7 +71,7 @@ export default async function SupportPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/support" pageType="support" position="header" />
       <PageScripts path="/support" pageType="support" position="body_start" />
       <PageSeoInjector path="/support" pageType="support" locale={locale} />

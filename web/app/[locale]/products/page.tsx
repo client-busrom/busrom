@@ -52,7 +52,7 @@ export default async function ProductOverviewPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/products" pageType="product_overview" position="header" />
       <PageScripts path="/products" pageType="product_overview" position="body_start" />
       <PageSeoInjector path="/products" pageType="product_overview" locale={locale} />

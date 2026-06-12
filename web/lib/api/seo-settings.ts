@@ -6,6 +6,7 @@
  */
 
 import type { Metadata } from 'next'
+import { cache } from 'react'
 import { getAlternateLanguages } from '../seo-utils'
 
 // CMS URL for API calls
@@ -64,7 +65,7 @@ const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 /**
  * Fetch all SEO settings from CMS
  */
-export async function getAllSeoSettings(locale: string = 'en'): Promise<SeoSetting[]> {
+export const getAllSeoSettings = cache(async (locale: string = 'en'): Promise<SeoSetting[]> => {
   const now = Date.now()
 
   // Return cached promise if still valid for this specific locale
@@ -98,7 +99,7 @@ export async function getAllSeoSettings(locale: string = 'en'): Promise<SeoSetti
   seoPromiseCache[locale] = fetchPromise
   seoCacheTime[locale] = now
   return fetchPromise
-}
+})
 
 /**
  * Match a path against a wildcard pattern

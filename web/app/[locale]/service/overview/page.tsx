@@ -56,7 +56,7 @@ export default async function ServiceOverviewPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/service/overview" pageType="service_overview" position="header" />
       <PageScripts path="/service/overview" pageType="service_overview" position="body_start" />
       <PageSeoInjector path="/service/overview" pageType="service_overview" locale={locale} />

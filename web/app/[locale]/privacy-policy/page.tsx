@@ -40,7 +40,7 @@ export default async function PrivacyPolicyPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/privacy-policy" pageType="privacy_policy" position="header" />
       <PageScripts path="/privacy-policy" pageType="privacy_policy" position="body_start" />
       <PageSeoInjector path="/privacy-policy" pageType="privacy_policy" locale={locale} />

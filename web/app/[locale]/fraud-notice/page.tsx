@@ -40,7 +40,7 @@ export default async function FraudNoticePage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/fraud-notice" pageType="fraud_notice" position="header" />
       <PageScripts path="/fraud-notice" pageType="fraud_notice" position="body_start" />
       <PageSeoInjector path="/fraud-notice" pageType="fraud_notice" locale={locale} />

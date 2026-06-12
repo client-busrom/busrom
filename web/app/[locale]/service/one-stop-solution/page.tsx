@@ -55,7 +55,7 @@ export default async function OneStopSolutionPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/service/one-stop-solution" pageType="one_stop_solution" position="header" />
       <PageScripts path="/service/one-stop-solution" pageType="one_stop_solution" position="body_start" />
       <PageSeoInjector path="/service/one-stop-solution" pageType="one_stop_solution" locale={locale} />

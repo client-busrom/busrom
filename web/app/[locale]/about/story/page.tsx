@@ -83,7 +83,7 @@ export default async function OurStoryPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/about/story" pageType="our_story" position="header" />
       <PageScripts path="/about/story" pageType="our_story" position="body_start" />
       <PageSeoInjector path="/about/story" pageType="our_story" locale={locale} />

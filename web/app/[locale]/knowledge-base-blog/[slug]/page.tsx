@@ -69,7 +69,7 @@ export default async function BlogDetailPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path={path} pageType="blog_detail" position="header" />
       <PageScripts path={path} pageType="blog_detail" position="body_start" />
       <PageSeoInjector path={path} pageType="blog_detail" locale={locale} />

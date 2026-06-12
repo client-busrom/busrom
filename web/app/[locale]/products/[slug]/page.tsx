@@ -72,7 +72,7 @@ export default async function ProductSeriesDetailPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path={path} pageType="product_series_detail" position="header" />
       <PageScripts path={path} pageType="product_series_detail" position="body_start" />
       <PageSeoInjector path={path} pageType="product_series_detail" locale={locale} />

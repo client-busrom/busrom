@@ -53,7 +53,7 @@ export default async function OemOdmPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/service/oem-odm" pageType="oem_odm" position="header" />
       <PageScripts path="/service/oem-odm" pageType="oem_odm" position="body_start" />
       <PageSeoInjector path="/service/oem-odm" pageType="oem_odm" locale={locale} />

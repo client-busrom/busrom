@@ -60,7 +60,7 @@ export default async function ContactPage({
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={Math.floor(Math.random() * Math.max(1, seoKeywords.length))} fallback="">
+      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
       <PageScripts path="/contact-us" pageType="contact_us" position="header" />
       <PageScripts path="/contact-us" pageType="contact_us" position="body_start" />
       <PageSeoInjector path="/contact-us" pageType="contact_us" locale={locale} />
