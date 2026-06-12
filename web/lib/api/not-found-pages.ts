@@ -24,7 +24,7 @@ export async function getNotFoundPageConfig(
 ): Promise<NotFoundPageConfig | null> {
   try {
     const res = await fetch(
-      `${PAYLOAD_URL}/api/not-found-pages?locale=${locale}&where[pageType][equals]=${pageType}&depth=3`,
+      `${PAYLOAD_URL}/api/not-found-pages?locale=${locale}&where[pageType][equals]=${pageType}&depth=1`,
       {
         next: { revalidate: 60 },
       }

@@ -163,7 +163,7 @@ async function resolveImageWallItem(item: any): Promise<ImageWallItem | null> {
  */
 export async function getPreloaderConfig(): Promise<PreloaderConfigData> {
   try {
-    const response = await fetch(`${CMS_URL}/api/globals/preloader-config?depth=2`, {
+    const response = await fetch(`${CMS_URL}/api/globals/preloader-config?depth=1`, {
       next: { revalidate: 60 }, // Revalidate every 60 seconds
       redirect: 'manual', // Don't follow redirects (302 to /signin means auth required)
     })

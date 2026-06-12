@@ -47,8 +47,8 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
   try {
     // 1. Fetch initial Page Data and Navigation Menus in Parallel
     const [pageRes, navRes] = await Promise.all([
-      fetch(`${cmsUrl}/api/pages?where[slug][equals]=${slug}&locale=${locale}${fallbackParam}&depth=2`, { next: { revalidate: 3600 } }),
-      fetch(`${cmsUrl}/api/navigation-menus?locale=${locale}${fallbackParam}&limit=1000&depth=2`, { next: { revalidate: 3600 } })
+      fetch(`${cmsUrl}/api/pages?where[slug][equals]=${slug}&locale=${locale}${fallbackParam}&depth=1`, { next: { revalidate: 3600 } }),
+      fetch(`${cmsUrl}/api/navigation-menus?locale=${locale}${fallbackParam}&limit=1000&depth=1`, { next: { revalidate: 3600 } })
     ]);
 
     if (!pageRes.ok) return null;
@@ -214,7 +214,7 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
     if (uniqueFormIds.length > 0) {
       const formFetchPromise = Promise.all(uniqueFormIds.map(async (id) => {
         try {
-          const res = await fetch(`${cmsUrl}/api/form-configs/${id}?depth=2&draft=false&locale=${locale}&trash=false`, { next: { revalidate: 3600 } });
+          const res = await fetch(`${cmsUrl}/api/form-configs/${id}?depth=1&draft=false&locale=${locale}&trash=false`, { next: { revalidate: 3600 } });
           if (res.ok) formConfigsMap[id] = normalizeMediaObject(await res.json());
         } catch (e) {}
       }));

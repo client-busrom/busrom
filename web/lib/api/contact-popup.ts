@@ -34,7 +34,7 @@ export interface ContactPopupData {
 export async function getContactPopup(locale: string): Promise<ContactPopupData | null> {
   try {
     const response = await fetch(
-      `${CMS_URL}/api/globals/contact-popup?locale=${locale}&depth=2`,
+      `${CMS_URL}/api/globals/contact-popup?locale=${locale}&depth=1`,
       { next: { revalidate: 300 } }
     )
 

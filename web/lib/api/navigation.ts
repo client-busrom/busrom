@@ -253,7 +253,7 @@ export async function getNavigation(locale: string): Promise<NavItem[]> {
     try {
       // 直接调用 CMS API，而不是自己的 API 路由
       const response = await fetch(
-        `${CMS_URL}/api/navigation-menus?where[visible][equals]=true&limit=1000&locale=${locale}&depth=2`,
+        `${CMS_URL}/api/navigation-menus?where[visible][equals]=true&limit=1000&locale=${locale}&depth=1`,
         {
           headers: { 'Content-Type': 'application/json' },
           next: { revalidate: 300 }, // 缓存 5 分钟
