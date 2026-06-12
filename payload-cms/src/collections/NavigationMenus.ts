@@ -76,10 +76,10 @@ export const NavigationMenus: CollectionConfig = {
       },
     ],
     afterRead: [
-      async ({ doc, req: { payload } }) => {
+      async ({ doc, req }) => {
         if (!doc.cardImage) return doc
         const { getApplicationImage } = await import('@/utilities/getApplicationImage')
-        const image = await getApplicationImage(payload, doc.cardImage)
+        const image = await getApplicationImage(req.payload, doc.cardImage, req)
         return {
           ...doc,
           cardImageResolved: image,
