@@ -403,18 +403,6 @@ export const Users: CollectionConfig = {
         }
       },
     ],
-    afterLogin: [
-      async ({ user, req }) => {
-        // Update last login time
-        await req.payload.update({
-          collection: 'users',
-          id: user.id,
-          data: {
-            lastLogin: new Date().toISOString(),
-          },
-          req, // Crucial for Postgres transaction joining to prevent deadlocks
-        })
-      },
-    ],
+
   },
 }
