@@ -509,22 +509,29 @@ export const Products: CollectionConfig = {
     beforeChange: [
       async ({ data, req, originalDoc, operation }) => {
         const isTranslation = req.context?.isTranslationSave || req.context?.isSyncing
+
+        // [AUTO-PRESERVE STATUS] If status is missing from the update (e.g. background patches),
+        // explicitly set it to the current value to prevent database resets.
+        if (operation === 'update' && !data.status && originalDoc?.status) {
+          data.status = originalDoc.status
+        }
+        
+        if (operation === 'update' && !data.publishedAt && originalDoc?.publishedAt) {
+          data.publishedAt = originalDoc.publishedAt
+        }
+
         if (isTranslation) return data
 
-        // ----------------------------------------------------------------------
-        // BULK UPDATE PROTECTION
-        // ----------------------------------------------------------------------
-
-        // ----------------------------------------------------------------------
-
         // Only generate slug from English name. Prevent other locales from overwriting it.
-        if (data.name) {
+        const nameObj = data.name || originalDoc?.name;
+        
+        if (nameObj) {
           let nameToSlugify = '';
 
-          if (typeof data.name === 'object' && data.name.en) {
-            nameToSlugify = data.name.en;
+          if (typeof nameObj === 'object' && nameObj.en) {
+            nameToSlugify = nameObj.en;
           } else if (req.locale === 'en' || req.locale === 'all' || !req.locale) {
-            nameToSlugify = typeof data.name === 'string' ? data.name : '';
+            nameToSlugify = typeof nameObj === 'string' ? nameObj : '';
           }
 
           if (nameToSlugify) {

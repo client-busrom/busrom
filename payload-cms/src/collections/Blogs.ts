@@ -61,13 +61,16 @@ export const Blogs: CollectionConfig = {
         }
 
         // [AUTO SLUG] Only generate slug from English title. Prevent other locales or translations from overwriting it.
-        if (data.title && !isTranslation) {
+        if (!isTranslation) {
           let titleToSlugify = '';
 
-          if (typeof data.title === 'object' && data.title.en) {
-            titleToSlugify = data.title.en;
+          // If title is passed in this payload, use it. Otherwise, fallback to the original document's title.
+          const titleObj = data.title || originalDoc?.title;
+
+          if (typeof titleObj === 'object' && titleObj?.en) {
+            titleToSlugify = titleObj.en;
           } else if (req.locale === 'en' || req.locale === 'all' || !req.locale) {
-            titleToSlugify = typeof data.title === 'string' ? data.title : '';
+            titleToSlugify = typeof titleObj === 'string' ? titleObj : '';
           }
 
           if (titleToSlugify) {
@@ -81,7 +84,7 @@ export const Blogs: CollectionConfig = {
           }
         }
 
-        const status = data.status;
+        const status = data.status || originalDoc?.status;
         const prevStatus = originalDoc?.status;
 
         if (status === 'published' && !data.publishedAt && prevStatus !== 'published') {
@@ -236,22 +239,6 @@ export const Blogs: CollectionConfig = {
       }
     ],
     afterChange: [
-      async ({ doc, previousDoc, operation, req }) => {
-        const start = Date.now()
-        // [SQL FORCE] Persistent status stabilization
-        if (doc.status === 'published' && operation === 'update' && doc.id) {
-          try {
-            const db = (req.payload.db as any).drizzle
-            if (db) {
-              const { sql } = await import('drizzle-orm')
-              await db.execute(sql`UPDATE "blogs" SET "status" = 'published' WHERE "id" = ${doc.id}`)
-              console.log(`🛡️ [Blogs] SQL Force SUCCESS for ${doc.id} (${Date.now() - start}ms)`)
-            }
-          } catch (e: any) {
-            console.error(`❌ [Blogs] SQL Force failed:`, e.message)
-          }
-        }
-      },
       autoIndexHook('blogs')
     ],
     afterDelete: [

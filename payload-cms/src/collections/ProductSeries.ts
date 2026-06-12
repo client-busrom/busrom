@@ -348,6 +348,44 @@ export const ProductSeries: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeChange: [
+      async ({ data, req, originalDoc, operation }) => {
+        const isTranslation = req.context?.isTranslationSave || req.context?.isSyncing
+
+        if (operation === 'update' && !data.status && originalDoc?.status) {
+          data.status = originalDoc.status
+        }
+        
+        if (operation === 'update' && !data.publishedAt && originalDoc?.publishedAt) {
+          data.publishedAt = originalDoc.publishedAt
+        }
+
+        if (isTranslation) return data
+
+        const nameObj = data.name || originalDoc?.name;
+        
+        if (nameObj) {
+          let nameToSlugify = '';
+
+          if (typeof nameObj === 'object' && nameObj.en) {
+            nameToSlugify = nameObj.en;
+          } else if (req.locale === 'en' || req.locale === 'all' || !req.locale) {
+            nameToSlugify = typeof nameObj === 'string' ? nameObj : '';
+          }
+
+          if (nameToSlugify) {
+            data.slug = nameToSlugify
+              .toLowerCase()
+              .trim()
+              .replace(/\s+/g, '-')
+              .replace(/[^a-z0-9-]/g, '')
+              .replace(/-+/g, '-')
+              .replace(/^-|-$/g, '');
+          }
+        }
+        return data
+      },
+    ],
     afterChange: [autoIndexHook('product-series')],
     afterDelete: [autoIndexDeleteHook('product-series')],
   },

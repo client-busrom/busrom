@@ -397,6 +397,14 @@ export const Pages: CollectionConfig = {
   hooks: {
     beforeChange: [
       async ({ data, operation, originalDoc }) => {
+        if (operation === 'update' && !data.status && originalDoc?.status) {
+          data.status = originalDoc.status
+        }
+        
+        if (operation === 'update' && !data.publishedAt && originalDoc?.publishedAt) {
+          data.publishedAt = originalDoc.publishedAt
+        }
+
         // Auto-set publishedAt when publishing
         if (
           operation === 'update' &&

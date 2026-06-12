@@ -1,5 +1,4 @@
-import { CollectionAfterChangeHook, getPayload } from 'payload'
-import configPromise from '@payload-config'
+import { CollectionAfterChangeHook } from 'payload'
 import { notifyGoogleOfUpdate } from '../lib/google-indexing'
 import { notifyIndexNow } from '../lib/index-now'
 
@@ -54,14 +53,9 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
 
     const logToDb = async (url: string, engine: 'google' | 'indexnow', action: 'update' | 'delete', result: any) => {
       try {
-        // NOTE: Use the global payload instance instead of `req.payload`.
-        // During bulk operations, multiple afterChange hooks run concurrently sharing the same
-        // `req` object. Using `req.payload.create` causes internal Drizzle state/transaction
-        // pool corruption: "TypeError: Cannot use 'in' operator to search for '_rels' in undefined".
-        // Accessing the root/global payload instance bypasses request transaction context completely.
-        const globalPayload = await getPayload({ config: configPromise })
-        await globalPayload.create({
+        await req.payload.create({
           collection: 'indexing-logs',
+          req,
           overrideAccess: true,
           data: {
             targetUrl: url,
@@ -89,15 +83,21 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
         // OPTIMIZATION: Only send the first/primary language (e.g. 'en') to Google Indexing API
         // This saves the 200/day quota limit. Googlebot will discover other languages via hreflang tags.
         const primaryUrl = urls[0]
-        notifyGoogleOfUpdate(primaryUrl, 'URL_UPDATED')
-          .then(res => logToDb(primaryUrl, 'google', 'update', res))
-          .catch(e => logToDb(primaryUrl, 'google', 'update', { success: false, message: e.message }))
+        try {
+          const res = await notifyGoogleOfUpdate(primaryUrl, 'URL_UPDATED')
+          await logToDb(primaryUrl, 'google', 'update', res)
+        } catch(e: any) {
+          await logToDb(primaryUrl, 'google', 'update', { success: false, message: e.message })
+        }
       }
       
       const indexNowTarget = urls.length > 1 ? `${urls.length} URLs (e.g. ${urls[0]})` : urls[0]
-      notifyIndexNow(urls)
-        .then(res => logToDb(indexNowTarget, 'indexnow', 'update', res))
-        .catch(e => logToDb(indexNowTarget, 'indexnow', 'update', { success: false, message: e.message }))
+      try {
+        const res = await notifyIndexNow(urls)
+        await logToDb(indexNowTarget, 'indexnow', 'update', res)
+      } catch(e: any) {
+        await logToDb(indexNowTarget, 'indexnow', 'update', { success: false, message: e.message })
+      }
     }
 
     // 2. Trigger: Status change from Published to NOT Published (Unpublished, Archived)
@@ -109,15 +109,21 @@ export const autoIndexHook = (collectionSlug: string): CollectionAfterChangeHook
         console.log('⚠️ [Google Indexing] Credentials not found. Skipping.')
       } else {
         const primaryUrl = urls[0]
-        notifyGoogleOfUpdate(primaryUrl, 'URL_DELETED')
-          .then(res => logToDb(primaryUrl, 'google', 'delete', res))
-          .catch(e => logToDb(primaryUrl, 'google', 'delete', { success: false, message: e.message }))
+        try {
+          const res = await notifyGoogleOfUpdate(primaryUrl, 'URL_DELETED')
+          await logToDb(primaryUrl, 'google', 'delete', res)
+        } catch(e: any) {
+          await logToDb(primaryUrl, 'google', 'delete', { success: false, message: e.message })
+        }
       }
       
       const indexNowTarget = urls.length > 1 ? `${urls.length} URLs (e.g. ${urls[0]})` : urls[0]
-      notifyIndexNow(urls)
-        .then(res => logToDb(indexNowTarget, 'indexnow', 'delete', res))
-        .catch(e => logToDb(indexNowTarget, 'indexnow', 'delete', { success: false, message: e.message }))
+      try {
+        const res = await notifyIndexNow(urls)
+        await logToDb(indexNowTarget, 'indexnow', 'delete', res)
+      } catch(e: any) {
+        await logToDb(indexNowTarget, 'indexnow', 'delete', { success: false, message: e.message })
+      }
     }
 
     return doc
