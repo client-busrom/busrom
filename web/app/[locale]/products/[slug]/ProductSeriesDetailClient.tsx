@@ -215,7 +215,7 @@ export function ProductSeriesDetailClient({
                   '"Playfair Display", "Times New Roman", Times, serif',
               }}
             >
-              {seriesData.name || "Product Series"}
+              {seriesData?.name || "Product Series"}
               <br />
               IS CURRENTLY BEING PREPARED.
               <br />
@@ -250,7 +250,7 @@ export function ProductSeriesDetailClient({
   // Render product series content with sections
   return (
       <div className="min-h-screen bg-background" data-header-theme="light">
-        <h1 className="sr-only">{seriesData.name} - Busrom Hardware</h1>
+        <h1 className="sr-only">{seriesData?.name} - Busrom Hardware</h1>
 
         {/* Hero Carousel Section */}
         {parsedContent.heroCarousel && (

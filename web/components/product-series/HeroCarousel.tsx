@@ -6,7 +6,7 @@ import { motion } from "framer-motion"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
 import { cn } from "@/lib/utils"
 import type { HeroCarouselData } from "@/lib/content-parser"
-import type { ProductSeriesData } from "@/lib/content-parser"
+
 import { IconifyIcon } from "../ui/IconifyIcon"
 
 /**

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from "react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
+import { getRandomAppImage } from "@/lib/image-utils"
 import useEmblaCarousel from "embla-carousel-react"
 import AutoScroll from "embla-carousel-auto-scroll"
 
@@ -77,7 +78,7 @@ export function ProductApplicationsSection({
               .map((id) => appMap.get(String(id)))
               .filter(Boolean)
               .map((app: any) => {
-                const appImage = app.image || app.sceneGallery?.[0]?.images?.[0]
+                const appImage = app.image || getRandomAppImage(app)
                 return {
                   id: app.id,
                   title: app.name || app.slug,
@@ -93,7 +94,7 @@ export function ProductApplicationsSection({
           if (res.ok) {
             const data = await res.json()
             const items: ApplicationItem[] = data.docs?.map((app: any) => {
-              const appImage = app.image || app.sceneGallery?.[0]?.images?.[0]
+              const appImage = app.image || getRandomAppImage(app)
               return {
                 id: app.id,
                 title: app.name || app.slug,

@@ -23,6 +23,7 @@ interface ShopPageClientProps {
   locale: Locale
   searchParams: { [key: string]: string | string[] | undefined }
   slugMode?: boolean
+  pageTitle?: string
 }
 
 // Helper to normalize slugs in the UI
@@ -36,7 +37,7 @@ function toUrlSlug(s: string): string {
     .replace(/[^a-z0-9-]/g, '')
 }
 
-export function ShopPageClient({ locale, slugMode = false }: ShopPageClientProps) {
+export function ShopPageClient({ locale, slugMode = false, pageTitle = "Shop | Busrom" }: ShopPageClientProps) {
   const router = useRouter()
   const searchParamsDict = useSearchParams()
   const pathname = usePathname()

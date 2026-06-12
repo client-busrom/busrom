@@ -1,4 +1,6 @@
 import React from "react";
+import { notFound } from "next/navigation";
+import { getRandomAppImage } from "@/lib/image-utils";
 import { PAGE_TEMPLATES } from "@/lib/constants";
 import { ApplicationTemplate } from "./ApplicationTemplate";
 import { ContactUsTemplate } from "./ContactUsTemplate";
@@ -48,11 +50,7 @@ export function TemplateSwitcher({ locale, rawData }: TemplateSwitcherProps) {
           .map((id: string): ApplicationCase | null => {
             const app = allApplications.find((a: any) => String(a.id) === String(id));
             if (!app) return null;
-            let appImage = app.image || app.mainImage;
-            if (!appImage && app.sceneGallery?.length > 0) {
-              const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0);
-              if (firstGroup) appImage = firstGroup.images[0];
-            }
+            let appImage = app.image || getRandomAppImage(app);
             return {
               id: String(app.id),
               title: app.title || app.name || "",
@@ -110,11 +108,7 @@ export function TemplateSwitcher({ locale, rawData }: TemplateSwitcherProps) {
           .map((id: string): any => {
             const app = allApplications.find((a: any) => String(a.id) === String(id));
             if (!app) return null;
-            let appImage = app.image || app.mainImage;
-            if (!appImage && app.sceneGallery?.length > 0) {
-              const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0);
-              if (firstGroup) appImage = firstGroup.images[0];
-            }
+            let appImage = app.image || getRandomAppImage(app);
             return {
               id: String(app.id),
               title: app.title || app.name || "",
@@ -154,11 +148,7 @@ export function TemplateSwitcher({ locale, rawData }: TemplateSwitcherProps) {
           .map((id: string): any => {
             const app = allApplications.find((a: any) => String(a.id || a) === String(id));
             if (!app) return null;
-            let appImage = app.image || app.mainImage;
-            if (!appImage && app.sceneGallery?.length > 0) {
-              const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0);
-              if (firstGroup) appImage = firstGroup.images[0];
-            }
+            let appImage = app.image || getRandomAppImage(app);
             return {
               id: String(app.id),
               title: app.title || app.name || "",

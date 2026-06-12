@@ -10,6 +10,7 @@ import { OurStoryTemplate } from "@/components/templates/OurStoryTemplate"
 import { notFound } from "next/navigation"
 import { PAGE_SLUGS } from "@/lib/constants"
 import { getMessages } from "@/i18n.config"
+import { getRandomAppImage } from "@/lib/image-utils"
 
 export async function generateMetadata({
   params,
@@ -57,11 +58,10 @@ export default async function OurStoryPage({
     const app = allApplications.find((a: any) => String(a.id) === String(id))
     if (!app) return null
 
-    // Image priority: slim image -> mainImage -> sceneGallery fallback
-    let appImage = app.image || app.mainImage
-    if (!appImage && app.sceneGallery?.length > 0) {
-      const firstGroup = app.sceneGallery.find((g: any) => g.images?.length > 0)
-      if (firstGroup) appImage = firstGroup.images[0]
+    // Image priority: slim image -> sceneGallery fallback via Double-Random
+    let appImage = app.image
+    if (!appImage) {
+      appImage = getRandomAppImage(app)
     }
 
     return {

@@ -1,4 +1,5 @@
 import { convertToCDNUrl } from "../cdn-url";
+import { getRandomAppImage } from "../image-utils";
 
 interface MediaObject {
   id: string;
@@ -283,10 +284,17 @@ export function parseOurStoryData(locale: string, rawData: any): OurStoryData {
     let mediaObj: any = null;
 
     if (sourceType === "application") {
-      const appId = typeof source === "object" ? source.id : String(source);
-      const app = allApplications.find((a: any) => String(a.id) === appId);
+      let app: any = null;
+      // If the source is already a hydrated application object, use it directly
+      if (typeof source === "object" && (source.image || source.sceneGallery)) {
+        app = source;
+      } else {
+        // Fallback to searching in allApplications if it's just an ID
+        const appId = typeof source === "object" ? source.id : String(source);
+        app = allApplications.find((a: any) => String(a.id) === appId);
+      }
       if (!app) return null;
-      mediaObj = app.image || app.mainImage || (app.sceneGallery?.[0]?.images?.[0]);
+      mediaObj = app.image || getRandomAppImage(app);
     } else {
       const imageId = typeof source === "object" ? source.id : String(source);
       mediaObj = mediaData[imageId] || (typeof source === "object" && source.url ? source : null);
