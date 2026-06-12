@@ -368,7 +368,7 @@ jobs:
 
           WEB_DOMAIN="https://www.busromhouse.com"
           CMS_DOMAIN="https://cms.busromhouse.com"
-          LOCALES=("en" "zh" "es" "fr" "de")
+          LOCALES=("en")
 
           # Warm CMS API endpoints
           echo "📡 Warming CMS API..."
