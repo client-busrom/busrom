@@ -462,8 +462,8 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || 'postgresql://busrom:busrom_dev_password@localhost:5432/busrom_payload',
-      // For AWS RDS with self-signed certificates
-      ...(process.env.NODE_ENV === 'production' && {
+      // For AWS RDS with self-signed certificates (Skip SSL for local Postgres even in production mode)
+      ...((process.env.NODE_ENV === 'production' && process.env.DATABASE_URI && !process.env.DATABASE_URI.includes('localhost') && !process.env.DATABASE_URI.includes('127.0.0.1')) && {
         ssl: {
           rejectUnauthorized: false,
         },

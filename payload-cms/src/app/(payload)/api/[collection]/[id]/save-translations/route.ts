@@ -44,14 +44,11 @@ export async function POST(
     const startTime = performance.now();
     for (const [localeCode, data] of Object.entries(locales)) {
       try {
-        // [Bugfix] Clear the transactionID from the request object for each iteration.
-        // In Payload 3.x, `payload.update` mutates `req` by attaching a `transactionID` when it starts a transaction.
-        // It commits the transaction at the end of the update, but leaves the ID on the `req` object.
-        // On subsequent loop iterations, Payload sees the ID, thinks it's an active transaction, and tries to use it.
-        // Postgres then aborts it because the transaction was already committed, causing the "rollback" or "empty translations" bug.
-        if (i18nReq.transactionID) {
-          delete i18nReq.transactionID
-        }
+        // In Payload 3.x, reusing the same `req` object in a loop of `payload.update` causes
+        // DataLoader cache corruption. The internal dataloader caches the document state on the first
+        // iteration. On subsequent iterations, it uses stale data to generate the SQL patch, 
+        // which catastrophically wipes out other localized fields (including the default 'en' locale).
+        // The fix is to NOT pass `req: i18nReq` into `payload.update` so each iteration gets a fresh context.
 
         console.log(`[save-translations] ⏳ Saving locale=${localeCode}... Data keys: ${Object.keys(data as any).join(', ')}`)
         
@@ -89,7 +86,6 @@ export async function POST(
           locale: localeCode as any,
           disableHooks: !shouldUseHooks,
           user: i18nReq.user,
-          req: i18nReq,
           context: {
             isTranslationSave: true,
             isSyncing: true,
@@ -98,14 +94,7 @@ export async function POST(
         const localeEndTime = performance.now();
         console.log(`[save-translations] ✅ Saved locale=${localeCode} in ${(localeEndTime - localeStartTime).toFixed(2)}ms (hooks: ${shouldUseHooks ? 'enabled' : 'disabled'})`);
 
-        // [SQL FORCE] 物理层确保状态不丢失 (针对 Blog 集合)
-        if (collection === 'blogs' && currentDoc.status === 'published') {
-          const db = (payload.db as any).drizzle
-          if (db) {
-            const { sql } = await import('drizzle-orm')
-            await db.execute(sql`UPDATE "blogs" SET "status" = 'published' WHERE "id" = ${id}`)
-          }
-        }
+        // removed [SQL FORCE] update to prevent deadlocks and connection exhaustion
 
         results.push({ locale: localeCode, success: true, id: (updatedDoc as any).id })
       } catch (err: any) {
