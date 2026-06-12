@@ -8,7 +8,7 @@ const PAYLOAD_URL = process.env.CMS_GRAPHQL_URL
 
 export async function getBlogSettings(locale: Locale) {
   try {
-    const res = await fetch(`${PAYLOAD_URL}/api/globals/knowledge-base-settings?locale=${locale}&depth=1`, {
+    const res = await fetch(`${PAYLOAD_URL}/api/globals/knowledge-base-settings?locale=${locale}&depth=2`, {
       next: { revalidate: 60 }
     })
     if (!res.ok) return null
@@ -36,7 +36,7 @@ export async function getInitialBlogs(locale: Locale, limit = 10) {
 export async function getBlogBySlug(slug: string, locale: string) {
   try {
     const response = await fetch(
-      `${PAYLOAD_URL}/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}&depth=1`,
+      `${PAYLOAD_URL}/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}&depth=2`,
       { next: { revalidate: 60 } }
     )
 

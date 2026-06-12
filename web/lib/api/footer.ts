@@ -22,13 +22,13 @@ export async function getFooterData(locale: string = 'en') {
     const CMS_URL = getCmsUrl();
     try {
       const [footerRes, socialRes] = await Promise.all([
-        fetch(`${CMS_URL}/api/globals/footer?locale=${locale}&depth=1`, {
+        fetch(`${CMS_URL}/api/globals/footer?locale=${locale}&depth=2`, {
           headers: {
             'Content-Type': 'application/json',
           },
           next: { revalidate: 3600 },
         }),
-        fetch(`${CMS_URL}/api/globals/social-config?locale=${locale}&depth=1`, {
+        fetch(`${CMS_URL}/api/globals/social-config?locale=${locale}&depth=2`, {
           headers: {
             'Content-Type': 'application/json',
           },

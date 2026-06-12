@@ -26,7 +26,7 @@ export async function getProductBySlug(slug: string, locale: string, noFallback 
 
     // 1. Fetch the main product document
     const response = await fetch(
-      `${PAYLOAD_URL}/api/products?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}${fallbackParam}&depth=1`,
+      `${PAYLOAD_URL}/api/products?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}${fallbackParam}&depth=2`,
       { next: { revalidate: 60 } }
     )
 
