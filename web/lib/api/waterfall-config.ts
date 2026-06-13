@@ -20,39 +20,55 @@ export const defaultWaterfallConfig: WaterfallConfigData = {
   textHoldDuration: 3.0,
 }
 
+let waterfallPromiseCache: Record<string, Promise<WaterfallConfigData> | undefined> = {}
+let waterfallCacheTime: Record<string, number> = {}
+const CACHE_TTL = 60 * 1000
+
 export async function getWaterfallConfig(locale?: string): Promise<WaterfallConfigData> {
-  try {
-    const url = new URL(`${CMS_URL}/api/globals/waterfall-config`)
-    url.searchParams.append('depth', '1')
-    if (locale) {
-      url.searchParams.append('locale', locale)
-    }
-
-    const response = await fetch(url.toString(), {
-      next: { revalidate: 60 },
-      redirect: 'manual',
-    })
-
-    if (!response.ok || response.status === 302) {
-      return defaultWaterfallConfig
-    }
-
-    const text = await response.text()
-    if (!text || text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
-      return defaultWaterfallConfig
-    }
-
-    const data = JSON.parse(text)
-
-    return {
-      imageStaggerDelay: data.imageStaggerDelay ?? defaultWaterfallConfig.imageStaggerDelay,
-      imageAnimationDuration: data.imageAnimationDuration ?? defaultWaterfallConfig.imageAnimationDuration,
-      imageHoldDuration: data.imageHoldDuration ?? defaultWaterfallConfig.imageHoldDuration,
-      textAnimationDuration: data.textAnimationDuration ?? defaultWaterfallConfig.textAnimationDuration,
-      textHoldDuration: data.textHoldDuration ?? defaultWaterfallConfig.textHoldDuration,
-    }
-  } catch (error) {
-    console.error('Error fetching waterfall config:', error)
-    return defaultWaterfallConfig
+  const cacheKey = locale || 'default'
+  const now = Date.now()
+  if (waterfallPromiseCache[cacheKey] && now - (waterfallCacheTime[cacheKey] || 0) < CACHE_TTL) {
+    return waterfallPromiseCache[cacheKey]
   }
+
+  const fetchPromise = (async () => {
+    try {
+      const url = new URL(`${CMS_URL}/api/globals/waterfall-config`)
+      url.searchParams.append('depth', '1')
+      if (locale) {
+        url.searchParams.append('locale', locale)
+      }
+
+      const response = await fetch(url.toString(), {
+        next: { revalidate: 60 },
+        redirect: 'manual',
+      })
+
+      if (!response.ok || response.status === 302) {
+        return defaultWaterfallConfig
+      }
+
+      const text = await response.text()
+      if (!text || text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
+        return defaultWaterfallConfig
+      }
+
+      const data = JSON.parse(text)
+
+      return {
+        imageStaggerDelay: data.imageStaggerDelay ?? defaultWaterfallConfig.imageStaggerDelay,
+        imageAnimationDuration: data.imageAnimationDuration ?? defaultWaterfallConfig.imageAnimationDuration,
+        imageHoldDuration: data.imageHoldDuration ?? defaultWaterfallConfig.imageHoldDuration,
+        textAnimationDuration: data.textAnimationDuration ?? defaultWaterfallConfig.textAnimationDuration,
+        textHoldDuration: data.textHoldDuration ?? defaultWaterfallConfig.textHoldDuration,
+      }
+    } catch (error) {
+      console.error('Error fetching waterfall config:', error)
+      return defaultWaterfallConfig
+    }
+  })();
+
+  waterfallPromiseCache[cacheKey] = fetchPromise
+  waterfallCacheTime[cacheKey] = now
+  return fetchPromise
 }

@@ -116,6 +116,7 @@ interface CustomScriptsResponse {
 }
 
 // Cache for custom scripts (revalidate every 5 minutes)
+let scriptsPromiseCache: Promise<CustomScript[]> | null = null;
 let scriptsCache: CustomScript[] | null = null
 let scriptsCacheTime = 0
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
@@ -247,32 +248,36 @@ export async function getAllCustomScripts(): Promise<CustomScript[]> {
   const now = Date.now()
 
   // Return cached data if still valid
-  if (scriptsCache && now - scriptsCacheTime < CACHE_TTL) {
-    return scriptsCache
+  if (scriptsPromiseCache && now - scriptsCacheTime < CACHE_TTL) {
+    return scriptsPromiseCache
   }
 
-  try {
-    const response = await fetch(
-      `${CMS_URL}/api/custom-scripts?where[isEnabled][equals]=true&limit=100&sort=-priority`,
-      {
-        next: { revalidate: 300 }, // 5 minutes
-      }
-    )
+  const fetchPromise = (async () => {
+    try {
+      const response = await fetch(
+        `${CMS_URL}/api/custom-scripts?where[isEnabled][equals]=true&limit=100&sort=-priority`,
+        {
+          next: { revalidate: 300 }, // 5 minutes
+        }
+      )
 
-    if (!response.ok) {
-      console.error('[CustomScripts] Failed to fetch:', response.status)
+      if (!response.ok) {
+        console.error('[CustomScripts] Failed to fetch:', response.status)
+        return scriptsCache || [] // Use old memory cache as absolute fallback if available
+      }
+
+      const data: CustomScriptsResponse = await response.json()
+      scriptsCache = data.docs || []
+      return scriptsCache
+    } catch (error) {
+      console.error('[CustomScripts] Error fetching scripts:', error)
       return scriptsCache || []
     }
+  })();
 
-    const data: CustomScriptsResponse = await response.json()
-    scriptsCache = data.docs || []
-    scriptsCacheTime = now
-
-    return scriptsCache
-  } catch (error) {
-    console.error('[CustomScripts] Error fetching scripts:', error)
-    return scriptsCache || []
-  }
+  scriptsPromiseCache = fetchPromise;
+  scriptsCacheTime = now;
+  return fetchPromise;
 }
 
 /**

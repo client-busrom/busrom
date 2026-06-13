@@ -161,62 +161,77 @@ async function resolveImageWallItem(item: any): Promise<ImageWallItem | null> {
  * const config = await getPreloaderConfig()
  * ```
  */
+let preloaderPromiseCache: Promise<PreloaderConfigData> | null = null;
+let preloaderCacheTime: number = 0;
+const CACHE_TTL = 60 * 1000;
+
 export async function getPreloaderConfig(): Promise<PreloaderConfigData> {
-  try {
-    const response = await fetch(`${CMS_URL}/api/globals/preloader-config?depth=1`, {
-      next: { revalidate: 60 }, // Revalidate every 60 seconds
-      redirect: 'manual', // Don't follow redirects (302 to /signin means auth required)
-    })
-
-    // If redirected (302) or not OK, return default config
-    if (!response.ok || response.status === 302) {
-      console.warn(`Failed to fetch preloader config: ${response.status} ${response.statusText}`)
-      return defaultPreloaderConfig
-    }
-
-    // Check content type to ensure we got JSON, not HTML (login page)
-    const contentType = response.headers.get('content-type') || ''
-    if (!contentType.includes('application/json')) {
-      console.warn(`Preloader config returned non-JSON content type: ${contentType}`)
-      return defaultPreloaderConfig
-    }
-
-    const text = await response.text()
-    if (!text || text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
-      console.warn('Preloader config returned HTML instead of JSON')
-      return defaultPreloaderConfig
-    }
-
-    const data = JSON.parse(text)
-
-    // New structure: imageWallItems is an array of related ImageWallItem documents
-    const items = data.imageWallItems || []
-    const resolvedImages = await Promise.all(
-      items.map((item: any) => resolveImageWallItem(item))
-    )
-
-    // Pad to 7 images with nulls if fewer items
-    const images: (ImageWallItem | null)[] = [
-      ...resolvedImages,
-      ...Array(Math.max(0, 7 - resolvedImages.length)).fill(null),
-    ].slice(0, 7)
-
-    const hasImages = images.some(img => img !== null)
-
-    return {
-      enabled: data.enabled ?? true,
-      backgroundColor: data.backgroundColor || defaultPreloaderConfig.backgroundColor,
-      textColor: data.textColor || defaultPreloaderConfig.textColor,
-      highlightColor: data.highlightColor || defaultPreloaderConfig.highlightColor,
-      imageWallEnabled: data.imageWallEnabled ?? true,
-      images: hasImages ? images : defaultPreloaderConfig.images,
-      loadingDuration: data.loadingDuration || defaultPreloaderConfig.loadingDuration,
-      logoAnimationDuration: data.logoAnimationDuration || defaultPreloaderConfig.logoAnimationDuration,
-      imageWallDuration: data.imageWallDuration || defaultPreloaderConfig.imageWallDuration,
-      imageWallStagger: data.imageWallStagger || defaultPreloaderConfig.imageWallStagger,
-    }
-  } catch (error) {
-    console.error('Error fetching preloader config:', error)
-    return defaultPreloaderConfig
+  const now = Date.now();
+  if (preloaderPromiseCache && now - preloaderCacheTime < CACHE_TTL) {
+    return preloaderPromiseCache;
   }
+
+  const fetchPromise = (async () => {
+    try {
+      const response = await fetch(`${CMS_URL}/api/globals/preloader-config?depth=1`, {
+        next: { revalidate: 60 }, // Revalidate every 60 seconds
+        redirect: 'manual', // Don't follow redirects (302 to /signin means auth required)
+      })
+
+      // If redirected (302) or not OK, return default config
+      if (!response.ok || response.status === 302) {
+        console.warn(`Failed to fetch preloader config: ${response.status} ${response.statusText}`)
+        return defaultPreloaderConfig
+      }
+
+      // Check content type to ensure we got JSON, not HTML (login page)
+      const contentType = response.headers.get('content-type') || ''
+      if (!contentType.includes('application/json')) {
+        console.warn(`Preloader config returned non-JSON content type: ${contentType}`)
+        return defaultPreloaderConfig
+      }
+
+      const text = await response.text()
+      if (!text || text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
+        console.warn('Preloader config returned HTML instead of JSON')
+        return defaultPreloaderConfig
+      }
+
+      const data = JSON.parse(text)
+
+      // New structure: imageWallItems is an array of related ImageWallItem documents
+      const items = data.imageWallItems || []
+      const resolvedImages = await Promise.all(
+        items.map((item: any) => resolveImageWallItem(item))
+      )
+
+      // Pad to 7 images with nulls if fewer items
+      const images: (ImageWallItem | null)[] = [
+        ...resolvedImages,
+        ...Array(Math.max(0, 7 - resolvedImages.length)).fill(null),
+      ].slice(0, 7)
+
+      const hasImages = images.some(img => img !== null)
+
+      return {
+        enabled: data.enabled ?? true,
+        backgroundColor: data.backgroundColor || defaultPreloaderConfig.backgroundColor,
+        textColor: data.textColor || defaultPreloaderConfig.textColor,
+        highlightColor: data.highlightColor || defaultPreloaderConfig.highlightColor,
+        imageWallEnabled: data.imageWallEnabled ?? true,
+        images: hasImages ? images : defaultPreloaderConfig.images,
+        loadingDuration: data.loadingDuration || defaultPreloaderConfig.loadingDuration,
+        logoAnimationDuration: data.logoAnimationDuration || defaultPreloaderConfig.logoAnimationDuration,
+        imageWallDuration: data.imageWallDuration || defaultPreloaderConfig.imageWallDuration,
+        imageWallStagger: data.imageWallStagger || defaultPreloaderConfig.imageWallStagger,
+      }
+    } catch (error) {
+      console.error('Error fetching preloader config:', error)
+      return defaultPreloaderConfig
+    }
+  })();
+
+  preloaderPromiseCache = fetchPromise;
+  preloaderCacheTime = now;
+  return fetchPromise;
 }
