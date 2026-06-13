@@ -2,7 +2,6 @@ import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvid
 import type { Locale } from "@/i18n.config"
 import { ProductSeriesDetailClient } from "./ProductSeriesDetailClient"
 import { PageScripts } from "@/components/PageScripts"
-import { PageSeoInjector } from "@/components/seo"
 import type { Metadata } from "next"
 import { getProductSeriesBySlug } from "@/lib/api/product-series"
 import { getNonHomePageSeo, buildMetadata } from "@/lib/api/seo-settings"

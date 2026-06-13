@@ -7,7 +7,6 @@ import { parseFaqData } from "@/lib/parsers/faq-parser"
 import { FaqTemplate } from "@/components/templates/FaqTemplate"
 import { PAGE_SLUGS } from "@/lib/constants"
 import { PageScripts } from "@/components/PageScripts"
-import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 
 export async function generateMetadata({

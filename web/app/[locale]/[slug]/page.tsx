@@ -6,7 +6,6 @@ import { fetchPageData } from "@/lib/api/pages"
 import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 import { TemplateSwitcher } from "@/components/templates/TemplateSwitcher"
 import { PageScripts } from "@/components/PageScripts"
-import { PageSeoInjector } from "@/components/seo"
 
 interface DynamicPageProps {
   params: Promise<{ locale: Locale; slug: string }>

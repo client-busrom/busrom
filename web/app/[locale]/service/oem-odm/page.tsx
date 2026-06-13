@@ -2,7 +2,6 @@ import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvid
 import type { Locale } from "@/i18n.config"
 import { OemOdmTemplate } from "@/components/templates/OemOdmTemplate"
 import { PageScripts } from "@/components/PageScripts"
-import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 import { fetchPageData } from "@/lib/api/pages"
 import { parseOemOdmData } from "@/lib/parsers/oem-odm-parser"

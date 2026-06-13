@@ -1,7 +1,6 @@
 import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import type { Locale } from "@/i18n.config"
 import { PageScripts } from "@/components/PageScripts"
-import { PageSeoInjector } from "@/components/seo"
 import { getPageMetadata, getNonHomePageSeo } from "@/lib/api/seo-settings"
 import type { Metadata } from "next"
 import { fetchPageData } from "@/lib/api/pages"

@@ -310,7 +310,7 @@ export function parseApplicationData(locale: string, pageContent: any): Applicat
       title: extractText("applications-title") || extractText("applications"),
       subtitle: extractText("applications-subtitle") || extractText("applications-item"),
       titleImage: findImgUrlByMarker("applications-title-image"),
-      applicationIds: caseCarousel?.data?.applications?.map((a: any) => a.id) || []
+      applicationIds: caseCarousel?.data?.applications?.map((a: any) => typeof a === 'object' && a !== null ? a.id : a) || []
     },
     moreApplications: {
       hasMore: moreAppNodes.length > 0,
@@ -318,7 +318,7 @@ export function parseApplicationData(locale: string, pageContent: any): Applicat
       tips: (findSubContent(moreAppNodes, "more-applications-tips")[0]?.children || []).map((c: any) => c.text).join("").trim(),
       ctaText: moreCta?.data?.title || "VIEW MORE",
       ctaHref: moreCta?.data?.url || "",
-      applicationIds: moreCarousel?.data?.applications?.map((a: any) => a.id) || []
+      applicationIds: moreCarousel?.data?.applications?.map((a: any) => typeof a === 'object' && a !== null ? a.id : a) || []
     },
     contactForm: {
       bgImage: findImgUrlByMarker("contact-form-bg-image"),
