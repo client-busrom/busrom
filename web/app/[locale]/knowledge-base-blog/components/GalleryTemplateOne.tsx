@@ -83,7 +83,7 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
                 <article key={item.id || idx} className="post-card group relative flex flex-col h-full">
                   <Link href={`/${localePrefix}/knowledge-base-blog/${item.slug}`} className="absolute inset-0 z-10" aria-label={item.title}></Link>
                   {/* Image Container with Corner Logic */}
-                  <div className="relative aspect-[4/3] mb-6 group">
+                  <div className="relative aspect-[402.66/320] mb-6 group">
                     <div className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden">
                       <OptimizedImage
                         image={safeImage(item.coverImage)}

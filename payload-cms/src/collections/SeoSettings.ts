@@ -12,7 +12,8 @@
 import type { CollectionConfig } from 'payload'
 
 // Local cache for SEO matching to prevent DB overload during Next.js SSG build
-const seoCache = new Map<string, { time: number; data: any[] }>()
+const seoDataCache = new Map<string, { time: number; data: any[] }>()
+const seoPromiseCache = new Map<string, Promise<any[]>>()
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
 function matchPathPattern(pattern: string, path: string): boolean {
@@ -78,18 +79,25 @@ export const SeoSettings: CollectionConfig = {
           const now = Date.now()
 
           // Check in-memory cache
-          if (seoCache.has(cacheKey) && now - seoCache.get(cacheKey)!.time < CACHE_TTL) {
-            allSettings = seoCache.get(cacheKey)!.data
+          if (seoDataCache.has(cacheKey) && now - seoDataCache.get(cacheKey)!.time < CACHE_TTL) {
+            allSettings = seoDataCache.get(cacheKey)!.data
+          } else if (seoPromiseCache.has(cacheKey)) {
+            allSettings = await seoPromiseCache.get(cacheKey)!
           } else {
             // Fetch all rules with depth 0 to avoid DB overhead
-            const result = await req.payload.find({
+            const p = req.payload.find({
               collection: 'seo-settings',
               limit: 1000,
               depth: 0,
               locale: locale as any,
+            }).then((result: any) => {
+              const docs = result.docs
+              seoDataCache.set(cacheKey, { time: Date.now(), data: docs })
+              seoPromiseCache.delete(cacheKey)
+              return docs
             })
-            allSettings = result.docs
-            seoCache.set(cacheKey, { time: now, data: allSettings })
+            seoPromiseCache.set(cacheKey, p)
+            allSettings = await p
           }
 
           // Strip locale prefixes

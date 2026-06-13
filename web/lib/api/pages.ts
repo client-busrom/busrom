@@ -9,16 +9,32 @@ const getCmsUrl = () => {
   if (process.env.NODE_ENV === 'development') return 'http://localhost:3002';
   return 'https://cms.busromhouse.com';
 };
-
 import { fetchLimiter } from '../semaphore';
+
+let rawNavPromiseCache: Record<string, Promise<any> | undefined> = {};
+let rawNavCacheTime: Record<string, number> = {};
+const CACHE_TTL = 5 * 60 * 1000;
+
+async function getCachedNavigationMenus(locale: string, fallbackParam: string, cmsUrl: string) {
+  const cacheKey = `${locale}-${fallbackParam}`;
+  const now = Date.now();
+  if (rawNavPromiseCache[cacheKey] && now - (rawNavCacheTime[cacheKey] || 0) < CACHE_TTL) {
+    return rawNavPromiseCache[cacheKey];
+  }
+
+  const p = fetch(`${cmsUrl}/api/navigation-menus?locale=${locale}${fallbackParam}&limit=1000&depth=1`, { next: { revalidate: 3600 } })
+    .then(res => res.ok ? res.json() : { docs: [] });
+  rawNavPromiseCache[cacheKey] = p;
+  rawNavCacheTime[cacheKey] = now;
+  return p;
+}
 
 /**
  * Server-side utility to fetch page content and resolve media.
  * Optimized with Parallel Fetching to reduce TTFB.
  */
 export async function fetchPageData(slug: string, locale: string, noFallback = false) {
-  return fetchLimiter.run(async () => {
-    const cmsUrl = getCmsUrl();
+  const cmsUrl = getCmsUrl();
   const strategy = undefined; 
   const fallbackParam = noFallback ? '' : '&fallback-locale=en';
 
@@ -51,13 +67,13 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
     // 1. Fetch initial Page Data and Navigation Menus in Parallel
     const [pageRes, navRes] = await Promise.all([
       fetch(`${cmsUrl}/api/pages?where[slug][equals]=${slug}&locale=${locale}${fallbackParam}&depth=1`, { next: { revalidate: 3600 } }),
-      fetch(`${cmsUrl}/api/navigation-menus?locale=${locale}${fallbackParam}&limit=1000&depth=1`, { next: { revalidate: 3600 } })
+      getCachedNavigationMenus(locale, fallbackParam, cmsUrl)
     ]);
 
     if (!pageRes.ok) return null;
     const [result, navData] = await Promise.all([
       pageRes.json(),
-      navRes.ok ? navRes.json() : { docs: [] }
+      Promise.resolve(navRes)
     ]);
 
     if (!result.docs?.length) return null;
@@ -353,5 +369,4 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
     console.error(`Error fetching page data for ${slug}:`, e);
     return null;
   }
-  });
 }
