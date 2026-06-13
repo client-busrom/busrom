@@ -20,14 +20,14 @@ export function PopularTopics({
 
   return (
     <section className="bg-transparent py-24 sm:py-32 overflow-hidden">
-      <div className="container mx-auto px-6">
+      <div className="mx-auto w-full px-6 max-w-[1280px]">
         <div className="mb-14 text-center">
-          <h2 className="text-[16px] font-bold tracking-[0.3em] inline-flex items-center text-[#060C14] pl-4 relative after:absolute after:rounded-full after:content-[''] after:h-2 after:w-2 after:bg-[#ff4848] after:left-0">
+          <h2 className="text-base uppercase font-lexend-deca font-bold pl-4 relative after:absolute after:rounded-full -mt-1 after:content-[''] after:h-2 after:w-2 after:bg-[#ff4848] after:left-0 after:top-2 w-fit mx-auto">
             {config?.navTitle || "POPULAR TOPICS"}
           </h2>
         </div>
 
-        <ul className="text-center flex flex-wrap justify-center gap-x-4 gap-y-8 sm:gap-x-10 lg:gap-x-14 font-prata text-black">
+        <ul className="text-center flex flex-wrap justify-center gap-x-3 gap-y-4 sm:gap-6 lg:gap-8 [&>li]:text-2xl sm:[&>li]:text-3xl lg:[&>li]:text-4xl [&>li]:cursor-pointer font-prata text-black [&>li]:capitalize">
           {/* ALL Category */}
           <li className="relative group transition-all duration-300 list-none">
             <Link
@@ -35,7 +35,7 @@ export function PopularTopics({
               className="inline-block relative"
             >
               <span
-                className={`transition-all duration-100 relative z-30 text-[36px] capitalize group-hover:text-white group-hover:drop-shadow-lg`}
+                className={`transition-all duration-100 relative z-30 group-hover:text-white group-hover:drop-shadow-lg`}
               >
                 {allLabel || "all"}
               </span>
@@ -49,7 +49,7 @@ export function PopularTopics({
                 />
               </span>
             </Link>
-            <span className="ml-4 sm:ml-10 lg:ml-14 opacity-10 text-[36px] font-light">
+            <span className="ml-3 sm:ml-6 lg:ml-8 opacity-30 text-[36px] font-light">
               /
             </span>
           </li>
@@ -83,7 +83,7 @@ export function PopularTopics({
                   className="inline-block relative"
                 >
                   <span
-                    className={`transition-all duration-100 relative z-30 text-[36px] capitalize group-hover:text-white group-hover:drop-shadow-lg`}
+                    className={`transition-all duration-100 relative z-30 group-hover:text-white group-hover:drop-shadow-lg`}
                   >
                     {tab.name}
                   </span>
@@ -100,7 +100,7 @@ export function PopularTopics({
                   )}
                 </Link>
                 {idx < categoryTabs.length - 1 && (
-                  <span className="ml-4 sm:ml-10 lg:ml-14 opacity-10 text-[36px] font-light">
+                  <span className="ml-3 sm:ml-6 lg:ml-8 opacity-30 text-[36px] font-light">
                     /
                   </span>
                 )}

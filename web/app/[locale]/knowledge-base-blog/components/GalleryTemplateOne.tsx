@@ -34,22 +34,22 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
           {/* LEFT SIDEBAR - 1/3 Width (col-4) */}
           <div className="w-full lg:w-1/3">
             <div className="sticky top-24 text-center lg:text-start">
-              <p className="inline-flex items-center text-xs uppercase font-bold tracking-widest text-[#9C9C8C] mb-8">
+              <p className="inline-flex items-center font-lexend-deca text-[16px] font-bold tracking-widest text-[#9C9C8C] mb-8">
                 <span className="w-2 h-2 rounded-full bg-primary mr-3"></span>
                 {section.tagTitle || "Latest Articles"}
               </p>
 
-              <h2 className="text-4xl lg:text-5xl font-prata !leading-[1.2] mb-10 text-[#060C14]">
+              <h2 className="text-[36px] font-prata !leading-[1.2] mb-10 text-[#060C14]">
                 {section.introTitle}
               </h2>
 
-              <p className="text-[#4E4C3D] text-sm sm:text-base leading-relaxed uppercase font-light tracking-wide mb-12">
+              <p className="text-[#4E4C3D] font-lexend-deca text-[16px] leading-relaxed font-light tracking-wide mb-12">
                 {section.introDesc}
               </p>
 
               <div className="hidden lg:block">
                 <Link
-                  className="inline-flex items-center px-10 py-5 border border-[#DBD8BD] rounded-full uppercase text-[15px] font-black tracking-[0.2em] text-[#060C14] hover:bg-[#060C14] hover:text-white hover:border-[#060C14] transition-colors duration-500 group overflow-hidden"
+                  className="inline-flex items-center px-10 py-5 border border-[#DBD8BD] rounded-full font-lexend-deca text-[15px] font-black tracking-[0.2em] text-[#060C14] hover:bg-[#060C14] hover:text-white hover:border-[#060C14] transition-colors duration-500 group overflow-hidden"
                   href={section.buttonLink || fallbackLink}
                   onClick={(e) => {
                     if (typeof window !== 'undefined' && !section.buttonLink && fallbackTag) {
@@ -100,7 +100,7 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
                             sessionStorage.setItem('pendingBlogTag', item.tags[0].slug);
                           }
                         }}
-                        className="border-2 border-[#756f3f] text-[#060C14] hover:bg-[#756f3f] hover:text-white transition duration-300 rounded-[8px] px-3 py-1 text-[10px] font-bold tracking-widest inline-flex uppercase"
+                        className="border-2 border-[#756f3f] text-[#060C14] hover:bg-[#756f3f] hover:text-white transition duration-300 rounded-[8px] px-3 py-1 font-lexend-deca text-[14px] font-normal tracking-widest inline-flex"
                       >
                         {item.tags?.[0]?.name || "Featured"}
                       </Link>
@@ -118,7 +118,7 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
                   </div>
 
                   <div className="text-center px-4">
-                    <h3 className="text-[26px] font-prata text-[#060C14] leading-[1.4] mb-4 relative z-0 pointer-events-none">
+                    <h3 className="text-[24px] font-prata text-[#060C14] leading-[1.4] mb-4 relative z-0 pointer-events-none">
                       <span className="bg-gradient-to-r from-current to-current bg-[length:0%_2px] bg-no-repeat bg-right-bottom transition-[background-size] duration-500 group-hover:bg-[length:100%_2px] group-hover:bg-left-bottom">
                         {item.title}
                       </span>
@@ -134,7 +134,7 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
                           className="w-10 h-10"
                         />
                       )}
-                      <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">{item.author?.name || "Nilima"}</span>
+                      <span className="font-lexend-deca text-[14px] font-bold text-gray-500 tracking-widest">{item.author?.name || "Nilima"}</span>
                     </div>
 
                     <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#F5F4E9] group-hover:bg-[#060C14] group-hover:text-white transition-all duration-300 group-hover:rotate-45 relative z-0">
@@ -150,7 +150,7 @@ export function GalleryTemplateOne({ section, items, locale }: any) {
             {/* Mobile Button Fallback */}
             <div className="mt-16 text-center lg:hidden">
               <Link
-                className="inline-flex items-center px-10 py-5 border border-[#DBD8BD] rounded-full uppercase text-[15px] font-black tracking-[0.2em] text-[#060C14] hover:bg-[#060C14] hover:text-white hover:border-[#060C14] transition-colors duration-500 group overflow-hidden"
+                className="inline-flex items-center px-10 py-5 border border-[#DBD8BD] rounded-full font-lexend-deca text-[15px] font-black tracking-[0.2em] text-[#060C14] hover:bg-[#060C14] hover:text-white hover:border-[#060C14] transition-colors duration-500 group overflow-hidden"
                 href={section.buttonLink || fallbackLink}
                 onClick={(e) => {
                   if (typeof window !== 'undefined' && !section.buttonLink && fallbackTag) {

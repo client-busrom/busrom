@@ -67,9 +67,9 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
                 </svg>
                 <div className="h-8 bg-[#756f3f] rounded-tr-xl md:rounded-tr-2xl flex items-start pr-4 pl-2 max-w-[60vw] sm:max-w-[320px]">
                   {/* Featured Badge */}
-                  <div className="relative text-[16px] font-bold tracking-widest pl-7 pr-2 py-[6px] after:absolute after:rounded-full after:content-[''] after:h-[8px] after:w-[8px] after:bg-[#ff4848] after:left-[13px] after:top-1/2 after:-translate-y-1/2 text-white bg-white/10 backdrop-blur-md rounded-[16px] border border-white/10 mt-[15px]">
+                  <div className="relative text-[14px] font-bold tracking-widest pl-7 pr-3 py-1 after:absolute after:rounded-full after:content-[''] after:h-[8px] after:w-[8px] after:bg-[#ff4848] after:left-[13px] after:top-1/2 after:-translate-y-1/2 text-white bg-white/10 backdrop-blur-md rounded-[16px] border border-white/10 mt-[15px]">
                     <div
-                      className="hero-tag-scroll-area overflow-y-auto overflow-x-hidden overscroll-contain pr-2 break-words whitespace-normal"
+                      className="hero-tag-scroll-area overflow-y-auto overflow-x-hidden overscroll-contain break-words whitespace-normal font-lexend-deca"
                       data-lenis-prevent="true"
                       style={{ maxHeight: '44px', lineHeight: '22px' }}
                     >
@@ -84,13 +84,13 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
 
               <div className="mt-6 text-white">
 
-                <h3 className="text-3xl sm:text-4xl text-white !leading-normal line-clamp-3 relative z-0 pointer-events-none">
+                <h3 className="font-prata text-[36px] text-white !leading-normal line-clamp-3 relative z-0 pointer-events-none">
                   <span className="bg-gradient-to-r from-white to-white bg-[length:0%_2px] bg-no-repeat bg-right-bottom transition-[background-size] duration-500 group-hover:bg-[length:100%_2px] group-hover:bg-left-bottom">
                     {hero.post.title}
                   </span>
                 </h3>
 
-                <ul className="flex flex-wrap items-center justify-center gap-3 gap-y-1 text-sm mt-6 mb-4">
+                <ul className="font-lexend-deca flex flex-wrap items-center justify-center gap-3 gap-y-1 text-sm mt-6 mb-[52px]">
                   <li className="flex items-center">
                     {hero.post.author?.avatar && (
                       <OptimizedImage
@@ -136,7 +136,7 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
               <OptimizedImage
                 image={safeImage(hero.post.coverImage)}
                 alt={hero.post.title}
-                size="large"
+                size="medium"
                 priority
                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
               />
@@ -150,7 +150,7 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
                     sessionStorage.setItem('pendingBlogTag', hero.post.tags[0].slug);
                   }
                 }}
-                className="border-2 border-[#756f3f] transition duration-300 hover:text-white hover:border-[#756f3f] text-dark bg-transparent hover:bg-[#756f3f] rounded-[8px] px-5 py-2 text-[14px] font-bold tracking-widest inline-flex"
+                className="font-lexend-deca border-2 border-[#756f3f] transition duration-300 hover:text-white hover:border-[#756f3f] text-dark bg-transparent hover:bg-[#756f3f] rounded-[8px] px-5 py-2 text-[14px] font-bold tracking-widest inline-flex"
               >
                 {hero.post.tags?.[0]?.name || "Featured"}
               </Link>
@@ -178,7 +178,7 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
                     ? `${localePrefix}/knowledge-base-blogs/${hero.post.categories[0].slug}`
                     : `${localePrefix}/knowledge-base-blogs`
                 }
-                className="border-2 border-[#756f3f] transition duration-300 hover:text-white hover:border-[#756f3f] text-dark bg-transparent hover:bg-[#756f3f] rounded-[8px] px-5 py-2 text-[14px] font-bold tracking-widest inline-flex"
+                className="font-lexend-deca border-2 border-[#756f3f] transition duration-300 hover:text-white hover:border-[#756f3f] text-dark bg-transparent hover:bg-[#756f3f] rounded-[8px] px-5 py-2 text-[14px] font-bold tracking-widest inline-flex"
               >
                 {hero.post.categories?.[0]?.name || "security"}
               </Link>

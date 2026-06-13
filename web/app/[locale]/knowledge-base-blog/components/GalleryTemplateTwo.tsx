@@ -29,20 +29,20 @@ export function GalleryTemplateTwo({ section, items, locale }: any) {
           {/* SIDEBAR - 5/12 width */}
           <div className="w-full lg:w-[41.6%]">
             <div className="sticky top-24 text-center lg:text-start">
-              <p className="inline-flex items-center text-xs uppercase font-bold tracking-widest text-gray-400 mb-8">
+              <p className="inline-flex items-center font-lexend-deca text-[16px] font-bold tracking-widest text-gray-400 mb-8">
                 <span className="w-2 h-2 rounded-full bg-primary mr-3"></span>
                 {section.tagTitle || "Popular Articles"}
               </p>
-              <h2 className="text-4xl lg:text-5xl font-prata !leading-[1.2] mb-10 text-white">
+              <h2 className="text-[36px] font-prata !leading-[1.2] mb-10 text-white">
                 {section.introTitle}
               </h2>
-              <p className="text-gray-400 text-sm sm:text-base leading-relaxed uppercase font-light tracking-wide mb-12">
+              <p className="text-gray-400 font-lexend-deca text-[16px] leading-relaxed font-light tracking-wide mb-12">
                 {section.introDesc}
               </p>
 
               <div className="block lg:hidden mb-12">
-                <Link 
-                  className="inline-flex items-center px-10 py-5 border border-[#DBD8BD] rounded-full uppercase text-[15px] font-black tracking-[0.2em] text-white hover:bg-white hover:text-[#060C14] hover:border-white transition-colors duration-500 group overflow-hidden"
+                <Link
+                  className="inline-flex items-center px-10 py-5 border border-[#DBD8BD] rounded-full font-lexend-deca text-[15px] font-black tracking-[0.2em] text-white hover:bg-white hover:text-[#060C14] hover:border-white transition-colors duration-500 group overflow-hidden"
                   href={section.buttonLink || fallbackLink}
                   onClick={(e) => {
                     if (typeof window !== 'undefined' && !section.buttonLink && fallbackTag) {
@@ -62,8 +62,8 @@ export function GalleryTemplateTwo({ section, items, locale }: any) {
               </div>
 
               <div className="hidden lg:block">
-                <Link 
-                  className="inline-flex items-center px-10 py-5 border border-[#DBD8BD] rounded-full uppercase text-[15px] font-black tracking-[0.2em] text-white hover:bg-white hover:text-[#060C14] hover:border-white transition-colors duration-500 group overflow-hidden"
+                <Link
+                  className="inline-flex items-center px-10 py-5 border border-[#DBD8BD] rounded-full font-lexend-deca text-[15px] font-black tracking-[0.2em] text-white hover:bg-white hover:text-[#060C14] hover:border-white transition-colors duration-500 group overflow-hidden"
                   href={section.buttonLink || fallbackLink}
                   onClick={(e) => {
                     if (typeof window !== 'undefined' && !section.buttonLink && fallbackTag) {
@@ -112,14 +112,14 @@ export function GalleryTemplateTwo({ section, items, locale }: any) {
                           />
                         </div>
                         <span className="absolute top-0 right-0 z-20 flex items-center justify-center bg-[#060C14] rounded-bl-xl pl-2 pb-2 pointer-events-auto">
-                          <Link 
+                          <Link
                             href={`${localePrefix}/knowledge-base-blogs`}
                             onClick={() => {
                               if (typeof window !== 'undefined' && item.tags?.[0]?.slug) {
                                 sessionStorage.setItem('pendingBlogTag', item.tags[0].slug);
                               }
                             }}
-                            className="border-2 border-[#756f3f] text-white hover:bg-[#756f3f] transition duration-300 rounded-[8px] px-3 py-1 text-[10px] font-bold tracking-widest inline-flex uppercase"
+                            className="border-2 border-[#756f3f] text-white hover:bg-[#756f3f] transition duration-300 rounded-[8px] px-3 py-1 font-lexend-deca text-[14px] font-normal tracking-widest inline-flex"
                           >
                             {item.tags?.[0]?.name || "Featured"}
                           </Link>
@@ -137,7 +137,7 @@ export function GalleryTemplateTwo({ section, items, locale }: any) {
                       </div>
 
                       <div className="max-w-xl">
-                        <h3 className="text-[26px] font-prata text-white leading-[1.4] mb-6 relative z-0 pointer-events-none">
+                        <h3 className="text-[24px] font-prata text-white leading-[1.4] mb-6 relative z-0 pointer-events-none">
                           <span className="bg-gradient-to-r from-current to-current bg-[length:0%_2px] bg-no-repeat bg-right-bottom transition-[background-size] duration-500 group-hover:bg-[length:100%_2px] group-hover:bg-left-bottom">
                             {item.title}
                           </span>
@@ -153,7 +153,7 @@ export function GalleryTemplateTwo({ section, items, locale }: any) {
                               className="w-10 h-10"
                             />
                           )}
-                          <span className="text-[12px] font-bold tracking-widest">{item.author?.name || "Nilima"}</span>
+                          <span className="font-lexend-deca text-[14px] font-bold tracking-widest">{item.author?.name || "Nilima"}</span>
                         </div>
 
                         <span className="inline-flex items-center justify-center w-12 h-12 rounded-full border border-white/10 group-hover:bg-white group-hover:text-black transition-all duration-300 group-hover:rotate-45 relative z-0">
