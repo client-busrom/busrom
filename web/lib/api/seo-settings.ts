@@ -68,20 +68,23 @@ const emptyDistribution: KeywordDistribution = {
   totalKeywords: 0,
 }
 
+import { fetchLimiter } from '../semaphore';
+
 export const getMatchedSeo = cache(
   async (path: string, pageType?: string, locale: string = 'en'): Promise<MatchResponse> => {
-    try {
-      const queryParams = new URLSearchParams({
-        path: path || '/',
-        locale: locale,
-      })
-      if (pageType) {
-        queryParams.append('pageType', pageType)
-      }
+    return fetchLimiter.run(async () => {
+      try {
+        const queryParams = new URLSearchParams({
+          path: path || '/',
+          locale: locale,
+        })
+        if (pageType) {
+          queryParams.append('pageType', pageType)
+        }
 
-      const response = await fetch(`${CMS_URL}/api/seo-settings/match?${queryParams.toString()}`, {
-        next: { revalidate: 300 }, // 5 minutes cache
-      })
+        const response = await fetch(`${CMS_URL}/api/seo-settings/match?${queryParams.toString()}`, {
+          next: { revalidate: 300 }, // 5 minutes cache
+        })
 
       if (!response.ok) {
         console.error('[SeoSettings] Failed to fetch matched SEO:', response.status)
@@ -119,6 +122,7 @@ export const getMatchedSeo = cache(
         distributedKeywords: emptyDistribution,
       }
     }
+    });
   }
 )
 

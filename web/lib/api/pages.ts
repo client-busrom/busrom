@@ -10,12 +10,15 @@ const getCmsUrl = () => {
   return 'https://cms.busromhouse.com';
 };
 
+import { fetchLimiter } from '../semaphore';
+
 /**
  * Server-side utility to fetch page content and resolve media.
  * Optimized with Parallel Fetching to reduce TTFB.
  */
 export async function fetchPageData(slug: string, locale: string, noFallback = false) {
-  const cmsUrl = getCmsUrl();
+  return fetchLimiter.run(async () => {
+    const cmsUrl = getCmsUrl();
   const strategy = undefined; 
   const fallbackParam = noFallback ? '' : '&fallback-locale=en';
 
@@ -350,4 +353,5 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
     console.error(`Error fetching page data for ${slug}:`, e);
     return null;
   }
+  });
 }
