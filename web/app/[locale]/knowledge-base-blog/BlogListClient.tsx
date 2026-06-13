@@ -19,7 +19,9 @@ interface BlogListClientProps {
 
 // Helper to prevent OptimizedImage from crashing on raw IDs (numbers)
 export const safeImage = (img: any) => {
+  if (!img) return null;
   if (typeof img === "number") return null;
+  if (typeof img === "string" && !img.includes("/") && !img.includes(".")) return null;
   return img;
 };
 
@@ -74,6 +76,17 @@ export function BlogListClient({
     if (!config?.kbCategoryTabs) return;
 
     const missingIds: string[] = [];
+    
+    if (config.featuredPost) {
+      const pId = typeof config.featuredPost === 'object' ? config.featuredPost.id : config.featuredPost;
+      if (pId) {
+        const alreadyPopulated = blogs.find(b => String(b.id) === String(pId));
+        if (!alreadyPopulated && !hydratedPosts[pId]) {
+          missingIds.push(String(pId));
+        }
+      }
+    }
+
     config.kbCategoryTabs.forEach((tab: any) => {
       const postsList = tab.blogPosts?.docs || (Array.isArray(tab.blogPosts) ? tab.blogPosts : []);
 
@@ -266,9 +279,12 @@ export function BlogListClient({
       .filter((s) => !!s); // Final safety filter
   }, [config?.sectionsData, locale, articlePool, blogs]);
 
+  const heroPostId = config?.featuredPost ? (typeof config?.featuredPost === 'object' ? config.featuredPost.id : config.featuredPost) : null;
+  const heroPostObj = heroPostId ? (hydratedPosts[heroPostId] || articlePool.find((p: any) => String(p.id) === String(heroPostId)) || (typeof config.featuredPost === 'object' ? config.featuredPost : null)) : (blogs.length > 0 ? blogs[0] : null);
+
   const hero = {
     tag: config?.heroTitle || (locale === "zh" ? "本周推荐" : "FEATURED"),
-    post: config?.featuredPost || (blogs.length > 0 ? blogs[0] : null),
+    post: heroPostObj,
   };
 
   const categoryTabs = config?.kbCategoryTabs || [];

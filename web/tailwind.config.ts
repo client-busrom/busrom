@@ -187,6 +187,8 @@ const config: Config = {
         'katibeh': ['var(--font-katibeh)', 'cursive'],
         'kavivanar': ['var(--font-kavivanar)', 'Kavivanar', 'cursive'],
         'acme': ['var(--font-acme)', 'sans-serif'],
+        'prata': ['var(--font-prata)', 'serif'],
+        'lexend-deca': ['var(--font-lexend-deca)', 'sans-serif'],
 
         // --- 系统字体 (直接使用名字) ---
         'arial':       ['Arial', 'sans-serif'],

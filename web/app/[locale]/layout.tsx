@@ -221,19 +221,19 @@ const katibeh = Katibeh({
   preload: true,
 });
 
-const fontPrata = Prata({
+const fontPrata = localFont({
+  src: "../../public/fonts/Prata-Regular.ttf",
   weight: "400",
   variable: "--font-prata",
   display: "swap",
-  subsets: ["latin"],
   preload: false,
 });
 
-const fontLexendDeca = Lexend_Deca({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+const fontLexendDeca = localFont({
+  src: "../../public/fonts/LexendDeca-VariableFont_wght.ttf",
+  weight: "100 900",
   variable: "--font-lexend-deca",
   display: "swap",
-  subsets: ["latin"],
   preload: false,
 });
 
