@@ -10,6 +10,7 @@ import FooterSimple from "./FooterSimple";
 import FooterBottom from "./FooterBottom";
 import SuccessModal from "./SuccessModal";
 import { cn } from "@/lib/utils";
+import { useSeoDataAttr } from "@/components/product-series/SeoKeywordProvider";
 
 type Props = {
   locale: Locale;
@@ -112,6 +113,7 @@ export default function Footer({
         )}
         style={{ minHeight: "calc(var(--rpx) * 1000)" }}
         data-header-theme={headerTheme || "transparent"}
+        data-seo-tag={useSeoDataAttr() || undefined}
       >
         <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"

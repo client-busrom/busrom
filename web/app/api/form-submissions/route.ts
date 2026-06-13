@@ -105,7 +105,12 @@ async function checkRateLimit(
       const todayISO = today.toISOString()
 
       const countRes = await fetch(
-        `${CMS_URL}/api/form-submissions?where[formName][equals]=${encodeURIComponent(formName)}&where[submittedAt][greater_than_equal]=${encodeURIComponent(todayISO)}&limit=0`
+        `${CMS_URL}/api/form-submissions?where[formName][equals]=${encodeURIComponent(formName)}&where[submittedAt][greater_than_equal]=${encodeURIComponent(todayISO)}&limit=0`,
+        {
+          headers: {
+            'x-internal-token': process.env.REVALIDATE_SECRET || '',
+          }
+        }
       )
 
       if (countRes.ok) {

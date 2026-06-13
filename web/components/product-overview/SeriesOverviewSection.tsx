@@ -161,6 +161,7 @@ export function SeriesOverviewSection({ data }: SeriesOverviewSectionProps) {
       <div
         className="hidden md:flex flex-col items-center w-full relative"
         style={{ 
+          marginTop: vw(-186),
           paddingTop: vw(346), 
           paddingBottom: vw(40) 
         }}

@@ -33,21 +33,20 @@ export default async function BlogCategoryPage({
   const resolvedSearchParams = await searchParams
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo(`/knowledge-base-blogs`, "knowledge_base_list", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', `/knowledge-base-blogs`, e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path={`/knowledge-base-blogs`} pageType="knowledge_base_list" position="header" />
       <PageScripts path={`/knowledge-base-blogs`} pageType="knowledge_base_list" position="body_start" />
-      <PageSeoInjector path={`/knowledge-base-blogs`} pageType="knowledge_base_list" locale={locale} />
-      <BlogListPageClient locale={locale} searchParams={resolvedSearchParams} slugMode={true} />
+            <BlogListPageClient locale={locale} searchParams={resolvedSearchParams} slugMode={true} />
       <PageScripts path={`/knowledge-base-blogs`} pageType="knowledge_base_list" position="footer" />
           </SeoKeywordProvider>
     </>

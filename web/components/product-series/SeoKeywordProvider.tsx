@@ -1,43 +1,67 @@
 'use client';
 
 import React, { createContext, useContext, useRef } from 'react';
+import type { KeywordDistribution } from '@/lib/api/seo-settings';
 
-const SeoKeywordContext = createContext<() => string>(() => '');
+interface SeoContextValue {
+  getImgAlt: () => string;
+  getAriaLabel: () => string;
+  getDataAttr: () => string;
+  getAriaDesc: () => string;
+  getSrOnly: () => string;
+}
+
+const SeoKeywordContext = createContext<SeoContextValue>({
+  getImgAlt: () => '',
+  getAriaLabel: () => '',
+  getDataAttr: () => '',
+  getAriaDesc: () => '',
+  getSrOnly: () => '',
+});
 
 export interface SeoKeywordProviderProps {
-  totalImages?: number;
-  chunkSize?: number;
-  keywords: string[];
-  fallback: string;
-  startIndex?: number;
+  distribution?: KeywordDistribution;
+  keywords?: string[]; // Legacy fallback
+  fallback?: string;
+  totalImages?: number; // Legacy fallback
   children: React.ReactNode;
 }
 
-/**
- * A Context Provider that distributes an array of SEO keywords sequentially.
- * Each time `useSeoAlt()` is called, it returns the next keyword in the array.
- * If the array is empty, it returns the fallback string.
- */
-export const SeoKeywordProvider = ({ keywords, fallback, startIndex = 0, chunkSize, totalImages = 30, children }: SeoKeywordProviderProps) => {
-  const index = useRef(startIndex);
-  
-  const getAlt = () => {
-    if (!keywords || keywords.length === 0) return fallback;
-    const actualChunkSize = chunkSize || Math.max(1, Math.ceil(keywords.length / totalImages));
-    const start = (index.current * actualChunkSize) % keywords.length;
-    const chunk = keywords.slice(start, start + actualChunkSize);
-    const word = chunk.join(', ');
-    index.current++;
-    return word;
+export const SeoKeywordProvider = ({ distribution, keywords, fallback = '', totalImages = 30, children }: SeoKeywordProviderProps) => {
+  const indices = useRef({ img: 0, aria: 0, data: 0, desc: 0, sr: 0 });
+
+  const getChunkedKeyword = (list: string[] | undefined, refKey: keyof typeof indices.current, defaultVal: string = '', elementsCount: number = 30) => {
+    if (!list || list.length === 0) return defaultVal;
+    
+    // Calculate how many keywords to pack into one element to ensure most of the list gets used
+    const chunkSize = Math.max(1, Math.ceil(list.length / elementsCount));
+    const start = (indices.current[refKey] * chunkSize) % list.length;
+    const chunk = list.slice(start, start + chunkSize);
+    
+    indices.current[refKey]++;
+    return chunk.join(', ');
   };
 
-  return <SeoKeywordContext.Provider value={getAlt}>{children}</SeoKeywordContext.Provider>;
+  const contextValue: SeoContextValue = {
+    getImgAlt: () => {
+      if (keywords && keywords.length > 0) return getChunkedKeyword(keywords, 'img', fallback, totalImages);
+      return getChunkedKeyword(distribution?.imgAlts, 'img', fallback, totalImages);
+    },
+    getAriaLabel: () => getChunkedKeyword(distribution?.ariaLabels, 'aria', '', 20), // Assume ~20 buttons/links
+    getDataAttr: () => getChunkedKeyword(distribution?.dataAttributes, 'data', '', 5), // Assume ~5 layout elements
+    getAriaDesc: () => getChunkedKeyword(distribution?.ariaDescribedby, 'desc', '', 15),
+    getSrOnly: () => getChunkedKeyword(distribution?.srOnlyLabels, 'sr', '', 10),
+  };
+
+  return <SeoKeywordContext.Provider value={contextValue}>{children}</SeoKeywordContext.Provider>;
 };
 
-/**
- * Hook to get the next SEO keyword for use as an image alt attribute.
- * Must be used within a <SeoKeywordProvider>.
- */
 export const useSeoAlt = () => {
-  return useContext(SeoKeywordContext);
+  const ctx = useContext(SeoKeywordContext);
+  return ctx.getImgAlt;
 };
+
+export const useSeoAriaLabel = () => useContext(SeoKeywordContext).getAriaLabel();
+export const useSeoDataAttr = () => useContext(SeoKeywordContext).getDataAttr();
+export const useSeoAriaDesc = () => useContext(SeoKeywordContext).getAriaDesc();
+export const useSeoSrOnly = () => useContext(SeoKeywordContext).getSrOnly();

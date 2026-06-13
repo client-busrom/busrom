@@ -11,6 +11,28 @@
 
 import type { CollectionConfig } from 'payload'
 
+// Local cache for SEO matching to prevent DB overload during Next.js SSG build
+const seoCache = new Map<string, { time: number; data: any[] }>()
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
+function matchPathPattern(pattern: string, path: string): boolean {
+  if (!pattern) return false
+  const normalizedPattern = pattern.replace(/^\/|\/$/g, '')
+  const normalizedPath = path.replace(/^\/|\/$/g, '')
+
+  const regexPattern = normalizedPattern
+    .split('/')
+    .map(segment => {
+      if (segment === '**') return '.*'
+      if (segment === '*') return '[^/]+'
+      return segment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    })
+    .join('/')
+
+  const regex = new RegExp(`^${regexPattern}$`)
+  return regex.test(normalizedPath)
+}
+
 export const SeoSettings: CollectionConfig = {
   slug: 'seo-settings',
   labels: {
@@ -37,10 +59,202 @@ export const SeoSettings: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: ({ req }) => !!req.user,
-    update: ({ req }) => !!req.user,
-    delete: ({ req }) => !!req.user,
+    create: ({ req }: { req: any }) => !!req.user,
+    update: ({ req }: { req: any }) => !!req.user,
+    delete: ({ req }: { req: any }) => !!req.user,
   },
+  endpoints: [
+    {
+      path: '/match',
+      method: 'get',
+      handler: async (req: any) => {
+        try {
+          const path = (req.query.path as string) || '/'
+          const pageType = req.query.pageType as string
+          const locale = (req.query.locale as string) || 'en'
+
+          const cacheKey = `${locale}`
+          let allSettings: any[] = []
+          const now = Date.now()
+
+          // Check in-memory cache
+          if (seoCache.has(cacheKey) && now - seoCache.get(cacheKey)!.time < CACHE_TTL) {
+            allSettings = seoCache.get(cacheKey)!.data
+          } else {
+            // Fetch all rules with depth 0 to avoid DB overhead
+            const result = await req.payload.find({
+              collection: 'seo-settings',
+              limit: 1000,
+              depth: 0,
+              locale: locale as any,
+            })
+            allSettings = result.docs
+            seoCache.set(cacheKey, { time: now, data: allSettings })
+          }
+
+          // Strip locale prefixes
+          const normalizedPath =
+            path.replace(/^\/(en|zh|de|fr|es|pt|it|nl|pl|ru|ja|ko|ar|th|vi|id|ms|tr|hi|bn)/, '') || '/'
+
+          const matches: { setting: any; priority: number }[] = []
+
+          // Find matches
+          for (const setting of allSettings) {
+            let priority = 0
+            let isMatch = false
+
+            if (setting.scope === 'exact_path' && setting.exactPath === normalizedPath) {
+              priority = 4
+              isMatch = true
+            } else if (
+              setting.scope === 'path_pattern' &&
+              setting.pathPattern &&
+              matchPathPattern(setting.pathPattern, normalizedPath)
+            ) {
+              priority = 3
+              isMatch = true
+            } else if (setting.scope === 'page_type' && pageType && setting.pageType === pageType) {
+              priority = 2
+              isMatch = true
+            } else if (setting.scope === 'global') {
+              priority = 1
+              isMatch = true
+            }
+
+            if (isMatch) {
+              matches.push({ setting, priority })
+            }
+          }
+
+          // If no matches, just fallback to global ones
+          let allMatches = matches.length > 0 ? matches : allSettings.filter(s => s.scope === 'global').map(s => ({ setting: s, priority: 1 }))
+
+          // Sort matches
+          // 1. isMainSeo = true comes first
+          // 2. priority (exact > pattern > type > global)
+          // 3. createdAt
+          allMatches.sort((a, b) => {
+            if (a.setting.isMainSeo !== b.setting.isMainSeo) {
+              return a.setting.isMainSeo ? -1 : 1
+            }
+            if (a.priority !== b.priority) {
+              return b.priority - a.priority
+            }
+            const timeA = a.setting.createdAt ? new Date(a.setting.createdAt).getTime() : 0
+            const timeB = b.setting.createdAt ? new Date(b.setting.createdAt).getTime() : 0
+            return timeA - timeB
+          })
+
+          const highestPriority = allMatches.length > 0 ? { ...allMatches[0].setting } : null
+
+          // Populate ogImage if needed, since depth=0 was used
+          if (highestPriority && highestPriority.ogImage && typeof highestPriority.ogImage === 'number') {
+            try {
+              const media = await req.payload.findByID({
+                collection: 'media',
+                id: highestPriority.ogImage,
+                depth: 0,
+              })
+              highestPriority.ogImage = media
+            } catch (err) {
+              // Ignore invalid media IDs
+            }
+          }
+
+          // Extract text for distribution
+          const textsForDistribution: string[] = []
+
+          const extractText = (s: any) => {
+            const texts: string[] = []
+            if (s.metaTitle) texts.push(s.metaTitle)
+            if (s.metaDescription) texts.push(s.metaDescription)
+            if (s.metaKeywords) {
+              const keywords = s.metaKeywords
+                .split(/[,\n]/)
+                .map((k: string) => k.trim())
+                .filter((k: string) => k.length > 0)
+              texts.push(...keywords)
+            }
+            return texts
+          }
+
+          if (allMatches.length > 0) {
+            const first = allMatches[0].setting
+            // For the main SEO, only take keywords for distribution to avoid duplicating title/desc in hidden fields
+            if (first.metaKeywords) {
+              const keywords = first.metaKeywords
+                .split(/[,\n]/)
+                .map((k: string) => k.trim())
+                .filter((k: string) => k.length > 0)
+              textsForDistribution.push(...keywords)
+            }
+            // For secondary matching records, take everything
+            for (let i = 1; i < allMatches.length; i++) {
+              textsForDistribution.push(...extractText(allMatches[i].setting))
+            }
+          }
+
+          // Remove duplicates and shuffle
+          const uniqueTexts = [...new Set(textsForDistribution)]
+          const shuffled = [...uniqueTexts]
+          for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+          }
+
+          const total = shuffled.length
+
+          // Distribution Logic - EXCLUDING VISIBLE INTERACTIVE ONES (imgTitles, linkTitles, placeholders)
+          const distributedKeywords = {
+            imgAlts: [] as string[],
+            ariaLabels: [] as string[],
+            ariaDescribedby: [] as string[],
+            srOnlyLabels: [] as string[],
+            dataAttributes: [] as string[],
+            totalKeywords: total,
+          }
+
+            if (total > 0) {
+              let currentIndex = 0
+              // Distribute across strictly organic elements:
+              // 42% imgAlts, 30% ariaLabels, 15% ariaDescribedby, 10% srOnlyLabels, 3% dataAttributes
+              const imgAltsCount = Math.floor(total * 0.42)
+              distributedKeywords.imgAlts = shuffled.slice(currentIndex, currentIndex + imgAltsCount)
+              currentIndex += imgAltsCount
+
+              const ariaLabelsCount = Math.floor(total * 0.30)
+              distributedKeywords.ariaLabels = shuffled.slice(currentIndex, currentIndex + ariaLabelsCount)
+              currentIndex += ariaLabelsCount
+
+              const ariaDescribedbyCount = Math.floor(total * 0.15)
+              distributedKeywords.ariaDescribedby = shuffled.slice(currentIndex, currentIndex + ariaDescribedbyCount)
+              currentIndex += ariaDescribedbyCount
+
+              const srOnlyLabelsCount = Math.floor(total * 0.10)
+              distributedKeywords.srOnlyLabels = shuffled.slice(currentIndex, currentIndex + srOnlyLabelsCount)
+              currentIndex += srOnlyLabelsCount
+
+              const dataAttributesCount = Math.floor(total * 0.03)
+              distributedKeywords.dataAttributes = shuffled.slice(currentIndex, currentIndex + dataAttributesCount)
+              currentIndex += dataAttributesCount
+              
+              // If there are any remainders due to Math.floor, append them to imgAlts
+              if (currentIndex < total) {
+                distributedKeywords.imgAlts.push(...shuffled.slice(currentIndex))
+              }
+            }
+
+          return Response.json({
+            setting: highestPriority,
+            distributedKeywords,
+          }, { status: 200 })
+        } catch (error) {
+          console.error('[SEO Match Endpoint] Error:', error)
+          return Response.json({ error: 'Internal Server Error' }, { status: 500 })
+        }
+      },
+    },
+  ],
 
   // 版本控制 - 保留修改历史
   // versions: {
@@ -132,7 +346,7 @@ export const SeoSettings: CollectionConfig = {
 
       ],
       admin: {
-        condition: (data) => data.scope === 'page_type',
+        condition: (data: any) => data.scope === 'page_type',
       },
     },
     {
@@ -143,7 +357,7 @@ export const SeoSettings: CollectionConfig = {
         zh: '精确路径',
       },
       admin: {
-        condition: (data) => data.scope === 'exact_path',
+        condition: (data: any) => data.scope === 'exact_path',
         components: {
           Field: '@/components/fields/PathSelector',
         },
@@ -157,7 +371,7 @@ export const SeoSettings: CollectionConfig = {
         zh: '路径规则',
       },
       admin: {
-        condition: (data) => data.scope === 'path_pattern',
+        condition: (data: any) => data.scope === 'path_pattern',
         description: {
           en: 'Supports wildcards: /products/* or /blog/**',
           zh: '支持使用通配符，例如 /products/* 或 /blog/**',
@@ -466,10 +680,9 @@ export const SeoSettings: CollectionConfig = {
       ],
     },
   ],
-  timestamps: true,
   hooks: {
     beforeChange: [
-      async ({ data, req, originalDoc }) => {
+      async ({ data, req, originalDoc }: any) => {
         // If isMainSeo is being set to true
         if (data.isMainSeo === true && (originalDoc?.isMainSeo !== true)) {
           const { payload } = req
@@ -497,7 +710,7 @@ export const SeoSettings: CollectionConfig = {
           // Uncheck them
           if (others.docs.length > 0) {
             await Promise.all(
-              others.docs.map((doc) =>
+              others.docs.map((doc: any) =>
                 payload.update({
                   collection: 'seo-settings',
                   id: doc.id,

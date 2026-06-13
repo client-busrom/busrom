@@ -62,21 +62,20 @@ export default async function ProductSeriesDetailPage({
     notFound()
   }
 
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo(path, "product_series_detail", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', path, e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path={path} pageType="product_series_detail" position="header" />
       <PageScripts path={path} pageType="product_series_detail" position="body_start" />
-      <PageSeoInjector path={path} pageType="product_series_detail" locale={locale} />
-      <ProductSeriesDetailClient locale={locale} slug={slug} initialData={seriesData} seoKeywords={seoKeywords} />
+            <ProductSeriesDetailClient locale={locale} slug={slug} initialData={seriesData} seoKeywords={seoKeywords} />
       <PageScripts path={path} pageType="product_series_detail" position="footer" />
           </SeoKeywordProvider>
     </>

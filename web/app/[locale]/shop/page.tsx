@@ -32,21 +32,20 @@ export default async function ShopPage({
   const resolvedSearchParams = await searchParams
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/shop", "shop_list", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/shop", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/shop" pageType="shop_list" position="header" />
       <PageScripts path="/shop" pageType="shop_list" position="body_start" />
-      <PageSeoInjector path="/shop" pageType="shop_list" locale={locale} />
-      <ShopPageClient locale={locale} searchParams={resolvedSearchParams} slugMode={false} />
+            <ShopPageClient locale={locale} searchParams={resolvedSearchParams} slugMode={false} />
       <PageScripts path="/shop" pageType="shop_list" position="footer" />
           </SeoKeywordProvider>
     </>

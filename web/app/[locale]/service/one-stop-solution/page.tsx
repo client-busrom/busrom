@@ -45,21 +45,20 @@ export default async function OneStopSolutionPage({
   const parsedData = parseOneStopData(pageData, locale)
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/service/one-stop-solution", "one_stop_solution", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/service/one-stop-solution", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/service/one-stop-solution" pageType="one_stop_solution" position="header" />
       <PageScripts path="/service/one-stop-solution" pageType="one_stop_solution" position="body_start" />
-      <PageSeoInjector path="/service/one-stop-solution" pageType="one_stop_solution" locale={locale} />
-      
+            
       {/* 渲染 SSR 模板 */}
       <OneStopSolutionTemplate locale={locale} data={parsedData} />
       

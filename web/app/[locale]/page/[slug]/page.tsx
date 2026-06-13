@@ -56,21 +56,20 @@ export default async function DynamicPage({
   const pageType = rawData.template?.toLowerCase() || "custom_page"
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo(path, pageType, locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', path, e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path={path} pageType={pageType} position="header" />
       <PageScripts path={path} pageType={pageType} position="body_start" />
-      <PageSeoInjector path={path} pageType={pageType} locale={locale} />
-      
+            
       {/* Universal Template Switcher with SSR Data */}
       <TemplateSwitcher locale={locale} rawData={rawData} />
       

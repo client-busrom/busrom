@@ -337,11 +337,14 @@ export function parseProductOverviewData(locale: string, rawData: any): ProductO
         return { 
           id: product.id, 
           title: product.title, 
-          mainImage: product.mainImage,
-          gallery: product.gallery,
-          images: product.images,
-          image: product.image,
-          featuredImage: product.featuredImage,
+          mainImage: Array.isArray(product.mainImage) 
+            ? product.mainImage.map(resolveMedia).filter(Boolean) 
+            : resolveMedia(product.mainImage),
+          showImage: resolveMedia(product.showImage),
+          gallery: Array.isArray(product.gallery) ? product.gallery.map(resolveMedia).filter(Boolean) : [],
+          images: Array.isArray(product.images) ? product.images.map(resolveMedia).filter(Boolean) : [],
+          image: resolveMedia(product.image),
+          featuredImage: resolveMedia(product.featuredImage),
           href: `/${locale}${targetPath}` 
         };
       }).filter(Boolean);

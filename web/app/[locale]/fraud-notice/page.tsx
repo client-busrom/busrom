@@ -30,21 +30,20 @@ export default async function FraudNoticePage({
   const { locale } = await params
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/fraud-notice", "fraud_notice", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/fraud-notice", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/fraud-notice" pageType="fraud_notice" position="header" />
       <PageScripts path="/fraud-notice" pageType="fraud_notice" position="body_start" />
-      <PageSeoInjector path="/fraud-notice" pageType="fraud_notice" locale={locale} />
-      <TemplatePage locale={locale} slug={PAGE_SLUGS.FRAUD_NOTICE} template={PAGE_TEMPLATES.FRAUD_NOTICE} />
+            <TemplatePage locale={locale} slug={PAGE_SLUGS.FRAUD_NOTICE} template={PAGE_TEMPLATES.FRAUD_NOTICE} />
       <PageScripts path="/fraud-notice" pageType="fraud_notice" position="footer" />
           </SeoKeywordProvider>
     </>

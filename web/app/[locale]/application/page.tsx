@@ -75,21 +75,20 @@ export default async function ApplicationsPage({
   }).filter(Boolean)
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/application", "application", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/application", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/application" pageType="application" position="header" />
       <PageScripts path="/application" pageType="application" position="body_start" />
-      <PageSeoInjector path="/application" pageType="application" locale={locale} />
-      
+            
       <ApplicationTemplate 
         locale={locale} 
         data={parsedData} 

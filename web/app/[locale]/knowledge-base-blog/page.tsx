@@ -58,21 +58,20 @@ export default async function BlogPage({
   const pageTitle = String(metadata.title || "Blog | Busrom")
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/knowledge-base-blog", "blog_list", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/knowledge-base-blog", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/knowledge-base-blog" pageType="blog_list" position="header" />
       <PageScripts path="/knowledge-base-blog" pageType="blog_list" position="body_start" />
-      <PageSeoInjector path="/knowledge-base-blog" pageType="blog_list" locale={locale} />
-      
+            
       <Suspense fallback={
         <div className="min-h-screen bg-white pt-20 flex items-center justify-center">
           <div className="w-12 h-12 border-2 border-[#ff4848] border-t-transparent rounded-full animate-spin"></div>

@@ -43,21 +43,20 @@ export default async function FaqPage({
   const parsedData = parseFaqData(locale, rawData)
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/faq", "faq", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/faq", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/faq" pageType="faq" position="header" />
       <PageScripts path="/faq" pageType="faq" position="body_start" />
-      <PageSeoInjector path="/faq" pageType="faq" locale={locale} />
-      
+            
       <FaqTemplate locale={locale} data={parsedData} />
       
       <PageScripts path="/faq" pageType="faq" position="footer" />

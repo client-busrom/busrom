@@ -46,21 +46,20 @@ export default async function ServiceOverviewPage({
   const parsedData = parseServiceOverviewData(pageData)
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/service/overview", "service_overview", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/service/overview", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/service/overview" pageType="service_overview" position="header" />
       <PageScripts path="/service/overview" pageType="service_overview" position="body_start" />
-      <PageSeoInjector path="/service/overview" pageType="service_overview" locale={locale} />
-      
+            
       {/* 直接渲染模板，不再经过 CSR 的 TemplatePage */}
       <ServiceOverviewTemplate locale={locale} data={parsedData} />
       

@@ -7,7 +7,7 @@ import { parseHomeData } from "@/lib/parsers/home-parser"
 import { getHomePageSeo, buildMetadata } from "@/lib/api/seo-settings"
 import { getVariantUrl, getCropImageUrl } from "@/lib/utils"
 import { PageScripts } from "@/components/PageScripts"
-import { PageSeoInjector } from "@/components/seo"
+import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvider"
 import { HomePageClient } from "./HomePageClient"
 import { cookies } from "next/headers"
 import { getMessages } from "@/i18n.config"
@@ -124,10 +124,12 @@ async function HomeContentLoader({ locale }: { locale: Locale }) {
         />
       ))}
 
-      <HomePageClient
-        initialContent={content}
-        currentLanguage={locale}
-      />
+      <SeoKeywordProvider distribution={distributedKeywords}>
+        <HomePageClient
+          initialContent={content}
+          currentLanguage={locale}
+        />
+      </SeoKeywordProvider>
     </>
   )
 }
@@ -143,8 +145,7 @@ export default async function Home({
     <>
       <PageScripts path="/" pageType="home" position="header" />
       <PageScripts path="/" pageType="home" position="body_start" />
-      <PageSeoInjector path="/" pageType="home" locale={locale} isHomePage={true} />
-
+      
       <Suspense fallback={<HomePageSkeleton />}>
         <HomeContentLoader locale={locale} />
       </Suspense>

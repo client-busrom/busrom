@@ -14,6 +14,7 @@ import { FloatingContactButtons } from "./floating-contact-buttons";
 import type { NavItem } from "@/types/navigation";
 import type { ContactPopupData } from "@/lib/api/contact-popup";
 import useSWR from "swr";
+import { useSeoDataAttr } from "@/components/product-series/SeoKeywordProvider";
 
 // 1. 定义 Header 的主题类型
 type HeaderTheme = "transparent" | "light" | "dark";
@@ -154,10 +155,13 @@ export default function Header({ locale, initialNavigation, contactPopupData }: 
     activeTheme === "transparent" ? "hover:bg-white/10" : "hover:bg-black/10";
   const headerShadow = isDropdownOpen ? "shadow-md" : "";
 
+  const seoDataAttr = useSeoDataAttr();
+
   return (
     <>
       <header
         ref={headerRef}
+        data-seo-tag={seoDataAttr || undefined}
         className={cn(
           "fixed top-0 left-0 right-0 w-full z-[70] lg:h-[2.4vw] transition-all duration-300 ease-in-out",
           headerBgColor,

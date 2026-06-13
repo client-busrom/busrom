@@ -61,21 +61,20 @@ export default async function SupportPage({
   }).filter(Boolean)
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/support", "support", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/support", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/support" pageType="support" position="header" />
       <PageScripts path="/support" pageType="support" position="body_start" />
-      <PageSeoInjector path="/support" pageType="support" locale={locale} />
-      
+            
       <SupportTemplate 
         locale={locale} 
         data={parsedData} 

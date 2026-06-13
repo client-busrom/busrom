@@ -73,21 +73,20 @@ export default async function OurStoryPage({
   }).filter(Boolean)
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/about/story", "our_story", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/about/story", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/about/story" pageType="our_story" position="header" />
       <PageScripts path="/about/story" pageType="our_story" position="body_start" />
-      <PageSeoInjector path="/about/story" pageType="our_story" locale={locale} />
-      
+            
       <OurStoryTemplate 
         locale={locale} 
         data={parsedData} 

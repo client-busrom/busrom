@@ -30,21 +30,20 @@ export default async function PrivacyPolicyPage({
   const { locale } = await params
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/privacy-policy", "privacy_policy", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/privacy-policy", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/privacy-policy" pageType="privacy_policy" position="header" />
       <PageScripts path="/privacy-policy" pageType="privacy_policy" position="body_start" />
-      <PageSeoInjector path="/privacy-policy" pageType="privacy_policy" locale={locale} />
-      <TemplatePage locale={locale} slug={PAGE_SLUGS.PRIVACY_POLICY} template={PAGE_TEMPLATES.PRIVACY_POLICY} />
+            <TemplatePage locale={locale} slug={PAGE_SLUGS.PRIVACY_POLICY} template={PAGE_TEMPLATES.PRIVACY_POLICY} />
       <PageScripts path="/privacy-policy" pageType="privacy_policy" position="footer" />
           </SeoKeywordProvider>
     </>

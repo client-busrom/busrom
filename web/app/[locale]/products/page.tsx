@@ -42,21 +42,20 @@ export default async function ProductOverviewPage({
   const parsedData = parseProductOverviewData(locale, rawData)
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/products", "product_overview", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/products", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/products" pageType="product_overview" position="header" />
       <PageScripts path="/products" pageType="product_overview" position="body_start" />
-      <PageSeoInjector path="/products" pageType="product_overview" locale={locale} />
-      
+            
       <ProductOverviewTemplate 
         locale={locale} 
         data={parsedData} 

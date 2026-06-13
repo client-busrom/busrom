@@ -42,14 +42,17 @@ function resolveProductImage(item: any) {
     : [];
 
   const fullPool = [...mainPool, ...galleryPool, ...imagesPool];
+  // Ensure we only select resolved objects with URLs, not string IDs
+  const validPool = fullPool.filter(img => img && typeof img === 'object' && img.url);
 
-  if (fullPool.length > 0) {
-    const randomIndex = Math.floor(Math.random() * fullPool.length);
-    const selected = fullPool[randomIndex];
+  if (validPool.length > 0) {
+    const randomIndex = Math.floor(Math.random() * validPool.length);
+    const selected = validPool[randomIndex];
     return selected.image || selected;
   }
 
-  return item.featuredImage || item.image || null;
+  // Fallback to the first mainImage if available
+  return Array.isArray(item.mainImage) && item.mainImage.length > 0 ? item.mainImage[0] : null;
 }
 
 // SVG viewBox dimensions and clipPath data for each mask
@@ -136,8 +139,8 @@ export function ProductOverviewHeroSection({
 
   // 桌面端轮播初始化
   const [emblaRef] = useEmblaCarousel(
-    { 
-      loop: true, 
+    {
+      loop: true,
       align: "start",
       dragFree: true,
       containScroll: "trimSnaps"
@@ -170,7 +173,7 @@ export function ProductOverviewHeroSection({
 
   return (
     <section
-      className="relative w-full bg-[#FFFCE2] flex flex-col items-center overflow-visible select-none z-[20]"
+      className="relative w-full flex flex-col items-center overflow-hidden select-none z-[20]"
       style={{
         height: "auto",
         minHeight: "auto",
@@ -179,10 +182,14 @@ export function ProductOverviewHeroSection({
         WebkitTouchCallout: "none",
       }}
     >
+      {/* Background Layers */}
+      <div className="absolute top-0 left-0 w-full bg-[#FFFCE2] -z-10 block md:hidden h-full" />
+      <div className="absolute top-0 left-0 w-full bg-[#FFFCE2] -z-10 hidden md:block" style={{ height: vw(968) }} />
+
       {/* ==================== 1. Desktop Layout (>= md) ==================== */}
       <div
         className="hidden md:flex flex-col items-center w-full relative"
-        style={{ height: vw(968), minHeight: vw(968), paddingTop: vw(128) }}
+        style={{ height: vw(1154), minHeight: vw(1154), paddingTop: vw(128) }}
       >
         {/* Floating Icons - Desktop Only */}
         <motion.div
@@ -279,13 +286,13 @@ export function ProductOverviewHeroSection({
           {/* CTA Link - Desktop */}
           <div className="relative">
             <motion.div
-              whileHover={{ 
+              whileHover={{
                 scale: [1, 1.03, 1],
               }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 2, 
-                ease: "easeInOut" 
+              transition={{
+                repeat: Infinity,
+                duration: 2,
+                ease: "easeInOut"
               }}
             >
               <Link
@@ -321,7 +328,7 @@ export function ProductOverviewHeroSection({
         {/* Gallery Area - Desktop (Refactored to Carousel) */}
         <div
           className="absolute inset-x-0 bottom-0 w-full pointer-events-auto"
-          style={{ height: vw(620), transform: `translateY(30%)` }}
+          style={{ height: vw(620) }}
         >
           <div className=" h-full" ref={emblaRef} style={{ willChange: 'transform' }}>
             <div className="flex h-full items-end pb-[vw(40)]">
@@ -410,9 +417,9 @@ export function ProductOverviewHeroSection({
 
         {/* Gallery Carousel - Mobile (Horizontal Snap) */}
         <div className="w-full mt-4">
-          <div 
+          <div
             className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar gap-6 px-10 pb-10"
-            style={{ 
+            style={{
               WebkitOverflowScrolling: "touch",
               scrollbarWidth: "none"
             }}

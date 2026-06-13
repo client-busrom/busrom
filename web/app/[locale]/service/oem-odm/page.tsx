@@ -43,21 +43,20 @@ export default async function OemOdmPage({
   const parsedData = parseOemOdmData(pageContent, locale)
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/service/oem-odm", "oem_odm", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/service/oem-odm", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/service/oem-odm" pageType="oem_odm" position="header" />
       <PageScripts path="/service/oem-odm" pageType="oem_odm" position="body_start" />
-      <PageSeoInjector path="/service/oem-odm" pageType="oem_odm" locale={locale} />
-      <OemOdmTemplate locale={locale} data={parsedData} />
+            <OemOdmTemplate locale={locale} data={parsedData} />
       <PageScripts path="/service/oem-odm" pageType="oem_odm" position="footer" />
           </SeoKeywordProvider>
     </>

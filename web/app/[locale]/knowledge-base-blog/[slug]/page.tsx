@@ -59,21 +59,20 @@ export default async function BlogDetailPage({
   const configData = await getBlogSettings(locale)
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo(path, "blog_detail", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', path, e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path={path} pageType="blog_detail" position="header" />
       <PageScripts path={path} pageType="blog_detail" position="body_start" />
-      <PageSeoInjector path={path} pageType="blog_detail" locale={locale} />
-      <BlogDetailClient locale={locale} slug={slug} blog={blogData} config={configData} />
+            <BlogDetailClient locale={locale} slug={slug} blog={blogData} config={configData} />
       <PageScripts path={path} pageType="blog_detail" position="footer" />
           </SeoKeywordProvider>
     </>

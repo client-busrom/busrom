@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { useSeoAriaLabel } from "@/components/product-series/SeoKeywordProvider";
 
 const DESIGN_WIDTH = 1920;
 
@@ -112,16 +113,18 @@ export function AnimatedLinkButton({
     ...externalStyle,
   };
 
+  const seoAriaLabel = useSeoAriaLabel();
+
   if (href) {
     return (
-      <a href={href} className={buttonClass} style={buttonStyle}>
+      <a href={href} className={buttonClass} style={buttonStyle} aria-label={seoAriaLabel || undefined}>
         {content}
       </a>
     );
   }
 
   return (
-    <button className={buttonClass} style={buttonStyle}>
+    <button className={buttonClass} style={buttonStyle} aria-label={seoAriaLabel || undefined}>
       {content}
     </button>
   );

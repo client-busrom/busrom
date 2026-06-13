@@ -51,8 +51,13 @@ export const FormSubmissions: CollectionConfig = {
       // If there's a user (admin UI), prevent all creation - submissions should only come from frontend
       return false
     },
-    // Only authenticated users can read/update
-    read: ({ req: { user } }) => {
+    // Only authenticated users can read/update (or internal API calls with secret token)
+    read: ({ req }) => {
+      // Allow internal server-to-server read (for daily limit counting)
+      const internalToken = req.headers?.get ? req.headers.get('x-internal-token') : undefined;
+      if (internalToken && process.env.REVALIDATE_SECRET && internalToken === process.env.REVALIDATE_SECRET) return true;
+
+      const { user } = req;
       if (!user) return false
       if (user.isAdmin) return true
 

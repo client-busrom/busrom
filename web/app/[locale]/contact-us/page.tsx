@@ -50,21 +50,20 @@ export default async function ContactPage({
   }
 
   
-  let seoKeywords: string[] = [];
+  let distribution = undefined;
   try {
     const { distributedKeywords } = await getNonHomePageSeo("/contact-us", "contact_us", locale);
-    seoKeywords = distributedKeywords?.imgAlts || [];
+    distribution = distributedKeywords;
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/contact-us", e);
   }
 
   return (
     <>
-      <SeoKeywordProvider keywords={seoKeywords} startIndex={0} fallback="">
+      <SeoKeywordProvider distribution={distribution}>
       <PageScripts path="/contact-us" pageType="contact_us" position="header" />
       <PageScripts path="/contact-us" pageType="contact_us" position="body_start" />
-      <PageSeoInjector path="/contact-us" pageType="contact_us" locale={locale} />
-      <ContactUsTemplate 
+            <ContactUsTemplate 
         locale={locale} 
         data={parsedData} 
         ssrData={ssrData}
