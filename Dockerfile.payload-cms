@@ -27,7 +27,7 @@ RUN pnpm run build
 
 # Deploy isolated workspace
 WORKDIR /app
-RUN pnpm deploy --filter payload-cms --prod /app/out
+RUN pnpm deploy --filter busrom-payload-cms --prod /app/out
 # Ensure .next is copied (pnpm deploy might ignore it due to .gitignore)
 RUN cp -r /app/payload-cms/.next /app/out/.next
 

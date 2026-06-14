@@ -47,7 +47,7 @@ RUN pnpm run build
 
 # Deploy isolated workspace
 WORKDIR /app
-RUN pnpm deploy --filter web --prod /app/out
+RUN pnpm deploy --filter @busrom/web --prod /app/out
 # Ensure .next and public are copied (pnpm deploy might ignore them due to .gitignore)
 RUN cp -r /app/web/.next /app/out/.next
 RUN cp -r /app/web/public /app/out/public
