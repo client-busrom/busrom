@@ -368,8 +368,8 @@ const nextConfig = {
       "base-uri 'self'",
       // Form action: self
       "form-action 'self'",
-      // Frame ancestors: none
-      "frame-ancestors 'none'",
+      // Frame ancestors: allow framing by Payload CMS
+      "frame-ancestors 'self' http://localhost:* http://127.0.0.1:* https://*.busromhouse.com",
       // Upgrade insecure requests
       ...(!isDev ? ["upgrade-insecure-requests"] : []),
     ].join('; ')
@@ -400,11 +400,6 @@ const nextConfig = {
       {
         key: 'X-Content-Type-Options',
         value: 'nosniff',
-      },
-      // X-Frame-Options (被 CSP frame-ancestors 替代，但保留兼容旧浏览器)
-      {
-        key: 'X-Frame-Options',
-        value: 'DENY',
       },
       // X-XSS-Protection (旧浏览器)
       {

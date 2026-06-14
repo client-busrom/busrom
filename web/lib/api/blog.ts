@@ -32,11 +32,15 @@ export async function getInitialBlogs(locale: Locale, limit = 10) {
   }
 }
 
-export async function getBlogBySlug(slug: string, locale: string) {
+export async function getBlogBySlug(slug: string, locale: string, isDraft = false) {
   try {
+    const draftQuery = isDraft ? '&draft=true' : '&where[status][equals]=published';
     const response = await cmsFetch(
-      `${PAYLOAD_URL}/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}&depth=1`,
-      { next: { revalidate: 60 } }
+      `${PAYLOAD_URL}/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}${draftQuery}&locale=${locale}&depth=1`,
+      { 
+        cache: isDraft ? 'no-store' : undefined,
+        next: { revalidate: isDraft ? 0 : 60 } 
+      }
     );
 
     if (!response.ok) {

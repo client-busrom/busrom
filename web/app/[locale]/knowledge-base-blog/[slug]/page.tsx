@@ -47,8 +47,13 @@ export default async function BlogDetailPage({
   const { locale, slug } = await params
   const path = `/knowledge-base-blog/${slug}`
 
-  // 1. Fetch Blog Data server-side
-  const blogData = await getBlogBySlug(slug, locale)
+  // Check Draft Mode
+  const { draftMode } = await import("next/headers")
+  const draft = await draftMode()
+  const isDraftMode = draft.isEnabled
+
+  // 1. Fetch Blog Data server-side (pass isDraftMode to support previews)
+  const blogData = await getBlogBySlug(slug, locale, isDraftMode)
   
   if (!blogData) {
     notFound()
@@ -71,7 +76,7 @@ export default async function BlogDetailPage({
       <SeoKeywordProvider distribution={distribution}>
       <PageScripts path={path} pageType="blog_detail" position="header" />
       <PageScripts path={path} pageType="blog_detail" position="body_start" />
-            <BlogDetailClient locale={locale} slug={slug} blog={blogData} config={configData} />
+            <BlogDetailClient locale={locale} slug={slug} blog={blogData} config={configData} isDraftMode={isDraftMode} />
       <PageScripts path={path} pageType="blog_detail" position="footer" />
           </SeoKeywordProvider>
     </>

@@ -33,6 +33,26 @@ export const Blogs: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
+    livePreview: {
+      url: ({ data, req }) => {
+        const secret = process.env.PAYLOAD_PUBLIC_DRAFT_SECRET || 'busrom-draft-secret-2026'
+        
+        // Dynamically get the host so it works across localhost and local IPs (e.g. 192.168.x.x)
+        const host = req.headers?.get ? req.headers.get('host') : (req.headers as any)?.host
+        const hostname = host ? host.split(':')[0] : 'localhost'
+        const baseUrl = process.env.PAYLOAD_PUBLIC_SITE_URL || `http://${hostname}:3001`
+
+        const locale = req.locale === 'all' || !req.locale ? 'en' : req.locale
+        const prefix = locale === 'en' ? '' : `/${locale}`
+        return `${baseUrl}/api/preview?url=${encodeURIComponent(`${prefix}/knowledge-base-blog/${data.slug}`)}&secret=${secret}`
+      },
+      breakpoints: [
+        { label: 'Mobile (iPhone 14)', name: 'mobile', width: 390, height: 844 },
+        { label: 'Tablet (iPad)', name: 'tablet', width: 768, height: 1024 },
+        { label: 'Laptop (13")', name: 'laptop', width: 1280, height: 800 },
+        { label: 'Desktop (1080p)', name: 'desktop', width: 1920, height: 1080 },
+      ],
+    },
     listSearchableFields: ['title', 'adminLabel', 'slug'],
     defaultColumns: ['title', 'adminLabel', 'slug', 'status', 'author', 'publishedAt', 'updatedAt'],
     group: {

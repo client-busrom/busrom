@@ -7,6 +7,9 @@ import Link from "next/link"
 import { BlogTemplateOne } from "@/components/blog/templates/BlogTemplateOne"
 import { BlogTemplateTwo } from "@/components/blog/templates/BlogTemplateTwo"
 import { BlogTemplateThree } from "@/components/blog/templates/BlogTemplateThree"
+import { useRouter } from "next/navigation"
+
+const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002"
 
 interface BlogContent {
   id: string
@@ -34,11 +37,42 @@ interface BlogDetailClientProps {
   slug: string
   blog: any
   config: any
+  isDraftMode?: boolean
 }
 
-export function BlogDetailClient({ locale, slug, blog, config }: BlogDetailClientProps) {
+export function BlogDetailClient({ locale, slug, blog, config, isDraftMode }: BlogDetailClientProps) {
+  const router = useRouter()
   const loading = false;
   const error = !blog ? "Blog post not found" : null;
+
+  useEffect(() => {
+    if (!isDraftMode) return
+
+    let refreshTimeout: NodeJS.Timeout
+
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'payload-live-preview') {
+        // Debounce the refresh to prevent infinite loops / multiple fast saves
+        clearTimeout(refreshTimeout)
+        refreshTimeout = setTimeout(() => {
+          console.log('[Live Preview] Refreshing Next.js route due to CMS update...')
+          router.refresh()
+        }, 500)
+      }
+    }
+
+    window.addEventListener('message', handleMessage)
+
+    // Notify Payload CMS that the iframe is ready to receive messages
+    if (window.parent) {
+      window.parent.postMessage({ type: 'payload-live-preview-ready' }, '*')
+    }
+
+    return () => {
+      window.removeEventListener('message', handleMessage)
+      clearTimeout(refreshTimeout)
+    }
+  }, [isDraftMode, router])
 
   const formatDate = (dateString: string) => {
     if (!dateString) return ""
@@ -74,13 +108,33 @@ export function BlogDetailClient({ locale, slug, blog, config }: BlogDetailClien
     )
   }
 
-  if (blog.templateType === 'template2') {
-    return <BlogTemplateTwo blog={blog} locale={locale} formatDate={formatDate} config={config} />
-  }
-  
-  if (blog.templateType === 'template3') {
-    return <BlogTemplateThree blog={blog} locale={locale} formatDate={formatDate} config={config} />
+  const renderTemplate = () => {
+    if (blog.templateType === 'template2') {
+      return <BlogTemplateTwo blog={blog} locale={locale} formatDate={formatDate} config={config} />
+    }
+
+    if (blog.templateType === 'template3') {
+      return <BlogTemplateThree blog={blog} locale={locale} formatDate={formatDate} config={config} />
+    }
+
+    return <BlogTemplateOne blog={blog} locale={locale} formatDate={formatDate} config={config} />
   }
 
-  return <BlogTemplateOne blog={blog} locale={locale} formatDate={formatDate} config={config} />
+  return (
+    <>
+      {isDraftMode && (
+        <div className="fixed top-0 left-0 w-full bg-[#B06E4E] text-white py-2 px-4 z-[9999] flex justify-between items-center text-sm font-medium">
+          <span>👀 Preview Mode Active (Auto-refreshes on Save)</span>
+          <a
+            href="/api/exit-preview"
+            className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded transition-colors"
+          >
+            Exit Preview
+          </a>
+        </div>
+      )}
+
+      {renderTemplate()}
+    </>
+  )
 }
