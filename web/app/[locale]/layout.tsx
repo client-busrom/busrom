@@ -334,13 +334,16 @@ const acme = localFont({
 });
 
 export function generateStaticParams() {
-  // Temporary workaround: Skip SSG for now to bypass 503/timeout build errors.
-  // This forces Next.js to use SSR (Server-Side Rendering) for all pages.
-  return [];
-  // return locales.map(locale => ({ locale }));
+  // 只在构建阶段(SSG)静态生成 'en' (英文) 的页面。
+  // 其他 23 种语言会在用户首次访问时动态生成(SSR/ISR)，从而大幅减轻构建时的后端并发压力。
+  return [{ locale: 'en' }];
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isValidLocale(locale)) {
+    return { title: '404 Not Found' };
+  }
   const siteConfig = await getSiteConfig()
   const faviconUrl = getMediaUrl(siteConfig.favicon)
   const logoUrl = getMediaUrl(siteConfig.logo)
@@ -405,7 +408,20 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params;
-  const validLocale = isValidLocale(locale) ? locale : defaultLocale;
+  
+  if (!isValidLocale(locale)) {
+    return (
+      <html lang="en">
+        <body>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'system-ui, sans-serif' }}>
+            <h1>404 - Not Found</h1>
+          </div>
+        </body>
+      </html>
+    );
+  }
+
+  const validLocale = locale;
   
   const [preloaderConfig, initialNavigation, footerData, contactPopupData] = await Promise.all([
     getPreloaderConfig(),

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import type { Locale } from "@/i18n.config"
+import { isValidLocale } from "@/i18n.config"
 import { Suspense } from "react"
 import { HomeContent } from "@/lib/content-data"
 import { getHomeRawData } from "@/lib/api/home"
@@ -22,6 +23,10 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>
 }): Promise<Metadata> {
   const { locale } = await params
+  
+  if (!isValidLocale(locale as any)) {
+    return { title: '404 Not Found' }
+  }
 
   const defaultMetadata: Metadata = {
     title: locale === 'zh' ? 'Busrom - 专业玻璃五金制造商' : 'Busrom - Professional Glass Hardware Manufacturer',
