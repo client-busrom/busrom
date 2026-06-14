@@ -6,7 +6,7 @@ FROM base AS builder
 WORKDIR /app
 
 # Copy root package files for monorepo
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 
 # Copy patches directory from root for patch-package
 COPY patches ./patches

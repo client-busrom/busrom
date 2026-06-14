@@ -9,7 +9,7 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 
 # Install dependencies only when needed
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 COPY web/package.json ./web/
 COPY payload-cms/package.json ./payload-cms/
 
@@ -21,7 +21,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy package files (all workspaces needed for monorepo pnpm install)
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 COPY web/package.json ./web/
 COPY payload-cms/package.json ./payload-cms/
 

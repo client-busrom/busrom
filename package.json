@@ -27,5 +27,6 @@
   },
   "dependencies": {
     "embla-carousel-auto-scroll": "^8.6.0"
-  }
+  },
+  "packageManager": "pnpm@9.12.0"
 }
