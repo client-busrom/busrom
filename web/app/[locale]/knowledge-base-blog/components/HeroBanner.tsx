@@ -129,10 +129,10 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
           </div>
 
           {/* RIGHT COLUMN - SIMPLE IMAGE & CATEGORY (5 Columns) */}
-          <div className="lg:col-span-5 relative hidden lg:flex flex-col h-full ml-0 lg:ml-4">
+          <div className="lg:col-span-5 relative hidden lg:flex flex-col h-full ml-0 lg:ml-4 group">
             <Link href={`${localePrefix}/knowledge-base-blog/${hero.post.slug}`} className="absolute inset-0 z-10" aria-label={hero.post.title}></Link>
             {/* Image with Parallax & Hover Effect */}
-            <div className="absolute inset-0 w-full h-full rounded-[16px] lg:rounded-[32px] overflow-hidden group">
+            <div className="absolute inset-0 w-full h-full rounded-[16px] overflow-hidden">
               <OptimizedImage
                 image={safeImage(hero.post.coverImage)}
                 alt={hero.post.title}
@@ -140,9 +140,9 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
                 priority
                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none rounded-[16px] lg:rounded-[32px]"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none rounded-[16px]"></div>
             </div>
-            <span className="absolute top-0 right-0 z-20 flex items-center justify-center bg-[#F6F4ED] rounded-bl-[16px] lg:rounded-bl-[32px] pl-[10px] pb-[10px] lg:pl-[24px] lg:pb-[24px] pointer-events-auto">
+            <span className="absolute top-0 right-0 z-20 flex items-center justify-center bg-[#F6F4ED] rounded-bl-[16px] pl-2 pb-2 pointer-events-auto">
               <Link
                 href={`${localePrefix}/knowledge-base-blogs`}
                 onClick={() => {

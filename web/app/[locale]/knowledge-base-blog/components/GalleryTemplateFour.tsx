@@ -83,7 +83,7 @@ export function GalleryTemplateFour({ section, items, locale }: any) {
               >
                 <Link href={`${localePrefix}/knowledge-base-blog/${item.slug}`} className="absolute inset-0 z-10 rounded-xl lg:rounded-2xl" aria-label={item.title}></Link>
                 {/* Image Box - 6 Columns */}
-                <div className={`lg:col-span-6 aspect-square lg:aspect-auto self-stretch py-4 lg:py-0 ${isRight ? 'lg:order-2' : 'lg:order-1'}`}>
+                <div className={`lg:col-span-6 aspect-square lg:aspect-[602/360] py-4 lg:py-0 ${isRight ? 'lg:order-2' : 'lg:order-1'}`}>
                   <div className="relative h-full group">
                     <div className="absolute inset-0 w-full h-full overflow-hidden rounded-xl lg:rounded-2xl">
                       <OptimizedImage

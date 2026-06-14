@@ -76,7 +76,7 @@ export function GalleryTemplateThree({ section, items, locale }: any) {
               <div className="hidden lg:flex flex-col gap-20">
                 {leftItems.map((item: any, idx: number) => (
                   <div key={item.id || idx} className={`${idx === 0 ? 'w-4/5 mx-auto' : 'w-full ml-auto'}`}>
-                    <PostCard item={item} locale={locale} />
+                    <PostCard item={item} locale={locale} aspectClass="aspect-[331.55/442.06]" />
                   </div>
                 ))}
               </div>
@@ -85,7 +85,7 @@ export function GalleryTemplateThree({ section, items, locale }: any) {
               <div className="flex lg:hidden flex-col gap-16">
                 {items.map((item: any, idx: number) => (
                   <div key={item.id || idx} className="w-full">
-                    <PostCard item={item} locale={locale} />
+                    <PostCard item={item} locale={locale} aspectClass="aspect-[3/4]" />
                   </div>
                 ))}
               </div>
@@ -95,7 +95,7 @@ export function GalleryTemplateThree({ section, items, locale }: any) {
             <div className="hidden lg:flex w-full lg:w-1/2 flex-col gap-20 lg:pt-32">
               {rightItems.map((item: any, idx: number) => (
                 <div key={item.id || idx} className={`${idx === 1 ? 'w-4/5 ml-auto' : 'w-full'}`}>
-                  <PostCard item={item} locale={locale} />
+                  <PostCard item={item} locale={locale} aspectClass="aspect-[420.44/560.58]" />
                 </div>
               ))}
             </div>
@@ -128,12 +128,12 @@ export function GalleryTemplateThree({ section, items, locale }: any) {
   )
 }
 
-function PostCard({ item, locale }: any) {
+function PostCard({ item, locale, aspectClass = "aspect-[3/4]" }: any) {
   const localePrefix = locale === "en" ? "" : `/${locale}`;
   return (
     <article className="post-card group relative flex flex-col text-center">
       <Link href={`${localePrefix}/knowledge-base-blog/${item.slug}`} className="absolute inset-0 z-10" aria-label={item.title}></Link>
-      <div className="relative aspect-[3/4] mb-8 group">
+      <div className={`relative ${aspectClass} mb-8 group`}>
         <div className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden">
           <OptimizedImage
             image={safeImage(item.coverImage)}

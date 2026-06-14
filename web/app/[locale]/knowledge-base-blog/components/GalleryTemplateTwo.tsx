@@ -102,7 +102,7 @@ export function GalleryTemplateTwo({ section, items, locale }: any) {
                   >
                     <article className="post-card group relative flex flex-col items-center text-center">
                       <Link href={`${localePrefix}/knowledge-base-blog/${item.slug}`} className="absolute inset-0 z-10" aria-label={item.title}></Link>
-                      <div className="relative w-full aspect-[16/10] mb-8 group">
+                      <div className="relative w-full aspect-[642.66/360] mb-8 group">
                         <div className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden">
                           <OptimizedImage
                             image={safeImage(item.coverImage)}
