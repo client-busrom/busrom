@@ -1,18 +1,5 @@
-import { fetchLimiter } from "../semaphore";
-/**
- * Preloader Config API
- *
- * Fetches preloader/loading animation configuration from Payload CMS
- * Used by Preloader.tsx and image-wall.tsx components
- */
-
+import { cmsFetch, CMS_URL } from "./client";
 import { convertToCDNUrl } from '@/lib/cdn-url'
-
-// Use runtime environment variable for server-side API calls
-// Prefer internal URL (from CMS_GRAPHQL_URL) over external CMS_URL for better performance
-const CMS_URL = process.env.CMS_GRAPHQL_URL
-  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002')
 
 /**
  * Image configuration for the image wall
@@ -110,9 +97,9 @@ async function resolveImageWallItem(item: any): Promise<ImageWallItem | null> {
     } else {
       // It's an ID, fetch the media
       try {
-        const mediaRes = await fetch(`${CMS_URL}/api/media/${imageConfig.manualImage}?depth=0`, {
+        const mediaRes = await cmsFetch(`/api/media/${imageConfig.manualImage}?depth=0`, {
           next: { revalidate: 3600 },
-        })
+        });
         if (mediaRes.ok) {
           const media = await mediaRes.json()
           backgroundImage = media.sizes?.card?.url
@@ -126,10 +113,10 @@ async function resolveImageWallItem(item: any): Promise<ImageWallItem | null> {
     }
   } else if (imageConfig.mode === 'application' && imageConfig.applicationId) {
     try {
-      const appRes = await fetch(`${CMS_URL}/api/applications/${imageConfig.applicationId}?depth=1`, {
+      const appRes = await cmsFetch(`/api/applications/${imageConfig.applicationId}?depth=1`, {
         headers: { 'Content-Type': 'application/json' },
         next: { revalidate: 3600 },
-      })
+      });
       if (appRes.ok) {
         const app = await appRes.json()
         const allImages = (app.sceneGallery || []).flatMap((scene: any) => scene.images || [])
@@ -172,9 +159,9 @@ export async function getPreloaderConfig(): Promise<PreloaderConfigData> {
     return preloaderPromiseCache;
   }
 
-  const fetchPromise = fetchLimiter.run(async () => {
+  const fetchPromise = (async () => {
     try {
-      const response = await fetch(`${CMS_URL}/api/globals/preloader-config?depth=1`, {
+      const response = await cmsFetch(`/api/globals/preloader-config?depth=1`, {
         next: { revalidate: 60 }, // Revalidate every 60 seconds
         redirect: 'manual', // Don't follow redirects (302 to /signin means auth required)
       })
@@ -230,7 +217,7 @@ export async function getPreloaderConfig(): Promise<PreloaderConfigData> {
       console.error('Error fetching preloader config:', error)
       return defaultPreloaderConfig
     }
-  });
+  })();
 
   preloaderPromiseCache = fetchPromise;
   preloaderCacheTime = now;

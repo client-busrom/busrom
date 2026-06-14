@@ -1,12 +1,4 @@
-import { fetchLimiter } from "../semaphore";
-/**
- * Site Config API
- *
- * Fetches global site configuration from Payload CMS
- */
-
-const CMS_URL =
-  (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'))
+import { cmsFetch, CMS_URL } from "./client";
 
 export interface TurnstileConfig {
   enabled: boolean
@@ -43,9 +35,9 @@ export async function getSiteConfig(): Promise<SiteConfigData> {
     return siteConfigPromise;
   }
 
-  const fetchPromise = fetchLimiter.run(async () => {
+  const fetchPromise = (async () => {
     try {
-      const response = await fetch(`${CMS_URL}/api/globals/site-config`, {
+      const response = await cmsFetch(`/api/globals/site-config`, {
         next: { revalidate: 300 }, // Cache for 5 minutes
       })
 
@@ -73,7 +65,7 @@ export async function getSiteConfig(): Promise<SiteConfigData> {
       console.error('Error fetching site config:', error)
       return getDefaultConfig()
     }
-  });
+  })();
 
   siteConfigPromise = fetchPromise;
   siteConfigTime = now;

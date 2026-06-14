@@ -461,9 +461,16 @@ export default buildConfig({
   // ==================================================================
   db: postgresAdapter({
     pool: {
-      connectionString: (process.env.DATABASE_URI || 'postgresql://busrom:busrom_dev_password@localhost:5432/busrom_payload').replace('?sslmode=require', ''),
-      // For AWS RDS with self-signed certificates
-      ...(process.env.NODE_ENV === 'production' && {
+      connectionString: (() => {
+        const uri = process.env.DATABASE_URI || 'postgresql://busrom:busrom_dev_password@localhost:5432/busrom_payload';
+        return uri.replace('?sslmode=require', '');
+      })(),
+      // For AWS RDS with self-signed certificates (auto-disabled for localhost/127.0.0.1 or via DB_SSL=false)
+      ...(process.env.NODE_ENV === 'production' && (() => {
+        const uri = process.env.DATABASE_URI || 'postgresql://busrom:busrom_dev_password@localhost:5432/busrom_payload';
+        const isLocal = uri.includes('localhost') || uri.includes('127.0.0.1');
+        return !isLocal && process.env.DB_SSL !== 'false';
+      })() && {
         ssl: {
           rejectUnauthorized: false,
         },

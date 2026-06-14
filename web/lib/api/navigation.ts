@@ -1,9 +1,7 @@
-import { fetchLimiter } from "../semaphore";
+import { cmsFetch, CMS_URL } from "./client";
 import { NavigationMenuType, type NavItem } from '@/types/navigation';
 import { resolveInternalLink } from '../utils';
 import { convertToCDNUrl } from '../cdn-url';
-
-const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
 
 /**
  * Payload CMS 导航菜单数据类型
@@ -67,7 +65,7 @@ async function resolveCardImage(
   // Manual mode: fetch the selected media directly
   if (config.mode === 'manual' && config.manualImage) {
     try {
-      const response = await fetch(
+      const response = await cmsFetch(
         `${CMS_URL}/api/media/${config.manualImage}?locale=${locale}`,
         {
           headers: { 'Content-Type': 'application/json' },
@@ -104,7 +102,7 @@ async function resolveCardImage(
   // Application mode: randomly pick one image from the application's scene gallery
   if (config.mode === 'application' && config.applicationId) {
     try {
-      const response = await fetch(
+      const response = await cmsFetch(
         `${CMS_URL}/api/applications/${config.applicationId}?locale=${locale}&depth=1`,
         {
           headers: { 'Content-Type': 'application/json' },
@@ -224,8 +222,8 @@ async function transformNavigationItem(
   if (children.length > 0) {
     result.childMenus = await Promise.all(
       children
-        .sort((a, b) => a.order - b.order)
-        .map(child => transformNavigationItem(child, locale, allMenus, item.type))
+          .sort((a, b) => a.order - b.order)
+          .map(child => transformNavigationItem(child, locale, allMenus, item.type))
     );
   }
 
@@ -250,10 +248,10 @@ export async function getNavigation(locale: string): Promise<NavItem[]> {
     return navPromiseCache[locale]!;
   }
 
-  const fetchPromise = fetchLimiter.run(async () => {
+  const fetchPromise = (async () => {
     try {
       // 直接调用 CMS API，而不是自己的 API 路由
-      const response = await fetch(
+      const response = await cmsFetch(
         `${CMS_URL}/api/navigation-menus?where[visible][equals]=true&limit=1000&locale=${locale}&depth=1`,
         {
           headers: { 'Content-Type': 'application/json' },
@@ -284,7 +282,7 @@ export async function getNavigation(locale: string): Promise<NavItem[]> {
       console.error('[getNavigation] Error:', error);
       return [];
     }
-  });
+  })();
 
   navPromiseCache[locale] = fetchPromise;
   navCacheTime[locale] = now;

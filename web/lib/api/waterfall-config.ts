@@ -1,8 +1,5 @@
 import { convertToCDNUrl } from '@/lib/cdn-url'
-
-const CMS_URL = process.env.CMS_GRAPHQL_URL
-  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002')
+import { cmsFetch, CMS_URL } from "./client";
 
 export interface WaterfallConfigData {
   imageStaggerDelay: number;
@@ -39,7 +36,7 @@ export async function getWaterfallConfig(locale?: string): Promise<WaterfallConf
         url.searchParams.append('locale', locale)
       }
 
-      const response = await fetch(url.toString(), {
+      const response = await cmsFetch(url.toString(), {
         next: { revalidate: 60 },
         redirect: 'manual',
       })

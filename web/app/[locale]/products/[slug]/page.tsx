@@ -19,8 +19,7 @@ export async function generateMetadata({
   // SEO Protection: If not translated, set to noindex
   let robots: any = undefined
   if (locale !== 'en') {
-    const checkSeries = await getProductSeriesBySlug(slug, locale)
-    if (!checkSeries || !checkSeries.name) {
+    if (!series || !series.name) {
       robots = { index: false, follow: true }
     }
   }
@@ -74,7 +73,7 @@ export default async function ProductSeriesDetailPage({
       <SeoKeywordProvider distribution={distribution}>
       <PageScripts path={path} pageType="product_series_detail" position="header" />
       <PageScripts path={path} pageType="product_series_detail" position="body_start" />
-            <ProductSeriesDetailClient locale={locale} slug={slug} initialData={seriesData} seoKeywords={seoKeywords} />
+            <ProductSeriesDetailClient locale={locale} slug={slug} initialData={seriesData} />
       <PageScripts path={path} pageType="product_series_detail" position="footer" />
           </SeoKeywordProvider>
     </>

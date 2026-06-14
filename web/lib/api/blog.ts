@@ -1,17 +1,15 @@
-import { fetchLimiter } from "../semaphore";
+import { cmsFetch, CMS_URL } from "./client";
 import type { Locale } from "@/i18n.config"
 import { convertToCDNUrl } from "@/lib/cdn-url"
 import { resolveAllMedia } from "@/lib/media-resolver"
 
-const PAYLOAD_URL = process.env.CMS_GRAPHQL_URL
-  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002')
+const PAYLOAD_URL = CMS_URL
 
 export async function getBlogSettings(locale: Locale) {
   try {
-    const res = await fetchLimiter.run(async () => fetch(`${PAYLOAD_URL}/api/globals/knowledge-base-settings?locale=${locale}&depth=1`, {
+    const res = await cmsFetch(`${PAYLOAD_URL}/api/globals/knowledge-base-settings?locale=${locale}&depth=1`, {
       next: { revalidate: 60 }
-    }));
+    });
     if (!res.ok) return null
     return await res.json()
   } catch (err) {
@@ -22,9 +20,9 @@ export async function getBlogSettings(locale: Locale) {
 
 export async function getInitialBlogs(locale: Locale, limit = 10) {
   try {
-    const res = await fetchLimiter.run(async () => fetch(`${PAYLOAD_URL}/api/blogs?locale=${locale}&limit=${limit}&where[status][equals]=published&depth=1`, {
+    const res = await cmsFetch(`${PAYLOAD_URL}/api/blogs?locale=${locale}&limit=${limit}&where[status][equals]=published&depth=1`, {
       next: { revalidate: 60 }
-    }));
+    });
     if (!res.ok) return []
     const data = await res.json()
     return data.docs || []
@@ -36,10 +34,10 @@ export async function getInitialBlogs(locale: Locale, limit = 10) {
 
 export async function getBlogBySlug(slug: string, locale: string) {
   try {
-    const response = await fetchLimiter.run(async () => fetch(
+    const response = await cmsFetch(
       `${PAYLOAD_URL}/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}&depth=1`,
       { next: { revalidate: 60 } }
-    ));
+    );
 
     if (!response.ok) {
       console.error('Payload API Error:', response.status, response.statusText)

@@ -1,12 +1,10 @@
-import { fetchLimiter } from "../semaphore";
+import { cmsFetch, CMS_URL } from "./client";
 import type { Locale } from "@/i18n.config"
 import { convertToCDNUrl } from "@/lib/cdn-url"
 import { resolveAllMedia, hydrateContent } from "@/lib/media-resolver"
 import { flattenLexicalChildren } from "@/lib/lexical-utils"
 
-const PAYLOAD_URL = process.env.CMS_GRAPHQL_URL
-  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002')
+const PAYLOAD_URL = CMS_URL;
 
 /**
  * Fetch product by slug (Server-side)
@@ -26,10 +24,10 @@ export async function getProductBySlug(slug: string, locale: string, noFallback 
     };
 
     // 1. Fetch the main product document
-    const response = await fetchLimiter.run(async () => fetch(
+    const response = await cmsFetch(
       `${PAYLOAD_URL}/api/products?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}${fallbackParam}&depth=1`,
       { next: { revalidate: 60 } }
-    ));
+    );
 
     if (!response.ok) {
       console.error('[Products API] Error:', response.status)
@@ -89,7 +87,7 @@ export async function getProductBySlug(slug: string, locale: string, noFallback 
       if (refs.length > 0) {
         await Promise.all(refs.map(async (ref) => {
           try {
-            const res = await fetchLimiter.run(async () => fetch(`${cmsUrl}/api/${ref.collection}/${ref.id}?locale=${locale}${fallbackParam}&depth=1`, { next: { revalidate: 60 } }));
+            const res = await cmsFetch(`${cmsUrl}/api/${ref.collection}/${ref.id}?locale=${locale}${fallbackParam}&depth=1`, { next: { revalidate: 60 } });
             if (res.ok) {
               const blockDoc = await res.json();
               reusableBlocks[ref.id] = blockDoc;

@@ -8,10 +8,7 @@ import type { Metadata } from 'next'
 import { cache } from 'react'
 import { getAlternateLanguages } from '../seo-utils'
 
-// CMS URL for API calls
-const CMS_URL = process.env.CMS_GRAPHQL_URL
-  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002')
+import { cmsFetch, CMS_URL } from "./client";
 
 // CDN URL for images
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL || 'https://cdn.busromhouse.com'
@@ -68,61 +65,57 @@ const emptyDistribution: KeywordDistribution = {
   totalKeywords: 0,
 }
 
-import { fetchLimiter } from '../semaphore';
-
 export const getMatchedSeo = cache(
   async (path: string, pageType?: string, locale: string = 'en'): Promise<MatchResponse> => {
-    return fetchLimiter.run(async () => {
-      try {
-        const queryParams = new URLSearchParams({
-          path: path || '/',
-          locale: locale,
-        })
-        if (pageType) {
-          queryParams.append('pageType', pageType)
-        }
+    try {
+      const queryParams = new URLSearchParams({
+        path: path || '/',
+        locale: locale,
+      })
+      if (pageType) {
+        queryParams.append('pageType', pageType)
+      }
 
-        const response = await fetch(`${CMS_URL}/api/seo-settings/match?${queryParams.toString()}`, {
-          next: { revalidate: 300 }, // 5 minutes cache
-        })
+      const response = await cmsFetch(`/api/seo-settings/match?${queryParams.toString()}`, {
+        next: { revalidate: 300 }, // 5 minutes cache
+      })
 
-        if (!response.ok) {
-          console.error('[SeoSettings] Failed to fetch matched SEO:', response.status)
-          return {
-            setting: null,
-            distributedKeywords: emptyDistribution,
-          }
-        }
-
-        const data: MatchResponse = await response.json()
-
-        // Log keyword distribution quantities for debugging
-        const dist = data.distributedKeywords
-        console.log(`[SEO API] Path: ${path} | Total hidden keywords: ${dist?.totalKeywords || 0}`)
-        if (dist && dist.totalKeywords > 0) {
-          console.log(`  ↳ imgAlts: ${dist.imgAlts?.length || 0}`)
-          console.log(`  ↳ ariaLabels: ${dist.ariaLabels?.length || 0}`)
-          console.log(`  ↳ ariaDescribedby: ${dist.ariaDescribedby?.length || 0}`)
-          console.log(`  ↳ srOnlyLabels: ${dist.srOnlyLabels?.length || 0}`)
-          console.log(`  ↳ dataAttributes: ${dist.dataAttributes?.length || 0}`)
-        }
-
-        // Ensure the distribution fields are arrays, even if backend returns empty
-        return {
-          setting: data.setting,
-          distributedKeywords: {
-            ...emptyDistribution,
-            ...data.distributedKeywords,
-          }
-        }
-      } catch (error) {
-        console.error('[SeoSettings] Error fetching matched SEO:', error)
+      if (!response.ok) {
+        console.error('[SeoSettings] Failed to fetch matched SEO:', response.status)
         return {
           setting: null,
           distributedKeywords: emptyDistribution,
         }
       }
-    });
+
+      const data: MatchResponse = await response.json()
+
+      // Log keyword distribution quantities for debugging
+      const dist = data.distributedKeywords
+      console.log(`[SEO API] Path: ${path} | Total hidden keywords: ${dist?.totalKeywords || 0}`)
+      if (dist && dist.totalKeywords > 0) {
+        console.log(`  ↳ imgAlts: ${dist.imgAlts?.length || 0}`)
+        console.log(`  ↳ ariaLabels: ${dist.ariaLabels?.length || 0}`)
+        console.log(`  ↳ ariaDescribedby: ${dist.ariaDescribedby?.length || 0}`)
+        console.log(`  ↳ srOnlyLabels: ${dist.srOnlyLabels?.length || 0}`)
+        console.log(`  ↳ dataAttributes: ${dist.dataAttributes?.length || 0}`)
+      }
+
+      // Ensure the distribution fields are arrays, even if backend returns empty
+      return {
+        setting: data.setting,
+        distributedKeywords: {
+          ...emptyDistribution,
+          ...data.distributedKeywords,
+        }
+      }
+    } catch (error) {
+      console.error('[SeoSettings] Error fetching matched SEO:', error)
+      return {
+        setting: null,
+        distributedKeywords: emptyDistribution,
+      }
+    }
   }
 )
 

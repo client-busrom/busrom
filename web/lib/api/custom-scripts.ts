@@ -1,20 +1,4 @@
-import { fetchLimiter } from "../semaphore";
-/**
- * Custom Scripts API
- *
- * Fetches custom scripts from Payload CMS and matches them based on
- * current page path and type.
- *
- * Security Features:
- * - Domain whitelist validation for external scripts
- * - Dangerous pattern detection
- * - Template-based scripts are pre-approved and bypass validation
- */
-
-// CMS URL for API calls
-const CMS_URL = process.env.CMS_GRAPHQL_URL
-  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002')
+import { cmsFetch, CMS_URL } from "./client";
 
 // ============================================================================
 // Security: Allowed external script domains (whitelist)
@@ -253,9 +237,9 @@ export async function getAllCustomScripts(): Promise<CustomScript[]> {
     return scriptsPromiseCache
   }
 
-  const fetchPromise = fetchLimiter.run(async () => {
+  const fetchPromise = (async () => {
     try {
-      const response = await fetch(
+      const response = await cmsFetch(
         `${CMS_URL}/api/custom-scripts?where[isEnabled][equals]=true&limit=100&sort=-priority`,
         {
           next: { revalidate: 300 }, // 5 minutes
@@ -274,7 +258,7 @@ export async function getAllCustomScripts(): Promise<CustomScript[]> {
       console.error('[CustomScripts] Error fetching scripts:', error)
       return scriptsCache || []
     }
-  });
+  })();
 
   scriptsPromiseCache = fetchPromise;
   scriptsCacheTime = now;

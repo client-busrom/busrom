@@ -2,14 +2,9 @@ import { convertToCDNUrl } from "../cdn-url";
 import { resolveAllMedia } from "../media-resolver";
 import { flattenLexicalChildren } from "@/lib/lexical-utils";
 import { PAGE_SLUGS } from "../constants";
+import { cmsFetch, CMS_URL } from "./client";
 
-const getCmsUrl = () => {
-  if (process.env.CMS_URL) return process.env.CMS_URL;
-  if (process.env.NEXT_PUBLIC_CMS_URL) return process.env.NEXT_PUBLIC_CMS_URL;
-  if (process.env.NODE_ENV === 'development') return 'http://localhost:3002';
-  return 'https://cms.busromhouse.com';
-};
-import { fetchLimiter } from '../semaphore';
+const getCmsUrl = () => CMS_URL;
 
 let rawNavPromiseCache: Record<string, Promise<any> | undefined> = {};
 let rawNavCacheTime: Record<string, number> = {};
@@ -22,7 +17,7 @@ async function getCachedNavigationMenus(locale: string, fallbackParam: string, c
     return rawNavPromiseCache[cacheKey];
   }
 
-  const p = fetch(`${cmsUrl}/api/navigation-menus?locale=${locale}${fallbackParam}&limit=1000&depth=1`, { next: { revalidate: 3600 } })
+  const p = cmsFetch(`${cmsUrl}/api/navigation-menus?locale=${locale}${fallbackParam}&limit=1000&depth=1`, { next: { revalidate: 3600 } })
     .then(res => res.ok ? res.json() : { docs: [] });
   rawNavPromiseCache[cacheKey] = p;
   rawNavCacheTime[cacheKey] = now;
@@ -66,7 +61,7 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
   try {
     // 1. Fetch initial Page Data and Navigation Menus in Parallel
     const [pageRes, navRes] = await Promise.all([
-      fetch(`${cmsUrl}/api/pages?where[slug][equals]=${slug}&locale=${locale}${fallbackParam}&depth=1`, { next: { revalidate: 3600 } }),
+      cmsFetch(`${cmsUrl}/api/pages?where[slug][equals]=${slug}&locale=${locale}${fallbackParam}&depth=1`, { next: { revalidate: 3600 } }),
       getCachedNavigationMenus(locale, fallbackParam, cmsUrl)
     ]);
 
@@ -172,7 +167,7 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
         });
       }
       if (sIdsSet.length > 0 && slug !== 'product-overview') seriesUrl += `&where[id][in]=${sIdsSet.join(',')}`;
-      fetchPromises.push(fetch(seriesUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json() : null));
+      fetchPromises.push(cmsFetch(seriesUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json() : null));
     } else {
       fetchPromises.push(Promise.resolve(null));
     }
@@ -197,7 +192,7 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
       } else if (sIdsSetForProds.length > 0) {
         productUrl += `&where[series][in]=${sIdsSetForProds.join(',')}`;
       }
-      fetchPromises.push(fetch(productUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json() : null));
+      fetchPromises.push(cmsFetch(productUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json() : null));
     } else {
       fetchPromises.push(Promise.resolve(null));
     }
@@ -206,7 +201,7 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
     const aIdsSet = Array.from(new Set(appIds));
     if (aIdsSet.length > 0) {
       const appUrl = `${cmsUrl}/api/applications?locale=${locale}${fallbackParam}&where[id][in]=${aIdsSet.join(',')}&depth=1`;
-      fetchPromises.push(fetch(appUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json() : null));
+      fetchPromises.push(cmsFetch(appUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json() : null));
     } else {
       fetchPromises.push(Promise.resolve(null));
     }
@@ -216,7 +211,7 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
     let faqCategoriesPromise: Promise<any[]> = Promise.resolve([]);
     if (fcIdsSet.length > 0) {
       const catUrl = `${cmsUrl}/api/categories?locale=${locale}${fallbackParam}&where[id][in]=${fcIdsSet.join(',')}&depth=0&limit=100`;
-      faqCategoriesPromise = fetch(catUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json().then(d => d.docs || []) : []);
+      faqCategoriesPromise = cmsFetch(catUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json().then(d => d.docs || []) : []);
     }
 
     // FAQ Items Fetch
@@ -224,7 +219,7 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
     let faqItemsPromise: Promise<any[]> = Promise.resolve([]);
     if (fiIdsSet.length > 0) {
       const itemUrl = `${cmsUrl}/api/faq-items?locale=${locale}${fallbackParam}&where[id][in]=${fiIdsSet.join(',')}&depth=0&limit=100`;
-      faqItemsPromise = fetch(itemUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json().then(d => d.docs || []) : []);
+      faqItemsPromise = cmsFetch(itemUrl, { next: { revalidate: 3600 } }).then(r => r.ok ? r.json().then(d => d.docs || []) : []);
     }
 
     // Form Configs Fetch (Parallel inside Parallel)
@@ -233,7 +228,7 @@ export async function fetchPageData(slug: string, locale: string, noFallback = f
     if (uniqueFormIds.length > 0) {
       const formFetchPromise = Promise.all(uniqueFormIds.map(async (id) => {
         try {
-          const res = await fetch(`${cmsUrl}/api/form-configs/${id}?depth=1&draft=false&locale=${locale}&trash=false`, { next: { revalidate: 3600 } });
+          const res = await cmsFetch(`${cmsUrl}/api/form-configs/${id}?depth=1&draft=false&locale=${locale}&trash=false`, { next: { revalidate: 3600 } });
           if (res.ok) formConfigsMap[id] = normalizeMediaObject(await res.json());
         } catch (e) {}
       }));

@@ -1,8 +1,7 @@
+import { cmsFetch, CMS_URL } from "./client";
 import type { Locale } from "@/i18n.config"
 
-const PAYLOAD_URL = process.env.CMS_GRAPHQL_URL
-  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002')
+const PAYLOAD_URL = CMS_URL
 
 /**
  * Check if a slug matches a published PRODUCT category
@@ -10,7 +9,7 @@ const PAYLOAD_URL = process.env.CMS_GRAPHQL_URL
  */
 export async function getCategoryBySlug(slug: string, locale: string) {
   try {
-    const response = await fetch(
+    const response = await cmsFetch(
       `${PAYLOAD_URL}/api/categories?where[slug][equals]=${encodeURIComponent(slug)}&where[type][equals]=PRODUCT&where[status][equals]=published&locale=${locale}&depth=0&limit=1`,
       { next: { revalidate: 60 } }
     )

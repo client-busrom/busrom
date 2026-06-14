@@ -1,17 +1,16 @@
+import { cmsFetch, CMS_URL } from "./client";
 import type { Locale } from "@/i18n.config"
 import { convertToCDNUrl } from "@/lib/cdn-url"
 import { resolveAllMedia } from "@/lib/media-resolver"
 
-const PAYLOAD_URL = process.env.CMS_GRAPHQL_URL
-  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3002')
+const PAYLOAD_URL = CMS_URL;
 
 /**
  * Fetch product series by slug (Server-side)
  */
 export async function getProductSeriesBySlug(slug: string, locale: string) {
   try {
-    const response = await fetch(
+    const response = await cmsFetch(
       `${PAYLOAD_URL}/api/product-series?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}&depth=1`,
       { next: { revalidate: 60 } }
     )
@@ -80,7 +79,7 @@ export async function getProductSeriesBySlug(slug: string, locale: string) {
       if (reusableBlockIds.size > 0) {
         const blockPromises = Array.from(reusableBlockIds).map(async (id) => {
           try {
-            const res = await fetch(`${PAYLOAD_URL}/api/reusable-blocks/${id}?locale=${locale}&depth=1`, { next: { revalidate: 3600 } })
+            const res = await cmsFetch(`${PAYLOAD_URL}/api/reusable-blocks/${id}?locale=${locale}&depth=1`, { next: { revalidate: 3600 } });
             if (res.ok) {
               const blockData = await res.json()
               reusableBlocks[id] = blockData.content || blockData.contentTranslation
@@ -131,7 +130,7 @@ export async function getProductSeriesBySlug(slug: string, locale: string) {
       if (formConfigIds.size > 0) {
         const formPromises = Array.from(formConfigIds).map(async (id) => {
           try {
-            const res = await fetch(`${PAYLOAD_URL}/api/form-configs/${id}?depth=1&draft=false&locale=${locale}&trash=false`, { next: { revalidate: 3600 } });
+            const res = await cmsFetch(`${PAYLOAD_URL}/api/form-configs/${id}?depth=1&draft=false&locale=${locale}&trash=false`, { next: { revalidate: 3600 } });
             if (res.ok) {
               formConfigsMap[id] = await res.json();
             }

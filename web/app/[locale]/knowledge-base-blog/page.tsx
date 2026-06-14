@@ -50,17 +50,14 @@ export default async function BlogPage({
 }) {
   const { locale } = await params
 
-  const defaultMetadata: Metadata = {
-    title: "Blog | Busrom",
-  }
-  const metadata = await getPageMetadata('/knowledge-base-blog', 'blog_list', locale, defaultMetadata)
-  const pageTitle = String(metadata.title || "Blog | Busrom")
-
-  
   let distribution = undefined;
+  let pageTitle = "Blog | Busrom";
   try {
-    const { distributedKeywords } = await getNonHomePageSeo("/knowledge-base-blog", "blog_list", locale);
+    const { setting, distributedKeywords } = await getNonHomePageSeo("/knowledge-base-blog", "blog_list", locale);
     distribution = distributedKeywords;
+    if (setting?.metaTitle) {
+      pageTitle = setting.metaTitle;
+    }
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/knowledge-base-blog", e);
   }

@@ -4,8 +4,7 @@
  * Fetches contact popup configuration from Payload CMS
  */
 
-const CMS_URL =
-  (process.env.CMS_GRAPHQL_URL ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '') : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'))
+import { cmsFetch, CMS_URL } from "./client";
 
 export interface ContactPopupOption {
   id: string
@@ -43,7 +42,7 @@ export async function getContactPopup(locale: string): Promise<ContactPopupData 
 
   const fetchPromise = (async () => {
     try {
-      const response = await fetch(
+      const response = await cmsFetch(
         `${CMS_URL}/api/globals/contact-popup?locale=${locale}&depth=1`,
         { next: { revalidate: 300 } }
       )

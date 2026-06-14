@@ -4,10 +4,7 @@
  * Unified API for fetching all home page content from Payload CMS
  */
 
-// Use runtime environment variable for server-side API calls
-const CMS_URL = process.env.CMS_GRAPHQL_URL
-  ? process.env.CMS_GRAPHQL_URL.replace('/api/graphql', '')
-  : (process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002')
+import { cmsFetch, CMS_URL } from "./client";
 
 /**
  * Fetch raw home page data from CMS
@@ -17,7 +14,7 @@ const CMS_URL = process.env.CMS_GRAPHQL_URL
  */
 export async function getHomeRawData(locale: string = 'en'): Promise<any> {
   try {
-    const response = await fetch(`${CMS_URL}/api/home?locale=${locale}`, {
+    const response = await cmsFetch(`${CMS_URL}/api/home?locale=${locale}`, {
       next: { revalidate: 60, tags: ['home'] }, // Cache for 60 seconds to optimize TTFB
     })
 

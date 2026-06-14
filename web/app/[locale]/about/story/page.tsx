@@ -34,12 +34,6 @@ export default async function OurStoryPage({
   const { locale } = await params
   const rawData = await fetchPageData(PAGE_SLUGS.OUR_STORY, locale)
 
-  const defaultMetadata: Metadata = {
-    title: "Our Story | Busrom",
-  }
-  const metadata = await getPageMetadata('/about/story', PAGE_SLUGS.OUR_STORY, locale, defaultMetadata)
-  const pageTitle = String(metadata.title || "Our Story | Busrom")
-
   if (!rawData) {
     return notFound()
   }
@@ -73,9 +67,13 @@ export default async function OurStoryPage({
 
   
   let distribution = undefined;
+  let pageTitle = "Our Story | Busrom";
   try {
-    const { distributedKeywords } = await getNonHomePageSeo("/about/story", "our_story", locale);
+    const { setting, distributedKeywords } = await getNonHomePageSeo("/about/story", "our_story", locale);
     distribution = distributedKeywords;
+    if (setting?.metaTitle) {
+      pageTitle = setting.metaTitle;
+    }
   } catch (e) {
     console.error('Failed to fetch seo keywords for', "/about/story", e);
   }

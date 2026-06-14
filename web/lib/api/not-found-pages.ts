@@ -1,10 +1,8 @@
+import { cmsFetch, CMS_URL } from "./client";
 import type { Locale } from "@/i18n.config";
-
-const PAYLOAD_URL = process.env.CMS_GRAPHQL_URL
-  ? process.env.CMS_GRAPHQL_URL.replace("/api/graphql", "")
-  : process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || "http://localhost:3002";
-
 import { convertToCDNUrl } from "@/lib/cdn-url";
+
+const PAYLOAD_URL = CMS_URL;
 
 export interface NotFoundPageConfig {
   id: string;
@@ -23,7 +21,7 @@ export async function getNotFoundPageConfig(
   pageType: NotFoundPageConfig["pageType"]
 ): Promise<NotFoundPageConfig | null> {
   try {
-    const res = await fetch(
+    const res = await cmsFetch(
       `${PAYLOAD_URL}/api/not-found-pages?locale=${locale}&where[pageType][equals]=${pageType}&depth=1`,
       {
         next: { revalidate: 60 },
