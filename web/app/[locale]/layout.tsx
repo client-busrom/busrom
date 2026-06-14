@@ -334,7 +334,10 @@ const acme = localFont({
 });
 
 export function generateStaticParams() {
-  return locales.map(locale => ({ locale }));
+  // Temporary workaround: Skip SSG for now to bypass 503/timeout build errors.
+  // This forces Next.js to use SSR (Server-Side Rendering) for all pages.
+  return [];
+  // return locales.map(locale => ({ locale }));
 }
 
 export async function generateMetadata(): Promise<Metadata> {
