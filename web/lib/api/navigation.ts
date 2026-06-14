@@ -1,3 +1,4 @@
+import { fetchLimiter } from "../semaphore";
 import { NavigationMenuType, type NavItem } from '@/types/navigation';
 import { resolveInternalLink } from '../utils';
 import { convertToCDNUrl } from '../cdn-url';
@@ -249,7 +250,7 @@ export async function getNavigation(locale: string): Promise<NavItem[]> {
     return navPromiseCache[locale]!;
   }
 
-  const fetchPromise = (async () => {
+  const fetchPromise = fetchLimiter.run(async () => {
     try {
       // 直接调用 CMS API，而不是自己的 API 路由
       const response = await fetch(
@@ -283,7 +284,7 @@ export async function getNavigation(locale: string): Promise<NavItem[]> {
       console.error('[getNavigation] Error:', error);
       return [];
     }
-  })();
+  });
 
   navPromiseCache[locale] = fetchPromise;
   navCacheTime[locale] = now;

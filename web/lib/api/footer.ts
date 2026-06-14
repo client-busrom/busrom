@@ -1,3 +1,4 @@
+import { fetchLimiter } from "../semaphore";
 const getCmsUrl = () => {
   if (process.env.CMS_URL) return process.env.CMS_URL;
   if (process.env.NEXT_PUBLIC_CMS_URL) return process.env.NEXT_PUBLIC_CMS_URL;
@@ -18,7 +19,7 @@ export async function getFooterData(locale: string = 'en') {
     return footerPromiseCache[locale];
   }
 
-  const fetchPromise = (async () => {
+  const fetchPromise = fetchLimiter.run(async () => {
     const CMS_URL = getCmsUrl();
     try {
       const [footerRes, socialRes] = await Promise.all([
@@ -119,7 +120,7 @@ export async function getFooterData(locale: string = 'en') {
       console.error('[Footer API Helper] Error:', error);
       return null;
     }
-  })();
+  });
 
   footerPromiseCache[locale] = fetchPromise;
   footerCacheTime[locale] = now;

@@ -1,3 +1,4 @@
+import { fetchLimiter } from "../semaphore";
 /**
  * Custom Scripts API
  *
@@ -252,7 +253,7 @@ export async function getAllCustomScripts(): Promise<CustomScript[]> {
     return scriptsPromiseCache
   }
 
-  const fetchPromise = (async () => {
+  const fetchPromise = fetchLimiter.run(async () => {
     try {
       const response = await fetch(
         `${CMS_URL}/api/custom-scripts?where[isEnabled][equals]=true&limit=100&sort=-priority`,
@@ -273,7 +274,7 @@ export async function getAllCustomScripts(): Promise<CustomScript[]> {
       console.error('[CustomScripts] Error fetching scripts:', error)
       return scriptsCache || []
     }
-  })();
+  });
 
   scriptsPromiseCache = fetchPromise;
   scriptsCacheTime = now;

@@ -1,3 +1,4 @@
+import { fetchLimiter } from "../semaphore";
 /**
  * Site Config API
  *
@@ -42,7 +43,7 @@ export async function getSiteConfig(): Promise<SiteConfigData> {
     return siteConfigPromise;
   }
 
-  const fetchPromise = (async () => {
+  const fetchPromise = fetchLimiter.run(async () => {
     try {
       const response = await fetch(`${CMS_URL}/api/globals/site-config`, {
         next: { revalidate: 300 }, // Cache for 5 minutes
@@ -72,7 +73,7 @@ export async function getSiteConfig(): Promise<SiteConfigData> {
       console.error('Error fetching site config:', error)
       return getDefaultConfig()
     }
-  })();
+  });
 
   siteConfigPromise = fetchPromise;
   siteConfigTime = now;

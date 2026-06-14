@@ -1,3 +1,4 @@
+import { fetchLimiter } from "../semaphore";
 import type { Locale } from "@/i18n.config"
 import { convertToCDNUrl } from "@/lib/cdn-url"
 import { resolveAllMedia, hydrateContent } from "@/lib/media-resolver"
@@ -25,10 +26,10 @@ export async function getProductBySlug(slug: string, locale: string, noFallback 
     };
 
     // 1. Fetch the main product document
-    const response = await fetch(
+    const response = await fetchLimiter.run(async () => fetch(
       `${PAYLOAD_URL}/api/products?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}${fallbackParam}&depth=1`,
       { next: { revalidate: 60 } }
-    )
+    ));
 
     if (!response.ok) {
       console.error('[Products API] Error:', response.status)
@@ -88,7 +89,7 @@ export async function getProductBySlug(slug: string, locale: string, noFallback 
       if (refs.length > 0) {
         await Promise.all(refs.map(async (ref) => {
           try {
-            const res = await fetch(`${cmsUrl}/api/${ref.collection}/${ref.id}?locale=${locale}${fallbackParam}&depth=1`, { next: { revalidate: 60 } });
+            const res = await fetchLimiter.run(async () => fetch(`${cmsUrl}/api/${ref.collection}/${ref.id}?locale=${locale}${fallbackParam}&depth=1`, { next: { revalidate: 60 } }));
             if (res.ok) {
               const blockDoc = await res.json();
               reusableBlocks[ref.id] = blockDoc;

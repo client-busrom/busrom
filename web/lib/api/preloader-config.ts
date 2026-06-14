@@ -1,3 +1,4 @@
+import { fetchLimiter } from "../semaphore";
 /**
  * Preloader Config API
  *
@@ -171,7 +172,7 @@ export async function getPreloaderConfig(): Promise<PreloaderConfigData> {
     return preloaderPromiseCache;
   }
 
-  const fetchPromise = (async () => {
+  const fetchPromise = fetchLimiter.run(async () => {
     try {
       const response = await fetch(`${CMS_URL}/api/globals/preloader-config?depth=1`, {
         next: { revalidate: 60 }, // Revalidate every 60 seconds
@@ -229,7 +230,7 @@ export async function getPreloaderConfig(): Promise<PreloaderConfigData> {
       console.error('Error fetching preloader config:', error)
       return defaultPreloaderConfig
     }
-  })();
+  });
 
   preloaderPromiseCache = fetchPromise;
   preloaderCacheTime = now;
