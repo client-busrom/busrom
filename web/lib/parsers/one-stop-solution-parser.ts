@@ -292,7 +292,7 @@ const mapProductsWithCarouselConfig = (products: any[], carouselItems: any[] = [
       title,
       image: displayImage, // Normalize to single 'image' prop for standard components
       showImage: displayImage, // Also keep 'showImage' for components that prefer it
-      link: `/${locale}/product/${product.slug}`,
+      link: `/${locale}/shop/${product.slug}`,
       showName: item.showName !== false,
       showCategory: !!item.showCategory,
       categoryName,
@@ -392,12 +392,12 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
 
   const categoriesProducts = catMapped.length > 0 || catOther.length > 0
     ? [...catMapped, ...catOther]
-    : products.map((p: any) => ({ ...p, title: p.category?.name || p.name, link: `/${locale}/product/${p.slug}` }));
+    : products.map((p: any) => ({ ...p, title: p.category?.name || p.name, link: `/${locale}/shop/${p.slug}` }));
 
   // Series
   const seriesRaw = extractSectionRaw(contentChildren, "product-attribute", mediaData);
   const seriesCarousel = seriesRaw.items.find((it: any) => it.sourceType === 'productCarousel');
-  const seriesProducts = seriesCarousel ? mapProductsWithCarouselConfig(products, seriesCarousel.carouselItems, locale) : products.map((p: any) => ({ ...p, title: p.category?.name || p.name, link: `/${locale}/product/${p.slug}` }));
+  const seriesProducts = seriesCarousel ? mapProductsWithCarouselConfig(products, seriesCarousel.carouselItems, locale) : products.map((p: any) => ({ ...p, title: p.category?.name || p.name, link: `/${locale}/shop/${p.slug}` }));
 
   // Brand Highlights
   const brandHighlightsRaw = extractSectionRaw(contentChildren, "brand-highlights-item", mediaData);
