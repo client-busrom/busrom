@@ -26,10 +26,12 @@ const VARIANT_FOLDERS: Record<string, string> = {
 
 // Initialize S3 client for manual file operations
 const s3Client = new S3Client({
-  credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
-  },
+  ...(process.env.S3_ACCESS_KEY_ID && process.env.S3_SECRET_ACCESS_KEY ? {
+    credentials: {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+    }
+  } : {}),
   region: process.env.S3_REGION || 'us-east-1',
   ...(process.env.S3_ENDPOINT && { endpoint: process.env.S3_ENDPOINT }),
   ...(process.env.USE_MINIO === 'true' && !process.env.S3_ENDPOINT && { endpoint: 'http://localhost:9000' }),
@@ -353,6 +355,25 @@ export const Media: CollectionConfig = {
         // Skip if this is a create operation (no previous doc to compare)
         if (operation === 'create' || !previousDoc) return doc
 
+        // Clean up orphaned S3 variants if the file was replaced
+        if (operation === 'update' && previousDoc.filename && doc.filename && previousDoc.filename !== doc.filename) {
+          req.payload.logger.info(`🔄 Media file replaced: ${previousDoc.filename} -> ${doc.filename}. Cleaning up old variants...`)
+          const bucket = process.env.S3_BUCKET_NAME || 'busrom-media'
+          for (const [sizeName, folder] of Object.entries(VARIANT_FOLDERS)) {
+            const key = `variants/${folder}/${previousDoc.filename}`
+            try {
+              await s3Client.send(
+                new DeleteObjectCommand({
+                  Bucket: bucket,
+                  Key: key,
+                })
+              )
+            } catch (error) {
+              req.payload.logger.warn(`⚠️ Failed to delete old variant ${key}: ${error instanceof Error ? error.message : String(error)}`)
+            }
+          }
+        }
+
         // Skip if this is a regeneration update (prevent infinite loop)
         if (context?.skipFocalPointRegeneration) return doc
 
@@ -388,136 +409,94 @@ export const Media: CollectionConfig = {
     ],
     beforeDelete: [
       async ({ req, id }) => {
-        const { user, payload } = req
+        const { payload } = req
 
-        // Fetch the media to check its status
-        const media = await payload.findByID({
-          collection: 'media',
-          id,
-        })
+        // Check if media is referenced by other collections
+        const references: string[] = []
 
-        // Check if user is super admin
-        // roles can be an array of IDs (numbers) or populated objects with code
-        const isSuperAdmin = user?.roles?.some((role: any) => {
-          // If role is populated object
-          if (typeof role === 'object' && role?.code === 'super_admin') return true
-          // If role is just an ID, check against super_admin role ID (1)
-          if (typeof role === 'number' && role === 1) return true
-          // If role is string ID
-          if (typeof role === 'string' && role === '1') return true
-          return false
-        }) || user?.isAdmin === true
-
-        // If media is already archived and user is super admin, check for references before hard delete
-        if (media.status === 'archived' && isSuperAdmin) {
-          // Check if media is referenced by other collections
-          const references: string[] = []
-
-          // Check PreloaderConfig global (images array)
-          try {
-            const preloaderConfig = await payload.findGlobal({
-              slug: 'preloader-config' as any,
-              depth: 0,
-            })
-            const preloaderImages = (preloaderConfig as any)?.images || []
-            const isInPreloader = preloaderImages.some((img: any) => {
-              const imageId = typeof img?.image === 'object' ? img.image?.id : img?.image
-              return imageId === id || imageId === Number(id)
-            })
-            if (isInPreloader) {
-              references.push('Preloader Config')
-            }
-          } catch (e) {
-            // Preloader config might not exist, ignore
-          }
-
-          // Check HeroBannerItems
-          const heroBannerRefs = await payload.find({
-            collection: 'hero-banner-items',
-            where: {
-              or: [
-                { image1: { equals: id } },
-                { image2: { equals: id } },
-                { image3: { equals: id } },
-                { image4: { equals: id } },
-              ],
-            },
-            limit: 5,
+        // Check PreloaderConfig global (images array)
+        try {
+          const preloaderConfig = await payload.findGlobal({
+            slug: 'preloader-config' as any,
+            depth: 0,
           })
-          if (heroBannerRefs.totalDocs > 0) {
-            references.push(`Hero Banner Items (${heroBannerRefs.totalDocs})`)
-          }
-
-          // Check ProductSeries (featuredImage)
-          const productSeriesRefs = await payload.find({
-            collection: 'product-series',
-            where: {
-              featuredImage: { equals: id },
-            },
-            limit: 5,
+          const preloaderImages = (preloaderConfig as any)?.images || []
+          const isInPreloader = preloaderImages.some((img: any) => {
+            const imageId = typeof img?.image === 'object' ? img.image?.id : img?.image
+            return imageId === id || imageId === Number(id)
           })
-          if (productSeriesRefs.totalDocs > 0) {
-            references.push(`Product Series (${productSeriesRefs.totalDocs})`)
+          if (isInPreloader) {
+            references.push('Preloader Config')
           }
-
-          // Check Products (mainImage, showImage)
-          const productRefs = await payload.find({
-            collection: 'products',
-            where: {
-              or: [
-                { mainImage: { equals: id } },
-                { showImage: { equals: id } },
-              ],
-            },
-            limit: 5,
-          })
-          if (productRefs.totalDocs > 0) {
-            references.push(`Products (${productRefs.totalDocs})`)
-          }
-
-          // Check Blogs (coverImage)
-          const blogRefs = await payload.find({
-            collection: 'blogs',
-            where: {
-              coverImage: { equals: id },
-            },
-            limit: 5,
-          })
-          if (blogRefs.totalDocs > 0) {
-            references.push(`Blogs (${blogRefs.totalDocs})`)
-          }
-
-          // If there are references, show error with details
-          if (references.length > 0) {
-            throw new APIError(
-              `无法删除此媒体文件，它被以下内容引用：${references.join('、')}。请先移除这些引用后再删除。`,
-              400,
-              undefined,
-              true // isPublic - show message to user
-            )
-          }
-
-          // Allow deletion - S3 files will be deleted by Payload's default behavior
-          console.log(`🗑️ Super admin hard deleting archived media: ${media.filename}`)
-          return // Continue with deletion
+        } catch (e) {
+          // Preloader config might not exist, ignore
         }
 
-        // Otherwise, soft delete (archive)
-        await payload.update({
-          collection: 'media',
-          id,
-          data: { status: 'archived' },
+        // Check HeroBannerItems
+        const heroBannerRefs = await payload.find({
+          collection: 'hero-banner-items',
+          where: {
+            or: [
+              { image1: { equals: id } },
+              { image2: { equals: id } },
+              { image3: { equals: id } },
+              { image4: { equals: id } },
+            ],
+          },
+          limit: 5,
         })
+        if (heroBannerRefs.totalDocs > 0) {
+          references.push(`Hero Banner Items (${heroBannerRefs.totalDocs})`)
+        }
 
-        console.log(`📦 Media archived: ${media.filename}`)
+        // Check ProductSeries (featuredImage)
+        const productSeriesRefs = await payload.find({
+          collection: 'product-series',
+          where: {
+            featuredImage: { equals: id },
+          },
+          limit: 5,
+        })
+        if (productSeriesRefs.totalDocs > 0) {
+          references.push(`Product Series (${productSeriesRefs.totalDocs})`)
+        }
 
-        // Prevent actual deletion
-        throw new APIError(
-          '媒体已归档。超级管理员可以永久删除已归档的媒体。',
-          400,
-          undefined,
-          true // isPublic - show message to user
-        )
+        // Check Products (mainImage, showImage)
+        const productRefs = await payload.find({
+          collection: 'products',
+          where: {
+            or: [
+              { mainImage: { equals: id } },
+              { showImage: { equals: id } },
+            ],
+          },
+          limit: 5,
+        })
+        if (productRefs.totalDocs > 0) {
+          references.push(`Products (${productRefs.totalDocs})`)
+        }
+
+        // Check Blogs (coverImage)
+        const blogRefs = await payload.find({
+          collection: 'blogs',
+          where: {
+            coverImage: { equals: id },
+          },
+          limit: 5,
+        })
+        if (blogRefs.totalDocs > 0) {
+          references.push(`Blogs (${blogRefs.totalDocs})`)
+        }
+
+        // If there are references, show error with details
+        if (references.length > 0) {
+          throw new APIError(
+            `无法删除此媒体文件，它被以下内容引用：${references.join('、')}。请先移除这些引用后再删除。注意：富文本编辑器内的图片引用无法被自动检测。`,
+            400,
+            undefined,
+            true // isPublic - show message to user
+          )
+        }
       },
     ],
     afterDelete: [
