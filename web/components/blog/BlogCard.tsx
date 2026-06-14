@@ -15,11 +15,11 @@ export function BlogCard({ item, locale }: { item: any, locale: string }) {
         <span className="absolute top-4 right-4 z-20 px-4 py-1 bg-white rounded-full text-[9px] font-black uppercase tracking-widest text-[#060C14] border border-black/5">
           {item.categories?.[0]?.name || "category"}
         </span>
-        
-        <OptimizedImage 
-          image={safeImage(item.coverImage)} 
-          alt={item.title} 
-          size="large"
+
+        <OptimizedImage
+          image={safeImage(item.coverImage)}
+          alt={item.title}
+          size="medium"
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
         />
       </div>
@@ -42,17 +42,17 @@ export function BlogCard({ item, locale }: { item: any, locale: string }) {
         </Link>
 
         <div className="flex items-center justify-center gap-3 mb-6 mt-auto">
-           {item.author?.avatar && (
-             <OptimizedImage 
-               image={safeImage(item.author.avatar)} 
-               alt={item.author.name} 
-               size="small"
-               className="w-6 h-6 rounded-full border border-gray-100 object-cover"
-             />
-           )}
-           <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.author?.name || "Busrom"}</span>
-           <span className="text-gray-300">•</span>
-           <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{(item.readTime || "03") + " MIN READ"}</span>
+          {item.author?.avatar && (
+            <OptimizedImage
+              image={safeImage(item.author.avatar)}
+              alt={item.author.name}
+              size="small"
+              className="w-6 h-6 rounded-full border border-gray-100 object-cover"
+            />
+          )}
+          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.author?.name || "Busrom"}</span>
+          <span className="text-gray-300">•</span>
+          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{(item.readTime || "03") + " MIN READ"}</span>
         </div>
 
         <Link className="mx-auto inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#F5F4E9] group-hover:bg-[#060C14] group-hover:text-white transition-all duration-300 group-hover:rotate-45" href={`${localePrefix}/knowledge-base-blog/${item.slug}`}>

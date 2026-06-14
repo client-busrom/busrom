@@ -44,7 +44,7 @@ export function PopularTopics({
                 <OptimizedImage
                   image={safeImage(blogs[0]?.coverImage)}
                   alt="All Categories"
-                  size="medium"
+                  size="small"
                   className="object-cover h-full w-full scale-125 group-hover:scale-100 transition-all duration-300"
                 />
               </span>
@@ -93,7 +93,7 @@ export function PopularTopics({
                       <OptimizedImage
                         image={safeImage(previewPost?.coverImage)}
                         alt={tab.name}
-                        size="medium"
+                        size="small"
                         className="object-cover h-full w-full scale-125 group-hover:scale-100 transition-all duration-300"
                       />
                     </span>
