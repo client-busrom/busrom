@@ -41,5 +41,5 @@ export class Semaphore {
 
 // Limit concurrent API requests to CMS during Next.js SSG build
 // AWS t3/t4g instances and Load Balancers will mark target as unhealthy if overwhelmed.
-// Next.js fires hundreds of concurrent requests by default. We limit it to 5.
-export const fetchLimiter = new Semaphore(5);
+// Next.js fires hundreds of concurrent requests by default. We limit it to 1 for serial execution.
+export const fetchLimiter = new Semaphore(1);

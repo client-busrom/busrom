@@ -5,24 +5,30 @@ export const defaultLocale = "en"
 // 所有支持的语言（与 Payload CMS localization 配置一致）
 // CMS 会自动 fallback 到英文如果某语言没有翻译
 export const locales = [
-  "en",  // English
-  "zh",  // 中文
-  "es",  // Español
-  "fr",  // Français
-  "de",  // Deutsch
-  "it",  // Italiano
-  "pt",  // Português
-  "nl",  // Nederlands
-  "ru",  // Русский
-  "ja",  // 日本語
-  "ko",  // 한국어
-  "ar",  // العربية
-  "tr",  // Türkçe
-  "pl",  // Polski
-  "sv",  // Svenska
-  "da",  // Dansk
-  "no",  // Norsk
-  "fi",  // Suomi
+  "en",
+  "zh",
+  "ar",
+  "de",
+  "es",
+  "fr",
+  "it",
+  "ja",
+  "ko",
+  "pt",
+  "ru",
+  "vi",
+  "th",
+  "id",
+  "tr",
+  "nl",
+  "pl",
+  "sv",
+  "da",
+  "fi",
+  "no",
+  "cs",
+  "el",
+  "hu"
 ] as const
 
 // 非默认语言（需要在 URL 中显示的语言）

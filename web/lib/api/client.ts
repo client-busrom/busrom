@@ -38,34 +38,50 @@ export async function cmsFetch(
 
   return fetchLimiter.run(async () => {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+
       try {
-        const response = await fetch(finalInput, init);
+        const response = await fetch(finalInput, {
+          ...init,
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
 
         // Retry on 502/503/504
         if (response.status === 502 || response.status === 503 || response.status === 504) {
           console.warn(`[cmsFetch] Attempt ${attempt} failed with status ${response.status} for ${urlString}. Retrying...`);
           if (attempt < maxRetries) {
-            await delay(attempt * 500);
+            // Exponential backoff: 3s, 6s
+            await delay(attempt * 3000);
             continue;
           }
         }
 
         return response;
       } catch (error: any) {
+        clearTimeout(timeoutId);
         lastError = error;
-        console.warn(`[cmsFetch] Attempt ${attempt} encountered network error: ${error.message || error} for ${urlString}. Retrying...`);
+        const isTimeout = error.name === 'AbortError';
+        console.warn(`[cmsFetch] Attempt ${attempt} ${isTimeout ? 'timed out (15s)' : 'encountered network error'}: ${error.message || error} for ${urlString}. Retrying...`);
         if (attempt < maxRetries) {
-          await delay(attempt * 500);
+          // Exponential backoff: 3s, 6s
+          await delay(attempt * 3000);
           continue;
         }
       }
     }
 
-    if (lastError) {
-      throw lastError;
-    }
-
-    // Exhausted retries but have a response (e.g. 504), return a fresh request's response to callers
-    return fetch(finalInput, init);
+    console.error(`[cmsFetch] All ${maxRetries} attempts failed for ${urlString}. Returning synthetic 504 Response.`);
+    
+    // Return synthetic 504 Gateway Timeout instead of throwing to prevent crashing the build
+    return new Response(
+      JSON.stringify({ error: 'Gateway Timeout / Bad Gateway after retries', url: urlString }),
+      {
+        status: 504,
+        statusText: 'Gateway Timeout',
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
   });
 }
