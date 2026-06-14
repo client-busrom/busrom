@@ -25,6 +25,12 @@ COPY payload-cms ./payload-cms
 WORKDIR /app/payload-cms
 RUN pnpm run build
 
+# Deploy isolated workspace
+WORKDIR /app
+RUN pnpm deploy --filter payload-cms --prod /app/out
+# Ensure .next is copied (pnpm deploy might ignore it due to .gitignore)
+RUN cp -r /app/payload-cms/.next /app/out/.next
+
 # ============ Runner Stage ============
 FROM base AS runner
 WORKDIR /app
@@ -38,16 +44,8 @@ ENV PORT=3002
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs payloaduser
 
-# Copy built application from builder
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/.next ./.next
-COPY --from=builder --chown=payloaduser:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/node_modules ./payload-cms/node_modules
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/package.json ./package.json
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/next.config.mjs ./next.config.mjs
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/payload.config.ts ./payload.config.ts
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/src ./src
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/tsconfig.json ./tsconfig.json
-COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/public ./public
+# Copy isolated workspace from builder
+COPY --from=builder --chown=payloaduser:nodejs /app/out ./
 
 # Copy startup script, CSS loader, and migration cleanup script
 COPY --chown=payloaduser:nodejs payload-cms/start-payload.sh ./start-payload.sh
