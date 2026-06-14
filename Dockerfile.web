@@ -76,8 +76,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/web/public ./web/public
 COPY --from=builder --chown=nextjs:nodejs /app/web/.next ./web/.next
 COPY --from=builder --chown=nextjs:nodejs /app/web/next.config.js ./web/next.config.js
 
-# Copy node_modules (needed for Next.js runtime, monorepo hoists to root)
+# Copy node_modules (needed for Next.js runtime, pnpm symlinks workspace to root)
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=deps --chown=nextjs:nodejs /app/web/node_modules ./web/node_modules
 
 # Switch to non-root user
 USER nextjs
@@ -91,4 +92,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 # Start Next.js
 WORKDIR /app/web
-CMD ["pnpm", "start"]
+CMD ["./node_modules/.bin/next", "start"]

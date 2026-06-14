@@ -41,6 +41,7 @@ RUN groupadd --system --gid 1001 nodejs && \
 # Copy built application from builder
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/.next ./.next
 COPY --from=builder --chown=payloaduser:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/node_modules ./payload-cms/node_modules
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/package.json ./package.json
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/next.config.mjs ./next.config.mjs
 COPY --from=builder --chown=payloaduser:nodejs /app/payload-cms/payload.config.ts ./payload.config.ts
