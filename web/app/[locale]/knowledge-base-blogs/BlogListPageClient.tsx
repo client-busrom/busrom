@@ -110,6 +110,10 @@ export function BlogListPageClient({ locale, slugMode = false }: BlogListPageCli
 
         if (matchedTagIds.length > 0) {
           setSelectedTags(matchedTagIds)
+          // Update the URL immediately so the user knows a filter is active!
+          const newUrl = new URL(window.location.href)
+          newUrl.searchParams.set('tag', pendingTag)
+          window.history.replaceState(null, '', newUrl.toString())
         }
         sessionStorage.removeItem('pendingBlogTag')
       } else if (tagParam) {
