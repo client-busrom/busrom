@@ -16,7 +16,7 @@ COPY payload-cms/package.json ./payload-cms/package.json
 COPY web/package.json ./web/package.json
 
 # Install ALL dependencies from root (monorepo)
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
 # Copy payload-cms source code after install
 COPY payload-cms ./payload-cms

@@ -14,13 +14,13 @@ COPY web/package.json ./web/
 COPY payload-cms/package.json ./payload-cms/
 
 # Install production dependencies (all workspaces needed for monorepo)
-RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod
+RUN corepack enable pnpm && pnpm install --frozen-lockfile --prod
 
 # ============ Stage 2: Builder ============
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package files (all workspaces needed for monorepo npm ci)
+# Copy package files (all workspaces needed for monorepo pnpm install)
 COPY package.json pnpm-lock.yaml* ./
 COPY web/package.json ./web/
 COPY payload-cms/package.json ./payload-cms/
@@ -29,7 +29,7 @@ COPY payload-cms/package.json ./payload-cms/
 COPY patches ./patches
 
 # Install ALL dependencies (including dev dependencies needed for build)
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
 # Copy source code
 COPY tsconfig.json ./
