@@ -44,6 +44,7 @@
     "country-flag-icons": "^1.6.4",
     "cross-env": "^7.0.3",
     "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.38.3",
     "exceljs": "^4.4.0",
     "googleapis": "^171.4.0",
     "graphql": "^16.8.1",
