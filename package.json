@@ -8,12 +8,12 @@
     "web"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:cms\" \"npm run dev:web\"",
-    "dev:cms": "npm run dev --workspace=payload-cms",
-    "dev:web": "npm run dev --workspace=web",
-    "build": "npm run build --workspaces",
-    "build:cms": "npm run build --workspace=payload-cms",
-    "build:web": "npm run build --workspace=web",
+    "dev": "concurrently \"pnpm run dev:cms\" \"pnpm run dev:web\"",
+    "dev:cms": "pnpm --filter payload-cms run dev",
+    "dev:web": "pnpm --filter web run dev",
+    "build": "pnpm -r run build",
+    "build:cms": "pnpm --filter payload-cms run build",
+    "build:web": "pnpm --filter web run build",
     "postinstall": "npx --no patch-package || true"
   },
   "devDependencies": {
@@ -23,7 +23,7 @@
   },
   "engines": {
     "node": ">=20.0.0",
-    "npm": ">=10.0.0"
+    "pnpm": ">=9.0.0"
   },
   "dependencies": {
     "embla-carousel-auto-scroll": "^8.6.0"
