@@ -268,20 +268,18 @@ export function BlogListPageClient({ locale, slugMode = false }: BlogListPageCli
   }, [])
 
   const toggleTag = (tagId: string) => {
-    setSelectedTags(prev => {
-      const next = prev.includes(tagId)
-        ? prev.filter(t => t !== tagId)
-        : [...prev, tagId]
+    const next = selectedTags.includes(tagId)
+      ? selectedTags.filter(t => t !== tagId)
+      : [...selectedTags, tagId]
+    
+    setSelectedTags(next)
 
-      // Sync with URL
-      const nextSlugs = next.map(id => {
-        const t = allTags.find((tag: any) => String(tag.id) === id)
-        return t ? (t.slug || t.id) : id
-      })
-      updateUrl({ tag: nextSlugs.length > 0 ? nextSlugs.join(',') : null })
-
-      return next
+    // Sync with URL
+    const nextSlugs = next.map(id => {
+      const t = allTags.find((tag: any) => String(tag.id) === id)
+      return t ? (t.slug || t.id) : id
     })
+    updateUrl({ tag: nextSlugs.length > 0 ? nextSlugs.join(',') : null })
   }
 
   // Close dropdown when clicking outside
