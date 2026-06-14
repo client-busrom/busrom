@@ -1,0 +1,3 @@
+patchedDependencies:
+  '@payloadcms/drizzle@3.85.1': patches/@payloadcms__drizzle@3.85.1.patch
+  '@payloadcms/translations@3.85.1': patches/@payloadcms__translations@3.85.1.patch

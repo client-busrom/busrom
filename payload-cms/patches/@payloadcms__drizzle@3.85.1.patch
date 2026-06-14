@@ -1,8 +1,8 @@
-diff --git a/node_modules/@payloadcms/drizzle/dist/queries/sanitizeQueryValue.js b/node_modules/@payloadcms/drizzle/dist/queries/sanitizeQueryValue.js
-index ea09651..5e07d37 100644
---- a/node_modules/@payloadcms/drizzle/dist/queries/sanitizeQueryValue.js
-+++ b/node_modules/@payloadcms/drizzle/dist/queries/sanitizeQueryValue.js
-@@ -31,7 +31,19 @@ export const sanitizeQueryValue = ({ adapter, columns, field, isUUID, operator:
+diff --git a/dist/queries/sanitizeQueryValue.js b/dist/queries/sanitizeQueryValue.js
+index 96972437d3777ef6928af9afd11ede41bdae83a9..2ec1632f5910368080a5f42aaf74f2acb4b63fe3 100644
+--- a/dist/queries/sanitizeQueryValue.js
++++ b/dist/queries/sanitizeQueryValue.js
+@@ -32,7 +32,19 @@ export const sanitizeQueryValue = ({ adapter, columns, field, isUUID, operator:
                  allPossibleIDTypes.push(val, String(val));
              }
          });

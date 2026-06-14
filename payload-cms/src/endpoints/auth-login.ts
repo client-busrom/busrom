@@ -53,6 +53,10 @@ export const authLoginHandler: PayloadHandler = async (req) => {
         req,
       })
 
+      if (!result || !result.user) {
+        throw new Error('Invalid credentials')
+      }
+
       // Check if user has 2FA enabled
       const user = await payload.findByID({
         collection: 'users',

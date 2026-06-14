@@ -1,8 +1,8 @@
-diff --git a/node_modules/@payloadcms/translations/dist/clientKeys.js b/node_modules/@payloadcms/translations/dist/clientKeys.js
-index 2938f80..9a7ae76 100644
---- a/node_modules/@payloadcms/translations/dist/clientKeys.js
-+++ b/node_modules/@payloadcms/translations/dist/clientKeys.js
-@@ -506,7 +506,151 @@ export const clientTranslationKeys = createClientTranslationKeys([
+diff --git a/dist/clientKeys.js b/dist/clientKeys.js
+index d4100ebc68554250a7d87f6fe458183e566e630c..798f627e8717797c52f27a6f960f49c1d7b6b684 100644
+--- a/dist/clientKeys.js
++++ b/dist/clientKeys.js
+@@ -534,7 +534,151 @@ export const clientTranslationKeys = createClientTranslationKeys([
      'version:viewingVersion',
      'version:viewingVersionGlobal',
      'version:viewingVersions',
