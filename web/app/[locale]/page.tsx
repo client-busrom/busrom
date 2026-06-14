@@ -146,6 +146,10 @@ export default async function Home({
 }) {
   const { locale } = await params
 
+  if (!isValidLocale(locale as any)) {
+    return null;
+  }
+
   return (
     <>
       <PageScripts path="/" pageType="home" position="header" />
