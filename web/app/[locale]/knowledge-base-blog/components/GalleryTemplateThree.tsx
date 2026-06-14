@@ -138,7 +138,7 @@ function PostCard({ item, locale, aspectClass = "aspect-[3/4]" }: any) {
           <OptimizedImage
             image={safeImage(item.coverImage)}
             alt={item.title}
-            size="large"
+            size="medium"
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
           />
         </div>

@@ -89,7 +89,7 @@ export function GalleryTemplateFour({ section, items, locale }: any) {
                       <OptimizedImage
                         image={safeImage(item.coverImage)}
                         alt={item.title}
-                        size="xlarge"
+                        size="medium"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                       />
                     </div>
