@@ -52,7 +52,6 @@ export const getMessages = async (locale: Locale) => {
     return (await import(`./messages/${locale}.json`)).default
   } catch (error) {
     // Fallback to default locale if message file is missing
-    console.warn(`[i18n] Message file for locale "${locale}" not found, falling back to "${defaultLocale}"`);
     return (await import(`./messages/${defaultLocale}.json`)).default
   }
 }
