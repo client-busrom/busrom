@@ -438,6 +438,17 @@ const nextConfig = {
         source: '/:path*',
         headers: commonHeaders,
       },
+      // Prevent Googlebot from directly indexing raw JSON API responses,
+      // while still allowing it to fetch them to render the frontend pages.
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
+          },
+        ],
+      },
       // Favicon: allow cross-origin access for search engines (Bing, Google etc.)
       // Must come AFTER /:path* so cross-origin overrides same-origin
       {
