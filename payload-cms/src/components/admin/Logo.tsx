@@ -33,6 +33,7 @@ export const Logo: React.FC = () => {
           fontWeight: 700,
           fontFamily: 'system-ui, -apple-system, sans-serif',
           boxShadow: '0 2px 8px rgba(160, 135, 69, 0.3)',
+          flexShrink: 0,
         }}
       >
         B
@@ -65,23 +66,34 @@ export const Logo: React.FC = () => {
 
 export const Icon: React.FC = () => {
   return (
-    <div
-      style={{
-        width: '24px',
-        height: '24px',
-        borderRadius: '4px',
-        background: 'linear-gradient(135deg, #A08745 0%, #756F3F 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#FFFFFF',
-        fontSize: '14px',
-        fontWeight: 700,
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-      }}
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ flexShrink: 0, display: 'block' }}
     >
-      B
-    </div>
+      <defs>
+        <linearGradient id="icon-grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#A08745" />
+          <stop offset="100%" stopColor="#756F3F" />
+        </linearGradient>
+      </defs>
+      <rect width="24" height="24" rx="4" fill="url(#icon-grad)" />
+      <text
+        x="50%"
+        y="50%"
+        dominantBaseline="central"
+        textAnchor="middle"
+        fill="#FFFFFF"
+        fontSize="14"
+        fontWeight="700"
+        fontFamily="system-ui, -apple-system, sans-serif"
+      >
+        B
+      </text>
+    </svg>
   )
 }
 

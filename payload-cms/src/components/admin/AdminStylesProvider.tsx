@@ -14,6 +14,18 @@ import { usePathname } from 'next/navigation'
 // Global CSS for all admin pages
 const globalAdminCSS = `
   /* ================================================================== */
+  /* Fix breadcrumb icon cropping */
+  /* ================================================================== */
+  .step-nav__home, .step-nav__home span {
+    overflow: visible !important;
+  }
+  .step-nav__home span {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ================================================================== */
   /* List Selection Toolbar Buttons Styling (编辑 / 删除 按钮美化与防误触) */
   /* ================================================================== */
   .list-selection .edit-many button,

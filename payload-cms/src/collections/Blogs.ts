@@ -36,7 +36,7 @@ export const Blogs: CollectionConfig = {
     livePreview: {
       url: ({ data, req }) => {
         const secret = process.env.PAYLOAD_PUBLIC_DRAFT_SECRET || 'busrom-draft-secret-2026'
-        
+
         // Dynamically get the host so it works across localhost and local IPs (e.g. 192.168.x.x)
         const host = req.headers?.get ? req.headers.get('host') : (req.headers as any)?.host
         const hostname = host ? host.split(':')[0] : 'localhost'
@@ -244,7 +244,7 @@ export const Blogs: CollectionConfig = {
           }
         }
 
-        // 4. "减肥" 逻辑：如果不是详情页的主文章，剔除重度数据以节省 API 带宽
+        // 4. "减肥" 逻辑：如果不是文章页的主文章，剔除重度数据以节省 API 带宽
         // 重要：如果当前是后台管理人员（req.user 存在），或者是主文档请求，则不剔除数据
         // 注意：isMainDoc 在上方第 109 行已经定义过，这里直接使用并增强
         const finalIsMainDoc = isMainDoc || req?.query?.depth === '0'
@@ -595,7 +595,7 @@ export const Blogs: CollectionConfig = {
               type: 'collapsible',
               label: {
                 en: 'Sidebar Widget Overrides',
-                zh: '详情页侧边栏覆盖 (Sidebar Overrides)',
+                zh: '文章页侧边栏覆盖',
               },
               admin: {
                 condition: (data) => data?.useCustomOverrides === true,
@@ -643,7 +643,7 @@ export const Blogs: CollectionConfig = {
               type: 'collapsible',
               label: {
                 en: 'Footer Widget Overrides',
-                zh: '详情页底部栏覆盖',
+                zh: '文章页底部栏覆盖',
               },
               admin: {
                 condition: (data) => data?.useCustomOverrides === true,
