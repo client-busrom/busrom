@@ -88,7 +88,30 @@ export const getBaseFeatures = () => [
 
   // Rich Content
   LinkFeature({
-    enabledCollections: ['pages', 'products', 'blogs'],
+    enabledCollections: ['pages', 'products', 'blogs', 'product-series'],
+    fields: ({ defaultFields }) => [
+      ...defaultFields.map((f: any) => {
+        if (f.name === 'linkType' || f.name === 'doc') {
+          return {
+            ...f,
+            admin: {
+              ...f.admin,
+              hidden: true, // 隐藏原生的类型选择和文档选择
+            },
+          }
+        }
+        return f
+      }),
+      {
+        name: 'advancedPicker',
+        type: 'ui',
+        admin: {
+          components: {
+            Field: '@/lexical-features/shared/LinkPickerUIField.client#LinkPickerUIField',
+          },
+        },
+      },
+    ],
   }),
   UploadFeature({
     collections: {

@@ -543,15 +543,31 @@ function splitIntoSections(nodes: LexicalNode[]): Map<string, LexicalNode[]> {
   let currentSection: string | null = null
   let currentNodes: LexicalNode[] = []
 
+  const sectionNames = [
+    'hero-carousel',
+    'product-series-overview',
+    'core-selling-points',
+    'product-advantages',
+    'applications',
+    'contact-form',
+    'more-series',
+    'quote'
+  ]
+
   for (const node of nodes) {
-    if (node.type === 'quote') {
+    const text = extractText(node).trim()
+    const isQuoteDivider = node.type === 'quote' && sectionNames.includes(text)
+    const isParagraphDivider = node.type === 'paragraph' && sectionNames.includes(text)
+    
+    // Accept either a quote or a paragraph containing exactly a section name
+    if (isQuoteDivider || isParagraphDivider) {
       // Save nodes to current section before starting a new one
       if (currentSection) {
         const existing = sections.get(currentSection) || []
         sections.set(currentSection, [...existing, ...currentNodes])
       }
       // Start new section
-      currentSection = extractText(node).trim()
+      currentSection = text
       currentNodes = []
     } else if (currentSection) {
       // Normal nodes go into the current section
@@ -1260,9 +1276,12 @@ function parseMoreSeries(
                           (typeof slide.image === 'string' || typeof slide.image === 'number' ? String(slide.image) : '')
           const imageUrl = imageId ? (mediaMap.get(imageId) || `/api/media/${imageId}`) : ''
 
+          let slug = slide.buttonLink || ''
+          slug = slug.replace(/^\/products\//, '').replace(/^\/product-series\//, '').replace(/^\//, '')
+
           series.push({
             name: slide.title || '',
-            slug: slide.buttonLink?.replace('/product-series/', '').replace(/^\//, '') || '',
+            slug: slug,
             image: imageUrl,
             link: slide.buttonLink || '#',
           })
