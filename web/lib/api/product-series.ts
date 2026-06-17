@@ -57,7 +57,7 @@ export async function getProductSeriesBySlug(slug: string, locale: string) {
       }
 
       // 1. Scan for reusable block IDs
-      const reusableBlockIds = new Set<string>()
+      const reusableBlockRefs = new Set<string>()
       const scanForBlocks = (nodes: any[]) => {
         if (!nodes || !Array.isArray(nodes)) return
         nodes.forEach(node => {
@@ -65,7 +65,12 @@ export async function getProductSeriesBySlug(slug: string, locale: string) {
             const blockType = node.type
             const blockRef = node.data?.[blockType]
             const id = typeof blockRef === 'object' && blockRef !== null ? blockRef.id : blockRef
-            if (id) reusableBlockIds.add(String(id))
+            
+            let collection = 'reusable-blocks'
+            if (node.type === 'seriesReusableBlock') collection = 'series-reusable-blocks'
+            if (node.type === 'productReusableBlock') collection = 'product-reusable-blocks'
+
+            if (id) reusableBlockRefs.add(`${collection}:${id}`)
           }
           if (node.children) scanForBlocks(node.children)
         })
@@ -76,10 +81,11 @@ export async function getProductSeriesBySlug(slug: string, locale: string) {
 
       // 2. Fetch reusable blocks in parallel
       const reusableBlocks: Record<string, any> = {}
-      if (reusableBlockIds.size > 0) {
-        const blockPromises = Array.from(reusableBlockIds).map(async (id) => {
+      if (reusableBlockRefs.size > 0) {
+        const blockPromises = Array.from(reusableBlockRefs).map(async (ref) => {
+          const [collection, id] = ref.split(':')
           try {
-            const res = await cmsFetch(`${PAYLOAD_URL}/api/reusable-blocks/${id}?locale=${locale}&depth=1`, { next: { revalidate: 3600 } });
+            const res = await cmsFetch(`${PAYLOAD_URL}/api/${collection}/${id}?locale=${locale}&depth=1`, { next: { revalidate: 3600 } });
             if (res.ok) {
               const blockData = await res.json()
               reusableBlocks[id] = blockData.content || blockData.contentTranslation
