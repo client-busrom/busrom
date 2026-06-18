@@ -90,8 +90,8 @@ export async function GET() {
       robotsTxt = getDefaultRobotsTxt(siteUrl)
     } else {
       // Ensure sitemap is included
-      if (!robotsTxt.includes('Sitemap:')) {
-        robotsTxt += `\n\nSitemap: ${siteUrl}/sitemap.xml\n`
+      if (!/sitemap:/i.test(robotsTxt)) {
+        robotsTxt += `\n\nSitemap: ${siteUrl}/sitemaps.xml\nSitemap: ${siteUrl}/sitemap.xml\n`
       }
     }
 

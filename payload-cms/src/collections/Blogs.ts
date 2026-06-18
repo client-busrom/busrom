@@ -305,6 +305,27 @@ export const Blogs: CollectionConfig = {
             const url = `${siteUrl}${prefix}/knowledge-base-blog/${doc.slug}`
             const res = await notifyGoogleOfUpdate(url)
             results.push({ locale, ...res })
+
+            // Log to database so SeoIndexingWidget can display it (log only 'en' to avoid spam)
+            if (locale === 'en') {
+              try {
+                await payload.create({
+                  collection: 'indexing-logs',
+                  req,
+                  overrideAccess: true,
+                  data: {
+                    targetUrl: url,
+                    engine: 'google',
+                    action: 'update',
+                    status: res?.success ? 'success' : (res?.message?.includes('Credentials') || res?.message?.includes('Key') ? 'failed_keys' : 'failed_network'),
+                    triggerUser: user.id,
+                    rawResponse: res,
+                  }
+                })
+              } catch (e) {
+                console.error('Failed to write SEO log in notify-google:', e)
+              }
+            }
           }
 
           return new Response(JSON.stringify({ success: true, results }), { status: 200 })
