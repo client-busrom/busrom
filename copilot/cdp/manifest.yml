@@ -1,0 +1,42 @@
+name: cdp
+type: Load Balanced Web Service
+
+image:
+  build:
+    dockerfile: ./cdp/Dockerfile
+    context: .
+  port: 3003
+
+cpu: 256
+memory: 512
+count: 1
+
+variables:
+  NODE_ENV: production
+  PORT: 3003
+  # PAYLOAD_URL is the canonical Payload CMS URL used by CDP middleware.
+  # It must match the value used to issue the payload-token cookie.
+  PAYLOAD_URL: https://cms.busromhouse.com
+  # Share the payload-token cookie across all busromhouse.com subdomains.
+  PAYLOAD_COOKIE_DOMAIN: .busromhouse.com
+  # Public endpoint advertised to web frontends.
+  NEXT_PUBLIC_CDP_ENDPOINT: https://cdp.busromhouse.com/api/analytics/track
+  CDP_ANONYMIZE_IP: "true"
+
+secrets:
+  # CDP analytics database (same Postgres instance as CMS, different DB name).
+  DATABASE_URL: /copilot/busrom/production/cdp/DATABASE_URL
+  # Must be identical to the PAYLOAD_SECRET configured for Payload CMS.
+  PAYLOAD_SECRET: /copilot/busrom/production/cms/PAYLOAD_SECRET
+  # Internal API key used by cron/CI to trigger ETL jobs.
+  ETL_API_KEY: /copilot/busrom/production/cdp/ETL_API_KEY
+
+http:
+  path: '/'
+  healthcheck:
+    path: /api/health
+    success_codes: '200'
+    interval: 30s
+    timeout: 10s
+    healthy_threshold: 2
+    unhealthy_threshold: 3

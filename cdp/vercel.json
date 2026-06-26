@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/analytics/summary?action=run-etl",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}

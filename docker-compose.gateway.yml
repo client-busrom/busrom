@@ -1,0 +1,42 @@
+# ==============================================================================
+# Busrom Gateway - Nginx Reverse Proxy
+# ==============================================================================
+# This service provides a unified entry point for all Busrom services:
+#   - cms.busrom.local     -> Payload CMS (3002)
+#   - cdp.busrom.local     -> CDP Analytics (3003)
+#   - busrom.local         -> Web Frontend (3001)
+#
+# Usage:
+#   docker-compose -f docker-compose.yml -f docker-compose.gateway.yml up -d nginx-gateway
+# ==============================================================================
+
+services:
+  nginx-gateway:
+    image: nginx:alpine
+    container_name: busrom-gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/gateway.conf:/etc/nginx/conf.d/default.conf:ro
+      # Optional: basic auth. To enable, first remove the docker/nginx/.htpasswd directory
+      # if it exists (`rmdir docker/nginx/.htpasswd`), then create a real .htpasswd file
+      # and uncomment the line below:
+      # - ./docker/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - busrom-network
+    depends_on:
+      - postgres
+      - minio
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Reuse the existing network from docker-compose.yml
+networks:
+  busrom-network:
+    driver: bridge

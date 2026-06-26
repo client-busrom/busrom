@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  superset:
+    image: apache/superset:latest
+    container_name: busrom-superset
+    ports:
+      - "8088:8088"
+    environment:
+      - SUPERSET_SECRET_KEY=your-secret-key-here
+      - SQLALCHEMY_DATABASE_URI=postgresql://busrom:***@busrom-postgres:5432/busrom_cdp
+      - SUPERSET_LOAD_EXAMPLES=no
+      - SUPERSET_FEATURE_EMBEDDED_SUPERSET=true
+      - BABEL_DEFAULT_LOCALE=zh
+    volumes:
+      - superset-home:/app/superset_home
+    networks:
+      - busrom-network
+
+  superset-db:
+    image: postgres:15-alpine
+    container_name: busrom-superset-db
+    environment:
+      - POSTGRES_USER=superset
+      - POSTGRES_PASSWORD=superset-password
+      - POSTGRES_DB=superset_metadata
+    volumes:
+      - superset-db-data:/var/lib/postgresql/data
+    networks:
+      - busrom-network
+
+volumes:
+  superset-home:
+  superset-db-data:
+
+networks:
+  busrom-network:
+    external: true

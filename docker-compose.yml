@@ -5,6 +5,9 @@
 # - PostgreSQL: Database
 # - MinIO: S3-compatible object storage (free, local S3 replacement)
 # - Nginx: Local CDN for serving media files with caching
+# - Superset: Business Intelligence & Analytics dashboards
+# - CDP: Customer Data Platform analytics service
+# - cdp-scheduler: Automated daily ETL scheduler
 #
 # Usage:
 #   docker-compose up -d          # Start all services
@@ -16,6 +19,7 @@
 #   - MinIO API: http://localhost:9000
 #   - Local CDN: http://localhost:8080
 #   - PostgreSQL: localhost:5432
+#   - CDP API: http://localhost:3003
 # ==============================================================================
 
 services:
@@ -126,6 +130,111 @@ services:
     networks:
       - busrom-network
 
+  # ============================================================================
+  # Apache Superset (Business Intelligence & Analytics)
+  # ============================================================================
+  # Provides multi-language BI dashboards for CDP analytics
+  # Connects to PostgreSQL (busrom_cdp database)
+  # ============================================================================
+  superset:
+    # NOTE: Using the pre-built image that matches the existing Superset metadata DB.
+    # The Dockerfile in docker/superset/ is kept up-to-date for fresh builds.
+    image: busrom-work-superset:legacy
+    container_name: busrom-superset
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      - SUPERSET_SECRET_KEY=${SUPERSET_SECRET_KEY:-busrom-superset-secret-key-2024}
+      - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI:-postgresql://busrom:busrom_dev_password@postgres:5432/busrom_cdp}
+      - SUPERSET_LOAD_EXAMPLES=no
+      - SUPERSET_FEATURE_EMBEDDED_SUPERSET=true
+      - BABEL_DEFAULT_LOCALE=zh
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=busrom_cms
+      - POSTGRES_USER=busrom
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-busrom_dev_password}
+      - PAYLOAD_SECRET=${PAYLOAD_SECRET:-local-dev-payload-secret-busrom-sso}
+      - PAYLOAD_CMS_URL=${PAYLOAD_CMS_URL:-http://cms.busrom.local}
+      - PAYLOAD_COOKIE_DOMAIN=${PAYLOAD_COOKIE_DOMAIN:-.busrom.local}
+      - PAYLOAD_DB_URI=${PAYLOAD_DB_URI:-postgresql://busrom:busrom_dev_password@postgres:5432/busrom_cms}
+      - PAYLOAD_SSO_ALLOWED_ROLES=${PAYLOAD_SSO_ALLOWED_ROLES:-admin,editor,analytics}
+      - PAYLOAD_SSO_DEFAULT_ROLE=${PAYLOAD_SSO_DEFAULT_ROLE:-Gamma}
+      - PAYLOAD_SSO_ROLE_MAPPING=${PAYLOAD_SSO_ROLE_MAPPING:-}
+      - SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE:-false}
+      - SESSION_LIFETIME_SECONDS=${SESSION_LIFETIME_SECONDS:-28800}
+    volumes:
+      - superset_home:/app/superset_home
+      - ./docker/superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./docker/superset/custom_security.py:/app/pythonpath/custom_security.py:ro
+      - ./docker/superset/start.sh:/app/start.sh:ro
+      - ./docker/superset/scripts/init_cdp_dashboards.py:/app/docker/superset/scripts/init_cdp_dashboards.py:ro
+    depends_on:
+      - postgres
+    networks:
+      - busrom-network
+    user: root
+    command: bash /app/start.sh
+
+  # ============================================================================
+  # CDP Analytics Service
+  # ============================================================================
+  # Customer Data Platform for traffic analytics, ETL, and BI data API
+  # Uses the dev stage for local development with hot-reload
+  # ============================================================================
+  cdp:
+    build:
+      context: ./cdp
+      target: dev
+    container_name: busrom-cdp
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    environment:
+      DATABASE_URL: postgresql://busrom:busrom_dev_password@postgres:5432/busrom_cdp
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:-CHANGE_ME_TO_A_SECURE_SECRET_AT_LEAST_32_CHARS}
+      PAYLOAD_CMS_URL: ${PAYLOAD_CMS_URL:-http://host.docker.internal:3002}
+      ETL_API_KEY: ${ETL_API_KEY:-CHANGE_ME_ETL_API_KEY}
+      NEXT_PUBLIC_CDP_ENDPOINT: ${NEXT_PUBLIC_CDP_ENDPOINT:-http://localhost:3003}
+      NODE_ENV: development
+    volumes:
+      - ./cdp:/app
+      - cdp_node_modules:/app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - busrom-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================================================
+  # CDP ETL Scheduler
+  # ============================================================================
+  # Triggers the daily ETL job at 03:00 UTC via the CDP analytics API.
+  # Requires ETL_API_KEY to match the CDP service environment variable.
+  # ============================================================================
+  cdp-scheduler:
+    image: alpine/curl
+    container_name: busrom-cdp-scheduler
+    restart: unless-stopped
+    environment:
+      ETL_API_KEY: ${ETL_API_KEY:-CHANGE_ME_ETL_API_KEY}
+      CDP_URL: ${CDP_URL:-http://cdp:3003}
+    command: >
+      /bin/sh -c "
+      echo '0 3 * * * curl -X POST -H \"x-etl-api-key: $ETL_API_KEY\" \"$CDP_URL/api/analytics/summary?action=run-etl\"' | crontab - &&
+      crond -f -L /dev/stdout
+      "
+    depends_on:
+      cdp:
+        condition: service_healthy
+    networks:
+      - busrom-network
+
 # ==============================================================================
 # Volumes
 # ==============================================================================
@@ -135,6 +244,10 @@ volumes:
   minio_data:
     driver: local
   nginx_cache:
+    driver: local
+  superset_home:
+    driver: local
+  cdp_node_modules:
     driver: local
 
 # ==============================================================================
