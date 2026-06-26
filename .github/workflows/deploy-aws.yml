@@ -108,6 +108,8 @@ jobs:
           cache-from: type=gha,scope=payload-cms
           cache-to: type=gha,mode=min,scope=payload-cms
           platforms: linux/amd64
+          build-args: |
+            NEXT_PUBLIC_CDP_DASHBOARD_URL=${{ needs.setup.outputs.environment == 'production' && secrets.NEXT_PUBLIC_CDP_DASHBOARD_URL_PRODUCTION || secrets.NEXT_PUBLIC_CDP_DASHBOARD_URL_STAGING || 'https://cdp.busromhouse.com/' }}
 
       - name: Verify image push
         run: |
@@ -167,12 +169,70 @@ jobs:
           platforms: linux/amd64
           build-args: |
             NEXT_PUBLIC_CMS_URL=${{ needs.setup.outputs.environment == 'production' && secrets.NEXT_PUBLIC_CMS_URL_PRODUCTION || secrets.NEXT_PUBLIC_CMS_URL_STAGING }}
+            NEXT_PUBLIC_CDP_ENDPOINT=${{ needs.setup.outputs.environment == 'production' && secrets.NEXT_PUBLIC_CDP_ENDPOINT_PRODUCTION || secrets.NEXT_PUBLIC_CDP_ENDPOINT_STAGING || 'https://cdp.busromhouse.com/api/analytics/track' }}
             NEXT_PUBLIC_TAWK_PROPERTY_ID=${{ secrets.NEXT_PUBLIC_TAWK_PROPERTY_ID }}
             NEXT_PUBLIC_TAWK_WIDGET_ID=${{ secrets.NEXT_PUBLIC_TAWK_WIDGET_ID }}
 
       - name: Verify image push
         run: |
           echo "✅ Web Docker image built and pushed successfully"
+          echo "Repository: ${{ steps.repo.outputs.name }}"
+          echo "Tag: ${{ github.sha }}"
+
+  # =============================================================================
+  # Build and Push CDP Docker Image
+  # =============================================================================
+  build-cdp:
+    name: Build & Push CDP Image
+    runs-on: ubuntu-latest
+    needs: setup
+    if: needs.setup.outputs.deploy == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4.3.1
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get repository name
+        id: repo
+        env:
+          ENVIRONMENT: ${{ needs.setup.outputs.environment }}
+        run: |
+          if [ "$ENVIRONMENT" == "production" ]; then
+            echo "name=${{ secrets.ECR_REPOSITORY_CDP_PRODUCTION || 'busrom-cdp-production' }}" >> $GITHUB_OUTPUT
+          else
+            echo "name=${{ secrets.ECR_REPOSITORY_CDP_STAGING || 'busrom-cdp-staging' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push CDP Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: ./cdp
+          file: ./cdp/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ steps.repo.outputs.name }}:${{ github.sha }}
+          cache-from: type=gha,scope=cdp
+          cache-to: type=gha,mode=min,scope=cdp
+          platforms: linux/amd64
+
+      - name: Verify image push
+        run: |
+          echo "✅ CDP Docker image built and pushed successfully"
           echo "Repository: ${{ steps.repo.outputs.name }}"
           echo "Tag: ${{ github.sha }}"
 
@@ -226,11 +286,14 @@ jobs:
             echo "service=${{ secrets.ECS_SERVICE_PAYLOAD_CMS_STAGING || 'busrom-payload-cms-staging' }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Download task definition
+      - name: Prepare task definition from template
         run: |
-          aws ecs describe-task-definition \
-            --task-definition busrom-payload-cms-${{ needs.setup.outputs.environment }} \
-            --query taskDefinition > task-definition-payload-cms.json
+          cp scripts/ecs-task-definitions/cms-task-definition.json task-definition-payload-cms.json
+          sed -i \
+            -e "s/ENVIRONMENT/${{ needs.setup.outputs.environment }}/g" \
+            -e "s/AWS_ACCOUNT_ID/${{ secrets.AWS_ACCOUNT_ID || '660753258365' }}/g" \
+            -e "s/AWS_REGION/${{ env.AWS_REGION }}/g" \
+            task-definition-payload-cms.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
@@ -304,11 +367,14 @@ jobs:
             echo "service=${{ secrets.ECS_SERVICE_WEB_STAGING || 'busrom-web-staging' }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Download task definition
+      - name: Prepare task definition from template
         run: |
-          aws ecs describe-task-definition \
-            --task-definition busrom-web-${{ needs.setup.outputs.environment }} \
-            --query taskDefinition > task-definition-web.json
+          cp scripts/ecs-task-definitions/web-task-definition.json task-definition-web.json
+          sed -i \
+            -e "s/ENVIRONMENT/${{ needs.setup.outputs.environment }}/g" \
+            -e "s/AWS_ACCOUNT_ID/${{ secrets.AWS_ACCOUNT_ID || '660753258365' }}/g" \
+            -e "s/AWS_REGION/${{ env.AWS_REGION }}/g" \
+            task-definition-web.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
@@ -333,12 +399,96 @@ jobs:
           echo "Image: ${{ needs.build-web.outputs.image-uri }}"
 
   # =============================================================================
+  # Deploy CDP to ECS
+  # =============================================================================
+  deploy-cdp:
+    name: Deploy CDP to ECS
+    runs-on: ubuntu-latest
+    needs: [setup, build-cdp]
+    environment: ${{ needs.setup.outputs.environment }}
+    # The CDP ECS service must be created manually (or via Copilot) before this
+    # job can succeed. The workflow only renders and registers the task definition
+    # when the service is missing.
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4.3.1
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image URI
+        id: image-uri
+        env:
+          ENVIRONMENT: ${{ needs.setup.outputs.environment }}
+        run: |
+          if [ "$ENVIRONMENT" == "production" ]; then
+            REPO_NAME="${{ secrets.ECR_REPOSITORY_CDP_PRODUCTION || 'busrom-cdp-production' }}"
+          else
+            REPO_NAME="${{ secrets.ECR_REPOSITORY_CDP_STAGING || 'busrom-cdp-staging' }}"
+          fi
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${REPO_NAME}:${{ github.sha }}"
+          echo "uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
+          echo "Built image URI: ${IMAGE_URI}"
+
+      - name: Get ECS cluster and service names
+        id: ecs
+        env:
+          ENVIRONMENT: ${{ needs.setup.outputs.environment }}
+        run: |
+          if [ "$ENVIRONMENT" == "production" ]; then
+            echo "cluster=${{ secrets.ECS_CLUSTER_PRODUCTION || 'busrom-cluster-production' }}" >> $GITHUB_OUTPUT
+            echo "service=${{ secrets.ECS_SERVICE_CDP_PRODUCTION || 'busrom-cdp-production' }}" >> $GITHUB_OUTPUT
+          else
+            echo "cluster=${{ secrets.ECS_CLUSTER_STAGING || 'busrom-cluster-staging' }}" >> $GITHUB_OUTPUT
+            echo "service=${{ secrets.ECS_SERVICE_CDP_STAGING || 'busrom-cdp-staging' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Prepare task definition from template
+        run: |
+          cp scripts/ecs-task-definitions/cdp-task-definition.json task-definition-cdp.json
+          sed -i \
+            -e "s/ENVIRONMENT/${{ needs.setup.outputs.environment }}/g" \
+            -e "s/AWS_ACCOUNT_ID/${{ secrets.AWS_ACCOUNT_ID || '660753258365' }}/g" \
+            -e "s/AWS_REGION/${{ env.AWS_REGION }}/g" \
+            task-definition-cdp.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition-cdp.json
+          container-name: busrom-cdp
+          image: ${{ steps.image-uri.outputs.uri }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ steps.ecs.outputs.service }}
+          cluster: ${{ steps.ecs.outputs.cluster }}
+          wait-for-service-stability: true
+
+      - name: Deployment success notification
+        if: success()
+        run: |
+          echo "✅ CDP deployed successfully to ${{ needs.setup.outputs.environment }}!"
+          echo "Image: ${{ steps.image-uri.outputs.uri }}"
+
+  # =============================================================================
   # Post-deployment health checks and cache warmup
   # =============================================================================
   health-check:
     name: Health Check & Cache Warmup
     runs-on: ubuntu-latest
-    needs: [setup, deploy-payload-cms, deploy-web]
+    needs: [setup, deploy-payload-cms, deploy-web, deploy-cdp]
 
     steps:
       - name: Wait for services to stabilize
@@ -349,16 +499,19 @@ jobs:
           echo "🎉 Deployment to ${{ needs.setup.outputs.environment }} completed!"
           echo "✅ Payload CMS service deployed"
           echo "✅ Web service deployed"
+          echo "✅ CDP service deployed"
           echo ""
           echo "Please verify the deployment manually:"
           if [ "${{ needs.setup.outputs.environment }}" == "production" ]; then
             echo "  Payload CMS: https://cms.busromhouse.com/api/health"
             echo "  Payload Admin: https://cms.busromhouse.com/admin"
             echo "  Web: https://www.busromhouse.com"
+            echo "  CDP: https://cdp.busromhouse.com/api/health"
           else
             echo "  Payload CMS: https://cms-staging.busromhouse.com/api/health"
             echo "  Payload Admin: https://cms-staging.busromhouse.com/admin"
             echo "  Web: https://staging.busromhouse.com"
+            echo "  CDP: https://cdp-staging.busromhouse.com/api/health"
           fi
 
       - name: Cache Warmup - Production

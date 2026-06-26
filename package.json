@@ -14,6 +14,11 @@
     "build": "pnpm -r run build",
     "build:cms": "pnpm --filter payload-cms run build",
     "build:web": "pnpm --filter web run build",
+    "dev:cdp": "cd cdp && npm run dev",
+    "build:cdp": "cd cdp && npm run build",
+    "type-check:cdp": "cd cdp && npm run type-check",
+    "etl:run": "cd cdp && npm run etl:run",
+    "etl:run:today": "cd cdp && npm run etl:run:today",
     "postinstall": "npx --no patch-package || true"
   },
   "devDependencies": {

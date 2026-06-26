@@ -23,12 +23,20 @@
         {
           "name": "NODE_ENV",
           "value": "production"
+        },
+        {
+          "name": "NEXT_PUBLIC_CDP_ENDPOINT",
+          "value": "https://cdp.busromhouse.com/api/analytics/track"
         }
       ],
       "secrets": [
         {
           "name": "NEXT_PUBLIC_API_URL",
           "valueFrom": "arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/NEXT_PUBLIC_API_URL"
+        },
+        {
+          "name": "GOOGLE_INDEXING_CREDENTIALS",
+          "valueFrom": "arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/GOOGLE_INDEXING_CREDENTIALS"
         }
       ],
       "logConfiguration": {

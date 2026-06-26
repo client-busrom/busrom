@@ -41,6 +41,10 @@ jobs:
         run: cd payload-cms && npx tsc --noEmit || true
         continue-on-error: true
 
+      - name: TypeScript type check (CDP)
+        run: cd cdp && npm run type-check || true
+        continue-on-error: true
+
   # ==================== Build Payload CMS ====================
   build-payload-cms:
     name: Build Payload CMS
@@ -69,6 +73,7 @@ jobs:
         env:
           DATABASE_URI: postgresql://test:test@localhost:5432/test
           PAYLOAD_SECRET: ci-build-test-secret-32chars-minimum
+          NEXT_PUBLIC_CDP_DASHBOARD_URL: https://cdp.busromhouse.com/
 
   # ==================== Build Web ====================
   build-web:
@@ -98,6 +103,7 @@ jobs:
         env:
           CMS_URL: http://localhost:3002
           CMS_GRAPHQL_URL: http://localhost:3002/api/graphql
+          NEXT_PUBLIC_CDP_ENDPOINT: https://cdp.busromhouse.com/api/analytics/track
 
   # ==================== Docker Build Test ====================
   docker-build:
@@ -121,6 +127,8 @@ jobs:
           tags: busrom-payload-cms:latest
           cache-from: type=gha,scope=payload-cms
           cache-to: type=gha,mode=min,scope=payload-cms
+          build-args: |
+            NEXT_PUBLIC_CDP_DASHBOARD_URL=https://cdp.busromhouse.com/
 
       - name: Build Web Docker image
         uses: docker/build-push-action@v5
@@ -131,6 +139,18 @@ jobs:
           tags: busrom-web:latest
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=min,scope=web
+          build-args: |
+            NEXT_PUBLIC_CDP_ENDPOINT=https://cdp.busromhouse.com/api/analytics/track
+
+      - name: Build CDP Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./cdp
+          file: ./cdp/Dockerfile
+          push: false
+          tags: busrom-cdp:latest
+          cache-from: type=gha,scope=cdp
+          cache-to: type=gha,mode=min,scope=cdp
 
   # ==================== Security Scan ====================
   security:

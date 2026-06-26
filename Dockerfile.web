@@ -37,6 +37,11 @@ ENV NEXT_PUBLIC_CDN_DOMAIN=$NEXT_PUBLIC_CDN_DOMAIN
 ARG NEXT_PUBLIC_CMS_URL=https://cms.busromhouse.com
 ENV NEXT_PUBLIC_CMS_URL=$NEXT_PUBLIC_CMS_URL
 
+# CDP analytics tracker endpoint baked into the client bundle (must be set during
+# build because it is referenced by NEXT_PUBLIC_CDP_ENDPOINT in web components).
+ARG NEXT_PUBLIC_CDP_ENDPOINT=https://cdp.busromhouse.com/api/analytics/track
+ENV NEXT_PUBLIC_CDP_ENDPOINT=$NEXT_PUBLIC_CDP_ENDPOINT
+
 # Tawk.to Chat Widget (must be set during build for NEXT_PUBLIC_ vars)
 ARG NEXT_PUBLIC_TAWK_PROPERTY_ID
 ENV NEXT_PUBLIC_TAWK_PROPERTY_ID=$NEXT_PUBLIC_TAWK_PROPERTY_ID

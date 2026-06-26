@@ -12,3 +12,6 @@ RUN openssl req -new -x509 -days 3650 -nodes -text \
 # Set proper permissions for Postgres to read the keys
 RUN chmod 600 /var/lib/postgresql/server.key && \
     chown postgres:postgres /var/lib/postgresql/server.crt /var/lib/postgresql/server.key
+
+# Copy initialization scripts to create additional databases on first startup
+COPY ./init-scripts /docker-entrypoint-initdb.d

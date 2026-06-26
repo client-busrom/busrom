@@ -21,6 +21,11 @@ RUN corepack enable pnpm && pnpm install --frozen-lockfile
 # Copy payload-cms source code after install
 COPY payload-cms ./payload-cms
 
+# CDP dashboard URL baked into the admin UI (must be available at build time because
+# it is referenced by a NEXT_PUBLIC_ variable in components/admin/CustomNav.tsx).
+ARG NEXT_PUBLIC_CDP_DASHBOARD_URL=https://cdp.busromhouse.com/
+ENV NEXT_PUBLIC_CDP_DASHBOARD_URL=$NEXT_PUBLIC_CDP_DASHBOARD_URL
+
 # Build payload-cms
 WORKDIR /app/payload-cms
 RUN pnpm run build

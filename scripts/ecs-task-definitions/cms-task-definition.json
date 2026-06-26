@@ -1,21 +1,21 @@
 {
-  "family": "busrom-cms-ENVIRONMENT",
+  "family": "busrom-payload-cms-ENVIRONMENT",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
-  "cpu": "512",
-  "memory": "1024",
+  "cpu": "1024",
+  "memory": "2048",
   "executionRoleArn": "arn:aws:iam::AWS_ACCOUNT_ID:role/ecsTaskExecutionRole",
   "taskRoleArn": "arn:aws:iam::AWS_ACCOUNT_ID:role/ecsTaskRole",
   "containerDefinitions": [
     {
-      "name": "busrom-cms",
-      "image": "AWS_ACCOUNT_ID.dkr.ecr.AWS_REGION.amazonaws.com/busrom-cms-ENVIRONMENT:latest",
-      "cpu": 512,
-      "memory": 1024,
+      "name": "busrom-payload-cms",
+      "image": "AWS_ACCOUNT_ID.dkr.ecr.AWS_REGION.amazonaws.com/busrom-payload-cms-ENVIRONMENT:latest",
+      "cpu": 1024,
+      "memory": 2048,
       "essential": true,
       "portMappings": [
         {
-          "containerPort": 3000,
+          "containerPort": 3002,
           "protocol": "tcp"
         }
       ],
@@ -23,6 +23,10 @@
         {
           "name": "NODE_ENV",
           "value": "production"
+        },
+        {
+          "name": "PORT",
+          "value": "3002"
         },
         {
           "name": "USE_MINIO",
@@ -39,16 +43,28 @@
         {
           "name": "S3_USE_ACCELERATION",
           "value": "true"
+        },
+        {
+          "name": "NEXT_PUBLIC_SERVER_URL",
+          "value": "https://cms.busromhouse.com"
+        },
+        {
+          "name": "PAYLOAD_COOKIE_DOMAIN",
+          "value": ".busromhouse.com"
+        },
+        {
+          "name": "NEXT_PUBLIC_CDP_DASHBOARD_URL",
+          "value": "https://cdp.busromhouse.com/"
         }
       ],
       "secrets": [
         {
-          "name": "DATABASE_URL",
-          "valueFrom": "arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/DATABASE_URL"
+          "name": "DATABASE_URI",
+          "valueFrom": "arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/PAYLOAD_DATABASE_URI"
         },
         {
-          "name": "SESSION_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/SESSION_SECRET"
+          "name": "PAYLOAD_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/PAYLOAD_SECRET"
         },
         {
           "name": "S3_ACCESS_KEY_ID",
@@ -65,12 +81,16 @@
         {
           "name": "WEB_URL",
           "valueFrom": "arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/WEB_URL"
+        },
+        {
+          "name": "GOOGLE_INDEXING_CREDENTIALS",
+          "valueFrom": "arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/GOOGLE_INDEXING_CREDENTIALS"
         }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/busrom-cms-ENVIRONMENT",
+          "awslogs-group": "/ecs/busrom-payload-cms-ENVIRONMENT",
           "awslogs-region": "AWS_REGION",
           "awslogs-stream-prefix": "ecs"
         }
@@ -78,7 +98,7 @@
       "healthCheck": {
         "command": [
           "CMD-SHELL",
-          "node -e \"require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})\""
+          "node -e \"require('http').get('http://localhost:3002/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})\""
         ],
         "interval": 30,
         "timeout": 10,
