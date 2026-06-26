@@ -36,9 +36,10 @@ const toImageObject = (
       altText: seoAlt
     };
   }
-  // Handle object with url, variants, and cropFocalPoint
-  const variants = mediaData.variants ? Object.fromEntries(
-    Object.entries(mediaData.variants).map(([key, value]) => {
+  // Handle object with url, variants (or sizes from Payload), and cropFocalPoint
+  const rawVariants = mediaData.variants || mediaData.sizes;
+  const variants = rawVariants ? Object.fromEntries(
+    Object.entries(rawVariants).map(([key, value]) => {
       const url = typeof value === 'string' ? value : (value as any)?.url;
       return [key, getMediaUrl(url, strategy)];
     })

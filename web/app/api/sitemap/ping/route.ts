@@ -13,7 +13,7 @@
  *
  * Request Body (optional):
  * {
- *   "urls": ["https://busrom.com/en/shop/product-1", ...] // specific changed URLs
+ *   "urls": ["https://busromhouse.com/en/shop/product-1", ...] // specific changed URLs
  * }
  *
  * Security: This endpoint should be protected in production
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busrom.com'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busromhouse.com'
 
     // Parse request body for optional changed URLs
     let changedUrls: string[] | undefined
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busrom.com'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busromhouse.com'
     const result = await pingSitemapToSearchEngines(siteUrl)
 
     return NextResponse.json(result, {

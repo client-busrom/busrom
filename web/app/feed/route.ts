@@ -33,7 +33,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busrom.com'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busromhouse.com'
 
     // Parse query parameters
     const typeParam = searchParams.get('type') || 'all'

@@ -16,6 +16,7 @@ import { getNavigation } from "@/lib/api/navigation";
 import NextTopLoader from "nextjs-toploader";
 import { GlobalScripts } from "@/components/GlobalScripts";
 import { ScriptDebugger } from "@/components/ScriptDebugger";
+import CDPProvider from "@/app/components/CDPProvider";
 import { OrganizationSchema } from "@/components/seo/OrganizationSchema";
 import { getSiteConfig, getMediaUrl } from "@/lib/api/site-config";
 import { getAlternateLanguages } from "@/lib/seo-utils";
@@ -506,6 +507,7 @@ export default async function RootLayout({
           <ScriptDebugger />
           <GlobalScripts position="body_start" />
         </Suspense>
+        <CDPProvider />
         <ClientLayoutWrapper preloaderConfig={preloaderConfig}>
           <NextTopLoader color="#D58A00" showSpinner={false} height={3} shadow="0 0 10px #D58A00,0 0 5px #D58A00" />
           <LenisProvider easingKey={"easeOutQuad"} />
