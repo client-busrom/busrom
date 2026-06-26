@@ -78,6 +78,19 @@ export const authLoginHandler: PayloadHandler = async (req) => {
 
         // Return response indicating 2FA is required
         // Also need to clear the auth cookie
+        // Build a clearing cookie that matches the shared-domain login cookie.
+        const isProduction = process.env.NODE_ENV === 'production'
+        const cookieDomain = process.env.PAYLOAD_COOKIE_DOMAIN
+        const clearCookieParts = [
+          'payload-token=',
+          'Path=/',
+          'HttpOnly',
+          'Max-Age=0',
+          'SameSite=Lax',
+          cookieDomain && `Domain=${cookieDomain}`,
+          isProduction && 'Secure=true',
+        ].filter(Boolean)
+
         return new Response(
           JSON.stringify({
             requires2FA: true,
@@ -89,7 +102,7 @@ export const authLoginHandler: PayloadHandler = async (req) => {
             headers: {
               'Content-Type': 'application/json',
               // Clear the auth cookie
-              'Set-Cookie': 'payload-token=; Path=/; HttpOnly; Max-Age=0',
+              'Set-Cookie': clearCookieParts.join('; '),
             },
           }
         )

@@ -95,6 +95,46 @@ const NavItem: React.FC<{ href: string; labelKey: string; badge?: number }> = ({
   )
 }
 
+// External navigation item (opens in a new tab)
+const ExternalNavItem: React.FC<{ href: string; labelKey: string }> = ({ href, labelKey }) => {
+  const { t } = useTranslation()
+  const label = t(`custom:nav:${labelKey}` as any)
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '8px 16px 8px 24px',
+        color: 'var(--theme-elevation-600)',
+        textDecoration: 'none',
+        fontSize: '14px',
+        fontWeight: 400,
+        backgroundColor: 'transparent',
+        borderRadius: '4px',
+        margin: '2px 8px',
+        transition: 'all 0.15s',
+        cursor: 'pointer',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = 'var(--theme-elevation-100)'
+        e.currentTarget.style.color = 'var(--theme-elevation-800)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent'
+        e.currentTarget.style.color = 'var(--theme-elevation-600)'
+      }}
+    >
+      <span>{label}</span>
+      <span style={{ fontSize: '12px', opacity: 0.6 }}>↗</span>
+    </a>
+  )
+}
+
 // Group header component
 const GroupHeader: React.FC<{
   labelKey: string
@@ -290,6 +330,7 @@ export const CustomNav: React.FC = () => {
   const { user } = useAuth()
   const isAdmin = (user as any)?.isAdmin === true
   const [unreadCount, setUnreadCount] = React.useState<number>(0)
+  const cdpUrl = process.env.NEXT_PUBLIC_CDP_DASHBOARD_URL || 'http://cdp.busrom.local/'
 
   // Fetch unread form submissions and notifications count
   React.useEffect(() => {
@@ -327,6 +368,7 @@ export const CustomNav: React.FC = () => {
         {/* Dashboard */}
         <div style={{ padding: '8px 16px 8px' }}>
           <NavItem href="/admin" labelKey="dashboard" />
+          <ExternalNavItem href={cdpUrl} labelKey="cdpDashboard" />
         </div>
 
         {/* Users & Access - Admin only */}

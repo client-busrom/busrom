@@ -29,6 +29,14 @@ export const Users: CollectionConfig = {
     tokenExpiration: 28800, // 8 hours
     maxLoginAttempts: 5,
     lockTime: 600 * 1000, // 10 minutes
+    cookies: {
+      // Share the auth cookie across CMS/CDP subdomains.
+      // Local: PAYLOAD_COOKIE_DOMAIN=.busrom.local
+      // Production: PAYLOAD_COOKIE_DOMAIN=.busromhouse.com
+      domain: process.env.PAYLOAD_COOKIE_DOMAIN || undefined,
+      sameSite: 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+    },
   },
   admin: {
     useAsTitle: 'name',

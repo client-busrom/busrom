@@ -294,6 +294,14 @@ export const GROUPS = {
   content: { en: 'Content', zh: '内容管理' },
   settings: { en: 'Settings', zh: '设置' },
   system: { en: 'System', zh: '系统' },
+  analytics: { en: 'Analytics', zh: '数据分析' },
+} as const
+
+// ============================================================================
+// Admin Navigation Labels (CustomNav component)
+// ============================================================================
+export const NAV_LABELS = {
+  cdpDashboard: { en: 'Analytics', zh: '数据分析' },
 } as const
 
 // ============================================================================

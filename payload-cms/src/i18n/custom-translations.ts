@@ -400,6 +400,8 @@ export const customTranslationsEn = {
     // ========================================================================
     nav: {
       dashboard: 'Dashboard',
+      cdpDashboard: 'Analytics',
+      analytics: 'Analytics',
       // Groups
       usersAccess: 'Users & Access',
       navigation: 'Navigation',
@@ -881,6 +883,8 @@ export const customTranslationsZh = {
     // ========================================================================
     nav: {
       dashboard: '仪表盘',
+      cdpDashboard: '数据分析',
+      analytics: '数据分析',
       // Groups
       usersAccess: '用户与权限',
       navigation: '网站导航管理',
