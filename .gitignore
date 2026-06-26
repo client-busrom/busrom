@@ -105,3 +105,35 @@ payload-cms/src/scripts/*.mjs
 # Payload auto-generated schema (contains DB structure details)
 payload-cms/src/payload-generated-schema.ts
 .gcp-keys/
+
+# -----------------------------------------------------------------------------
+# Temporary / one-off scripts that should never reach the repository
+# -----------------------------------------------------------------------------
+check_config*.py
+dedupe.js
+
+# Agent / session metadata and local tooling guides
+.kimi/
+HERMES_BEST_PRACTICES.md
+
+# Local system files
+.hosts
+
+# Local development helper scripts (contain hardcoded local-only credentials / modify
+# the developer machine, so they are not meant for CI/CD or production).
+scripts/codex-cli-wrapper.sh
+scripts/kimi-cli-wrapper.sh
+scripts/setup-local-hosts.sh
+scripts/verify-gateway.sh
+scripts/init-superset.sh
+
+# Duplicate / leftover CDP tracker components that are not wired into the app
+web/components/CdpProvider.tsx
+web/lib/cdp/
+
+# Temporary test write artifacts
+test-write.txt
+
+# Python bytecode caches
+__pycache__/
+*.pyc
