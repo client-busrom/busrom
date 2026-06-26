@@ -48,7 +48,7 @@ cp .env.example .env
 
 | 变量 | 说明 | 示例 |
 |------|------|------|
-| `DATABASE_URL` | PostgreSQL 连接字符串 | `postgresql://user:pass@localhost:5432/busrom_dev` |
+| `DATABASE_URL` | PostgreSQL 连接字符串 | `postgresql://user:***@localhost:5432/busrom_dev` |
 | `SESSION_SECRET` | 会话密钥 | 使用 `openssl rand -base64 32` 生成 |
 | `CLOUDINARY_*` | 图片存储服务 | 从 Cloudinary 控制台获取 |
 
@@ -213,6 +213,74 @@ npx prisma migrate deploy
    - 检查生产网站是否正常
    - 测试关键功能
    - 查看错误日志
+
+## 📊 CDP 数据分析平台
+
+### 本地启动
+
+```bash
+# 1. 启动基础设施（Postgres、MinIO、Superset、Nginx CDN）
+docker-compose up -d
+
+# 2. 应用 CDP 数据库迁移
+cd cdp
+npm run db:push
+
+# 3. 启动 CDP Dashboard
+cd cdp
+npm run dev
+
+# CDP Dashboard: http://localhost:3003
+```
+
+### 数据库迁移（CDP）
+
+CDP 使用 Drizzle ORM。当 `src/db/schema.ts` 发生变更时：
+
+```bash
+cd cdp
+# 自动生成并应用迁移
+npm run db:push
+
+# 或手动执行 SQL 迁移文件
+psql "postgresql://busrom:busrom_dev_password@localhost:5432/busrom_cdp" \
+  -f src/db/migrations.sql
+```
+
+### 统一网关与域名验证
+
+项目通过 Nginx Gateway 统一入口，本地使用 `.busrom.local` 域名：
+
+```bash
+# 1. 配置本地 hosts（需要 sudo）
+sudo bash scripts/setup-local-hosts.sh
+
+# 2. 启动网关容器
+docker-compose -f docker-compose.yml -f docker-compose.gateway.yml up -d nginx-gateway
+
+# 3. 验证各端点
+bash scripts/verify-gateway.sh
+```
+
+访问地址：
+
+- Web: http://busrom.local
+- CMS: http://cms.busrom.local
+- CDP: http://cdp.busrom.local
+- Superset: http://cdp.busrom.local/superset
+
+### ETL 任务
+
+手动执行指定日期的 ETL：
+
+```bash
+cd cdp
+# 默认处理昨天的数据
+node --loader ts-node/esm src/jobs/etl.ts
+
+# 处理指定日期
+# TODO: 建议封装为 CLI 脚本 / cron 任务
+```
 
 ## 🔐 安全注意事项
 

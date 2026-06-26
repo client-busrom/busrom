@@ -35,7 +35,7 @@
 ┌────────▼────────┐     ┌────────▼────────┐
 │   ECS Service   │     │   ECS Service   │
 │   (CMS - 3000)  │     │   (Web - 3001)  │
-│  Keystone CMS   │     │    Next.js      │
+│  Payload CMS    │     │    Next.js      │
 └────────┬────────┘     └────────┬────────┘
          │                       │
          └───────────┬───────────┘
@@ -102,8 +102,12 @@ cd busrom
 
 **cms/.env.production**:
 ```bash
-# PostgreSQL Database (RDS)
-DATABASE_URL=postgresql://username:password@rds-endpoint:5432/busrom_cms
+# Database
+# 使用与 CMS 相同的数据库实例，但不同的数据库名
+DATABASE_URL=postgresql://username:***@rds-endpoint:5432/busrom_cdp
+
+# 如果使用同一数据库实例，只需确保数据库名不同
+# 例如：busrom_cms (CMS), busrom_cdp (CDP), busrom_web (Web)
 
 # AWS S3 Storage
 USE_MINIO=false
