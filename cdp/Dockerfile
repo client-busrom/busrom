@@ -52,7 +52,6 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 cdp
 
 # Copy built application
-COPY --from=builder --chown=cdp:nodejs /app/public ./public
 COPY --from=builder --chown=cdp:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=cdp:nodejs /app/.next/static ./.next/static
 
