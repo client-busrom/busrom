@@ -1,4 +1,3 @@
-import { createHash } from 'crypto'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
@@ -6,20 +5,24 @@ import { jwtVerify } from 'jose'
 const PAYLOAD_URL = process.env.PAYLOAD_URL || 'https://cms.busromhouse.com'
 const CMS_COOKIE_NAME = 'payload-token'
 
-function getPayloadSecret(): Uint8Array {
+async function getPayloadSecret(): Promise<Uint8Array> {
   // Payload CMS hashes the configured secret with SHA-256 and uses the first
   // 32 hex characters as the JWT signing key (same convention used by the
   // Superset SSO integration).
   const raw = process.env.PAYLOAD_SECRET || 'CHANGE_ME_IN_PRODUCTION'
-  const key = createHash('sha256').update(raw).digest('hex').slice(0, 32)
-  return new TextEncoder().encode(key)
+  const encoder = new TextEncoder()
+  const rawBuffer = encoder.encode(raw)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', rawBuffer)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  return encoder.encode(hashHex.slice(0, 32))
 }
 
 const ALLOWED_ROLES = ['admin', 'editor', 'analytics']
 
 async function verifyPayloadToken(token: string) {
   try {
-    const { payload } = await jwtVerify(token, getPayloadSecret(), {
+    const { payload } = await jwtVerify(token, await getPayloadSecret(), {
       algorithms: ['HS256'],
       clockTolerance: 60,
     })
