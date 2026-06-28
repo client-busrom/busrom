@@ -12,7 +12,7 @@ async function getPayloadSecret(): Promise<Uint8Array> {
   const raw = process.env.PAYLOAD_SECRET || 'CHANGE_ME_IN_PRODUCTION'
   const encoder = new TextEncoder()
   const rawBuffer = encoder.encode(raw)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', rawBuffer)
+  const hashBuffer = await (globalThis.crypto as Crypto).subtle.digest('SHA-256', rawBuffer)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
   const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
   return encoder.encode(hashHex.slice(0, 32))
