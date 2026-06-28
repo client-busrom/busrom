@@ -474,7 +474,7 @@ export function parseProductApplicationsData(content: LexicalContent) {
       }
     }
 
-    // Check for applicationCarousel block with indicator
+    // Check for applicationCarousel block with indicator (legacy marker pattern)
     if (node.type === 'paragraph' && nodeText === 'applications-item') {
       const nextNode = nodes[i + 1]
       if (nextNode?.type === 'applicationCarousel' && nextNode.data?.applications) {
@@ -482,6 +482,13 @@ export function parseProductApplicationsData(content: LexicalContent) {
           if (app.id) applicationIds.push(String(app.id))
         })
       }
+    }
+
+    // Check for applicationCarousel block directly (current template pattern)
+    if (node.type === 'applicationCarousel' && node.data?.applications) {
+      node.data.applications.forEach((app: any) => {
+        if (app.id) applicationIds.push(String(app.id))
+      })
     }
 
     // Check for relationship block with applications

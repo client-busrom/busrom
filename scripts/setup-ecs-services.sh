@@ -57,6 +57,7 @@ register_task_definition() {
   local WEB_URL_ARN=$(aws secretsmanager describe-secret --secret-id "busrom/${ENVIRONMENT}/WEB_URL" --region "$AWS_REGION" --query 'ARN' --output text 2>/dev/null || echo "")
   local CDN_DOMAIN_ARN=$(aws secretsmanager describe-secret --secret-id "busrom/${ENVIRONMENT}/CDN_DOMAIN" --region "$AWS_REGION" --query 'ARN' --output text 2>/dev/null || echo "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:busrom/${ENVIRONMENT}/CDN_DOMAIN")
   local API_URL_ARN=$(aws secretsmanager describe-secret --secret-id "busrom/${ENVIRONMENT}/NEXT_PUBLIC_API_URL" --region "$AWS_REGION" --query 'ARN' --output text 2>/dev/null || echo "")
+  local INDEXNOW_KEY_ARN=$(aws secretsmanager describe-secret --secret-id "busrom/${ENVIRONMENT}/INDEXNOW_KEY" --region "$AWS_REGION" --query 'ARN' --output text 2>/dev/null || echo "")
 
   # Replace placeholders in template
   sed -e "s|ENVIRONMENT|${ENVIRONMENT}|g" \
@@ -69,6 +70,11 @@ register_task_definition() {
       -e "s|arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/CDN_DOMAIN|${CDN_DOMAIN_ARN}|g" \
       -e "s|arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/WEB_URL|${WEB_URL_ARN}|g" \
       "$template_file" > "$output_file"
+
+  # Replace INDEXNOW_KEY placeholder if present
+  if [ -n "$INDEXNOW_KEY_ARN" ]; then
+    sed -i.bak "s|arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/INDEXNOW_KEY|${INDEXNOW_KEY_ARN}|g" "$output_file"
+  fi
 
   # For web task definition, also replace NEXT_PUBLIC_API_URL if present
   if [ "$service_type" == "web" ] && [ -n "$API_URL_ARN" ]; then

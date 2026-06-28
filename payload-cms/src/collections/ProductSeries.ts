@@ -72,37 +72,29 @@ export const ProductSeries: CollectionConfig = {
           const { notifyGoogleOfUpdate } = await import('../lib/google-indexing')
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
 
-          const results: any[] = []
-          const locales = ['en', 'zh', 'ar', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'pt', 'ru', 'vi', 'th', 'id', 'tr', 'nl', 'pl', 'sv', 'da', 'fi', 'no', 'cs', 'el', 'hu']
+          // Only notify Google of the primary (en) URL to stay within the 200/day quota.
+          const url = `${siteUrl}/products/${doc.slug}`
+          const res = await notifyGoogleOfUpdate(url)
 
-          for (const locale of locales) {
-            const prefix = locale === 'en' ? '' : `/${locale}`
-            const url = `${siteUrl}${prefix}/products/${doc.slug}`
-            const res = await notifyGoogleOfUpdate(url)
-            results.push({ locale, ...res })
-
-            if (locale === 'en') {
-              try {
-                await payload.create({
-                  collection: 'indexing-logs',
-                  req,
-                  overrideAccess: true,
-                  data: {
-                    targetUrl: url,
-                    engine: 'google',
-                    action: 'update',
-                    status: res?.success ? 'success' : (res?.message?.includes('Credentials') || res?.message?.includes('Key') ? 'failed_keys' : 'failed_network'),
-                    triggerUser: user.id,
-                    rawResponse: res,
-                  }
-                })
-              } catch (e) {
-                console.error('Failed to write SEO log in notify-google:', e)
+          try {
+            await payload.create({
+              collection: 'indexing-logs',
+              req,
+              overrideAccess: true,
+              data: {
+                targetUrl: url,
+                engine: 'google',
+                action: 'update',
+                status: res?.success ? 'success' : (res?.message?.includes('Credentials') || res?.message?.includes('Key') ? 'failed_keys' : 'failed_network'),
+                triggerUser: user.id,
+                rawResponse: res,
               }
-            }
+            })
+          } catch (e) {
+            console.error('Failed to write SEO log in notify-google:', e)
           }
 
-          return new Response(JSON.stringify({ success: true, results }), { status: 200 })
+          return new Response(JSON.stringify({ success: res?.success, result: res, url }), { status: res?.success ? 200 : 500 })
         } catch (e: any) {
           return new Response(JSON.stringify({ error: e.message }), { status: 500 })
         }

@@ -79,9 +79,6 @@ export const safeBulkStatusEndpoint: Endpoint = {
             },
             user: req.user,
             req: req,
-            context: {
-              isSyncing: true, // Prevents autoIndexHook from firing 1000s of external API calls
-            },
           })
           successCount++
         } catch (err: any) {

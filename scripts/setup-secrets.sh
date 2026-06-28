@@ -117,6 +117,12 @@ fi
 echo -e "   Using NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}"
 echo ""
 
+# IndexNow API Key
+echo -e "${YELLOW}8. INDEXNOW_KEY${NC}"
+INDEXNOW_KEY=$(openssl rand -hex 32)
+echo -e "   Generated INDEXNOW_KEY: ${INDEXNOW_KEY}"
+echo ""
+
 # =============================================================================
 # Create Secrets
 # =============================================================================
@@ -162,6 +168,11 @@ create_or_update_secret \
   "$NEXT_PUBLIC_API_URL" \
   "Next.js API URL for ${PROJECT_NAME} ${ENVIRONMENT}"
 
+create_or_update_secret \
+  "${PROJECT_NAME}/${ENVIRONMENT}/INDEXNOW_KEY" \
+  "$INDEXNOW_KEY" \
+  "IndexNow API key for ${PROJECT_NAME} ${ENVIRONMENT}"
+
 echo ""
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}✅ Secrets Setup Complete!${NC}"
@@ -179,6 +190,7 @@ echo -e "  - ${PROJECT_NAME}/${ENVIRONMENT}/S3_SECRET_ACCESS_KEY"
 echo -e "  - ${PROJECT_NAME}/${ENVIRONMENT}/CDN_DOMAIN"
 echo -e "  - ${PROJECT_NAME}/${ENVIRONMENT}/WEB_URL"
 echo -e "  - ${PROJECT_NAME}/${ENVIRONMENT}/NEXT_PUBLIC_API_URL"
+echo -e "  - ${PROJECT_NAME}/${ENVIRONMENT}/INDEXNOW_KEY"
 echo ""
 
 echo -e "${YELLOW}⚠️  Important:${NC}"

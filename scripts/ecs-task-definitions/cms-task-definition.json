@@ -85,6 +85,10 @@
         {
           "name": "GOOGLE_INDEXING_CREDENTIALS",
           "valueFrom": "arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/GOOGLE_INDEXING_CREDENTIALS"
+        },
+        {
+          "name": "INDEXNOW_KEY",
+          "valueFrom": "arn:aws:secretsmanager:AWS_REGION:AWS_ACCOUNT_ID:secret:busrom/ENVIRONMENT/INDEXNOW_KEY"
         }
       ],
       "logConfiguration": {
