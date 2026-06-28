@@ -66,6 +66,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // ETL trigger is allowed via internal API key; the route handler validates
+  // the actual key, so we just need to see the header here.
+  if (
+    pathname === '/api/analytics/summary' &&
+    request.method === 'POST' &&
+    request.nextUrl.searchParams.get('action') === 'run-etl' &&
+    (request.headers.get('x-etl-api-key') || request.headers.get('authorization'))
+  ) {
+    return NextResponse.next()
+  }
+
   const token = extractToken(request)
 
   console.log('[CDP Middleware] Request URL:', request.url)
@@ -98,16 +109,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  if (!checkPermission(user)) {
-    if (pathname.startsWith('/api/')) {
-      return NextResponse.json(
-        { error: 'Forbidden', message: 'Insufficient permissions' },
-        { status: 403 }
-      )
-    }
-    return NextResponse.redirect(new URL('/admin/unauthorized', PAYLOAD_URL))
-  }
-
+  // For analytics read endpoints any valid Payload user is allowed.
+  // The route handler applies role-based data masking where needed.
   const response = NextResponse.next()
   response.headers.set('x-cdp-user-id', (user.id as string) || '')
   response.headers.set('x-cdp-user-email', (user.email as string) || '')
