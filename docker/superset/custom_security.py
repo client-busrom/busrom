@@ -33,12 +33,19 @@ class PayloadCMSSecurityManager(SupersetSecurityManager):
     """Custom Superset security manager that authenticates via Payload CMS JWT."""
 
     # Paths that are never intercepted by the SSO flow.
+    # Superset is mounted under /superset/ in production, so both the raw
+    # Flask paths and the externally-visible prefixed paths are listed.
     _EXEMPT_PATHS = {
         "/login",
         "/logout",
         "/register",
         "/health",
         "/api/v1/health",
+        "/superset/login",
+        "/superset/logout",
+        "/superset/register",
+        "/superset/health",
+        "/superset/api/v1/health",
     }
 
     def __init__(self, appbuilder):
@@ -104,10 +111,11 @@ class PayloadCMSSecurityManager(SupersetSecurityManager):
             return True
         if path.startswith("/static/") or path.startswith("/appbuilder/"):
             return True
-        if path.startswith("/api/"):
+        if path.startswith("/api/") or path.startswith("/superset/api/"):
             # Let Superset's existing auth layer handle API calls.
             return True
-        for prefix in ("/login/", "/logout/", "/register/"):
+        for prefix in ("/login/", "/logout/", "/register/",
+                       "/superset/login/", "/superset/logout/", "/superset/register/"):
             if path.startswith(prefix):
                 return True
         return False
