@@ -38,6 +38,14 @@ COPY --from=zh-translations \
 # Ensure translation files are readable
 RUN chmod -R a+r /app/superset/translations/zh/LC_MESSAGES
 
+# Copy custom Superset configuration, Payload SSO security manager, and startup script.
+# The base image adds /app/pythonpath to PYTHONPATH, so configs placed
+# there are loaded automatically.
+COPY superset_config.py /app/pythonpath/superset_config.py
+COPY custom_security.py /app/pythonpath/custom_security.py
+COPY start.sh /app/start.sh
+RUN chmod -R a+r /app/pythonpath && chmod a+rx /app/start.sh
+
 USER superset
-# Use the default entrypoint from base image
-CMD ["/app/docker/docker-init.sh"]
+# Use the project startup script (db upgrade, init roles, start gunicorn).
+CMD ["/app/start.sh"]

@@ -2,7 +2,6 @@ import { default as default_a66bd44433c9260839699cd88113e799 } from '@/component
 import { default as default_85b184ead3859892512d1fa42a0ba167 } from '@/components/admin/TwoFactorAuthField'
 import { default as default_6e007ac8f0e2f687212ebb65ad91c147 } from '@/components/fields/TranslationCenter'
 import { default as default_a8e2ac70c3f86fe45f78f09046549378 } from '@/components/fields/SpecsField'
-import { default as default_stabletextfield_7a8b9c0d1e2f3a4b } from '@/components/fields/StableTextField'
 import { SafeBulkStatus as SafeBulkStatus_1701fa21b19db81296227007f9cd0cae } from '@/components/SafeBulkStatus/index'
 import { MultiLocaleTextareaField as MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80 } from '@/components/fields/MultiLocaleField'
 import { default as default_643116d2ab91f7b0d99236a7afb7c645 } from '@/components/fields/MediaPicker'
@@ -10,6 +9,7 @@ import { default as default_394ddaf2fca725ee5ec4bf214e01a751 } from '@/component
 import { default as default_0de41d40d46c5fdc2f903e5479d41ed4 } from '@/components/fields/GoogleIndexingButton'
 import { default as default_8ee29faa67a64494ccbe7f4a2ea41dbf } from '@/components/fields/AttributesTableField'
 import { default as default_1c5ae25fc75ab523bfe3f6b5ce843df4 } from '@/components/fields/ProductSpecificationsField'
+import { default as default_3c4d3a8ca5d87712647c4aee5d8604f2 } from '@/components/fields/StableTextField'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -99,7 +99,6 @@ export const importMap = {
   "@/components/admin/TwoFactorAuthField#default": default_85b184ead3859892512d1fa42a0ba167,
   "@/components/fields/TranslationCenter#default": default_6e007ac8f0e2f687212ebb65ad91c147,
   "@/components/fields/SpecsField#default": default_a8e2ac70c3f86fe45f78f09046549378,
-  "@/components/fields/StableTextField#default": default_stabletextfield_7a8b9c0d1e2f3a4b,
   "@/components/SafeBulkStatus/index#SafeBulkStatus": SafeBulkStatus_1701fa21b19db81296227007f9cd0cae,
   "@/components/fields/MultiLocaleField#MultiLocaleTextareaField": MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80,
   "@/components/fields/MediaPicker#default": default_643116d2ab91f7b0d99236a7afb7c645,
@@ -107,6 +106,7 @@ export const importMap = {
   "@/components/fields/GoogleIndexingButton#default": default_0de41d40d46c5fdc2f903e5479d41ed4,
   "@/components/fields/AttributesTableField#default": default_8ee29faa67a64494ccbe7f4a2ea41dbf,
   "@/components/fields/ProductSpecificationsField#default": default_1c5ae25fc75ab523bfe3f6b5ce843df4,
+  "@/components/fields/StableTextField#default": default_3c4d3a8ca5d87712647c4aee5d8604f2,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,

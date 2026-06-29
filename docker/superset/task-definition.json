@@ -1,0 +1,95 @@
+{
+  "family": "busrom-superset-production",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::660753258365:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::660753258365:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "busrom-superset",
+      "image": "660753258365.dkr.ecr.us-east-1.amazonaws.com/busrom-superset-production:latest",
+      "cpu": 1024,
+      "memory": 2048,
+      "portMappings": [
+        {
+          "containerPort": 8088,
+          "hostPort": 8088,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "SUPERSET_ENV",
+          "value": "production"
+        },
+        {
+          "name": "FLASK_ENV",
+          "value": "production"
+        },
+        {
+          "name": "PYTHONPATH",
+          "value": "/app/pythonpath"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "SQLALCHEMY_DATABASE_URI",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:660753258365:secret:busrom/production/SUPERSET_DATABASE_URL"
+        },
+        {
+          "name": "SUPERSET_SECRET_KEY",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:660753258365:secret:busrom/production/SUPERSET_SECRET_KEY"
+        },
+        {
+          "name": "SUPERSET_CORS_ORIGINS",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:660753258365:secret:busrom/production/SUPERSET_CORS_ORIGINS"
+        },
+        {
+          "name": "PAYLOAD_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:660753258365:secret:busrom/production/PAYLOAD_SECRET"
+        },
+        {
+          "name": "PAYLOAD_CMS_URL",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:660753258365:secret:busrom/production/PAYLOAD_CMS_URL"
+        },
+        {
+          "name": "PAYLOAD_COOKIE_DOMAIN",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:660753258365:secret:busrom/production/PAYLOAD_COOKIE_DOMAIN"
+        },
+        {
+          "name": "PAYLOAD_DB_URI",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:660753258365:secret:busrom/production/PAYLOAD_DB_URI"
+        },
+        {
+          "name": "PAYLOAD_SSO_ALLOWED_ROLES",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:660753258365:secret:busrom/production/PAYLOAD_SSO_ALLOWED_ROLES"
+        },
+        {
+          "name": "PAYLOAD_SSO_DEFAULT_ROLE",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:660753258365:secret:busrom/production/PAYLOAD_SSO_DEFAULT_ROLE"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/busrom-superset-production",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8088/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 10,
+        "retries": 3,
+        "startPeriod": 120
+      }
+    }
+  ]
+}

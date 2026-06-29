@@ -30,8 +30,12 @@ ${SYSTEM_PYTHON} -m pip install --no-cache-dir ${PIP_TARGET} flask-cors || true
 # Initialize database
 superset db upgrade
 
-# Create admin user (ignore error if exists)
-superset fab create-admin --username admin --firstname Admin --lastname User --email admin@busrom.com --password admin123 || true
+# Create admin user (ignore error if exists). Prefer ADMIN_PASSWORD env var;
+# otherwise generate a random password so we do not ship a hardcoded credential.
+if [ -z "$ADMIN_PASSWORD" ]; then
+  ADMIN_PASSWORD=$(python -c "import secrets; print(secrets.token_urlsafe(32))")
+fi
+superset fab create-admin --username admin --firstname Admin --lastname User --email admin@busrom.com --password "$ADMIN_PASSWORD" || true
 
 # Initialize roles
 superset init || true
