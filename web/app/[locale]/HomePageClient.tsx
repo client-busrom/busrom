@@ -157,9 +157,11 @@ const MemoizedBrandValue = memo(BrandValue);
 export function HomePageClient({
   initialContent,
   currentLanguage,
+  footerData,
 }: {
-  initialContent: HomeContent; // 3. 使用严格类型
+  initialContent: HomeContent;
   currentLanguage: Locale;
+  footerData?: any;
 }) {
   // 4. SWR 逻辑 - 使用 initialContent 作为数据源，不再重复请求
   // 因为 SWR 直接获取的是原始 CMS 数据，没有经过 getHomeContent() 转换
@@ -295,6 +297,7 @@ export function HomePageClient({
           locale={currentLanguage}
           showForm={true}
           headerTheme="transparent"
+          ssrData={footerData}
         />
       </DeferredContent>
     </main>
