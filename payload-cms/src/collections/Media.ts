@@ -350,6 +350,14 @@ export const Media: CollectionConfig = {
     },
   ],
   hooks: {
+    afterRead: [
+      async ({ doc }) => {
+        // Dynamically fix media URLs based on current env vars
+        // This prevents broken images when S3/CDN config changes after upload
+        const { default: fixMediaUrl } = await import('@/hooks/fixMediaUrl')
+        return fixMediaUrl(doc)
+      },
+    ],
     afterChange: [
       async ({ doc, previousDoc, req, operation, context }) => {
         // Skip if this is a create operation (no previous doc to compare)

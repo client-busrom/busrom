@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { convertToCDNUrl } from '@/lib/cdn-url';
 
 const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.busromhouse.com';
 
@@ -36,7 +37,8 @@ export async function GET(request: NextRequest) {
     let backgroundImage: string | null = null
     const resolved = data.backgroundImageResolved
     if (resolved) {
-      backgroundImage = resolved.sizes?.desktop?.url || resolved.url || null
+      const rawUrl = resolved.sizes?.desktop?.url || resolved.url || null
+      backgroundImage = rawUrl ? convertToCDNUrl(rawUrl) : null
     }
 
     // Fallback: resolve from raw JSON config if the hook result is unavailable.
@@ -45,7 +47,8 @@ export async function GET(request: NextRequest) {
       if (bgConfig.mode === 'manual' && bgConfig.manualImage) {
         const manualImage = bgConfig.manualImage
         if (typeof manualImage === 'object' && manualImage?.url) {
-          backgroundImage = manualImage.sizes?.desktop?.url || manualImage.url
+          const rawUrl = manualImage.sizes?.desktop?.url || manualImage.url
+          backgroundImage = rawUrl ? convertToCDNUrl(rawUrl) : null
         } else if (typeof manualImage === 'number' || typeof manualImage === 'string') {
           try {
             const mediaRes = await fetch(`${CMS_URL}/api/media/${manualImage}?depth=1`, {
@@ -54,7 +57,8 @@ export async function GET(request: NextRequest) {
             })
             if (mediaRes.ok) {
               const media = await mediaRes.json()
-              backgroundImage = media.sizes?.desktop?.url || media.url || null
+              const rawUrl = media.sizes?.desktop?.url || media.url || null
+              backgroundImage = rawUrl ? convertToCDNUrl(rawUrl) : null
             }
           } catch (e) {
             console.error('[Footer API] Failed to resolve manual image:', e)
@@ -74,7 +78,8 @@ export async function GET(request: NextRequest) {
             if (uniqueImages.length > 0) {
               const randomIndex = Math.floor(Math.random() * uniqueImages.length)
               const img = uniqueImages[randomIndex] as any
-              backgroundImage = img.sizes?.desktop?.url || img.url || null
+              const rawUrl = img.sizes?.desktop?.url || img.url || null
+              backgroundImage = rawUrl ? convertToCDNUrl(rawUrl) : null
             }
           }
         } catch (e) {
@@ -83,7 +88,7 @@ export async function GET(request: NextRequest) {
       }
       // Fallback: old structure (direct media relation)
       if (!backgroundImage && bgConfig.url) {
-        backgroundImage = bgConfig.url
+        backgroundImage = convertToCDNUrl(bgConfig.url)
       }
     }
 
