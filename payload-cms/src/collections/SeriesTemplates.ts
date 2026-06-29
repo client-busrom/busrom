@@ -77,6 +77,9 @@ export const SeriesTemplates: CollectionConfig = {
       label: { en: 'Identifier Name', zh: '识别名称' },
       admin: {
         width: '100%',
+        components: {
+          Field: '@/components/fields/StableTextField',
+        },
       },
     },
     {

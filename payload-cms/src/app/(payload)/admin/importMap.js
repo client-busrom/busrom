@@ -2,6 +2,7 @@ import { default as default_a66bd44433c9260839699cd88113e799 } from '@/component
 import { default as default_85b184ead3859892512d1fa42a0ba167 } from '@/components/admin/TwoFactorAuthField'
 import { default as default_6e007ac8f0e2f687212ebb65ad91c147 } from '@/components/fields/TranslationCenter'
 import { default as default_a8e2ac70c3f86fe45f78f09046549378 } from '@/components/fields/SpecsField'
+import { default as default_stabletextfield_7a8b9c0d1e2f3a4b } from '@/components/fields/StableTextField'
 import { SafeBulkStatus as SafeBulkStatus_1701fa21b19db81296227007f9cd0cae } from '@/components/SafeBulkStatus/index'
 import { MultiLocaleTextareaField as MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80 } from '@/components/fields/MultiLocaleField'
 import { default as default_643116d2ab91f7b0d99236a7afb7c645 } from '@/components/fields/MediaPicker'
@@ -98,6 +99,7 @@ export const importMap = {
   "@/components/admin/TwoFactorAuthField#default": default_85b184ead3859892512d1fa42a0ba167,
   "@/components/fields/TranslationCenter#default": default_6e007ac8f0e2f687212ebb65ad91c147,
   "@/components/fields/SpecsField#default": default_a8e2ac70c3f86fe45f78f09046549378,
+  "@/components/fields/StableTextField#default": default_stabletextfield_7a8b9c0d1e2f3a4b,
   "@/components/SafeBulkStatus/index#SafeBulkStatus": SafeBulkStatus_1701fa21b19db81296227007f9cd0cae,
   "@/components/fields/MultiLocaleField#MultiLocaleTextareaField": MultiLocaleTextareaField_818f830b0ef41c7fd6298cda9b34bc80,
   "@/components/fields/MediaPicker#default": default_643116d2ab91f7b0d99236a7afb7c645,

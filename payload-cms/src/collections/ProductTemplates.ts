@@ -95,6 +95,9 @@ export const ProductTemplates: CollectionConfig = {
           en: 'Internal name for this template',
           zh: '此模版的内部名称',
         },
+        components: {
+          Field: '@/components/fields/StableTextField',
+        },
       },
     },
     {
