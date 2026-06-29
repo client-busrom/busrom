@@ -32,11 +32,34 @@ export async function GET(request: NextRequest) {
     const socialData = socialRes.ok ? await socialRes.json() : { socialLinks: [] };
 
     // Resolve background image
+    // CMS afterRead hook resolves the JSON picker config into a full media object.
     let backgroundImage: string | null = null
+    const resolved = data.backgroundImageResolved
+    if (resolved) {
+      backgroundImage = resolved.sizes?.desktop?.url || resolved.url || null
+    }
+
+    // Fallback: resolve from raw JSON config if the hook result is unavailable.
     const bgConfig = data.backgroundImage
-    if (bgConfig) {
-      if (bgConfig.mode === 'manual' && bgConfig.manualImage?.url) {
-        backgroundImage = bgConfig.manualImage.sizes?.desktop?.url || bgConfig.manualImage.url
+    if (!backgroundImage && bgConfig) {
+      if (bgConfig.mode === 'manual' && bgConfig.manualImage) {
+        const manualImage = bgConfig.manualImage
+        if (typeof manualImage === 'object' && manualImage?.url) {
+          backgroundImage = manualImage.sizes?.desktop?.url || manualImage.url
+        } else if (typeof manualImage === 'number' || typeof manualImage === 'string') {
+          try {
+            const mediaRes = await fetch(`${CMS_URL}/api/media/${manualImage}?depth=1`, {
+              headers: { 'Content-Type': 'application/json' },
+              next: { revalidate: 60 },
+            })
+            if (mediaRes.ok) {
+              const media = await mediaRes.json()
+              backgroundImage = media.sizes?.desktop?.url || media.url || null
+            }
+          } catch (e) {
+            console.error('[Footer API] Failed to resolve manual image:', e)
+          }
+        }
       } else if (bgConfig.mode === 'application' && bgConfig.applicationId) {
         // Fetch application and randomly pick one image from scene gallery
         try {
