@@ -29,6 +29,10 @@
           "value": "3003"
         },
         {
+          "name": "HOSTNAME",
+          "value": "0.0.0.0"
+        },
+        {
           "name": "PAYLOAD_URL",
           "value": "https://cms.busromhouse.com"
         },
