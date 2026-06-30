@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import type { Locale } from "@/i18n.config";
 import { getHomeContent } from "@/lib/content-data";
 import { FooterApiData, FormConfig } from "./types";
@@ -38,6 +38,15 @@ export default function Footer({
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+
+  // Use a direct DOM ref to set the background image style
+  // This avoids a React rendering issue where state updates don't propagate to inline styles
+  const bgRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (bgRef.current && footerData?.backgroundImage) {
+      bgRef.current.style.backgroundImage = `url(${footerData.backgroundImage})`;
+    }
+  }, [footerData?.backgroundImage]);
 
   // Fetch all data
   useEffect(() => {
@@ -116,6 +125,7 @@ export default function Footer({
         data-seo-tag={useSeoDataAttr() || undefined}
       >
         <div
+          ref={bgRef}
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: footerData?.backgroundImage
