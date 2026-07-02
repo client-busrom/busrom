@@ -67,7 +67,8 @@ export function convertToCDNUrl(url: string, strategy?: string): string {
 
   try {
     const domain = getCDNDomain(strategy);
-    const urlObj = new URL(url)
+    // encodeURI handles spaces and special chars in URLs that would break new URL()
+    const urlObj = new URL(encodeURI(url))
 
     // 1. 开发环境 MinIO: 转换 http://localhost:9000 -> 选定的 CDN 域名
     if (url.startsWith(MINIO_ENDPOINT)) {
