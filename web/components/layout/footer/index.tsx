@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { Locale } from "@/i18n.config";
 import { getHomeContent } from "@/lib/content-data";
 import { FooterApiData, FormConfig } from "./types";
@@ -11,6 +11,7 @@ import FooterBottom from "./FooterBottom";
 import SuccessModal from "./SuccessModal";
 import { cn } from "@/lib/utils";
 import { useSeoDataAttr } from "@/components/product-series/SeoKeywordProvider";
+import { OptimizedBackgroundImage } from "@/components/ui/OptimizedImage";
 
 type Props = {
   locale: Locale;
@@ -38,15 +39,6 @@ export default function Footer({
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-
-  // Use a direct DOM ref to set the background image style
-  // This avoids a React rendering issue where state updates don't propagate to inline styles
-  const bgRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (bgRef.current && footerData?.backgroundImage) {
-      bgRef.current.style.backgroundImage = `url(${footerData.backgroundImage})`;
-    }
-  }, [footerData?.backgroundImage]);
 
   // Fetch all data
   useEffect(() => {
@@ -124,15 +116,9 @@ export default function Footer({
         data-header-theme={headerTheme || "transparent"}
         data-seo-tag={useSeoDataAttr() || undefined}
       >
-        <div
-          ref={bgRef}
-          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: footerData?.backgroundImage
-              ? `url(${footerData.backgroundImage})`
-              : "url(/BusromFooterBg.webp)",
-          }}
-          aria-hidden="true"
+        <OptimizedBackgroundImage
+          image={footerData?.backgroundImage || "/BusromFooterBg.webp"}
+          className="absolute inset-0 z-0"
         />
 
         <div className="flex-1 flex flex-col justify-center relative z-10 py-12 md:py-20 lg:py-28 pb-24">
