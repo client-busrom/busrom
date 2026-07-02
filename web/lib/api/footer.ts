@@ -17,13 +17,13 @@ export async function getFooterData(locale: string = 'en') {
   const fetchPromise = (async () => {
     try {
       const [footerRes, socialRes] = await Promise.all([
-        cmsFetch(`/api/globals/footer?locale=${locale}&depth=1`, {
+        cmsFetch(`${CMS_URL}/api/globals/footer?locale=${locale}&depth=1`, {
           headers: {
             'Content-Type': 'application/json',
           },
           next: { revalidate: 3600 },
         }),
-        cmsFetch(`/api/globals/social-config?locale=${locale}&depth=1`, {
+        cmsFetch(`${CMS_URL}/api/globals/social-config?locale=${locale}&depth=1`, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -54,7 +54,7 @@ export async function getFooterData(locale: string = 'en') {
             backgroundImage = rawUrl ? convertToCDNUrl(rawUrl) : null;
           } else if (typeof manualImage === 'number' || typeof manualImage === 'string') {
             try {
-              const mediaRes = await cmsFetch(`/api/media/${manualImage}?depth=1`, {
+              const mediaRes = await cmsFetch(`${CMS_URL}/api/media/${manualImage}?depth=1`, {
                 headers: { 'Content-Type': 'application/json' },
                 next: { revalidate: 3600 },
               });
@@ -69,7 +69,7 @@ export async function getFooterData(locale: string = 'en') {
           }
         } else if (bgConfig.mode === 'application' && bgConfig.applicationId) {
           try {
-            const appRes = await cmsFetch(`/api/applications/${bgConfig.applicationId}?depth=1`, {
+            const appRes = await cmsFetch(`${CMS_URL}/api/applications/${bgConfig.applicationId}?depth=1`, {
               headers: { 'Content-Type': 'application/json' },
               next: { revalidate: 3600 },
             });
