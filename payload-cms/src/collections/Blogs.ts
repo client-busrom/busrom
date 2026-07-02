@@ -19,6 +19,55 @@ import { LABELS, OPTIONS } from '../i18n/admin-labels'
 
 import { formatSlug } from '../hooks/formatSlug'
 
+/**
+ * Workaround for Payload CMS issue #16292:
+ * Filtering a hasMany relationship field by "None" in the admin list generates
+ * `categories[equals]=null`, which crashes the admin UI (blank screen) because
+ * the Postgres adapter cannot build valid SQL from a null value in an array.
+ *
+ * We rewrite `categories: { equals: null }` / `categories: { equals: [null] }`
+ * to `categories: { exists: false }` so the query returns blogs with no
+ * categories instead of crashing.
+ */
+const sanitizeCategoriesNullFilter = (where: any): any => {
+  if (!where || typeof where !== 'object') {
+    return where
+  }
+
+  if (Array.isArray(where)) {
+    return where.map(sanitizeCategoriesNullFilter)
+  }
+
+  const result: any = {}
+  for (const [key, value] of Object.entries(where)) {
+    if (key === 'and' || key === 'or') {
+      result[key] = sanitizeCategoriesNullFilter(value)
+    } else if (key === 'categories' && value && typeof value === 'object' && !Array.isArray(value)) {
+      const operators = value as Record<string, any>
+      const sanitizedOperators: Record<string, any> = {}
+
+      for (const [op, opValue] of Object.entries(operators)) {
+        const isNullArray = Array.isArray(opValue) && opValue.length === 1 && opValue[0] === null
+        const isNullValue = opValue === null
+
+        if ((op === 'equals' || op === 'equals_') && (isNullValue || isNullArray)) {
+          sanitizedOperators.exists = false
+        } else if ((op === 'not_equals' || op === 'not_equals_') && (isNullValue || isNullArray)) {
+          sanitizedOperators.exists = true
+        } else {
+          sanitizedOperators[op] = opValue
+        }
+      }
+
+      result[key] = sanitizedOperators
+    } else {
+      result[key] = value
+    }
+  }
+
+  return result
+}
+
 export const Blogs: CollectionConfig = {
   slug: 'blogs',
   labels: {
@@ -67,6 +116,16 @@ export const Blogs: CollectionConfig = {
     delete: ({ req }) => !!req.user,
   },
   hooks: {
+    // Workaround for Payload CMS issue #16292: admin list filter on a hasMany
+    // relationship field with "None" sends `categories[equals]=null` and whitescreens.
+    // Rewrite it to `categories[exists]=false` before the query reaches the DB.
+    beforeOperation: [
+      async ({ args, operation }: any) => {
+        if ((operation === 'find' || operation === 'count') && args?.where) {
+          args.where = sanitizeCategoriesNullFilter(args.where)
+        }
+      },
+    ],
     beforeChange: [
       async ({ data, originalDoc, operation, req }) => {
         const isTranslation = req.context?.isTranslationSave || req.context?.isSyncing

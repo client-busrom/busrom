@@ -12,7 +12,6 @@ import { SeoKeywordProvider } from "@/components/product-series/SeoKeywordProvid
 import { HomePageClient } from "./HomePageClient"
 import { cookies } from "next/headers"
 import { getMessages } from "@/i18n.config"
-import { getFooterData } from "@/lib/api/footer"
 
 // Force dynamic rendering to ensure fresh content and cookie-based strategy support
 export const dynamic = 'force-dynamic'
@@ -117,9 +116,6 @@ async function HomeContentLoader({ locale }: { locale: Locale }) {
     }
   }
 
-  // 5. Fetch Footer data for SSR hydration (prevents fallback image flash)
-  const footerData = await getFooterData(locale)
-
   return (
     <>
       {/* Preload critical LCP images */}
@@ -137,7 +133,6 @@ async function HomeContentLoader({ locale }: { locale: Locale }) {
         <HomePageClient
           initialContent={content}
           currentLanguage={locale}
-          footerData={footerData}
         />
       </SeoKeywordProvider>
     </>
