@@ -21,10 +21,11 @@ async function resolveCoverImageUrl(coverImage: any): Promise<string> {
     return url ? convertToCDNUrl(url) : ''
   }
   
-  // Numeric ID - fetch from CMS
+  // Numeric ID - fetch from CMS (use correct base URL without /api/graphql suffix)
   if (typeof coverImage === 'number' || (typeof coverImage === 'string' && /^\d+$/.test(coverImage))) {
+    const MEDIA_CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.busromhouse.com'
     try {
-      const mediaRes = await cmsFetch(`${PAYLOAD_URL}/api/media/${coverImage}?depth=0`, {
+      const mediaRes = await cmsFetch(`${MEDIA_CMS_URL}/api/media/${coverImage}?depth=0`, {
         next: { revalidate: 3600 },
       })
       if (mediaRes.ok) {
