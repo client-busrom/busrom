@@ -11,7 +11,6 @@ import FooterBottom from "./FooterBottom";
 import SuccessModal from "./SuccessModal";
 import { cn } from "@/lib/utils";
 import { useSeoDataAttr } from "@/components/product-series/SeoKeywordProvider";
-import { OptimizedBackgroundImage } from "@/components/ui/OptimizedImage";
 
 type Props = {
   locale: Locale;
@@ -116,9 +115,10 @@ export default function Footer({
         data-header-theme={headerTheme || "transparent"}
         data-seo-tag={useSeoDataAttr() || undefined}
       >
-        <OptimizedBackgroundImage
-          image={footerData?.backgroundImage || "/BusromFooterBg.webp"}
-          className="absolute inset-0 z-0"
+        <img
+          src={footerData?.backgroundImage || "/BusromFooterBg.webp"}
+          alt=""
+          className="absolute inset-0 z-0 w-full h-full object-cover"
         />
 
         <div className="flex-1 flex flex-col justify-center relative z-10 py-12 md:py-20 lg:py-28 pb-24">
