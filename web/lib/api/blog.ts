@@ -5,6 +5,41 @@ import { resolveAllMedia } from "@/lib/media-resolver"
 
 const PAYLOAD_URL = CMS_URL
 
+/**
+ * Resolve a coverImage value to a CDN URL string.
+ * Handles: string URL, populated media object, numeric ID (fetches from CMS).
+ */
+async function resolveCoverImageUrl(coverImage: any): Promise<string> {
+  if (!coverImage) return ''
+  
+  // Already a string URL
+  if (typeof coverImage === 'string') return coverImage
+  
+  // Populated media object
+  if (typeof coverImage === 'object' && coverImage !== null) {
+    const url = coverImage.url || coverImage.sizes?.large?.url || ''
+    return url ? convertToCDNUrl(url) : ''
+  }
+  
+  // Numeric ID - fetch from CMS
+  if (typeof coverImage === 'number' || (typeof coverImage === 'string' && /^\d+$/.test(coverImage))) {
+    try {
+      const mediaRes = await cmsFetch(`${PAYLOAD_URL}/api/media/${coverImage}?depth=0`, {
+        next: { revalidate: 3600 },
+      })
+      if (mediaRes.ok) {
+        const media = await mediaRes.json()
+        const url = media.url || media.sizes?.large?.url || ''
+        return url ? convertToCDNUrl(url) : ''
+      }
+    } catch (e) {
+      console.error('[resolveCoverImageUrl] Failed to fetch media:', e)
+    }
+  }
+  
+  return ''
+}
+
 export async function getBlogSettings(locale: Locale) {
   try {
     const res = await cmsFetch(`${PAYLOAD_URL}/api/globals/knowledge-base-settings?locale=${locale}&depth=1`, {
@@ -57,13 +92,6 @@ export async function getBlogBySlug(slug: string, locale: string, isDraft = fals
 
     const blog = blogs[0]
 
-    const getCoverImageUrl = (coverImage: any): string => {
-      if (!coverImage) return ''
-      if (typeof coverImage === 'string') return coverImage
-      const url = coverImage.url || coverImage.sizes?.large?.url || ''
-      return url ? convertToCDNUrl(url) : ''
-    }
-
     const transformedBlog: any = {
       ...blog, // Preserve all raw fields first
       id: blog.id,
@@ -75,7 +103,7 @@ export async function getBlogBySlug(slug: string, locale: string, isDraft = fals
       publishedAt: blog.publishedAt || blog.createdAt,
       createdAt: blog.createdAt,
       updatedAt: blog.updatedAt,
-      coverImage: getCoverImageUrl(blog.coverImage),
+      coverImage: await resolveCoverImageUrl(blog.coverImage),
       categories: (blog.categories || []).map((cat: any) => ({
         id: cat.id,
         name: cat.name || '',
@@ -87,13 +115,13 @@ export async function getBlogBySlug(slug: string, locale: string, isDraft = fals
         id: blog.prevPost.id,
         slug: blog.prevPost.slug,
         title: blog.prevPost.title,
-        coverImage: getCoverImageUrl(blog.prevPost.coverImage)
+        coverImage: await resolveCoverImageUrl(blog.prevPost.coverImage)
       } : null,
       nextPost: blog.nextPost ? {
         id: blog.nextPost.id,
         slug: blog.nextPost.slug,
         title: blog.nextPost.title,
-        coverImage: getCoverImageUrl(blog.nextPost.coverImage)
+        coverImage: await resolveCoverImageUrl(blog.nextPost.coverImage)
       } : null,
     }
 
