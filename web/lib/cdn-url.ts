@@ -46,7 +46,10 @@ export function getCDNDomain(strategy?: string): string {
   }
 
   // 4. 生产环境默认逻辑 (视项目需求，这里默认走中国区)
-  return DEFAULT_CDN_DOMAIN || CHINA_DOMAIN;
+  //    如果 env var 没配置，回退到 CHINA_DOMAIN（而非 localhost:8080）
+  return DEFAULT_CDN_DOMAIN !== 'http://localhost:8080'
+    ? DEFAULT_CDN_DOMAIN
+    : CHINA_DOMAIN;
 }
 
 /**
