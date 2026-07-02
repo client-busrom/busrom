@@ -120,6 +120,7 @@ export default function Footer({
           alt=""
           className="absolute inset-0 z-0 w-full h-full object-cover"
         />
+        <div className="absolute inset-0 z-[1] bg-black/50" />
 
         <div className="flex-1 flex flex-col justify-center relative z-10 py-12 md:py-20 lg:py-28 pb-24">
           <div
