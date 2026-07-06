@@ -242,7 +242,11 @@ export function BlogTemplateTwo({ blog, locale, formatDate, config }: BlogTempla
         {/* Narrative Column */}
         <main className={`${showSidebar ? 'lg:col-span-9' : 'max-w-[1000px] w-full mx-auto'} order-1 lg:order-2`}>
           <div id="blog-content" className="max-w-none">
-            <BlogLexicalRenderer content={blog.content} mediaData={blog.mediaData} />
+            <BlogLexicalRenderer
+              content={blog.content}
+              mediaData={blog.mediaData}
+              locale={locale}
+            />
           </div>
 
           {/* 5. Minimalist Footer Pagination */}

@@ -265,6 +265,7 @@ export function BlogTemplateOne({
                   <BlogLexicalRenderer
                     content={blog.content}
                     mediaData={blog.mediaData}
+                    locale={locale}
                   />
                 ) : (
                   <p className="italic text-[#000000]">

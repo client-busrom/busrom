@@ -67,12 +67,14 @@ export function convertToCDNUrl(url: string, strategy?: string): string {
 
   try {
     const domain = getCDNDomain(strategy);
-    // encodeURI handles spaces and special chars in URLs that would break new URL()
-    const urlObj = new URL(encodeURI(url))
+    // Only encode raw spaces in URLs, don't double-encode existing %20
+    const safeUrl = url.includes(' ') ? url.replace(/ /g, '%20') : url
+    const urlObj = new URL(safeUrl)
 
     // 1. 开发环境 MinIO: 转换 http://localhost:9000 -> 选定的 CDN 域名
+    // MinIO path-style: /{bucket}/media/{filename}, CDN expects /media/{filename}
     if (url.startsWith(MINIO_ENDPOINT)) {
-      const path = urlObj.pathname
+      const path = urlObj.pathname.replace(/^\/[^/]+/, '') // strip bucket segment
       return `${domain}${path}`
     }
 

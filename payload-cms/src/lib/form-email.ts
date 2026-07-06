@@ -191,10 +191,8 @@ export async function sendFormNotificationEmail(
       </style>
     </head>
     <body>
-      <div class="header">
-        <h2>New Form Submission: ${submission.formName || 'Unknown Form'}</h2>
-      </div>
       <div class="content">
+        ${submission.sourcePage ? `<p style="color:#666;font-size:13px;margin-bottom:16px;"><strong>Source Page:</strong> ${submission.sourcePage}</p>` : ''}
         <h3>Submitted Data:</h3>
         ${formDataHtml}
         <div class="meta">
@@ -203,7 +201,7 @@ export async function sendFormNotificationEmail(
           ${submission.chinaTime ? `<p><strong>China Time (CST):</strong> ${submission.chinaTime}</p>` : ''}
           ${submission.userLocalTime ? `<p><strong>Submitter Local Time:</strong> ${submission.userLocalTime}</p>` : ''}
           <p><strong>Locale:</strong> ${locale}</p>
-          ${submission.sourcePage ? `<p><strong>Source Page:</strong> ${submission.sourcePage}</p>` : ''}
+          <p><strong>Device:</strong> ${(submission as any).deviceType || 'unknown'} / ${(submission as any).browser || 'unknown'} / ${(submission as any).os || 'unknown'}</p>
           ${submission.ipAddress ? `<p><strong>IP Address:</strong> ${submission.ipAddress}</p>` : ''}
         </div>
       </div>

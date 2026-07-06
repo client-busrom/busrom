@@ -21,11 +21,10 @@ async function resolveCoverImageUrl(coverImage: any): Promise<string> {
     return url ? convertToCDNUrl(url) : ''
   }
   
-  // Numeric ID - fetch from CMS (use correct base URL without /api/graphql suffix)
+  // Numeric ID - fetch from CMS using same URL pattern as getBlogSettings
   if (typeof coverImage === 'number' || (typeof coverImage === 'string' && /^\d+$/.test(coverImage))) {
-    const MEDIA_CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.busromhouse.com'
     try {
-      const mediaRes = await cmsFetch(`${MEDIA_CMS_URL}/api/media/${coverImage}?depth=0`, {
+      const mediaRes = await cmsFetch(`${PAYLOAD_URL}/api/media/${coverImage}?depth=0`, {
         next: { revalidate: 3600 },
       })
       if (mediaRes.ok) {
@@ -41,13 +40,67 @@ async function resolveCoverImageUrl(coverImage: any): Promise<string> {
   return ''
 }
 
+/**
+ * Resolve an author avatar value to a CDN URL string.
+ * Handles: string URL, populated media object, numeric ID.
+ */
+async function resolveAuthorAvatar(avatar: any): Promise<string> {
+  if (!avatar) return ''
+
+  // Already a string URL
+  if (typeof avatar === 'string') return avatar
+
+  // Populated media object
+  if (typeof avatar === 'object' && avatar !== null) {
+    const url =
+      avatar.url ||
+      avatar.sizes?.thumbnail?.url ||
+      avatar.sizes?.small?.url ||
+      avatar.sizes?.medium?.url ||
+      avatar.sizes?.large?.url ||
+      ''
+    return url ? convertToCDNUrl(url) : ''
+  }
+
+  // Numeric ID - fetch from CMS
+  if (typeof avatar === 'number' || (typeof avatar === 'string' && /^\d+$/.test(avatar))) {
+    try {
+      const mediaRes = await cmsFetch(`${PAYLOAD_URL}/api/media/${avatar}?depth=0`, {
+        next: { revalidate: 3600 },
+      })
+      if (mediaRes.ok) {
+        const media = await mediaRes.json()
+        const url =
+          media.url ||
+          media.sizes?.thumbnail?.url ||
+          media.sizes?.small?.url ||
+          media.sizes?.medium?.url ||
+          media.sizes?.large?.url ||
+          ''
+        return url ? convertToCDNUrl(url) : ''
+      }
+    } catch (e) {
+      console.error('[resolveAuthorAvatar] Failed to fetch media:', e)
+    }
+  }
+
+  return ''
+}
+
 export async function getBlogSettings(locale: Locale) {
   try {
     const res = await cmsFetch(`${PAYLOAD_URL}/api/globals/knowledge-base-settings?locale=${locale}&depth=1`, {
       next: { revalidate: 60 }
     });
     if (!res.ok) return null
-    return await res.json()
+    const data = await res.json()
+
+    // Hydrate coverImage for featuredPost (may be ID if depth is insufficient)
+    if (data?.featuredPost?.coverImage) {
+      data.featuredPost.coverImage = await resolveCoverImageUrl(data.featuredPost.coverImage)
+    }
+
+    return data
   } catch (err) {
     console.error("Error fetching blog settings:", err)
     return null
@@ -99,7 +152,16 @@ export async function getBlogBySlug(slug: string, locale: string, isDraft = fals
       slug: blog.slug,
       title: blog.title || '',
       excerpt: blog.excerpt || '',
-      author: blog.author || 'Busrom Team',
+      author:
+        typeof blog.author === 'object' && blog.author !== null
+          ? {
+              ...blog.author,
+              title: blog.author.role || blog.author.title || 'Editorial Team',
+              avatar: {
+                url: await resolveAuthorAvatar(blog.author.avatar),
+              },
+            }
+          : 'Busrom Team',
       status: blog.status,
       publishedAt: blog.publishedAt || blog.createdAt,
       createdAt: blog.createdAt,

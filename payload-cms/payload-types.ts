@@ -2156,6 +2156,9 @@ export interface FormSubmission {
    */
   city?: string | null;
   userAgent?: string | null;
+  deviceType?: ('desktop' | 'tablet' | 'mobile') | null;
+  browser?: string | null;
+  os?: string | null;
   /**
    * Internal notes about this submission
    */
@@ -3375,6 +3378,9 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   country?: T;
   city?: T;
   userAgent?: T;
+  deviceType?: T;
+  browser?: T;
+  os?: T;
   adminNotes?: T;
   emailSent?: T;
   submittedAt?: T;

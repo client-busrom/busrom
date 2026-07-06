@@ -151,13 +151,27 @@ const extractSectionRaw = (children: any[], markerId: string, mediaData: Record<
       })));
     }
     if (node.type === "custom-image-gallery" && node.data?.images) {
-      items.push(...node.data.images.map((g: any) => ({
-        id: typeof g.image === 'object' ? g.image.id : String(g.image || ""),
-        image: mediaData[typeof g.image === 'object' ? g.image.id : String(g.image || "")] || (typeof g.image === 'object' ? g.image : null),
-        title: g.title || "",
-        link: g.linkUrl || "",
-        sourceType: node.type
-      })));
+      items.push(...node.data.images.map((g: any) => {
+        // Support gallery images sourced from an Application (case gallery)
+        if (g.sourceType === 'application' && g.application) {
+          const appId = String(typeof g.application === 'object' ? g.application.id : g.application);
+          return {
+            id: appId,
+            image: mediaData[appId] || null,
+            title: g.title || "",
+            link: g.linkUrl || "",
+            sourceType: 'application'
+          };
+        }
+        const imageId = typeof g.image === 'object' ? g.image.id : String(g.image || "");
+        return {
+          id: imageId,
+          image: mediaData[imageId] || (typeof g.image === 'object' ? g.image : null),
+          title: g.title || "",
+          link: g.linkUrl || "",
+          sourceType: node.type
+        };
+      }));
     }
     if (node.type === "productCarousel") {
       items.push({ sourceType: "productCarousel", carouselItems: node.data?.items || [] });
@@ -334,9 +348,16 @@ export const parseOneStopData = (pageContent: any, locale: string): ParsedOneSto
       const imgItem = imageItems[i] || {};
       let finalImage = null;
       if (imgItem.sourceType === 'application' && imgItem.application) {
-        const appId = typeof imgItem.application === 'object' ? imgItem.application.id : String(imgItem.application);
-        const app = applicationsRes.find((a: any) => String(a.id) === appId);
-        if (app) finalImage = getRandomAppImage(app);
+        const appId = String(typeof imgItem.application === 'object' ? imgItem.application.id : imgItem.application);
+        // resolveAllMedia pre-computes a random image for each Application id
+        finalImage = mediaData[appId] || null;
+        if (!finalImage) {
+          const app = applicationsRes.find((a: any) => String(a.id) === appId);
+          if (app) {
+            const picked = getRandomAppImage(app);
+            finalImage = picked?.image || picked || null;
+          }
+        }
       } else {
         finalImage = imgItem.image ? (mediaData[typeof imgItem.image === 'object' ? imgItem.image.id : String(imgItem.image)] || (typeof imgItem.image === 'object' ? imgItem.image : null)) : null;
       }

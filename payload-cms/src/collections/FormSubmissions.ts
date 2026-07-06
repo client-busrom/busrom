@@ -513,6 +513,44 @@ export const FormSubmissions: CollectionConfig = {
             readOnly: true,
           },
         },
+        {
+          name: 'deviceType',
+          type: 'select',
+          label: {
+            en: 'Device Type',
+            zh: '设备类型',
+          },
+          options: [
+            { label: 'Desktop', value: 'desktop' },
+            { label: 'Tablet', value: 'tablet' },
+            { label: 'Mobile', value: 'mobile' },
+          ],
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'browser',
+          type: 'text',
+          label: {
+            en: 'Browser',
+            zh: '浏览器',
+          },
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'os',
+          type: 'text',
+          label: {
+            en: 'OS',
+            zh: '操作系统',
+          },
+          admin: {
+            readOnly: true,
+          },
+        },
       ],
     },
 

@@ -2,6 +2,37 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const CMS_URL = process.env.CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'https://cms.busromhouse.com'
 
+/**
+ * Parse User-Agent string to extract device type, browser, and OS.
+ */
+function parseUserAgent(ua: string): { deviceType: string; browser: string; os: string } {
+  const lower = ua.toLowerCase()
+  
+  // Device type
+  let deviceType = 'desktop'
+  if (/mobile|android.*mobile|iphone|ipod/.test(lower)) deviceType = 'mobile'
+  else if (/ipad|tablet|kindle|playbook|silk/.test(lower)) deviceType = 'tablet'
+
+  // Browser
+  let browser = 'Unknown'
+  if (/edg\//.test(lower)) browser = 'Edge'
+  else if (/opr\//.test(lower)) browser = 'Opera'
+  else if (/chrome/.test(lower) && !/edg/.test(lower)) browser = 'Chrome'
+  else if (/safari/.test(lower) && !/chrome/.test(lower)) browser = 'Safari'
+  else if (/firefox/.test(lower)) browser = 'Firefox'
+  else if (/msie|trident/.test(lower)) browser = 'IE'
+
+  // OS
+  let os = 'Unknown'
+  if (/windows/.test(lower)) os = 'Windows'
+  else if (/mac os|macintosh/.test(lower)) os = 'macOS'
+  else if (/android/.test(lower)) os = 'Android'
+  else if (/iphone|ipad|ipod/.test(lower)) os = 'iOS'
+  else if (/linux/.test(lower)) os = 'Linux'
+
+  return { deviceType, browser, os }
+}
+
 // In-memory rate limit store (for serverless, consider using Redis)
 const rateLimitStore = new Map<string, { count: number; lastSubmit: number; hourStart: number }>()
 
@@ -274,6 +305,7 @@ export async function POST(request: NextRequest) {
     // Get request metadata
     const userAgent = request.headers.get('user-agent') || 'unknown'
     const referer = request.headers.get('referer') || 'unknown'
+    const deviceInfo = parseUserAgent(userAgent)
 
     // Prepare submission data for Payload CMS
     const submissionData: any = {
@@ -284,6 +316,9 @@ export async function POST(request: NextRequest) {
       userLocalTime: userLocalTime || '',
       ipAddress,
       userAgent,
+      deviceType: deviceInfo.deviceType,
+      browser: deviceInfo.browser,
+      os: deviceInfo.os,
       submissionType: autoSubmitted ? 'AUTO' : 'MANUAL',
       status: 'UNREAD',
     }

@@ -43,10 +43,10 @@ export default function FooterBottom({ footerData, siteLogoUrl, centered = false
       <Image
         src={siteLogoUrl || "/Busrom1.svg"}
         alt="Busrom Logo"
-        width={116}
-        height={91}
+        width={96}
+        height={75}
         className="object-contain"
-        style={{ width: "120px", height: "auto" }}
+        style={{ width: "96px", height: "auto" }}
         unoptimized={!!siteLogoUrl}
       />
       <div className="text-brand-text-inverse/60 text-sm font-anaheim flex flex-col sm:flex-row justify-center items-center gap-y-2 sm:gap-y-0 sm:gap-x-3 leading-[1.8]">

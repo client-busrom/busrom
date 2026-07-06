@@ -143,6 +143,7 @@ export function BlogTemplateThree({
               <BlogLexicalRenderer
                 content={blog.content}
                 mediaData={blog.mediaData}
+                locale={locale}
               />
             </div>
 

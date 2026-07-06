@@ -58,6 +58,7 @@ const formInputClasses = `
   focus-visible:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0
   autofill:bg-transparent autofill:text-white
   caret-color: white !important;
+  [&::selection]:bg-[#756f3f] [&::selection]:text-white
   [&:-webkit-autofill]:bg-transparent
   [&:-webkit-autofill]:[-webkit-text-fill-color:white!important]
   [&:-webkit-autofill]:[box-shadow:0_0_0_1000px_#BFB672_inset!important]
@@ -106,6 +107,7 @@ interface FormField {
 
 // 表单配置类型
 interface FormConfig {
+  id?: number;
   name?: string;
   fields?: FormField[];
   submitButtonText: string;
@@ -376,6 +378,7 @@ export default function MainForm({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          formId: formConfig?.id,
           formName: formConfig?.name || "main-form",
           data: formData,
           locale,
@@ -761,7 +764,7 @@ export default function MainForm({
                           data.placeholderWhatsapp,
                         )}
                         disabled={submitting}
-                        className="flex-1 bg-transparent px-3 outline-none font-anaheim font-bold text-base text-white placeholder:text-white/50 caret-white [&:-webkit-autofill]:[caret-color:white!important] [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#BFB672_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s!important]"
+                        className="flex-1 bg-transparent px-3 outline-none font-anaheim font-bold text-base text-white placeholder:text-white/50 caret-white [&::selection]:bg-[#756f3f] [&::selection]:text-white [&:-webkit-autofill]:[caret-color:white!important] [&:-webkit-autofill]:[-webkit-text-fill-color:white!important] [&:-webkit-autofill]:[box-shadow:0_0_0px_1000px_#BFB672_inset!important] [&:-webkit-autofill]:[transition:background-color_9999s_ease-in-out_0s!important]"
                         autoComplete="off"
                         autoCorrect="off"
                         autoCapitalize="off"
