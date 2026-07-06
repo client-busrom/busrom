@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
       hasTurnstileToken: !!turnstileToken,
       userLocalTime,
     })
-
+    console.log('[Form Submission API] Will save with formName:', formName);
     // Validate required fields
     if (!data || typeof data !== 'object') {
       return NextResponse.json(

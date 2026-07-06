@@ -21,6 +21,9 @@ import { motion } from "framer-motion";
 // lg 断点 (1024px) - 与 Tailwind 一致
 const LG_BREAKPOINT = 1024;
 
+// CMS 中首页主表单的 name（与 FormConfigs 集合一致）
+const FORM_NAME = "home-page-main-inquiry-form";
+
 // Helper: 获取提交次数
 const getSubmissionCount = (): number => {
   if (typeof window === "undefined") return 0;
@@ -141,9 +144,15 @@ export default function MainForm({
   const [isVisible, setIsVisible] = useState(false); // 表单是否进入视口
 
   // 表单配置 - 优先使用 props 传过来的数据，没有再调接口
-  const [formConfig, setFormConfig] = useState<FormConfig | null>(
-    data.formConfig || null,
-  );
+  // depth=1 时 formConfig 只是关系 ID 字符串（如 "1"），不是真正的配置对象，需要丢弃
+  const [formConfig, setFormConfig] = useState<FormConfig | null>(() => {
+    const raw = data.formConfig;
+    // 只有包含 fields/name 的真对象才有效；字符串 ID 无效
+    if (raw && typeof raw === 'object' && !Array.isArray(raw) && (raw.fields || raw.name)) {
+      return raw;
+    }
+    return null;
+  });
 
   // 获取字段 label - 优先使用 formConfig 中的配置
   const getFieldLabel = (fieldName: string, fallbackLabel: string): string => {
@@ -292,11 +301,11 @@ export default function MainForm({
       try {
         // 并行获取表单配置和 Turnstile 配置
         const [formRes, turnstileRes] = await Promise.all([
-          fetch(`/api/form-config/main-form?locale=${locale}`),
+          fetch(`/api/form-config/${FORM_NAME}?locale=${locale}`),
           fetch("/api/site-config/turnstile"),
         ]);
 
-        if (formRes.ok && !formConfig) {
+        if (formRes.ok) {
           const config = await formRes.json();
           setFormConfig(config);
           console.log(`[MainForm] Loaded config for "${locale}":`, config);
@@ -354,6 +363,9 @@ export default function MainForm({
     setSubmitting(true);
     setError(null);
 
+    console.log('[MainForm submit] formConfig:', JSON.stringify(formConfig));
+    console.log('[MainForm submit] formId:', formConfig?.id, 'formName:', formConfig?.name);
+
     // 验证必填字段
     if (!formData.name || !formData.email) {
       setError(
@@ -379,7 +391,7 @@ export default function MainForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           formId: formConfig?.id,
-          formName: formConfig?.name || "main-form",
+          formName: formConfig?.name || FORM_NAME,
           data: formData,
           locale,
           privacyAccepted,
@@ -396,8 +408,8 @@ export default function MainForm({
         if (typeof window !== "undefined" && (window as any).dataLayer) {
           (window as any).dataLayer.push({
             event: "form_submit_success",
-            form_id: formConfig?.name || "main-form",
-            form_name: formConfig?.name || "main-form",
+            form_id: formConfig?.name || FORM_NAME,
+            form_name: formConfig?.name || FORM_NAME,
           });
         }
 
@@ -644,7 +656,7 @@ export default function MainForm({
                 </div>
               ) : (
                 <form
-                  id={formConfig?.name || "main-form"}
+                  id={formConfig?.name || FORM_NAME}
                   onSubmit={handleSubmit}
                   className="flex flex-col"
                   style={{ gap: "clamp(12px, 1.2vw, 24px)" }}
