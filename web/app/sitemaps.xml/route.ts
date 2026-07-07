@@ -13,14 +13,14 @@
  */
 
 import { NextResponse } from 'next/server'
-import { generateSitemapIndexXML, SITEMAP_LOCALES } from '@/lib/api/sitemap'
+import { generateSitemapIndexXML, SITEMAP_LOCALES, BASE_SITE_URL } from '@/lib/api/sitemap'
 
 // Force dynamic rendering - this route generates content at runtime
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
+    const baseUrl = BASE_SITE_URL
 
     // Generate sitemap index XML
     const xml = generateSitemapIndexXML(SITEMAP_LOCALES as unknown as string[], baseUrl)
@@ -28,7 +28,7 @@ export async function GET() {
     return new NextResponse(xml, {
       status: 200,
       headers: {
-        'Content-Type': 'application/xml',
+        'Content-Type': 'application/xml; charset=utf-8',
         'Cache-Control': 'public, max-age=3600, s-maxage=3600',
       },
     })

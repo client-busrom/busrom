@@ -13,7 +13,6 @@
  */
 
 import { NextResponse } from 'next/server'
-import { SITEMAP_LOCALES } from '@/lib/api/sitemap'
 
 // Force dynamic rendering - this route fetches from CMS at runtime
 export const dynamic = 'force-dynamic'
@@ -56,11 +55,6 @@ async function getRobotsTxtFromCMS(): Promise<string | null> {
  * Get default robots.txt content
  */
 function getDefaultRobotsTxt(siteUrl: string): string {
-  // Generate sitemap entries for all locales
-  const localeSitemaps = (SITEMAP_LOCALES as unknown as string[])
-    .map((locale) => `Sitemap: ${siteUrl}/sitemap/${locale}`)
-    .join('\n')
-
   return `# Busrom Robots.txt
 # Multi-language B2B industrial hardware website
 
@@ -71,9 +65,8 @@ Allow: /
 Disallow: /admin/
 
 # Sitemaps
-Sitemap: ${siteUrl}/sitemaps.xml
 Sitemap: ${siteUrl}/sitemap.xml
-${localeSitemaps}
+Sitemap: ${siteUrl}/sitemaps.xml
 `
 }
 
@@ -91,7 +84,7 @@ export async function GET() {
     } else {
       // Ensure sitemap is included
       if (!/sitemap:/i.test(robotsTxt)) {
-        robotsTxt += `\n\nSitemap: ${siteUrl}/sitemaps.xml\nSitemap: ${siteUrl}/sitemap.xml\n`
+        robotsTxt += `\n\nSitemap: ${siteUrl}/sitemap.xml\nSitemap: ${siteUrl}/sitemaps.xml\n`
       }
     }
 

@@ -1,49 +1,39 @@
 /**
- * Sitemap XML Route
+ * Main Sitemap Index Route
  *
- * This route generates a dynamic sitemap.xml file containing all pages of the website.
- * The sitemap helps search engines discover and index all pages.
+ * This route generates the main sitemap.xml index file that references
+ * content-type sitemaps (products, blogs, pages, etc.).
  *
  * Route: /sitemap.xml
  *
  * Features:
- * - Includes all static pages
- * - Fetches dynamic routes from CMS (products, blogs, applications)
- * - Sets appropriate lastmod, changefreq, and priority for each URL
- * - Caches the result for performance
+ * - Lists all content-type sitemaps
+ * - Each child sitemap contains URLs with hreflang alternates for all locales
+ * - Follows the pattern used by pergoluxshop.com and other large e-commerce sites
  */
 
 import { NextResponse } from 'next/server'
-import { getAllSitemapUrls, generateSitemapXML } from '@/lib/api/sitemap'
+import { generateTypeSitemapIndexXML, SITEMAP_TYPES, BASE_SITE_URL } from '@/lib/api/sitemap'
 
-// Force dynamic rendering - this route fetches from CMS at runtime
+// Force dynamic rendering - this route generates content at runtime
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    // Get base URL from environment or default
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://busromhouse.com'
+    const baseUrl = BASE_SITE_URL
 
-    // Fetch all URLs
-    const urls = await getAllSitemapUrls()
+    // Generate type-based sitemap index XML
+    const xml = generateTypeSitemapIndexXML(SITEMAP_TYPES, baseUrl)
 
-    // Generate XML
-    const xml = generateSitemapXML(urls, baseUrl)
-
-    // Return XML response
     return new NextResponse(xml, {
       status: 200,
       headers: {
-        'Content-Type': 'application/xml',
-        'Cache-Control': 'public, max-age=3600, s-maxage=3600', // Cache for 1 hour
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=3600',
       },
     })
   } catch (error) {
-    console.error('Error generating sitemap:', error)
-
-    // Return error response
-    return new NextResponse('Error generating sitemap', {
-      status: 500,
-    })
+    console.error('Error generating main sitemap index:', error)
+    return new NextResponse('Error generating sitemap index', { status: 500 })
   }
 }
