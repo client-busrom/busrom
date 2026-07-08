@@ -15,7 +15,6 @@
 
 import type { CollectionConfig } from 'payload'
 import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
-import { formatSlug } from '../hooks/formatSlug'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
@@ -72,10 +71,21 @@ export const Categories: CollectionConfig = {
         return doc
       },
     ],
-    // 2. beforeChange: generate fullTitle for admin UI
+    // 2. beforeChange: generate fullTitle for admin UI and slug from English name
     beforeChange: [
       async ({ data, req, originalDoc, operation }) => {
         const { payload } = req
+        const isTranslation = req.context?.isTranslationSave || req.context?.isSyncing
+
+        // [AUTO-PRESERVE STATUS] If status is missing from the update (e.g. background patches),
+        // explicitly set it to the current value to prevent database resets.
+        if (operation === 'update' && !data.status && originalDoc?.status) {
+          data.status = originalDoc.status
+        }
+
+        if (operation === 'update' && !data.publishedAt && originalDoc?.publishedAt) {
+          data.publishedAt = originalDoc.publishedAt
+        }
 
         // Optimization: fullTitle only uses 'en'. 
         // Only re-calculate if English name, parent or slug is being changed.
@@ -152,6 +162,32 @@ export const Categories: CollectionConfig = {
           }
         }
         data.fullTitle = fullTitle
+
+        // [AUTO SLUG] Only generate slug from English name. Prevent translations from overwriting it.
+        if (!isTranslation) {
+          const nameObj = data.name || originalDoc?.name
+
+          if (nameObj) {
+            let nameToSlugify = ''
+
+            if (typeof nameObj === 'object' && nameObj?.en) {
+              nameToSlugify = nameObj.en
+            } else if (req.locale === 'en' || req.locale === 'all' || !req.locale) {
+              nameToSlugify = typeof nameObj === 'string' ? nameObj : ''
+            }
+
+            if (nameToSlugify) {
+              data.slug = nameToSlugify
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/[^a-z0-9-]/g, '')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '')
+            }
+          }
+        }
+
         return data
       },
     ],
@@ -429,9 +465,6 @@ export const Categories: CollectionConfig = {
       label: {
         en: 'Technical Slug',
         zh: '技术标识 (自动生成)',
-      },
-      hooks: {
-        beforeValidate: [formatSlug('name')],
       },
       validate: async (val: string | any, { data, req, id }: any) => {
         if (!val) return true

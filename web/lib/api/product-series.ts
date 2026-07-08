@@ -53,7 +53,13 @@ export async function getProductSeriesBySlug(slug: string, locale: string) {
     if (transformedSeries.contentTranslation) {
       const normalize = (url: string) => {
         if (!url) return ''
-        return url.startsWith('http') ? convertToCDNUrl(url) : convertToCDNUrl(`${PAYLOAD_URL}${url.startsWith('/') ? '' : '/'}${url}`)
+        if (url.startsWith('http')) return convertToCDNUrl(url)
+        const isMediaPath = url.startsWith('/api/media') || url.startsWith('/media') || /\.(jpg|jpeg|png|gif|svg|webp|avif|pdf|docx|zip)$/i.test(url)
+        if (isMediaPath) {
+          const normalizedPath = url.startsWith('/') ? url : `/${url}`
+          return convertToCDNUrl(`${PAYLOAD_URL}${normalizedPath}`)
+        }
+        return url.startsWith('/') ? url : `/${url}`
       }
 
       // 1. Scan for reusable block IDs

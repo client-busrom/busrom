@@ -153,6 +153,7 @@ export default function Footer({
           <FooterBottom
             footerData={footerData}
             siteLogoUrl={siteLogoUrl}
+            locale={locale}
             centered
           />
         </div>

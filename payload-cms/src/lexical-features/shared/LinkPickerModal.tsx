@@ -34,7 +34,7 @@ interface FetchResult {
 }
 
 const collections: CollectionConfig[] = [
-  { value: 'pages', label: '其他子页', pathPrefix: '', searchFields: ['title', 'slug', 'path'], apiCollection: 'pages' },
+  { value: 'pages', label: '网站页面', pathPrefix: '', searchFields: ['title', 'slug'], apiCollection: 'pages' },
   { value: 'product-series', label: '产品详解页', pathPrefix: '/products', searchFields: ['name', 'slug'], apiCollection: 'product-series' },
   { value: 'products', label: '产品链接页', pathPrefix: '/shop', searchFields: ['name', 'slug', 'sku', 'adminLabel'], apiCollection: 'products' },
   { value: 'categories-product', label: 'shop列表页分类', pathPrefix: '/shop', categoryType: 'PRODUCT', searchFields: ['name', 'slug', 'adminLabel'], apiCollection: 'categories' },

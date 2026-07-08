@@ -5,7 +5,7 @@ import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import useEmblaCarousel from "embla-carousel-react"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
-import { cn } from "@/lib/utils"
+import { cn, resolveInternalLink } from "@/lib/utils"
 import type { ProductOverviewData } from "@/lib/content-parser"
 
 
@@ -226,7 +226,7 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
           {/* CTA Button - Mobile */}
           {ctaButton && (
             <Link
-              href={ctaButton.url}
+              href={resolveInternalLink(ctaButton.url)}
               className="mt-4 inline-flex items-center gap-2 px-6 py-3 border-2 border-[#756F3F] rounded-full font-anaheim font-medium text-[#756F3F] hover:bg-[#756F3F] hover:text-white transition-colors"
             >
               <div className="w-3 h-3 rounded-full bg-[#FFCC4A]" />
@@ -498,7 +498,7 @@ export function ProductOverview({ data, className }: ProductOverviewProps) {
 
           return (
             <Link
-              href={ctaButton.url}
+              href={resolveInternalLink(ctaButton.url)}
               className="absolute flex items-center group pointer-events-auto"
               style={{
                 left: `${(1529 / DESIGN_WIDTH) * 100}%`,

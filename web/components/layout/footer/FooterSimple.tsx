@@ -199,7 +199,7 @@ export default function FooterSimple({
         </div>
 
         {/* 第三行：Logo + Copyright */}
-        <FooterBottom footerData={footerData} siteLogoUrl={siteLogoUrl} />
+        <FooterBottom footerData={footerData} siteLogoUrl={siteLogoUrl} locale={locale} />
       </div>
     </footer>
   );

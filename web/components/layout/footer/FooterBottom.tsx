@@ -1,15 +1,16 @@
 import React from "react";
 import Image from "next/image";
-import SocialIcon from "./SocialIcon";
+import Link from "next/link";
 import { FooterApiData } from "./types";
 
 interface Props {
   footerData: FooterApiData | null;
   siteLogoUrl: string | null;
+  locale?: string;
   centered?: boolean;
 }
 
-export default function FooterBottom({ footerData, siteLogoUrl, centered = false }: Props) {
+export default function FooterBottom({ footerData, siteLogoUrl, locale, centered = false }: Props) {
   const currentYear = new Date().getFullYear();
 
   // 过滤出有效的法律链接（同时有 label 和 url）
@@ -38,17 +39,21 @@ export default function FooterBottom({ footerData, siteLogoUrl, centered = false
   }
 
   // 普通页版本：Logo + 版权（上下结构，居中）
+  const homeHref = locale ? `/${locale}/` : "/";
+
   return (
     <div className="pt-16 flex flex-col items-center gap-[20px]">
-      <Image
-        src={siteLogoUrl || "/Busrom1.svg"}
-        alt="Busrom Logo"
-        width={96}
-        height={75}
-        className="object-contain"
-        style={{ width: "96px", height: "auto" }}
-        unoptimized={!!siteLogoUrl}
-      />
+      <Link href={homeHref} className="hover:opacity-80 transition-opacity">
+        <Image
+          src={siteLogoUrl || "/Busrom1.svg"}
+          alt="Busrom Logo"
+          width={96}
+          height={75}
+          className="object-contain"
+          style={{ width: "96px", height: "auto" }}
+          unoptimized={!!siteLogoUrl}
+        />
+      </Link>
       <div className="text-brand-text-inverse/60 text-sm font-anaheim flex flex-col sm:flex-row justify-center items-center gap-y-2 sm:gap-y-0 sm:gap-x-3 leading-[1.8]">
         <span>{footerData?.copyrightText ? footerData.copyrightText : `© ${currentYear} Busrom. All rights reserved.`}</span>
         {validLegalLinks.length > 0 && (

@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { OptimizedImage } from "@/components/ui/OptimizedImage"
-import { cn } from "@/lib/utils"
+import { cn, resolveInternalLink } from "@/lib/utils"
 import type { QuoteData } from "@/lib/content-parser"
 
 /**
@@ -101,7 +101,7 @@ export function Quote({ data, className }: QuoteProps) {
 
         {/* Arrow in the middle of BUS ROM - with pulse animation synced with logo sway */}
         <Link
-          href={ctaLink || "#"}
+          href={resolveInternalLink(ctaLink) || "#"}
           className="absolute group animate-arrow-pulse z-20"
           style={{
             left: `${(753 / DESIGN_WIDTH) * 100}%`,
@@ -178,7 +178,7 @@ export function Quote({ data, className }: QuoteProps) {
 
         {/* CTA Button - 纯净悬停反色 (Hover Inversion) */}
         <Link
-          href={ctaLink || "#"}
+          href={resolveInternalLink(ctaLink) || "#"}
           className="absolute flex items-center group cursor-pointer transition-colors duration-300 bg-[#FEF07D] hover:bg-[#564E16] z-20"
           style={{
             right: `${(318 / DESIGN_WIDTH) * 100}%`,
@@ -266,7 +266,7 @@ export function Quote({ data, className }: QuoteProps) {
 
           {/* 脉冲箭头按钮 - 精确放置在标识下方/中央位置，方便点击 */}
           <Link
-            href={ctaLink || "#"}
+            href={resolveInternalLink(ctaLink) || "#"}
             className="absolute top-[60%] group animate-arrow-pulse w-36 h-10 z-20"
           >
             <img
@@ -289,7 +289,7 @@ export function Quote({ data, className }: QuoteProps) {
 
         {/* 4. 底部 CTA 按钮 - 移动端专属饱满触控尺寸，继承纯净悬停反色 */}
         <Link
-          href={ctaLink || "#"}
+          href={resolveInternalLink(ctaLink) || "#"}
           className="w-max max-w-full h-16 flex items-center group cursor-pointer transition-colors duration-300 bg-[#FEF07D] hover:bg-[#564E16] rounded-full pl-8 pr-2 gap-4 shadow-xl active:scale-95 z-20"
           style={{
             transform: "translateZ(0)",
