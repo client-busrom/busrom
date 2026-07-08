@@ -24,6 +24,7 @@ interface CollectionConfig {
   isFaq?: boolean
   searchFields: string[]
   apiCollection: string
+  depth?: number
 }
 
 interface FetchResult {
@@ -33,14 +34,15 @@ interface FetchResult {
 }
 
 const collections: CollectionConfig[] = [
-  { value: 'products', label: '产品链接页', pathPrefix: '/shop', searchFields: ['name', 'slug', 'sku', 'adminLabel'], apiCollection: 'products' },
+  { value: 'pages', label: '其他子页', pathPrefix: '', searchFields: ['title', 'slug', 'path'], apiCollection: 'pages' },
   { value: 'product-series', label: '产品详解页', pathPrefix: '/products', searchFields: ['name', 'slug'], apiCollection: 'product-series' },
+  { value: 'products', label: '产品链接页', pathPrefix: '/shop', searchFields: ['name', 'slug', 'sku', 'adminLabel'], apiCollection: 'products' },
   { value: 'categories-product', label: 'shop列表页分类', pathPrefix: '/shop', categoryType: 'PRODUCT', searchFields: ['name', 'slug', 'adminLabel'], apiCollection: 'categories' },
   { value: 'categories-blog', label: '知识库列表页分类', pathPrefix: '/knowledge-base-blogs', categoryType: 'BLOG', searchFields: ['name', 'slug', 'adminLabel'], apiCollection: 'categories' },
-  { value: 'pages', label: '其他子页', pathPrefix: '', searchFields: ['title', 'slug', 'path'], apiCollection: 'pages' },
-  { value: 'blogs', label: '知识库', pathPrefix: '/knowledge-base-blog', searchFields: ['title', 'slug', 'adminLabel'], apiCollection: 'blogs' },
   { value: 'blog-tags', label: '知识库标签', pathPrefix: '/knowledge-base-blogs', searchFields: ['name', 'slug'], apiCollection: 'blog-tags' },
+  { value: 'blogs', label: '知识库', pathPrefix: '/knowledge-base-blog', searchFields: ['title', 'slug', 'adminLabel'], apiCollection: 'blogs' },
   { value: 'categories-faq', label: 'FAQ 分类', pathPrefix: '/faq', categoryType: 'FAQ', isFaq: true, searchFields: ['name', 'slug', 'adminLabel'], apiCollection: 'categories' },
+  { value: 'faq', label: 'FAQ', pathPrefix: '/faq', searchFields: ['question', 'slug', 'adminLabel'], apiCollection: 'faq-items', depth: 1 },
   { value: 'categories', label: '所有分类', pathPrefix: '/category', searchFields: ['name', 'slug', 'adminLabel'], apiCollection: 'categories' },
 ]
 
@@ -82,6 +84,10 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
 
     if (config.categoryType) {
       params.append('where[type][equals]', config.categoryType)
+    }
+
+    if (config.depth) {
+      params.append('depth', String(config.depth))
     }
 
     return params
@@ -233,6 +239,13 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     } else if (config.value === 'blog-tags') {
       const slugValue = item.slug || item.id
       path = `${config.pathPrefix}?tag=${slugValue}`
+    } else if (config.value === 'faq') {
+      const category = item.category
+      const slugValue =
+        category && typeof category === 'object' && category.slug
+          ? category.slug
+          : (item.slug || item.id)
+      path = `${config.pathPrefix}#faq-detail-${slugValue}`
     } else if (itemPath && typeof itemPath === 'string') {
       path = itemPath.startsWith('/') ? itemPath : `/${itemPath}`
     } else {
@@ -262,6 +275,14 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     }
     if (config.value === 'blog-tags') {
       return `${config.pathPrefix}?tag=${slugValue}`
+    }
+    if (config.value === 'faq') {
+      const category = item.category
+      const categorySlug =
+        category && typeof category === 'object' && category.slug
+          ? category.slug
+          : slugValue
+      return `${config.pathPrefix}#faq-detail-${categorySlug}`
     }
     return `${config.pathPrefix}/${slugValue}`
   }
@@ -435,7 +456,11 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
                     <div style={{ fontSize: '14px', fontWeight: 600, color: '#111827' }}>
                       {item._collectionValue === 'products'
                         ? ((typeof item.name === 'object' ? item.name?.en || item.name?.zh : item.name) || item.adminLabel || item.slug)
-                        : (item.adminLabel || item.title || (typeof item.name === 'object' ? item.name?.en || item.name?.zh : item.name) || item.slug)}
+                        : item._collectionValue === 'faq'
+                          ? (item.adminLabel || (typeof item.question === 'object' ? item.question?.en || item.question?.zh : item.question) || item.slug)
+                          : item._collectionValue === 'blogs'
+                            ? ((typeof item.title === 'object' ? item.title?.en || item.title?.zh : item.title) || item.adminLabel || item.slug)
+                            : (item.adminLabel || item.title || (typeof item.name === 'object' ? item.name?.en || item.name?.zh : item.name) || item.slug)}
                     </div>
                     <span style={{
                       padding: '4px 10px',
