@@ -116,8 +116,6 @@ export function BlogTemplateThree({
                 {blog.title}
               </h1>
               <div className="flex items-center gap-4 text-sm font-bold uppercase tracking-widest text-[#000000]">
-                <span>{formatDate(blog.publishedAt)}</span>
-                <span>•</span>
                 <span className="text-[#ff4848]">
                   {blog.author?.name || blog.author || "Busrom Editorial"}
                 </span>

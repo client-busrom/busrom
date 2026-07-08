@@ -87,7 +87,7 @@ export function BlogTemplateTwo({ blog, locale, formatDate, config }: BlogTempla
         </h1>
         
         <div className="text-[11px] font-bold uppercase tracking-[3px] text-[#000000]/50">
-          BY {blog.author?.name?.toUpperCase() || blog.author?.toUpperCase() || 'BUSROM EDITORIAL'} &nbsp; | &nbsp; {formatDate(blog.publishedAt)}
+          BY {blog.author?.name?.toUpperCase() || blog.author?.toUpperCase() || 'BUSROM EDITORIAL'}
         </div>
       </header>
 
@@ -207,7 +207,6 @@ export function BlogTemplateTwo({ blog, locale, formatDate, config }: BlogTempla
                       <h6 className="text-[13px] font-bold leading-tight text-[#000000] group-hover:text-[#B06E4E] transition-colors line-clamp-2 italic">
                         {rp.title}
                       </h6>
-                      <p className="text-[10px] font-bold text-[#000000]/30 uppercase tracking-[2px]">{formatDate(rp.publishedAt)}</p>
                     </Link>
                   ))}
                 </div>

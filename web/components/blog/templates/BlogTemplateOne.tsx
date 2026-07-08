@@ -190,10 +190,6 @@ export function BlogTemplateOne({
               >
                 {blog.categories?.[0]?.name || "self-care"}
               </Link>
-              <span className="font-extralight opacity-40">—</span>
-              <p className="text-[#000000] text-xs font-medium">
-                {formatDate(blog.publishedAt)}
-              </p>
             </div>
 
             <h1 className="text-[43.2px] font-montserrat font-bold !leading-tight mb-4 text-[#000000]">
