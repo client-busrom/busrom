@@ -14,6 +14,7 @@
 import type { CollectionConfig } from 'payload'
 import { autoIndexHook } from '../hooks/autoIndex'
 import { autoIndexDeleteHook } from '../hooks/autoIndexDelete'
+import { createNotifyIndexNowEndpoint } from '../endpoints/notifyIndexNow'
 
 
 export const ProductSeries: CollectionConfig = {
@@ -100,33 +101,13 @@ export const ProductSeries: CollectionConfig = {
         }
       },
     },
+    {
+      path: '/:id/notify-indexnow',
+      method: 'post',
+      handler: createNotifyIndexNowEndpoint('product-series'),
+    },
   ],
   fields: [
-    {
-      type: 'row',
-      fields: [
-        {
-          name: 'translationCenter',
-          type: 'ui',
-          admin: {
-            width: '70%',
-            components: {
-              Field: '@/components/fields/TranslationCenter',
-            },
-          },
-        },
-        {
-          name: 'isSystem',
-          type: 'checkbox',
-          label: { en: 'System Page', zh: '系统页面' },
-          defaultValue: false,
-          admin: {
-            width: '30%',
-            description: { en: 'System pages cannot be deleted', zh: '系统页面无法删除' },
-          },
-        },
-      ],
-    },
     {
       type: 'row',
       fields: [
@@ -141,7 +122,7 @@ export const ProductSeries: CollectionConfig = {
             { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
           ],
           admin: {
-            width: '40%',
+            width: '33%',
           },
         },
         {
@@ -149,8 +130,18 @@ export const ProductSeries: CollectionConfig = {
           type: 'date',
           label: { en: 'Published At', zh: '发布时间' },
           admin: {
-            width: '60%',
+            width: '42%',
             date: { pickerAppearance: 'dayAndTime' },
+          },
+        },
+        {
+          name: 'isSystem',
+          type: 'checkbox',
+          label: { en: 'System Page', zh: '系统页面' },
+          defaultValue: false,
+          admin: {
+            width: '25%',
+            description: { en: 'System pages cannot be deleted', zh: '系统页面无法删除' },
           },
         },
       ],
@@ -318,6 +309,17 @@ export const ProductSeries: CollectionConfig = {
     // Sidebar Fields
     // ==================================================================
     {
+      name: 'translationCenter',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        disableListColumn: true,
+        components: {
+          Field: '@/components/fields/TranslationCenter',
+        },
+      },
+    },
+    {
       name: 'googleIndexing',
       type: 'ui',
       admin: {
@@ -325,6 +327,17 @@ export const ProductSeries: CollectionConfig = {
         disableListColumn: true,
         components: {
           Field: '@/components/fields/GoogleIndexingButton',
+        },
+      },
+    },
+    {
+      name: 'indexNow',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        disableListColumn: true,
+        components: {
+          Field: '@/components/fields/IndexNowButton',
         },
       },
     },

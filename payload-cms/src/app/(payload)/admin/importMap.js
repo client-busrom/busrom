@@ -7,6 +7,7 @@ import { MultiLocaleTextareaField as MultiLocaleTextareaField_818f830b0ef41c7fd6
 import { default as default_643116d2ab91f7b0d99236a7afb7c645 } from '@/components/fields/MediaPicker'
 import { default as default_394ddaf2fca725ee5ec4bf214e01a751 } from '@/components/fields/MediaThumbnailCell'
 import { default as default_0de41d40d46c5fdc2f903e5479d41ed4 } from '@/components/fields/GoogleIndexingButton'
+import { default as default_6bb8ec84e499fe795a05f87dc5badf52 } from '@/components/fields/IndexNowButton'
 import { default as default_8ee29faa67a64494ccbe7f4a2ea41dbf } from '@/components/fields/AttributesTableField'
 import { default as default_1c5ae25fc75ab523bfe3f6b5ce843df4 } from '@/components/fields/ProductSpecificationsField'
 import { default as default_3c4d3a8ca5d87712647c4aee5d8604f2 } from '@/components/fields/StableTextField'
@@ -104,6 +105,7 @@ export const importMap = {
   "@/components/fields/MediaPicker#default": default_643116d2ab91f7b0d99236a7afb7c645,
   "@/components/fields/MediaThumbnailCell#default": default_394ddaf2fca725ee5ec4bf214e01a751,
   "@/components/fields/GoogleIndexingButton#default": default_0de41d40d46c5fdc2f903e5479d41ed4,
+  "@/components/fields/IndexNowButton#default": default_6bb8ec84e499fe795a05f87dc5badf52,
   "@/components/fields/AttributesTableField#default": default_8ee29faa67a64494ccbe7f4a2ea41dbf,
   "@/components/fields/ProductSpecificationsField#default": default_1c5ae25fc75ab523bfe3f6b5ce843df4,
   "@/components/fields/StableTextField#default": default_3c4d3a8ca5d87712647c4aee5d8604f2,

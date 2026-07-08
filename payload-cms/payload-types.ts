@@ -824,12 +824,12 @@ export interface Product {
  */
 export interface ProductSery {
   id: number;
+  status?: ('published' | 'draft' | 'archived') | null;
+  publishedAt?: string | null;
   /**
    * System pages cannot be deleted
    */
   isSystem?: boolean | null;
-  status?: ('published' | 'draft' | 'archived') | null;
-  publishedAt?: string | null;
   /**
    * URL-friendly identifier (e.g., "elite-door-handle-series")
    */
@@ -1110,12 +1110,12 @@ export interface BlogTag {
  */
 export interface SeriesTemplate {
   id: number;
+  status?: ('published' | 'draft' | 'archived') | null;
+  publishedAt?: string | null;
   /**
    * System pages cannot be deleted
    */
   isSystem?: boolean | null;
-  status?: ('published' | 'draft' | 'archived') | null;
-  publishedAt?: string | null;
   name: string;
   category?: (number | null) | Category;
   content?: {
@@ -1199,12 +1199,12 @@ export interface ProductAttribute {
  */
 export interface ProductTemplate {
   id: number;
+  status?: ('published' | 'draft' | 'archived') | null;
+  publishedAt?: string | null;
   /**
    * System pages cannot be deleted
    */
   isSystem?: boolean | null;
-  status?: ('published' | 'draft' | 'archived') | null;
-  publishedAt?: string | null;
   /**
    * Internal name for this template
    */
@@ -2833,9 +2833,9 @@ export interface ProductsSelect<T extends boolean = true> {
  * via the `definition` "product-series_select".
  */
 export interface ProductSeriesSelect<T extends boolean = true> {
-  isSystem?: T;
   status?: T;
   publishedAt?: T;
+  isSystem?: T;
   slug?: T;
   name?: T;
   description?: T;
@@ -2870,9 +2870,9 @@ export interface ProductAttributesSelect<T extends boolean = true> {
  * via the `definition` "product-templates_select".
  */
 export interface ProductTemplatesSelect<T extends boolean = true> {
-  isSystem?: T;
   status?: T;
   publishedAt?: T;
+  isSystem?: T;
   name?: T;
   category?: T;
   content?: T;
@@ -2901,9 +2901,9 @@ export interface ProductReusableBlocksSelect<T extends boolean = true> {
  * via the `definition` "series-templates_select".
  */
 export interface SeriesTemplatesSelect<T extends boolean = true> {
-  isSystem?: T;
   status?: T;
   publishedAt?: T;
+  isSystem?: T;
   name?: T;
   category?: T;
   content?: T;

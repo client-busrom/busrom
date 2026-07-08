@@ -249,7 +249,7 @@ export function MoreSeries({ data, currentSlug, className }: MoreSeriesProps) {
                           <OptimizedImage
                             image={item.image}
                             alt=""
-                            size="small"
+                            size="medium"
                             className="absolute inset-0 w-full h-full object-contain"
                           />
                         </div>

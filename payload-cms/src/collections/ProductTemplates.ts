@@ -34,20 +34,10 @@ export const ProductTemplates: CollectionConfig = {
           name: 'translationCenter',
           type: 'ui',
           admin: {
-            width: '50%',
+            width: '100%',
             components: {
               Field: '@/components/fields/TranslationCenter',
             },
-          },
-        },
-        {
-          name: 'isSystem',
-          type: 'checkbox',
-          label: { en: 'System Page', zh: '系统页面' },
-          defaultValue: false,
-          admin: {
-            width: '50%',
-            description: { en: 'System pages cannot be deleted', zh: '系统页面无法删除' },
           },
         },
       ],
@@ -66,7 +56,7 @@ export const ProductTemplates: CollectionConfig = {
             { label: { en: 'Archived', zh: '归档' }, value: 'archived' },
           ],
           admin: {
-            width: '40%',
+            width: '33%',
           },
         },
         {
@@ -74,8 +64,18 @@ export const ProductTemplates: CollectionConfig = {
           type: 'date',
           label: { en: 'Published At', zh: '发布时间' },
           admin: {
-            width: '60%',
+            width: '42%',
             date: { pickerAppearance: 'dayAndTime' },
+          },
+        },
+        {
+          name: 'isSystem',
+          type: 'checkbox',
+          label: { en: 'System Page', zh: '系统页面' },
+          defaultValue: false,
+          admin: {
+            width: '25%',
+            description: { en: 'System pages cannot be deleted', zh: '系统页面无法删除' },
           },
         },
       ],

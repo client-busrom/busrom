@@ -14,6 +14,7 @@ import type { CollectionConfig } from 'payload'
 import { syncM2M, cleanupM2M } from '../hooks/syncM2M'
 import { autoIndexHook } from '../hooks/autoIndex'
 import { autoIndexDeleteHook } from '../hooks/autoIndexDelete'
+import { createNotifyIndexNowEndpoint } from '../endpoints/notifyIndexNow'
 import { createKBWidgetField, KB_WIDGET_SUBFIELDS } from '../fields/knowledgeBaseWidgets'
 import { LABELS, OPTIONS } from '../i18n/admin-labels'
 
@@ -384,6 +385,11 @@ export const Blogs: CollectionConfig = {
         }
       },
     },
+    {
+      path: '/:id/notify-indexnow',
+      method: 'post',
+      handler: createNotifyIndexNowEndpoint('blogs'),
+    },
   ],
   fields: [
     {
@@ -404,10 +410,21 @@ export const Blogs: CollectionConfig = {
           name: 'googleIndexing',
           type: 'ui',
           admin: {
-            width: '50%',
+            width: '25%',
             disableListColumn: true,
             components: {
               Field: '@/components/fields/GoogleIndexingButton',
+            },
+          },
+        },
+        {
+          name: 'indexNow',
+          type: 'ui',
+          admin: {
+            width: '25%',
+            disableListColumn: true,
+            components: {
+              Field: '@/components/fields/IndexNowButton',
             },
           },
         },

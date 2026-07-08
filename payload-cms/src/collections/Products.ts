@@ -18,6 +18,7 @@ import type {
 } from 'payload'
 import { autoIndexHook } from '../hooks/autoIndex'
 import { autoIndexDeleteHook } from '../hooks/autoIndexDelete'
+import { createNotifyIndexNowEndpoint } from '../endpoints/notifyIndexNow'
 
 
 
@@ -117,6 +118,11 @@ export const Products: CollectionConfig = {
           return new Response(JSON.stringify({ error: e.message }), { status: 500 })
         }
       },
+    },
+    {
+      path: '/:id/notify-indexnow',
+      method: 'post',
+      handler: createNotifyIndexNowEndpoint('products'),
     },
   ],
 
@@ -408,6 +414,17 @@ export const Products: CollectionConfig = {
         disableListColumn: true,
         components: {
           Field: '@/components/fields/GoogleIndexingButton',
+        },
+      },
+    },
+    {
+      name: 'indexNow',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        disableListColumn: true,
+        components: {
+          Field: '@/components/fields/IndexNowButton',
         },
       },
     },

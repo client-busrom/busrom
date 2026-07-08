@@ -22,6 +22,7 @@
 import type { CollectionConfig } from 'payload'
 import { autoIndexHook } from '../hooks/autoIndex'
 import { autoIndexDeleteHook } from '../hooks/autoIndexDelete'
+import { createNotifyIndexNowEndpoint } from '../endpoints/notifyIndexNow'
 
 
 export const Pages: CollectionConfig = {
@@ -65,6 +66,13 @@ export const Pages: CollectionConfig = {
       return true
     },
   },
+  endpoints: [
+    {
+      path: '/:id/notify-indexnow',
+      method: 'post',
+      handler: createNotifyIndexNowEndpoint('pages'),
+    },
+  ],
   // 版本控制 - 保留修改历史
   // versions: {
 
@@ -73,6 +81,44 @@ export const Pages: CollectionConfig = {
   // },
 
   fields: [
+    // ==================================================================
+    // Top action bar: translation + indexing buttons
+    // ==================================================================
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'translationCenter',
+          type: 'ui',
+          admin: {
+            width: '50%',
+            components: {
+              Field: '@/components/fields/TranslationCenter',
+            },
+          },
+        },
+        {
+          name: 'googleIndexing',
+          type: 'ui',
+          admin: {
+            width: '25%',
+            components: {
+              Field: '@/components/fields/GoogleIndexingButton',
+            },
+          },
+        },
+        {
+          name: 'indexNow',
+          type: 'ui',
+          admin: {
+            width: '25%',
+            components: {
+              Field: '@/components/fields/IndexNowButton',
+            },
+          },
+        },
+      ],
+    },
     // ==================================================================
     // Tab Layout for better organization
     // ==================================================================
@@ -91,12 +137,14 @@ export const Pages: CollectionConfig = {
             {
               type: 'row',
               fields: [
-
                 {
                   name: 'status',
                   type: 'select',
                   label: { en: 'Status', zh: '状态' },
                   defaultValue: 'draft',
+                  admin: {
+                    width: '33%',
+                  },
                   options: [
                     { label: { en: 'Published', zh: '已发布' }, value: 'published' },
                     { label: { en: 'Draft', zh: '草稿' }, value: 'draft' },
@@ -108,37 +156,21 @@ export const Pages: CollectionConfig = {
                   type: 'date',
                   label: { en: 'Published At', zh: '发布时间' },
                   admin: {
+                    width: '42%',
                     date: { pickerAppearance: 'dayAndTime' },
                   },
                 },
                 {
-                  name: 'translationCenter',
-                  type: 'ui',
+                  name: 'isSystem',
+                  type: 'checkbox',
+                  label: { en: 'System Page', zh: '系统页面' },
+                  defaultValue: false,
                   admin: {
-                    components: {
-                      Field: '@/components/fields/TranslationCenter',
-                    },
+                    width: '25%',
+                    description: { en: 'System pages cannot be deleted', zh: '系统页面无法删除' },
                   },
                 },
               ],
-            },
-            {
-              name: 'isSystem',
-              type: 'checkbox',
-              label: { en: 'System Page', zh: '系统页面' },
-              defaultValue: false,
-              admin: {
-                description: { en: 'System pages cannot be deleted', zh: '系统页面无法删除' },
-              },
-            },
-            {
-              name: 'googleIndexing',
-              type: 'ui',
-              admin: {
-                components: {
-                  Field: '@/components/fields/GoogleIndexingButton',
-                },
-              },
             },
             {
               name: 'slug',
