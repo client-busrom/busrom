@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Icon } from "@iconify/react";
+import { getNodeTotalText } from "@/lib/parsers/faq-parser";
 
 const DESIGN_WIDTH = 1920;
 const MOBILE_DESIGN_WIDTH = 375;
@@ -64,10 +65,13 @@ export function FaqSearchSection({
       return;
     }
 
+    const lowerQuery = query.toLowerCase();
     const filtered = allFaqs
-      .filter((faq: any) =>
-        faq.question.toLowerCase().includes(query.toLowerCase()),
-      )
+      .filter((faq: any) => {
+        const questionText = (faq.question || "").toLowerCase();
+        const answerText = getNodeTotalText(faq.answer).toLowerCase();
+        return questionText.includes(lowerQuery) || answerText.includes(lowerQuery);
+      })
       .slice(0, 5);
 
     setResults(filtered);

@@ -51,7 +51,7 @@ export interface FaqData {
   } | null;
 }
 
-function getNodeTotalText(node: any): string {
+export function getNodeTotalText(node: any): string {
   if (!node) return "";
   if (Array.isArray(node)) return node.map(getNodeTotalText).join("");
   if (typeof node === "string") return node;
