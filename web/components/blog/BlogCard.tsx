@@ -51,8 +51,6 @@ export function BlogCard({ item, locale }: { item: any, locale: string }) {
             />
           )}
           <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.author?.name || "Busrom"}</span>
-          <span className="text-gray-300">•</span>
-          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{(item.readTime || "03") + " MIN READ"}</span>
         </div>
 
         <Link className="mx-auto inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#F5F4E9] group-hover:bg-[#060C14] group-hover:text-white transition-all duration-300 group-hover:rotate-45" href={`${localePrefix}/knowledge-base-blog/${item.slug}`}>

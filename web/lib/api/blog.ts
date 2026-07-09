@@ -143,7 +143,8 @@ export async function getBlogSettings(locale: Locale) {
 export async function getInitialBlogs(locale: Locale, limit = 10) {
   try {
     const publishedAtFilter = getPublishedAtQueryParam()
-    const res = await cmsFetch(`${PAYLOAD_URL}/api/blogs?locale=${locale}&limit=${limit}&where[status][equals]=published${publishedAtFilter}&depth=1`, {
+    // depth=2 so author.avatar is populated for the hero card
+    const res = await cmsFetch(`${PAYLOAD_URL}/api/blogs?locale=${locale}&limit=${limit}&where[status][equals]=published${publishedAtFilter}&depth=2`, {
       next: { revalidate: 60 }
     });
     if (!res.ok) return []

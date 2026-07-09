@@ -41,8 +41,8 @@ const collections: CollectionConfig[] = [
   { value: 'categories-blog', label: '知识库列表页分类', pathPrefix: '/knowledge-base-blogs', categoryType: 'BLOG', searchFields: ['name', 'slug', 'adminLabel'], apiCollection: 'categories' },
   { value: 'blog-tags', label: '知识库标签', pathPrefix: '/knowledge-base-blogs', searchFields: ['name', 'slug'], apiCollection: 'blog-tags' },
   { value: 'blogs', label: '知识库', pathPrefix: '/knowledge-base-blog', searchFields: ['title', 'slug', 'adminLabel'], apiCollection: 'blogs' },
-  { value: 'categories-faq', label: 'FAQ 分类', pathPrefix: '/faq', categoryType: 'FAQ', isFaq: true, searchFields: ['name', 'slug', 'adminLabel'], apiCollection: 'categories' },
-  { value: 'faq', label: 'FAQ', pathPrefix: '/faq', searchFields: ['question', 'slug', 'adminLabel'], apiCollection: 'faq-items', depth: 1 },
+  { value: 'categories-faq', label: 'FAQ 分类', pathPrefix: '/faq-frequently-asked-questions', categoryType: 'FAQ', isFaq: true, searchFields: ['name', 'slug', 'adminLabel'], apiCollection: 'categories' },
+  { value: 'faq', label: 'FAQ', pathPrefix: '/faq-frequently-asked-questions', searchFields: ['question', 'slug', 'adminLabel'], apiCollection: 'faq-items', depth: 1 },
   { value: 'categories', label: '所有分类', pathPrefix: '/category', searchFields: ['name', 'slug', 'adminLabel'], apiCollection: 'categories' },
 ]
 

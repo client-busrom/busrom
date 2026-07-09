@@ -18,7 +18,15 @@ export function middleware(request: NextRequest) {
   ) {
     return NextResponse.next();
   }
-  // 2. Simple Locale Prefixing logic
+  // 2. FAQ path redirect (legacy /faq -> /faq-frequently-asked-questions)
+  const faqPathRegex = /^(\/[a-z]{2})?\/faq(?:\/.*)?$/;
+  if (faqPathRegex.test(pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.replace('/faq', '/faq-frequently-asked-questions');
+    return NextResponse.redirect(url, 301);
+  }
+
+  // 3. Simple Locale Prefixing logic
   const hasLocale = locales.some(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
   );

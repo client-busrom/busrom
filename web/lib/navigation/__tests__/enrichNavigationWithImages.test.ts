@@ -203,7 +203,7 @@ describe('enrichNavigationWithImages', () => {
             id: 'service-1',
             name: { en: 'FAQ' },
             type: 'STANDARD' as const,
-            link: '/faq',
+            link: '/faq-frequently-asked-questions',
             order: 1
           }
         ]

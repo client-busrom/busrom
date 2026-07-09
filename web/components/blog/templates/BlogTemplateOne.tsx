@@ -13,29 +13,6 @@ import {
 
 import { resolveModuleConfig } from "@/lib/blog-config-utils";
 
-const getReadTime = (content: any): number => {
-  if (!content?.root) return 3; // Default 3 min if empty
-  
-  let totalText = "";
-  const traverse = (node: any) => {
-    if (node.type === "text" && node.text) {
-      totalText += node.text + " ";
-    }
-    if (node.children && Array.isArray(node.children)) {
-      node.children.forEach(traverse);
-    }
-  };
-  traverse(content.root);
-  
-  // Count words: English words separated by space, plus CJK characters.
-  const wordCount = totalText.split(/\s+/).filter(Boolean).length;
-  const cjkChars = (totalText.match(/[\u4e00-\u9fa5]/g) || []).length;
-  
-  const totalWords = wordCount + cjkChars;
-  const readTime = Math.ceil(totalWords / 250); // Given ~250 WPM reading speed
-  return Math.max(1, readTime); // At least 1 min
-};
-
 export function BlogTemplateOne({
   blog,
   locale,
@@ -213,8 +190,7 @@ export function BlogTemplateOne({
                   {blog.author?.name || "Kathryn Jackson"}
                 </Link>
               </li>
-              <li className="text-[#000000] opacity-40">•</li>
-              <li>{getReadTime(blog.content)} MIN TO READ</li>
+
             </ul>
           </div>
         </div>

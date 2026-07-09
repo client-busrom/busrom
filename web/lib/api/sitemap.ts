@@ -232,7 +232,7 @@ function getStaticRoutes(): { path: string; changefreq: SitemapUrl['changefreq']
     { path: '/service/overview', changefreq: 'monthly', priority: 0.7 },
     { path: '/service/one-stop-solution', changefreq: 'monthly', priority: 0.7 },
     { path: '/service/oem-odm', changefreq: 'monthly', priority: 0.7 },
-    { path: '/faq', changefreq: 'monthly', priority: 0.6 },
+    { path: '/faq-frequently-asked-questions', changefreq: 'monthly', priority: 0.6 },
 
     // About pages
     { path: '/about/story', changefreq: 'monthly', priority: 0.6 },

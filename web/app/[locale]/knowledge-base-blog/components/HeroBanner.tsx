@@ -144,7 +144,7 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
           </div>
 
           {/* RIGHT COLUMN - SIMPLE IMAGE & CATEGORY (5 Columns) */}
-          <div className="lg:col-span-5 relative hidden lg:flex flex-col h-full ml-0 lg:ml-4 group">
+          <div className="lg:col-span-5 relative hidden lg:flex flex-col h-full ml-0 lg:ml-4 group bg-[#F6F4ED] rounded-[16px] overflow-hidden">
             <Link href={`${localePrefix}/knowledge-base-blog/${hero.post.slug}`} className="absolute inset-0 z-10" aria-label={hero.post.title}></Link>
             {/* Image with Parallax & Hover Effect */}
             <div className="absolute inset-0 w-full h-full rounded-[16px] overflow-hidden">

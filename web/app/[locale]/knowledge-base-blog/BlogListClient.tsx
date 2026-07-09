@@ -62,7 +62,7 @@ export function BlogListClient({
             const now = new Date()
             now.setSeconds(0, 0)
             const blogsRes = await fetch(
-              `/api/payload/blogs?locale=${locale}&limit=10&where[status][equals]=published&where[publishedAt][less_than_equal]=${encodeURIComponent(now.toISOString())}`,
+              `/api/payload/blogs?locale=${locale}&limit=10&where[status][equals]=published&where[publishedAt][less_than_equal]=${encodeURIComponent(now.toISOString())}&depth=2`,
             );
             if (blogsRes.ok) {
               const blogsData = await blogsRes.json();
@@ -146,6 +146,7 @@ export function BlogListClient({
 
     blogs.forEach(checkAuthor);
     Object.values(hydratedPosts).forEach(checkAuthor);
+    if (config?.featuredPost) checkAuthor(config.featuredPost);
 
     if (config?.sectionsData) {
       let rawSections = config.sectionsData[locale] || config.sectionsData["en"] || [];
@@ -300,7 +301,25 @@ export function BlogListClient({
   }, [config?.sectionsData, locale, articlePool, blogs]);
 
   const heroPostId = config?.featuredPost ? (typeof config?.featuredPost === 'object' ? config.featuredPost.id : config.featuredPost) : null;
-  const heroPostObj = heroPostId ? (hydratedPosts[heroPostId] || articlePool.find((p: any) => String(p.id) === String(heroPostId)) || (typeof config.featuredPost === 'object' ? config.featuredPost : null)) : (blogs.length > 0 ? blogs[0] : null);
+  const rawHeroPost = heroPostId ? (hydratedPosts[heroPostId] || articlePool.find((p: any) => String(p.id) === String(heroPostId)) || (typeof config.featuredPost === 'object' ? config.featuredPost : null)) : (blogs.length > 0 ? blogs[0] : null);
+
+  // Hydrate hero author avatar so the left card shows the profile picture
+  const heroPostObj = useMemo(() => {
+    if (!rawHeroPost?.author) return rawHeroPost;
+
+    const authorId = typeof rawHeroPost.author === 'object' ? rawHeroPost.author.id : rawHeroPost.author;
+    const hydratedAuthor = hydratedAuthors[authorId];
+
+    if (!hydratedAuthor) return rawHeroPost;
+
+    return {
+      ...rawHeroPost,
+      author: {
+        ...(typeof rawHeroPost.author === 'object' ? rawHeroPost.author : {}),
+        ...hydratedAuthor,
+      },
+    };
+  }, [rawHeroPost, hydratedAuthors]);
 
   const hero = {
     tag: config?.heroTitle || (locale === "zh" ? "本周推荐" : "FEATURED"),

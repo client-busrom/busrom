@@ -21,7 +21,7 @@ export async function generateMetadata({
     description: "Frequently asked questions about Busrom products and services",
   }
 
-  return getPageMetadata('/faq', 'faq', locale, defaultMetadata)
+  return getPageMetadata('/faq-frequently-asked-questions', 'faq', locale, defaultMetadata)
 }
 
 export default async function FaqPage({
@@ -44,21 +44,21 @@ export default async function FaqPage({
   
   let distribution = undefined;
   try {
-    const { distributedKeywords } = await getNonHomePageSeo("/faq", "faq", locale);
+    const { distributedKeywords } = await getNonHomePageSeo("/faq-frequently-asked-questions", "faq", locale);
     distribution = distributedKeywords;
   } catch (e) {
-    console.error('Failed to fetch seo keywords for', "/faq", e);
+    console.error('Failed to fetch seo keywords for', "/faq-frequently-asked-questions", e);
   }
 
   return (
     <>
       <SeoKeywordProvider distribution={distribution}>
-      <PageScripts path="/faq" pageType="faq" position="header" />
-      <PageScripts path="/faq" pageType="faq" position="body_start" />
+      <PageScripts path="/faq-frequently-asked-questions" pageType="faq" position="header" />
+      <PageScripts path="/faq-frequently-asked-questions" pageType="faq" position="body_start" />
             
       <FaqTemplate locale={locale} data={parsedData} />
       
-      <PageScripts path="/faq" pageType="faq" position="footer" />
+      <PageScripts path="/faq-frequently-asked-questions" pageType="faq" position="footer" />
           </SeoKeywordProvider>
     </>
   )
