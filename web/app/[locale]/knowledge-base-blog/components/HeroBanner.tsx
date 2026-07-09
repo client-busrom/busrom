@@ -7,6 +7,7 @@ interface HeroBannerProps {
   hero: {
     tag: string;
     post: any;
+    backgroundImage?: string;
   };
   locale: Locale;
 }
@@ -82,7 +83,21 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
               {/* Stretched link for the entire card (z-10). It sits below the tag (z-20) */}
               <Link href={`${localePrefix}/knowledge-base-blog/${hero.post.slug}`} className="absolute inset-0 z-10" aria-label={hero.post.title}></Link>
 
-              <div className="mt-6 text-white">
+              {/* Background image overlay (30% opacity on top of the base color) */}
+              {hero.backgroundImage && (
+                <div className="absolute inset-0 z-0 overflow-hidden rounded-xl md:rounded-2xl rounded-tr-none md:rounded-tr-none">
+                  <OptimizedImage
+                    image={safeImage(hero.backgroundImage)}
+                    alt=""
+                    size="medium"
+                    className="w-full h-full object-cover opacity-30"
+                    aria-hidden="true"
+                    priority
+                  />
+                </div>
+              )}
+
+              <div className="relative z-10 text-white flex flex-col items-center">
 
                 <h3 className="font-prata text-[36px] text-white !leading-normal line-clamp-3 relative z-0 pointer-events-none">
                   <span className="bg-gradient-to-r from-white to-white bg-[length:0%_2px] bg-no-repeat bg-right-bottom transition-[background-size] duration-500 group-hover:bg-[length:100%_2px] group-hover:bg-left-bottom">
@@ -90,7 +105,7 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
                   </span>
                 </h3>
 
-                <ul className="font-lexend-deca flex flex-wrap items-center justify-center gap-3 gap-y-1 text-sm mt-6 mb-[52px]">
+                <ul className="font-lexend-deca flex flex-wrap items-center justify-center gap-3 gap-y-1 text-sm my-6">
                   <li className="flex items-center">
                     {hero.post.author?.avatar && (
                       <OptimizedImage
@@ -105,7 +120,7 @@ export function HeroBanner({ hero, locale }: HeroBannerProps) {
                 </ul>
 
                 <Link
-                  className="h-12 sm:h-14 w-12 sm:w-14 m-auto flex items-center justify-center text-white group-hover:text-white group-hover:bg-white/10 bg-white/30 sm:bg-transparent rounded-full transition-all duration-300 p-[17px] sm:p-0 group-hover:rotate-45 relative z-10"
+                  className="h-12 sm:h-14 w-12 sm:w-14 flex items-center justify-center text-white group-hover:text-white group-hover:bg-white/10 bg-white/30 sm:bg-transparent rounded-full transition-all duration-300 p-[17px] sm:p-0 group-hover:rotate-45 relative z-10"
                   href={`${localePrefix}/knowledge-base-blog/${hero.post.slug}`}
                 >
                   <svg

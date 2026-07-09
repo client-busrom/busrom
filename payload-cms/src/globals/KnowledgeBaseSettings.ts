@@ -97,6 +97,21 @@ export const KnowledgeBaseSettings: GlobalConfig = {
                     },
                   },
                 },
+                {
+                  name: 'heroBackgroundImage',
+                  type: 'upload',
+                  relationTo: 'media',
+                  label: { en: 'Hero Background Image', zh: '首屏背景图' },
+                  admin: {
+                    description: {
+                      en: 'Displayed behind the left card with 30% opacity over the current background color.',
+                      zh: '显示在左侧卡片背景色之上，透明度 30%。',
+                    },
+                    components: {
+                      Field: '@/components/fields/MediaPicker',
+                    },
+                  },
+                },
               ],
             },
             // 2. Category Filter

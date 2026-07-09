@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
+function isBlogVisible(post: any): boolean {
+  if (!post || !post.publishedAt) return false
+  return new Date(post.publishedAt).getTime() <= Date.now()
+}
+
 export function PopularTopics({
   config,
   locale,
@@ -71,6 +76,11 @@ export function PopularTopics({
             // If previewPost is still missing but we had a fallback object from earlier bad types
             if (!previewPost && typeof postsList[0] === "object") {
               previewPost = postsList[0];
+            }
+
+            // Never preview a future-dated blog
+            if (previewPost && !isBlogVisible(previewPost)) {
+              previewPost = null;
             }
 
             return (

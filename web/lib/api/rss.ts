@@ -49,7 +49,7 @@ export async function getFeedItems(type: FeedType, limit: number, locale: string
     body: JSON.stringify({
       query: `
         query GetLatestBlogs($locale: LocaleInputType!, $limit: Int!) {
-          Blogs(where: { status: { equals: "published" } }, limit: $limit, sort: "-updatedAt", locale: $locale) {
+          Blogs(where: { status: { equals: "published" }, publishedAt: { less_than_equal: "${new Date().toISOString()}" } }, limit: $limit, sort: "-updatedAt", locale: $locale) {
             docs {
               slug
               name

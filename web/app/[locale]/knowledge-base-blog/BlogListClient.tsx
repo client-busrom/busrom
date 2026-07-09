@@ -47,12 +47,22 @@ export function BlogListClient({
           );
           if (configRes.ok) {
             const activeConfig = await configRes.json();
+            // Future-dated featured posts should not appear on the frontend
+            if (
+              activeConfig.featuredPost &&
+              activeConfig.featuredPost.publishedAt &&
+              new Date(activeConfig.featuredPost.publishedAt).getTime() > Date.now()
+            ) {
+              activeConfig.featuredPost = null;
+            }
             setConfig(activeConfig);
           }
 
           if (blogs.length === 0) {
+            const now = new Date()
+            now.setSeconds(0, 0)
             const blogsRes = await fetch(
-              `/api/payload/blogs?locale=${locale}&limit=10&where[status][equals]=published`,
+              `/api/payload/blogs?locale=${locale}&limit=10&where[status][equals]=published&where[publishedAt][less_than_equal]=${encodeURIComponent(now.toISOString())}`,
             );
             if (blogsRes.ok) {
               const blogsData = await blogsRes.json();
@@ -103,7 +113,8 @@ export function BlogListClient({
 
     if (missingIds.length > 0) {
       // Use Payload's comma-separated syntax for 'in' operator to avoid query parameter parsing issues
-      const idsQuery = `where[id][in]=${missingIds.join(',')}&where[status][equals]=published`;
+      const now = new Date().toISOString()
+      const idsQuery = `where[id][in]=${missingIds.join(',')}&where[status][equals]=published&where[publishedAt][less_than_equal]=${encodeURIComponent(now)}`;
       fetch(`/api/payload/blogs?locale=${locale}&${idsQuery}&depth=1&t=${Date.now()}`)
         .then(res => res.ok ? res.json() : { docs: [] })
         .then(data => {
@@ -162,18 +173,27 @@ export function BlogListClient({
     }
   }, [blogs, hydratedPosts, config, locale]);
 
+  // Helper: a blog is only visible once current time >= publishedAt
+  const isBlogVisible = (post: any) => {
+    if (!post || !post.publishedAt) return false
+    return new Date(post.publishedAt).getTime() <= Date.now()
+  }
+
   // Create a flattened articles pool from categories for tag-based filtering
+  // All sources are filtered so future-dated blogs never surface on the frontend.
   const articlePool = useMemo(() => {
-    const allPosts: any[] = [...blogs];
-    const seenIds = new Set(blogs.map(b => String(b.id)));
+    const allPosts: any[] = [...blogs].filter(isBlogVisible);
+    const seenIds = new Set(allPosts.map(b => String(b.id)));
 
     // Add hydrated posts
-    Object.values(hydratedPosts).forEach((post: any) => {
-      if (post && post.id && !seenIds.has(String(post.id))) {
-        allPosts.push(post);
-        seenIds.add(String(post.id));
-      }
-    });
+    Object.values(hydratedPosts)
+      .filter(isBlogVisible)
+      .forEach((post: any) => {
+        if (post && post.id && !seenIds.has(String(post.id))) {
+          allPosts.push(post);
+          seenIds.add(String(post.id));
+        }
+      });
 
     if (config?.kbCategoryTabs) {
       config.kbCategoryTabs.forEach((tab: any) => {
@@ -183,7 +203,7 @@ export function BlogListClient({
             const pId = typeof post === 'object' && post !== null ? post.id : post;
             const fullPost = typeof post === 'object' && post !== null ? post : hydratedPosts[pId];
 
-            if (fullPost && fullPost.id && !seenIds.has(String(fullPost.id))) {
+            if (fullPost && fullPost.id && isBlogVisible(fullPost) && !seenIds.has(String(fullPost.id))) {
               allPosts.push(fullPost);
               seenIds.add(String(fullPost.id));
             }
@@ -285,6 +305,7 @@ export function BlogListClient({
   const hero = {
     tag: config?.heroTitle || (locale === "zh" ? "本周推荐" : "FEATURED"),
     post: heroPostObj,
+    backgroundImage: config?.heroBackgroundImage,
   };
 
   const categoryTabs = config?.kbCategoryTabs || [];

@@ -190,6 +190,9 @@ export const Blogs: CollectionConfig = {
         const referenceDate = doc.publishedAt || doc.createdAt;
         const { payload, locale } = req;
 
+        // Visibility cut-off: future-dated posts should never appear on the frontend
+        const now = new Date().toISOString();
+
         // 1. Fetch Basic Pagination (Prev/Next)
         if (referenceDate && doc.status === 'published') {
           try {
@@ -199,6 +202,7 @@ export const Blogs: CollectionConfig = {
                 where: {
                   and: [
                     { publishedAt: { less_than: referenceDate } },
+                    { publishedAt: { less_than_equal: now } },
                     { status: { equals: 'published' } }
                   ]
                 },
@@ -213,6 +217,7 @@ export const Blogs: CollectionConfig = {
                 where: {
                   and: [
                     { publishedAt: { greater_than: referenceDate } },
+                    { publishedAt: { less_than_equal: now } },
                     { status: { equals: 'published' } }
                   ]
                 },
@@ -249,7 +254,8 @@ export const Blogs: CollectionConfig = {
                 try {
                   const where: any = {
                     id: { not_equals: doc.id },
-                    status: { equals: 'published' }
+                    status: { equals: 'published' },
+                    publishedAt: { less_than_equal: now }
                   };
 
                   if (logic === 'category' && doc.categories?.length > 0) {
@@ -292,9 +298,10 @@ export const Blogs: CollectionConfig = {
                     id: postId,
                     locale,
                     depth: 0,
-                    select: { title: true, slug: true, coverImage: true }
+                    select: { title: true, slug: true, coverImage: true, publishedAt: true }
                   });
-                  doc[fieldName] = post;
+                  // Only keep manual pagination target if it is already visible
+                  doc[fieldName] = post && post.publishedAt && post.publishedAt <= now ? post : null;
                 } catch (e) {
                   console.error(`Error populating manual pagination ${key}:`, e);
                 }

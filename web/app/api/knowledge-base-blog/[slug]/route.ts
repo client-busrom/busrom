@@ -24,9 +24,14 @@ export async function GET(
     const locale = searchParams.get('locale') || 'en'
     const { slug } = await params
 
+    // Only expose blogs whose publishedAt has passed (sync-to-site time)
+    const now = new Date()
+    now.setSeconds(0, 0)
+    const publishedAtFilter = `&where[publishedAt][less_than_equal]=${encodeURIComponent(now.toISOString())}`
+
     // Fetch from Payload CMS REST API
     const response = await fetch(
-      `${CMS_URL}/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published&locale=${locale}&depth=2`,
+      `${CMS_URL}/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}&where[status][equals]=published${publishedAtFilter}&locale=${locale}&depth=2`,
       { next: { revalidate: 60 } }
     )
 

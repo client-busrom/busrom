@@ -143,10 +143,11 @@ async function fetchProductSeries(): Promise<{ slug: string; updatedAt: string }
  * Fetch all blogs for sitemap
  */
 async function fetchBlogs(): Promise<{ slug: string; updatedAt: string }[]> {
+  const now = new Date().toISOString()
   return fetchAllGraphQLDocs(
     (page, limit) => `
       query GetBlogsForSitemap {
-        Blogs(where: { status: { equals: published } }, limit: ${limit}, page: ${page}) {
+        Blogs(where: { status: { equals: published }, publishedAt: { less_than_equal: "${now}" } }, limit: ${limit}, page: ${page}) {
           docs {
             slug
             updatedAt

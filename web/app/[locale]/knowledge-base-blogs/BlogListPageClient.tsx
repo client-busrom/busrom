@@ -147,7 +147,10 @@ export function BlogListPageClient({ locale, slugMode = false }: BlogListPageCli
   }, [selectedCategory, sortBy, selectedTags, searchQuery])
 
   // Fetch ALL blogs once (front-end filtering is fast, avoids round trips per tab click)
-  const blogsUrl = `/api/payload/blogs?locale=${locale}&limit=1000&where[status][equals]=published`
+  // Only include blogs whose publishedAt has passed.
+  const now = new Date()
+  now.setSeconds(0, 0)
+  const blogsUrl = `/api/payload/blogs?locale=${locale}&limit=1000&where[status][equals]=published&where[publishedAt][less_than_equal]=${encodeURIComponent(now.toISOString())}`
   const { data: blogsData, isLoading, isValidating } = useSWR<any>(
     blogsUrl,
     fetcher,

@@ -6,6 +6,24 @@ import { resolveAllMedia } from "@/lib/media-resolver"
 const PAYLOAD_URL = CMS_URL
 
 /**
+ * Returns the current UTC time truncated to the minute for stable cache keys
+ * when filtering blogs by publishedAt. A blog is only visible once
+ * `current time >= publishedAt`.
+ */
+function getPublishedAtFilterValue() {
+  const now = new Date()
+  now.setSeconds(0, 0)
+  return now.toISOString()
+}
+
+/**
+ * Build the publishedAt query parameter for Payload's `where` filter.
+ */
+function getPublishedAtQueryParam(prefix = '&') {
+  return `${prefix}where[publishedAt][less_than_equal]=${encodeURIComponent(getPublishedAtFilterValue())}`
+}
+
+/**
  * Resolve a coverImage value to a CDN URL string.
  * Handles: string URL, populated media object, numeric ID (fetches from CMS).
  */
@@ -87,6 +105,11 @@ async function resolveAuthorAvatar(avatar: any): Promise<string> {
   return ''
 }
 
+function isBlogVisible(post: any): boolean {
+  if (!post || !post.publishedAt) return false
+  return new Date(post.publishedAt).getTime() <= Date.now()
+}
+
 export async function getBlogSettings(locale: Locale) {
   try {
     const res = await cmsFetch(`${PAYLOAD_URL}/api/globals/knowledge-base-settings?locale=${locale}&depth=1`, {
@@ -95,9 +118,19 @@ export async function getBlogSettings(locale: Locale) {
     if (!res.ok) return null
     const data = await res.json()
 
+    // Future-dated featured posts should not appear on the frontend
+    if (data?.featuredPost && !isBlogVisible(data.featuredPost)) {
+      data.featuredPost = null
+    }
+
     // Hydrate coverImage for featuredPost (may be ID if depth is insufficient)
     if (data?.featuredPost?.coverImage) {
       data.featuredPost.coverImage = await resolveCoverImageUrl(data.featuredPost.coverImage)
+    }
+
+    // Hydrate hero background image URL
+    if (data?.heroBackgroundImage) {
+      data.heroBackgroundImage = await resolveCoverImageUrl(data.heroBackgroundImage)
     }
 
     return data
@@ -109,7 +142,8 @@ export async function getBlogSettings(locale: Locale) {
 
 export async function getInitialBlogs(locale: Locale, limit = 10) {
   try {
-    const res = await cmsFetch(`${PAYLOAD_URL}/api/blogs?locale=${locale}&limit=${limit}&where[status][equals]=published&depth=1`, {
+    const publishedAtFilter = getPublishedAtQueryParam()
+    const res = await cmsFetch(`${PAYLOAD_URL}/api/blogs?locale=${locale}&limit=${limit}&where[status][equals]=published${publishedAtFilter}&depth=1`, {
       next: { revalidate: 60 }
     });
     if (!res.ok) return []
@@ -124,8 +158,9 @@ export async function getInitialBlogs(locale: Locale, limit = 10) {
 export async function getBlogBySlug(slug: string, locale: string, isDraft = false) {
   try {
     const draftQuery = isDraft ? '&draft=true' : '&where[status][equals]=published';
+    const publishedAtFilter = isDraft ? '' : getPublishedAtQueryParam()
     const response = await cmsFetch(
-      `${PAYLOAD_URL}/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}${draftQuery}&locale=${locale}&depth=1`,
+      `${PAYLOAD_URL}/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}${draftQuery}&locale=${locale}${publishedAtFilter}&depth=1`,
       { 
         cache: isDraft ? 'no-store' : undefined,
         next: { revalidate: isDraft ? 0 : 60 } 

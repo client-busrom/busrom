@@ -3946,6 +3946,10 @@ export interface KnowledgeBaseSetting {
    * Left: Meta info, Right: Cover & Category
    */
   featuredPost?: (number | null) | Blog;
+  /**
+   * Displayed behind the left card with 30% opacity over the current background color.
+   */
+  heroBackgroundImage?: (number | null) | Media;
   navTitle?: string | null;
   showAll?: boolean | null;
   kbCategoryTabs?: (number | Category)[] | null;
@@ -4896,6 +4900,7 @@ export interface KnowledgeBaseSettingsSelect<T extends boolean = true> {
   status?: T;
   heroTitle?: T;
   featuredPost?: T;
+  heroBackgroundImage?: T;
   navTitle?: T;
   showAll?: T;
   kbCategoryTabs?: T;
