@@ -19,11 +19,16 @@ import type { CollectionConfig, FieldHook } from 'payload'
 // Security: Allowed external script domains (whitelist)
 // ============================================================================
 export const ALLOWED_SCRIPT_DOMAINS = [
-  // Analytics
+  // Analytics & Google Ads
   'www.googletagmanager.com',
   'www.google-analytics.com',
   'analytics.google.com',
   'googleads.g.doubleclick.net',
+  'www.googleadservices.com',
+  'www.google.com',
+  'pagead2.googlesyndication.com',
+  'tpc.googlesyndication.com',
+  'bid.g.doubleclick.net',
   // Facebook/Meta
   'connect.facebook.net',
   'www.facebook.com',

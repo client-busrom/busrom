@@ -159,7 +159,7 @@ export function FaqTemplate({ locale, data }: FaqTemplateProps) {
     <main className="min-h-screen bg-[#F6F4ED]" data-header-theme="dark">
       {/* Hero Section */}
       {hero && <FaqHeroSection data={hero} locale={locale} />}
-
+                                                                               
       {/* Search Section */}
       {search && (
         <div ref={searchRef} id="faq-search">
