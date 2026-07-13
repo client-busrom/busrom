@@ -611,10 +611,11 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
       // Build per-locale data
       const localesPayload: Record<string, Record<string, unknown>> = {}
 
-      // Fetch source data once (for array fields & required fields)
+      // Fetch source data once (for array fields & slug preservation)
       let sourceData: any = null
       const hasArrayFields = fieldsData.some(f => f.config.name.match(/^(.+)\[(\d+)]\.(.+)$/))
-      if (hasArrayFields || collectionSlug === 'products') {
+      const needsSourceData = hasArrayFields || collectionSlug === 'products' || collectionSlug === 'categories'
+      if (needsSourceData) {
         const dataUrl = isGlobal
           ? `/api/globals/${activeSlug}?locale=${sourceLocale}&depth=0`
           : `/api/${activeSlug}/${docId}?locale=${sourceLocale}&depth=0`
@@ -658,6 +659,12 @@ export const TranslationCenter: React.FC<TranslationCenterProps> = () => {
 
           // Fill required fields to prevent hooks from regenerating them
           if (collectionSlug === 'products') {
+            if (!dataToSave.name && sourceData.name) dataToSave.name = sourceData.name
+            if (sourceData.slug) dataToSave.slug = sourceData.slug
+          }
+          if (collectionSlug === 'categories') {
+            // Preserve existing slug during translation saves so non-English
+            // category names cannot overwrite the slug.
             if (!dataToSave.name && sourceData.name) dataToSave.name = sourceData.name
             if (sourceData.slug) dataToSave.slug = sourceData.slug
           }

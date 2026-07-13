@@ -26,7 +26,7 @@ export const PAGE_SLUGS = {
   HOME: "home",
   APPLICATION: "application",
   CONTACT_US: "contact-us",
-  FAQ: "faq",
+  FAQ: "faq-frequently-asked-questions",
   FRAUD_NOTICE: "fraud-notice",
   OEM_ODM: "oem-odm",
   ONE_STOP_SOLUTION: "one-stop-solution",

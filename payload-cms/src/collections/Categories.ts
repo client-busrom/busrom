@@ -87,6 +87,13 @@ export const Categories: CollectionConfig = {
           data.publishedAt = originalDoc.publishedAt
         }
 
+        // [TRANSLATION SAVE] Translation Center saves locale-by-locale. Do not
+        // regenerate slug/fullTitle here; otherwise non-English names can corrupt
+        // the slug. Matches behavior in Products and ProductSeries hooks.
+        if (isTranslation) {
+          return data
+        }
+
         // Optimization: fullTitle only uses 'en'. 
         // Only re-calculate if English name, parent or slug is being changed.
         const isNameChanging = 'name' in data
@@ -164,6 +171,7 @@ export const Categories: CollectionConfig = {
         data.fullTitle = fullTitle
 
         // [AUTO SLUG] Only generate slug from English name. Prevent translations from overwriting it.
+        // Guard: if the English name contains no ASCII letters, preserve the existing slug instead of emptying it.
         if (!isTranslation) {
           const nameObj = data.name || originalDoc?.name
 
@@ -177,13 +185,19 @@ export const Categories: CollectionConfig = {
             }
 
             if (nameToSlugify) {
-              data.slug = nameToSlugify
+              const slugified = nameToSlugify
                 .toLowerCase()
                 .trim()
                 .replace(/\s+/g, '-')
                 .replace(/[^a-z0-9-]/g, '')
                 .replace(/-+/g, '-')
                 .replace(/^-|-$/g, '')
+
+              // Only apply the new slug if it actually contains ASCII characters.
+              // This prevents Chinese-only English-name fields from wiping out the slug.
+              if (slugified) {
+                data.slug = slugified
+              }
             }
           }
         }
