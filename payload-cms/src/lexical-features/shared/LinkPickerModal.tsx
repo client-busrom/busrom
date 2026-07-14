@@ -25,6 +25,8 @@ interface CollectionConfig {
   searchFields: string[]
   apiCollection: string
   depth?: number
+  isStatic?: boolean
+  staticItems?: any[]
 }
 
 interface FetchResult {
@@ -34,10 +36,33 @@ interface FetchResult {
 }
 
 const collections: CollectionConfig[] = [
-  { value: 'pages', label: '网站页面', pathPrefix: '', searchFields: ['title', 'slug'], apiCollection: 'pages' },
+  {
+    value: 'pages',
+    label: '网站页面',
+    pathPrefix: '',
+    searchFields: ['title', 'slug'],
+    apiCollection: 'pages',
+    staticItems: [
+      { id: 'static-shop', title: 'Shop List Page', slug: 'shop', path: '/shop' },
+      { id: 'static-kb-list', title: 'Knowledge Base List Page', slug: 'knowledge-base-blogs', path: '/knowledge-base-blogs' },
+    ],
+  },
   { value: 'product-series', label: '产品详解页', pathPrefix: '/products', searchFields: ['name', 'slug'], apiCollection: 'product-series' },
   { value: 'products', label: '产品链接页', pathPrefix: '/shop', searchFields: ['name', 'slug', 'sku', 'adminLabel'], apiCollection: 'products' },
   { value: 'categories-product', label: 'shop列表页分类', pathPrefix: '/shop', categoryType: 'PRODUCT', searchFields: ['name', 'slug', 'adminLabel'], apiCollection: 'categories' },
+  {
+    value: 'shop-filters',
+    label: 'shop列表页标签',
+    pathPrefix: '/shop',
+    searchFields: ['title'],
+    apiCollection: 'static',
+    isStatic: true,
+    staticItems: [
+      { id: 'shop-hot', title: 'Hot Items', slug: 'hot', path: '/shop?hot=1' },
+      { id: 'shop-new', title: 'New Arrivals', slug: 'new', path: '/shop?new=1' },
+      { id: 'shop-featured', title: 'Featured', slug: 'featured', path: '/shop?featured=1' },
+    ],
+  },
   { value: 'categories-blog', label: '知识库列表页分类', pathPrefix: '/knowledge-base-blogs', categoryType: 'BLOG', searchFields: ['name', 'slug', 'adminLabel'], apiCollection: 'categories' },
   { value: 'blog-tags', label: '知识库标签', pathPrefix: '/knowledge-base-blogs', searchFields: ['name', 'slug'], apiCollection: 'blog-tags' },
   { value: 'blogs', label: '知识库', pathPrefix: '/knowledge-base-blog', searchFields: ['title', 'slug', 'adminLabel'], apiCollection: 'blogs' },
@@ -93,6 +118,38 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     return params
   }, [])
 
+  const applyCollectionMeta = useCallback((doc: any, config: CollectionConfig) => ({
+    ...doc,
+    _collectionValue: config.value,
+    _collectionLabel: config.label,
+    _pathPrefix: config.pathPrefix,
+    _isFaq: config.isFaq,
+    _categoryType: config.categoryType,
+  }), [])
+
+  const getStaticItems = useCallback((config: CollectionConfig, query: string) => {
+    if (!config.staticItems?.length) return []
+    const items = config.staticItems.map((doc) => applyCollectionMeta(doc, config))
+    if (!query) return items
+    const q = query.toLowerCase()
+    return items.filter((item) => {
+      const name = (item.adminLabel || item.title || item.name || '').toLowerCase()
+      return name.includes(q)
+    })
+  }, [applyCollectionMeta])
+
+  const sortByRelevance = useCallback((items: any[], query: string) => {
+    if (!query) return items
+    const q = query.toLowerCase()
+    return [...items].sort((a, b) => {
+      const aName = (a.adminLabel || a.title || a.name || '').toLowerCase()
+      const bName = (b.adminLabel || b.title || b.name || '').toLowerCase()
+      const aExact = aName === q ? 3 : aName.startsWith(q) ? 2 : aName.includes(q) ? 1 : 0
+      const bExact = bName === q ? 3 : bName.startsWith(q) ? 2 : bName.includes(q) ? 1 : 0
+      return bExact - aExact
+    })
+  }, [])
+
   const fetchItems = useCallback(async () => {
     // 优化：all 模式下无搜索词时不自动加载，避免 9 个并发请求拖垮首屏
     if (isAllMode && !debouncedSearchQuery.trim()) {
@@ -117,31 +174,23 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
         // all 模式：串行请求，避免并发爆炸；前端分页
         for (const config of activeCollections) {
           if (signal.aborted) return
-          const params = buildSearchParams(config, 1, debouncedSearchQuery)
-          const response = await fetch(`/api/${config.apiCollection}?${params}`, { signal })
-          const data: FetchResult = await response.json()
-          const docs = (data.docs || []).map((doc: any) => ({
-            ...doc,
-            _collectionValue: config.value,
-            _collectionLabel: config.label,
-            _pathPrefix: config.pathPrefix,
-            _isFaq: config.isFaq,
-            _categoryType: config.categoryType,
-          }))
+          let docs: any[] = []
+          if (config.isStatic) {
+            docs = getStaticItems(config, debouncedSearchQuery)
+          } else {
+            const params = buildSearchParams(config, 1, debouncedSearchQuery)
+            const response = await fetch(`/api/${config.apiCollection}?${params}`, { signal })
+            const data: FetchResult = await response.json()
+            docs = (data.docs || []).map((doc: any) => applyCollectionMeta(doc, config))
+            if (config.staticItems?.length) {
+              docs = docs.concat(getStaticItems(config, debouncedSearchQuery))
+            }
+          }
           allResults = allResults.concat(docs)
         }
 
         // 相关性排序
-        if (debouncedSearchQuery) {
-          const query = debouncedSearchQuery.toLowerCase()
-          allResults.sort((a, b) => {
-            const aName = (a.adminLabel || a.title || a.name || '').toLowerCase()
-            const bName = (b.adminLabel || b.title || b.name || '').toLowerCase()
-            const aExact = aName === query ? 3 : aName.startsWith(query) ? 2 : aName.includes(query) ? 1 : 0
-            const bExact = bName === query ? 3 : bName.startsWith(query) ? 2 : bName.includes(query) ? 1 : 0
-            return bExact - aExact
-          })
-        }
+        allResults = sortByRelevance(allResults, debouncedSearchQuery)
 
         // 前端分页
         calculatedTotalPages = Math.max(1, Math.ceil(allResults.length / PAGE_SIZE))
@@ -155,18 +204,33 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
           setTotalPages(1)
           return
         }
-        const params = buildSearchParams(config, currentPage, debouncedSearchQuery)
-        const response = await fetch(`/api/${config.apiCollection}?${params}`, { signal })
-        const data: FetchResult = await response.json()
-        allResults = (data.docs || []).map((doc: any) => ({
-          ...doc,
-          _collectionValue: config.value,
-          _collectionLabel: config.label,
-          _pathPrefix: config.pathPrefix,
-          _isFaq: config.isFaq,
-          _categoryType: config.categoryType,
-        }))
-        calculatedTotalPages = data.totalPages || 1
+
+        if (config.isStatic) {
+          // 纯静态分类：本地过滤 + 本地分页
+          const items = sortByRelevance(getStaticItems(config, debouncedSearchQuery), debouncedSearchQuery)
+          calculatedTotalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
+          const start = (currentPage - 1) * PAGE_SIZE
+          allResults = items.slice(start, start + PAGE_SIZE)
+        } else if (config.staticItems?.length) {
+          // 混合静态项：拉取全部后合并再本地分页
+          const params = buildSearchParams(config, 1, debouncedSearchQuery)
+          params.set('limit', '1000')
+          params.set('page', '1')
+          const response = await fetch(`/api/${config.apiCollection}?${params}`, { signal })
+          const data: FetchResult = await response.json()
+          let docs = (data.docs || []).map((doc: any) => applyCollectionMeta(doc, config))
+          docs = docs.concat(getStaticItems(config, debouncedSearchQuery))
+          docs = sortByRelevance(docs, debouncedSearchQuery)
+          calculatedTotalPages = Math.max(1, Math.ceil(docs.length / PAGE_SIZE))
+          const start = (currentPage - 1) * PAGE_SIZE
+          allResults = docs.slice(start, start + PAGE_SIZE)
+        } else {
+          const params = buildSearchParams(config, currentPage, debouncedSearchQuery)
+          const response = await fetch(`/api/${config.apiCollection}?${params}`, { signal })
+          const data: FetchResult = await response.json()
+          allResults = (data.docs || []).map((doc: any) => applyCollectionMeta(doc, config))
+          calculatedTotalPages = data.totalPages || 1
+        }
       }
 
       if (signal.aborted) return
@@ -181,7 +245,7 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
     } finally {
       setIsLoading(false)
     }
-  }, [activeCollections, debouncedSearchQuery, currentPage, buildSearchParams, isAllMode])
+  }, [activeCollections, debouncedSearchQuery, currentPage, buildSearchParams, isAllMode, applyCollectionMeta, getStaticItems, sortByRelevance])
 
   // Debounce search query
   useEffect(() => {
@@ -262,6 +326,14 @@ export const LinkPickerModal: React.FC<LinkPickerModalProps> = ({ isOpen, onClos
   const getItemUrl = (item: any) => {
     const config = collections.find((c) => c.value === item._collectionValue)
     if (!config) return ''
+
+    // Static items may carry a full path (e.g. /shop?hot=1)
+    if (item.path && typeof item.path === 'string') {
+      return item.path
+    }
+    if (item.url && typeof item.url === 'string') {
+      return item.url
+    }
 
     const slugValue = item.slug || item.id
     if (config.categoryType) {

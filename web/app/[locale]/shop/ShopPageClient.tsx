@@ -113,6 +113,27 @@ export function ShopPageClient({ locale, slugMode = false, pageTitle = "Shop | B
   const [searchQuery, setSearchQuery] = useState("")
   const [isFilterSortOpen, setIsFilterSortOpen] = useState(false)
   const filterSortRef = useRef<HTMLDivElement>(null)
+  const isInitialFilterSync = useRef(true)
+
+  // Initialize filters from URL query params (so shared/filtered links work)
+  useEffect(() => {
+    setHotOnly(searchParamsDict.get('hot') === '1')
+    setNewOnly(searchParamsDict.get('new') === '1')
+    setFeaturedOnly(searchParamsDict.get('featured') === '1')
+  }, [searchParamsDict])
+
+  // Sync filter toggles back to URL (skip first render to avoid overwriting on init)
+  useEffect(() => {
+    if (isInitialFilterSync.current) {
+      isInitialFilterSync.current = false
+      return
+    }
+    updateUrl({
+      hot: hotOnly ? '1' : null,
+      new: newOnly ? '1' : null,
+      featured: featuredOnly ? '1' : null,
+    })
+  }, [hotOnly, newOnly, featuredOnly])
 
   // Reset page when anything else changes
   useEffect(() => {
@@ -230,11 +251,16 @@ export function ShopPageClient({ locale, slugMode = false, pageTitle = "Shop | B
       const newSlug = updates.category
       // pathname already includes locale, e.g. /en/shop or /en/shop/bathroom-glass-clip
       const basePath = pathname.replace(/\/shop\/.*$/, '/shop')
+      // Preserve active filter params when switching categories
+      const params = new URLSearchParams(searchParamsDict.toString())
+      params.delete('page')
+      const queryString = params.toString()
+      const suffix = queryString ? `?${queryString}` : ''
       if (newSlug) {
-        router.push(`${basePath}/${newSlug}`, { scroll: false })
+        router.push(`${basePath}/${newSlug}${suffix}`, { scroll: false })
       } else {
         // "All" tab clicked → go to /[locale]/shop
-        router.push(basePath, { scroll: false })
+        router.push(`${basePath}${suffix}`, { scroll: false })
       }
       return
     }

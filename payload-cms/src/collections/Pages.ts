@@ -68,6 +68,59 @@ export const Pages: CollectionConfig = {
   },
   endpoints: [
     {
+      path: '/:id/notify-google',
+      method: 'post',
+      handler: async (req) => {
+        const { payload, user, routeParams } = req
+        if (!user) return new Response('Unauthorized', { status: 401 })
+
+        const id = routeParams?.id
+        if (!id) return new Response('Missing ID', { status: 400 })
+
+        try {
+          const doc = await payload.findByID({
+            collection: 'pages',
+            id: id as string,
+            depth: 0,
+          })
+
+          if (!doc || doc.status !== 'published') {
+            return new Response(JSON.stringify({ error: 'Only published pages can be indexed.' }), { status: 400 })
+          }
+
+          const { notifyGoogleOfUpdate } = await import('../lib/google-indexing')
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.busromhouse.com'
+
+          // Pages store the full frontend path in the `path` field.
+          const pagePath = doc.path || `/${doc.slug}`
+          const url = `${siteUrl}${pagePath}`
+          const res = await notifyGoogleOfUpdate(url)
+
+          try {
+            await payload.create({
+              collection: 'indexing-logs',
+              req,
+              overrideAccess: true,
+              data: {
+                targetUrl: url,
+                engine: 'google',
+                action: 'update',
+                status: res?.success ? 'success' : (res?.message?.includes('Credentials') || res?.message?.includes('Key') ? 'failed_keys' : 'failed_network'),
+                triggerUser: user.id,
+                rawResponse: res,
+              }
+            })
+          } catch (e) {
+            console.error('Failed to write SEO log in notify-google:', e)
+          }
+
+          return new Response(JSON.stringify({ success: res?.success, result: res, url }), { status: res?.success ? 200 : 500 })
+        } catch (e: any) {
+          return new Response(JSON.stringify({ error: e.message }), { status: 500 })
+        }
+      },
+    },
+    {
       path: '/:id/notify-indexnow',
       method: 'post',
       handler: createNotifyIndexNowEndpoint('pages'),
