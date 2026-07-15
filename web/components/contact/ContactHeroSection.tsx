@@ -173,13 +173,39 @@ export function ContactHeroSection({
           animate={{ opacity: 1, y: 0, rotate: -7.39 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
+          <style dangerouslySetInnerHTML={{__html: `
+            .contact-desc-scroll {
+              scrollbar-width: thin;
+              scrollbar-color: transparent transparent;
+              transition: scrollbar-color 0.3s;
+            }
+            .contact-desc-scroll:hover, .contact-desc-scroll:active {
+              scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+            }
+            .contact-desc-scroll::-webkit-scrollbar {
+              width: 4px;
+            }
+            .contact-desc-scroll::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .contact-desc-scroll::-webkit-scrollbar-thumb {
+              background: transparent;
+              border-radius: 4px;
+            }
+            .contact-desc-scroll:hover::-webkit-scrollbar-thumb,
+            .contact-desc-scroll:active::-webkit-scrollbar-thumb {
+              background: rgba(255, 255, 255, 0.3);
+            }
+          `}} />
           <p
-            className={`font-josefin-sans text-white overflow-y-auto custom-scrollbar pr-2 ${locale !== "en" ? "whitespace-normal" : "whitespace-pre-line"}`}
+            data-lenis-prevent="true"
+            className={`font-josefin-sans text-white overflow-y-auto contact-desc-scroll pr-2 ${locale !== "en" ? "whitespace-normal" : "whitespace-pre-line"}`}
             style={{
               fontSize: rpx(28),
               lineHeight: rpx(39),
               maxHeight: rpx(39 * 3),
               textAlign: "left",
+              overscrollBehavior: "contain",
             }}
           >
             {subtitle}
@@ -366,8 +392,9 @@ export function ContactHeroSection({
           viewport={{ once: true }}
         >
           <p
-            className={`font-josefin-sans text-white text-sm sm:text-base leading-snug overflow-y-auto custom-scrollbar pr-2 ${locale !== "en" ? "whitespace-normal" : "whitespace-pre-line"}`}
-            style={{ maxHeight: "4.5em" }}
+            data-lenis-prevent="true"
+            className={`font-josefin-sans text-white text-sm sm:text-base leading-snug overflow-y-auto contact-desc-scroll pr-2 ${locale !== "en" ? "whitespace-normal" : "whitespace-pre-line"}`}
+            style={{ maxHeight: "4.5em", overscrollBehavior: "contain" }}
           >
             {subtitle}
           </p>
