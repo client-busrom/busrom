@@ -312,16 +312,38 @@ export function HeroCarousel({ data, onQuoteClick, className }: HeroCarouselProp
             gap: `${(61 / DESIGN_WIDTH) * 100}vw`,
           }}
         >
+          <style dangerouslySetInnerHTML={{__html: `
+            .hero-desc-scroll {
+              scrollbar-width: thin;
+              scrollbar-color: transparent transparent;
+              transition: scrollbar-color 0.3s;
+            }
+            .hero-desc-scroll:hover, .hero-desc-scroll:active {
+              scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+            }
+            .hero-desc-scroll::-webkit-scrollbar {
+              width: 4px;
+            }
+            .hero-desc-scroll::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .hero-desc-scroll::-webkit-scrollbar-thumb {
+              background: transparent;
+              border-radius: 4px;
+            }
+            .hero-desc-scroll:hover::-webkit-scrollbar-thumb,
+            .hero-desc-scroll:active::-webkit-scrollbar-thumb {
+              background: rgba(255, 255, 255, 0.3);
+            }
+          `}} />
           <p
-            className="font-josefin-sans text-white overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
+            className="font-josefin-sans text-white overflow-y-auto hero-desc-scroll pr-2"
             data-lenis-prevent
             style={{
               fontSize: `${(36 / DESIGN_WIDTH) * 100}vw`,
               lineHeight: 1.52,
               maxHeight: `${(220 / DESIGN_WIDTH) * 100}vw`,
               overscrollBehavior: 'contain',
-              msOverflowStyle: 'none',
-              scrollbarWidth: 'none',
             }}
           >
             {currentData.description}
