@@ -1,0 +1,177 @@
+/**
+ * Klaro 极简白底主题
+ *
+ * 覆盖 Klaro 0.7.x 默认的黑底(#333)绿按钮(#1a936f)，改成：
+ * - 白底卡片 + 深色文字
+ * - 中性黑色主按钮（不用绿色，避免 GDPR 诱导同意嫌疑）
+ * - 浅灰 toggle 开关
+ *
+ * 实现：精确选择器 + !important（Klaro 默认值用 var(--xxx, #fallback)）
+ */
+
+/* === 1. 卡片背景：黑(#333) → 白(#fff) === */
+
+.klaro .cookie-notice:not(.cookie-modal-notice) {
+  background-color: #ffffff !important;
+  color: #1a1a1a !important;
+  border-top: 1px solid #e5e5e5 !important;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+.klaro .cookie-modal .cm-modal.cm-klaro {
+  background-color: #ffffff !important;
+  color: #1a1a1a !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16) !important;
+  border-radius: 12px !important;
+}
+
+.klaro .cookie-modal-notice {
+  background-color: #ffffff !important;
+  color: #1a1a1a !important;
+}
+
+/* === 2. 文字颜色：白(#fafafa) → 深(#1a1a1a) === */
+
+.klaro .cookie-notice:not(.cookie-modal-notice) p,
+.klaro .cookie-notice:not(.cookie-modal-notice) h1,
+.klaro .cookie-notice:not(.cookie-modal-notice) h2,
+.klaro .cookie-notice:not(.cookie-modal-notice) h3,
+.klaro .cookie-notice:not(.cookie-modal-notice) span,
+.klaro .cookie-notice:not(.cookie-modal-notice) div {
+  color: #1a1a1a !important;
+}
+
+.klaro .cookie-notice:not(.cookie-modal-notice) p {
+  color: #6b6b6b !important;
+}
+
+.klaro .cookie-modal .cm-modal.cm-klaro p,
+.klaro .cookie-modal .cm-modal.cm-klaro h1,
+.klaro .cookie-modal .cm-modal.cm-klaro h2,
+.klaro .cookie-modal .cm-modal.cm-klaro h3,
+.klaro .cookie-modal .cm-modal.cm-klaro span,
+.klaro .cookie-modal .cm-modal.cm-klaro div {
+  color: #1a1a1a !important;
+}
+
+.klaro .cookie-modal .cm-modal.cm-klaro .cm-body p,
+.klaro .cookie-modal .cm-modal.cm-klaro .cm-header p {
+  color: #6b6b6b !important;
+}
+
+.klaro .cookie-notice a,
+.klaro .cookie-modal .cm-modal.cm-klaro a {
+  color: #1a1a1a !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+}
+
+/* === 3. 按钮：绿(#1a936f) → 中性黑(#1a1a1a) === */
+
+.klaro .cookie-modal .cm-btn,
+.klaro .context-notice .cm-btn,
+.klaro .cookie-notice .cm-btn {
+  color: #ffffff !important;
+  background-color: #5c5c5c !important;
+  border: 1px solid #5c5c5c !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  padding: 10px 20px !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease !important;
+  line-height: 1.2 !important;
+}
+
+.klaro .cookie-modal .cm-btn.cm-btn-success,
+.klaro .context-notice .cm-btn.cm-btn-success,
+.klaro .cookie-notice .cm-btn.cm-btn-success {
+  background-color: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+  color: #ffffff !important;
+}
+.klaro .cookie-modal .cm-btn.cm-btn-success:hover,
+.klaro .context-notice .cm-btn.cm-btn-success:hover,
+.klaro .cookie-notice .cm-btn.cm-btn-success:hover {
+  background-color: #333333 !important;
+  border-color: #333333 !important;
+}
+
+.klaro .cookie-modal .cm-btn.cm-btn-success-var,
+.klaro .context-notice .cm-btn.cm-btn-success-var,
+.klaro .cookie-notice .cm-btn.cm-btn-success-var {
+  background-color: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+  color: #ffffff !important;
+}
+
+.klaro .cookie-modal .cm-btn.cm-btn-close,
+.klaro .context-notice .cm-btn.cm-btn-close,
+.klaro .cookie-notice .cm-btn.cm-btn-close {
+  background-color: transparent !important;
+  border-color: #e5e5e5 !important;
+  color: #1a1a1a !important;
+}
+.klaro .cookie-modal .cm-btn.cm-btn-close:hover,
+.klaro .context-notice .cm-btn.cm-btn-close:hover,
+.klaro .cookie-notice .cm-btn.cm-btn-close:hover {
+  background-color: #f5f5f5 !important;
+}
+
+/* === 4. toggle 开关：绿(#1a936f) → 深灰 === */
+
+.klaro .cookie-modal .cm-list-input:checked + .cm-list-label .slider,
+.klaro .context-notice .cm-list-input:checked + .cm-list-label .slider,
+.klaro .cookie-notice .cm-list-input:checked + .cm-list-label .slider {
+  background-color: #1a1a1a !important;
+}
+
+.klaro .cookie-modal .cm-list-input + .cm-list-label .slider,
+.klaro .context-notice .cm-list-input + .cm-list-label .slider,
+.klaro .cookie-notice .cm-list-input + .cm-list-label .slider {
+  background-color: #d1d1d1 !important;
+}
+
+/* === 5. 分隔线 === */
+
+.klaro .cookie-modal .cm-switch-container,
+.klaro .context-notice .cm-switch-container,
+.klaro .cookie-notice .cm-switch-container {
+  border-bottom-color: #e5e5e5 !important;
+}
+
+/* === 6. 弹窗标题 === */
+
+.klaro .cookie-modal .cm-modal .cm-header h2 {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: #1a1a1a !important;
+}
+
+.klaro .cookie-modal .cm-modal .hide {
+  opacity: 0.6 !important;
+}
+.klaro .cookie-modal .cm-modal .hide:hover {
+  opacity: 1 !important;
+}
+
+/* === 7. 遮罩层 === */
+
+.klaro .cookie-overlay {
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(2px) !important;
+  -webkit-backdrop-filter: blur(2px) !important;
+}
+
+/* === 8. 移动端 === */
+
+@media (max-width: 640px) {
+  .klaro .cookie-notice:not(.cookie-modal-notice) .cn-body .cn-ok {
+    flex-direction: column-reverse !important;
+    gap: 8px !important;
+  }
+  .klaro .cookie-notice:not(.cookie-modal-notice) .cn-body .cn-ok .cm-btn {
+    width: 100% !important;
+    text-align: center !important;
+  }
+}

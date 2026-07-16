@@ -10,6 +10,7 @@
 import { ReactNode, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { getCDPAnalytics } from '@/lib/analytics'
+import { useConsent } from '@/lib/consent/use-consent'
 
 interface CDPProviderProps {
   children?: ReactNode
@@ -23,9 +24,12 @@ const CDP_DEBUG = process.env.NEXT_PUBLIC_CDP_DEBUG === 'true'
 export default function CDPProvider({ children }: CDPProviderProps) {
   const pathname = usePathname()
   const initializedRef = useRef(false)
+  // GDPR 门控：用户未同意 analytics 前，不初始化 CDP SDK
+  const analyticsAllowed = useConsent('analytics')
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+    if (!analyticsAllowed) return
 
     const analytics = getCDPAnalytics({
       endpoint: CDP_ENDPOINT,
@@ -38,7 +42,7 @@ export default function CDPProvider({ children }: CDPProviderProps) {
     } else {
       analytics.trackPageView()
     }
-  }, [pathname])
+  }, [pathname, analyticsAllowed])
 
   return <>{children}</>
 }

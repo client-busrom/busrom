@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback, useState } from 'react'
 import Script from 'next/script'
+import { useConsent } from '@/lib/consent/use-consent'
 
 interface TawkChatProps {
   propertyId?: string
@@ -17,6 +18,8 @@ declare global {
 
 export function TawkChat({ propertyId, widgetId }: TawkChatProps) {
   const [shouldLoad, setShouldLoad] = useState(false)
+  // GDPR 门控：未同意 functional 前，不加载 Tawk 客服脚本
+  const functionalAllowed = useConsent('functional')
 
   // 监听用户的第一次交互（滚动、点击、鼠标移动等），只有在真实用户交互后才加载 Tawk
   useEffect(() => {
@@ -95,7 +98,7 @@ export function TawkChat({ propertyId, widgetId }: TawkChatProps) {
     return () => clearInterval(titleInterval);
   }, [shouldLoad, propertyId, widgetId])
 
-  if (!shouldLoad || !propertyId || !widgetId) return null
+  if (!shouldLoad || !functionalAllowed || !propertyId || !widgetId) return null
 
   return (
     <Script

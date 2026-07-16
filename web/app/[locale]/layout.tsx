@@ -17,6 +17,8 @@ import NextTopLoader from "nextjs-toploader";
 import { GlobalScripts } from "@/components/GlobalScripts";
 import { ScriptDebugger } from "@/components/ScriptDebugger";
 import CDPProvider from "@/app/components/CDPProvider";
+import { CookieConsentProvider } from "@/components/consent/CookieConsentProvider";
+import { ConsentModeDefaultScript } from "@/components/consent/ConsentModeDefaultScript";
 import { OrganizationSchema } from "@/components/seo/OrganizationSchema";
 import { getSiteConfig, getMediaUrl } from "@/lib/api/site-config";
 import { getAlternateLanguages } from "@/lib/seo-utils";
@@ -479,6 +481,8 @@ export default async function RootLayout({
     >
       <head>
         <meta httpEquiv="content-language" content={validLocale} />
+        {/* Consent Mode v2 默认拒绝，必须早于任何 GTM/GA 脚本 */}
+        <ConsentModeDefaultScript />
         <link rel="preconnect" href="https://cdn.busromhouse.com" />
         <link rel="dns-prefetch" href="https://cdn.busromhouse.com" />
         <link rel="preconnect" href="https://d2kqew3hn5wphn.cloudfront.net" />
@@ -503,30 +507,33 @@ export default async function RootLayout({
         // 初始锁定滚动条，等待 Preloader 结束
         overflow: preloaderConfig.enabled ? 'hidden' : 'auto'
       }}>
-        <Suspense fallback={null}>
-          <ScriptDebugger />
-          <GlobalScripts position="body_start" />
-        </Suspense>
-        <CDPProvider />
-        <ClientLayoutWrapper preloaderConfig={preloaderConfig}>
-          <NextTopLoader color="#D58A00" showSpinner={false} height={3} shadow="0 0 10px #D58A00,0 0 5px #D58A00" />
-          <LenisProvider easingKey={"easeOutQuad"} />
-          <div className="flex flex-col min-h-screen">
-            <Header locale={validLocale} initialNavigation={initialNavigation} contactPopupData={contactPopupData} />
-            {children}
-            <Suspense fallback={null}>
-              <ScrollToTopOnRouteChange />
-              <ScrollToTop />
-            </Suspense>
-            <ConditionalFooter locale={validLocale} ssrData={footerData} />
-          </div>
-          <Suspense fallback={null}>
-            <GlobalScripts position="footer" />
-          </Suspense>
+        {/* GDPR Cookie 同意管理：包裹所有需要门控的脚本/组件 */}
+        <CookieConsentProvider locale={validLocale}>
           <Suspense fallback={null}>
             <ScriptDebugger />
+            <GlobalScripts position="body_start" />
           </Suspense>
-        </ClientLayoutWrapper>
+          <CDPProvider />
+          <ClientLayoutWrapper preloaderConfig={preloaderConfig}>
+            <NextTopLoader color="#D58A00" showSpinner={false} height={3} shadow="0 0 10px #D58A00,0 0 5px #D58A00" />
+            <LenisProvider easingKey={"easeOutQuad"} />
+            <div className="flex flex-col min-h-screen">
+              <Header locale={validLocale} initialNavigation={initialNavigation} contactPopupData={contactPopupData} />
+              {children}
+              <Suspense fallback={null}>
+                <ScrollToTopOnRouteChange />
+                <ScrollToTop />
+              </Suspense>
+              <ConditionalFooter locale={validLocale} ssrData={footerData} />
+            </div>
+            <Suspense fallback={null}>
+              <GlobalScripts position="footer" />
+            </Suspense>
+            <Suspense fallback={null}>
+              <ScriptDebugger />
+            </Suspense>
+          </ClientLayoutWrapper>
+        </CookieConsentProvider>
       </body>
     </html>
   );
