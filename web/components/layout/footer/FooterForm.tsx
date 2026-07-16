@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Turnstile } from "@/components/ui/turnstile";
 import { cn } from "@/lib/utils";
+import { trackUetConversion } from "@/lib/analytics/uet";
 import { motion } from "framer-motion";
 import { FormConfig } from "./types";
 
@@ -159,6 +160,8 @@ export default function FooterForm({
             form_name: formConfig?.name || "footer-form",
           });
         }
+        // UET 转化追踪：footer 表单单独用 Contact_Form 标签
+        trackUetConversion("Submit", "Contact_Form", 5, "Lead");
         setTurnstileToken(null);
         setTurnstileKey((prev) => prev + 1);
         const successMsg =

@@ -7,6 +7,7 @@ import { COUNTRIES } from "@/components/ui/PhoneInput"
 import { CountrySelectorList } from "@/components/ui/CountryCodePicker"
 import { CountryFlag } from "@/components/ui/CountryFlag"
 import { cn } from "@/lib/utils"
+import { trackUetConversion } from "@/lib/analytics/uet"
 import { motion } from "framer-motion"
 
 interface FormField {
@@ -498,6 +499,7 @@ export function FullInquiryModal({
           form_name: configData?.name || "full-inquiry-modal-form"
         });
       }
+      trackUetConversion('Submit', 'Request_Quote', 5, 'Lead')
       setSubmitSuccess(true)
       setTimeout(() => {
         onClose()

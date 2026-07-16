@@ -6,6 +6,7 @@ import { ChevronDown } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
 import { cn } from "@/lib/utils";
+import { trackUetConversion } from "@/lib/analytics/uet";
 import Link from "next/link";
 import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
 import { CountryFlag } from "@/components/ui/CountryFlag";
@@ -382,6 +383,7 @@ export function StoryContactFormSection({
             (mergedConfig as any)?.name || configData?.name || "contact-form",
         });
       }
+      trackUetConversion("Submit", "Request_Quote", 5, "Lead");
 
       setSubmitStatus("success");
       setFormData({});

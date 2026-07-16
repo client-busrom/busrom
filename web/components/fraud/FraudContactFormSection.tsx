@@ -5,6 +5,7 @@ import { CUSTOM_ICONS } from "@/lib/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { trackUetConversion } from "@/lib/analytics/uet";
 import { CountryFlag } from "@/components/ui/CountryFlag";
 import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
 import { COUNTRIES } from "@/components/ui/PhoneInput";
@@ -290,6 +291,7 @@ export function FraudContactFormSection({
             form_name: formConfig?.name || "Application Form",
           });
         }
+        trackUetConversion("Submit", "Request_Quote", 5, "Lead");
       }
     } catch (err) {
       setSubmitStatus("error");

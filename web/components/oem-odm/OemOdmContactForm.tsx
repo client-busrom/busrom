@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { trackUetConversion } from "@/lib/analytics/uet";
 import { CUSTOM_ICONS } from "@/lib/icons";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
@@ -396,6 +397,7 @@ export function OemOdmContactForm({
             form_name: configData?.name || "OEM/ODM Contact Form",
           });
         }
+        trackUetConversion("Submit", "Request_Quote", 5, "Lead");
         setTurnstileToken(null);
         setTurnstileKey((prev) => prev + 1);
         setTimeout(() => {

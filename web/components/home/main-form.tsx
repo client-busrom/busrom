@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { trackUetConversion } from "@/lib/analytics/uet";
 import type { MainFormData } from "@/lib/content-data";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
@@ -412,6 +413,7 @@ export default function MainForm({
             form_name: formConfig?.name || FORM_NAME,
           });
         }
+        trackUetConversion("Submit", "Request_Quote", 5, "Lead");
 
         // 5秒后重置表单
         setTimeout(() => {

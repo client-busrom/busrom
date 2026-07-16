@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import type { Locale } from "@/i18n.config"
 import { Turnstile } from "@/components/ui/turnstile"
+import { trackUetConversion } from "@/lib/analytics/uet"
 
 interface FormField {
   label: string
@@ -304,6 +305,7 @@ export function FormBlock({ formConfig, locale }: FormBlockProps) {
             form_name: configData.name || "shop-form-block"
           });
         }
+        trackUetConversion('Submit', 'Request_Quote', 5, 'Lead')
         setSubmitSuccess(true)
         setFormData({})
         setTurnstileToken(null)

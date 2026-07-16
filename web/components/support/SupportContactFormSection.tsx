@@ -10,6 +10,7 @@ import React, {
 import { CUSTOM_ICONS } from "@/lib/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { trackUetConversion } from "@/lib/analytics/uet";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { COUNTRIES } from "@/components/ui/PhoneInput";
 import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
@@ -330,6 +331,7 @@ export function SupportContactFormSection({
           form_name: mergedConfig?.name || formConfig?.name || "Support Contact Form",
         });
       }
+      trackUetConversion("Submit", "Request_Quote", 5, "Lead");
 
       setSubmitStatus("success");
       setFormData({});

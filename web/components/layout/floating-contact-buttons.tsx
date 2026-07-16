@@ -4,6 +4,7 @@ import { useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import { IconifyIcon } from '@/components/ui/IconifyIcon'
 import type { ContactPopupData } from '@/lib/api/contact-popup'
+import { trackUetConversion } from '@/lib/analytics/uet'
 
 interface FloatingContactButtonsProps {
   data: ContactPopupData | null
@@ -24,15 +25,16 @@ export function FloatingContactButtons({ data }: FloatingContactButtonsProps) {
   if (!whatsapp && !email) return null
 
   return (
-    <div className="fixed right-6 lg:right-[0.5vw] top-1/2 mt-10 lg:mt-[3vw] z-[60] flex flex-col gap-3 lg:gap-[0.625vw]">
+    <div className="flex fixed right-4 lg:right-[0.5vw] top-1/2 mt-10 lg:mt-[3vw] z-[60] flex-col gap-2 lg:gap-[0.625vw]">
       {whatsapp?.linkUrl && (
         <div className="relative group/tooltip">
           <a
             href={`https://wa.me/${whatsapp.linkUrl.replace(/\D/g, '')}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackUetConversion('WhatsApp Click', 'WhatsApp_Floating_Sidebar', 1, 'Engagement')}
             className={cn(
-              'flex items-center justify-center w-12 h-12 lg:w-[2.5vw] lg:h-[2.5vw] rounded-full',
+              'flex items-center justify-center w-10 h-10 lg:w-[2.5vw] lg:h-[2.5vw] rounded-full',
               'bg-brand-secondary shadow-lg',
               'transition-all duration-300 ease-out',
               'hover:scale-110 hover:shadow-xl',
@@ -52,7 +54,8 @@ export function FloatingContactButtons({ data }: FloatingContactButtonsProps) {
             href={`https://wa.me/${whatsapp.linkUrl.replace(/\D/g, '')}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="absolute right-full mr-3 lg:mr-[0.625vw] top-1/2 -translate-y-1/2"
+            onClick={() => trackUetConversion('WhatsApp Click', 'WhatsApp_Floating_Sidebar', 1, 'Engagement')}
+            className="hidden lg:block absolute right-full mr-3 lg:mr-[0.625vw] top-1/2 -translate-y-1/2"
             aria-label="WhatsApp Tooltip"
           >
             <div
@@ -78,8 +81,9 @@ export function FloatingContactButtons({ data }: FloatingContactButtonsProps) {
         <div className="relative group/tooltip">
           <a
             href={email.linkUrl.startsWith('mailto:') ? email.linkUrl : `mailto:${email.linkUrl}`}
+            onClick={() => trackUetConversion('Email Click', 'Email_Floating_Sidebar', 1, 'Engagement')}
             className={cn(
-              'flex items-center justify-center w-12 h-12 lg:w-[2.5vw] lg:h-[2.5vw] rounded-full',
+              'flex items-center justify-center w-10 h-10 lg:w-[2.5vw] lg:h-[2.5vw] rounded-full',
               'bg-brand-secondary shadow-lg',
               'transition-all duration-300 ease-out',
               'hover:scale-110 hover:shadow-xl',
@@ -97,7 +101,8 @@ export function FloatingContactButtons({ data }: FloatingContactButtonsProps) {
           {/* Tooltip */}
           <a
             href={email.linkUrl.startsWith('mailto:') ? email.linkUrl : `mailto:${email.linkUrl}`}
-            className="absolute right-full mr-3 lg:mr-[0.625vw] top-1/2 -translate-y-1/2"
+            onClick={() => trackUetConversion('Email Click', 'Email_Floating_Sidebar', 1, 'Engagement')}
+            className="hidden lg:block absolute right-full mr-3 lg:mr-[0.625vw] top-1/2 -translate-y-1/2"
             aria-label="Email Tooltip"
           >
             <div

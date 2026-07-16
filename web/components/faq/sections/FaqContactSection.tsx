@@ -11,6 +11,7 @@ import { CountryFlag } from "@/components/ui/CountryFlag";
 import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
 
 import { cn } from "@/lib/utils";
+import { trackUetConversion } from "@/lib/analytics/uet";
 
 const DESIGN_WIDTH = 1920;
 const vw = (px: number) => `${(px / DESIGN_WIDTH) * 100}vw`;
@@ -191,6 +192,7 @@ export function FaqContactSection({ data, locale }: FaqContactSectionProps) {
             form_name: formConfig?.name || "faq-contact-form",
           });
         }
+        trackUetConversion("Submit", "Request_Quote", 5, "Lead");
         setSubmitted(true);
         setTimeout(() => setSubmitted(false), 5000);
       } else {

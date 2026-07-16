@@ -6,6 +6,7 @@ import { ChevronDown, Check } from "lucide-react";
 import { CUSTOM_ICONS } from "@/lib/icons";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { cn } from "@/lib/utils";
+import { trackUetConversion } from "@/lib/analytics/uet";
 import { COUNTRIES } from "@/components/ui/PhoneInput";
 import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
 import { CountryFlag } from "@/components/ui/CountryFlag";
@@ -265,6 +266,7 @@ export function CtaSection({
           form_name: mergedConfig?.name || mergedConfig?.displayName || "One-Stop Solution Contact"
         });
       }
+      trackUetConversion('Submit', 'Request_Quote', 5, 'Lead');
 
       setSubmitStatus("success");
       setFormState({

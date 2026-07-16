@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { Turnstile } from "@/components/ui/turnstile";
 import { cn } from "@/lib/utils";
+import { trackUetConversion } from "@/lib/analytics/uet";
 import { COUNTRIES } from "@/components/ui/PhoneInput";
 import { CountrySelectorList } from "@/components/ui/CountryCodePicker";
 import { CountryFlag } from "@/components/ui/CountryFlag";
@@ -528,6 +529,7 @@ export function ContactFormSection({
           form_name: configData?.name || "contact-form",
         });
       }
+      trackUetConversion("Submit", "Request_Quote", 5, "Lead");
       setFormData({});
       setFileName("");
       setUploadedFile(null);

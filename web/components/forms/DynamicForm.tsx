@@ -6,6 +6,7 @@ import type { Locale } from "@/i18n.config"
 import { Info, ChevronDown } from "lucide-react"
 import { Turnstile } from "@/components/ui/turnstile"
 import { cn } from "@/lib/utils"
+import { trackUetConversion } from "@/lib/analytics/uet"
 import { Label } from "@/components/ui/label"
 import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone'
 // @ts-ignore
@@ -458,6 +459,7 @@ export function DynamicForm({ formConfig: initialFormConfig, formName, locale, c
             form_name: formConfig?.name || formName || "Dynamic Form",
           });
         }
+        trackUetConversion("Submit", "Request_Quote", 5, "Lead")
 
         // 提交成功后也强制记录同意（双重保障）
         if (formConfig?.privacyConsentText) {

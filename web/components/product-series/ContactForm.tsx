@@ -7,6 +7,7 @@ import { RichText } from "@payloadcms/richtext-lexical/react";
 import { ChevronDown, Check } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { cn } from "@/lib/utils";
+import { trackUetConversion } from "@/lib/analytics/uet";
 import { useParams } from "next/navigation";
 import type { ContactFormData } from "@/lib/content-parser";
 import { COUNTRIES } from "@/components/ui/PhoneInput";
@@ -385,6 +386,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
             form_name: formConfig?.name || "Product Series Inquiry Form",
           });
         }
+        trackUetConversion("Submit", "Request_Quote", 5, "Lead");
         setFormData({
           name: "",
           email: "",
