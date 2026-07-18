@@ -272,6 +272,7 @@ const nextConfig = {
       'https://*.clarity.ms',
       'https://www.clarity.ms',
       'https://bat.bing.com',
+      'https://bat.bing.net',
       'https://mc.yandex.ru',
       'https://metrika.yandex.ru',
       'https://*.hotjar.com',
@@ -320,6 +321,15 @@ const nextConfig = {
       'https://api.amplitude.com',
       'https://api.mixpanel.com',
       'https://px.ads.linkedin.com',
+      // Microsoft Bing Ads UET 数据上报（含 .net 备用域名）
+      'https://bat.bing.com',
+      'https://bat.bing.net',
+      'https://c.bing.com',
+      // Google Ads 转化收集端点
+      'https://pagead2.googlesyndication.com',
+      'https://tpc.googlesyndication.com',
+      'https://www.google.com',
+      'https://www.googleadservices.com',
     ].join(' ')
 
     const thirdPartyImages = [
@@ -342,6 +352,7 @@ const nextConfig = {
       'https://www.facebook.com',
       'https://analytics.tiktok.com',
       'https://bat.bing.com',
+      'https://bat.bing.net',
       'https://c.bing.com',
       'https://mc.yandex.ru',
     ].join(' ')
