@@ -19,6 +19,7 @@ import { ScriptDebugger } from "@/components/ScriptDebugger";
 import CDPProvider from "@/app/components/CDPProvider";
 import { CookieConsentProvider } from "@/components/consent/CookieConsentProvider";
 import { ConsentModeDefaultScript } from "@/components/consent/ConsentModeDefaultScript";
+import { DevTrackingScripts } from "@/components/consent/DevTrackingScripts";
 import { OrganizationSchema } from "@/components/seo/OrganizationSchema";
 import { getSiteConfig, getMediaUrl } from "@/lib/api/site-config";
 import { getAlternateLanguages } from "@/lib/seo-utils";
@@ -495,6 +496,8 @@ export default async function RootLayout({
         <Suspense fallback={null}>
           <GlobalScripts position="header" />
         </Suspense>
+        {/* 开发环境注入 UET/Clarity 测试脚本（生产环境由 CMS 管理） */}
+        <DevTrackingScripts />
         <script dangerouslySetInnerHTML={{
           __html: `
             if(/bot|googlebot|crawler|spider|robot|crawling|lighthouse|speed insights|speed-insights|ptst|chrome-lighthouse|gtmetrix|pingdom/i.test(navigator.userAgent)){

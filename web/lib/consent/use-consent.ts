@@ -20,17 +20,16 @@
 import { useEffect, useState, useCallback } from 'react'
 import type { ConsentPurpose, ConsentServiceName } from './klaro-config'
 
-/** Klaro 全局对象形态（仅用到的字段） */
-interface KlaroGlobal {
-  getManager?: () => {
-    confirmed: boolean
-    getConsent: (name: string) => boolean
-  }
+/** Klaro Manager 接口 */
+interface KlaroManager {
+  confirmed: boolean
+  getConsent: (name: string) => boolean
 }
 
 declare global {
   interface Window {
-    klaro?: KlaroGlobal
+    /** Klaro setup() 返回的 manager 引用（window.klaro 会被 Preact 组件覆盖） */
+    __klaroManager?: KlaroManager
   }
 }
 
@@ -38,15 +37,45 @@ declare global {
 export const KLARO_CONSENT_EVENT = 'klaro-consent-change'
 
 /**
+ * purpose → 对应的 service 名映射。
+ * Klaro 的 getConsent() 只接受 service 名，不接受 purpose 名。
+ * 需要将 purpose 名转换为对应的 service 名来检查。
+ */
+const PURPOSE_TO_SERVICES: Record<ConsentPurpose, ConsentServiceName[]> = {
+  necessary: [],
+  functional: ['tawk'],
+  analytics: ['cdp', 'gtm'],
+  marketing: ['gtm', 'cms-scripts'],
+}
+
+/**
  * 判断某个 purpose 或 service 是否已同意。
  * 在 SSR / Klaro 尚未初始化时返回 false（保守拒绝）。
+ *
+ * Klaro 的 getConsent() 只接受 service 名（如 'gtm'、'cms-scripts'），
+ * 不接受 purpose 名（如 'marketing'）。当传入 purpose 名时，检查该 purpose
+ * 下所有关联的 service 是否都已同意。
+ *
+ * 注意：不能用 window.klaro.getManager()，因为 Klaro 的 setup() 会把 window.klaro
+ * 覆盖为 Preact 组件。manager 引用通过 CookieConsentProvider 存在 window.__klaroManager。
  */
 export function isConsentGiven(target: ConsentPurpose | ConsentServiceName): boolean {
-  if (typeof window === 'undefined' || !window.klaro) return false
-  const manager = window.klaro.getManager?.()
+  if (typeof window === 'undefined') return false
+  const manager = window.__klaroManager
   if (!manager || !manager.confirmed) return false
-  // purpose 名与 service 名共用同一个 getConsent 入参，Klaro 内部会自动识别
-  return manager.getConsent(target)
+
+  // 先尝试直接作为 service 名查询
+  if (manager.consents && target in manager.consents) {
+    return manager.consents[target] === true
+  }
+
+  // 如果是 purpose 名，检查该 purpose 下所有关联的 service
+  const services = PURPOSE_TO_SERVICES[target as ConsentPurpose]
+  if (services && services.length > 0) {
+    return services.every(service => manager.consents?.[service] === true)
+  }
+
+  return false
 }
 
 /**

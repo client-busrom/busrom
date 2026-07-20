@@ -130,3 +130,86 @@ UET 开始正常追踪 / GA4 Ads 开始追踪
 - UET 通过 CMS 模板注入，属 `cms-scripts` 服务（归 marketing 类别）
 - 用户未同意 marketing 时，UET 仍会加载但发匿名 ping（Microsoft 官方设计）
 - 第二阶段改造 GlobalScripts 客户端门控后，未同意时 UET 完全不加载（更严格）
+
+## 九、问题排查与修复记录（2026-07-20）
+
+### 9.1 问题描述
+测试时发现：
+1. **GA4 返回 `gcs=G100`**（所有 consent 信号为 denied）
+2. **Microsoft Clarity** 显示 "Data from this session is not being collected... due to your configured project settings"
+3. **Bing UET** 仅触发 Page Load Event，无自定义事件（如 Email Click）
+4. **转化目标未触发**
+
+### 9.2 根因分析
+所有问题的根源是同一个：**GDPR Cookie 同意机制默认将所有非必要 cookie 设为 denied，且允许用户在未明确同意的情况下继续浏览** (`mustConsent: false`)。
+
+| 平台 | 拦截机制 | 返回值 |
+|------|---------|--------|
+| GA4 | Google Consent Mode default = denied，未收到 update | `gcs=G100` |
+| Clarity | 项目设置启用了 consent 保护，收到 denied 信号后停止采集 | "not being collected" |
+| Bing UET | UET consent mode default = denied + 代码侧 consent 门控 | 仅 PageLoad |
+
+### 9.3 已实施的修复
+
+#### 修复 1：增大 `wait_for_update` 超时时间
+**文件**：`web/components/consent/ConsentModeDefaultScript.tsx`
+- 将 `wait_for_update` 从 500ms 增加到 1500ms
+- 原因：Klaro 动态 import + 初始化可能需要更长时间，500ms 窗口可能不够
+
+#### 修复 2：添加 Microsoft Clarity Consent API 集成
+**文件**：`web/components/consent/CookieConsentProvider.tsx`
+- 在 `syncConsentMode()` 中添加 `clarity('consent')` 调用
+- 当用户同意 marketing consent 时，调用 Clarity 自有的 consent API
+- 这解决了 Clarity 项目设置中 consent mode 导致的数据采集停止问题
+
+#### 修复 3：为 GlobalScripts 添加 consent 门控（Phase 2 部分实现）
+**新增文件**：
+- `web/components/consent/ConsentAwareScript.tsx` — 客户端包装组件，只在 consent 授权后渲染 Script
+- `web/components/consent/ConsentGatedScripts.tsx` — 通用 consent 门控包装组件
+
+**修改文件**：`web/components/GlobalScripts.tsx`
+- 新增 `isAnalyticsScript()` 函数，根据模板类型判断脚本类别
+- Analytics 脚本（GA4/GTM）：立即加载，接收 consent 信号
+- Marketing 脚本（Clarity/UET/Meta 等）：使用 `ConsentAwareScript` 包装，只在用户同意 marketing 后加载
+
+#### 修复 4：修复 Klaro Manager 初始化问题（关键 Bug）
+**问题**：Klaro 的 `setup()` 函数会将 `window.klaro` 覆盖为 Preact 组件，导致 `getManager()` 不可用。`isConsentGiven()` 始终返回 `false`，consent 状态无法同步到 GA4/UET/Clarity。
+
+**修复**：
+- `CookieConsentProvider.tsx`：setup() 后遍历 Preact 组件树提取 manager 引用，存入 `window.__klaroManager`
+- `use-consent.ts`：`isConsentGiven()` 改用 `manager.consents` 对象直接查询，不再依赖 `getConsent()`
+- 新增 `PURPOSE_TO_SERVICES` 映射（Klaro 的 `getConsent()` 只接受 service 名，不接受 purpose 名）
+
+**验证结果**（本地测试）：
+- ✅ Consent 状态正确：`{cdp: true, gtm: true, tawk: true, cms-scripts: true}`
+- ✅ Google Consent Mode 更新为 `granted`
+- ⚠️ UET/Clarity 本地未加载（正常，需要 CMS 配置的第三方脚本）
+
+### 9.4 测试要求
+**关键前提**：测试者必须点击 Cookie Banner 上的"全部接受"按钮，否则所有追踪都会被阻止。
+
+测试步骤：
+1. 清除浏览器 cookie 和 localStorage
+2. 访问网站，等待 Cookie Banner 出现
+3. 点击"全部接受"
+4. 验证 GA4 返回 `gcs=G110`（analytics=granted, ad=granted）
+5. 验证 Clarity 开始采集数据
+6. 点击 Email 按钮，验证 UET 触发 "Email Click" 事件
+7. 验证 Bing 转化目标触发
+
+### 9.5 验证命令
+在浏览器控制台执行：
+```javascript
+// 检查 consent 状态
+window.klaro?.getManager()?.getConsent('marketing')  // 应返回 true
+window.klaro?.getManager()?.getConsent('analytics')  // 应返回 true
+
+// 检查 GA4 consent mode
+window.dataLayer?.filter(d => d[0] === 'consent')  // 应看到 update granted
+
+// 检查 UET consent
+window.uetq?.filter(d => d[0] === 'consent')  // 应看到 update granted
+
+// 检查 Clarity
+window.clarity  // 应存在
+```

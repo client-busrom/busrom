@@ -18,7 +18,7 @@ gtag('consent', 'default', {
   analytics_storage: 'denied',
   functionality_storage: 'denied',
   security_storage: 'granted',
-  wait_for_update: 500
+  wait_for_update: 1500
 });
 `
   return (

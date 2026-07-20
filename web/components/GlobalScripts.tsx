@@ -13,11 +13,29 @@
  * - Dangerous patterns are blocked
  * - Template-based scripts are pre-approved
  *
+ * Consent Gating (GDPR):
+ * - Analytics scripts (GA4, GTM): Load immediately to receive consent signals
+ * - Marketing scripts (Clarity, UET, Meta, etc.): Only load after marketing consent
+ *
  * Page-specific scripts should use the PageScripts component.
  */
 
 import Script from 'next/script'
 import { getValidatedScripts, type CustomScript } from '@/lib/api/custom-scripts'
+import { ConsentAwareScript } from '@/components/consent/ConsentAwareScript'
+
+/** Analytics 模板类型：这些脚本需要立即加载以便接收 consent 信号 */
+const ANALYTICS_TEMPLATES = new Set([
+  'google_analytics_4',
+  'google_tag_manager',
+  'google_tag_manager_noscript',
+])
+
+/** 判断脚本是否属于 analytics 类（不需要 consent 门控） */
+function isAnalyticsScript(script: CustomScript): boolean {
+  if (script.scriptType !== 'template') return false
+  return ANALYTICS_TEMPLATES.has(script.templateType || '')
+}
 
 interface GlobalScriptsProps {
   position: 'header' | 'body_start' | 'footer'
@@ -83,9 +101,6 @@ function getDebugTrackingCode(script: CustomScript, position: string): string {
 
 /**
  * Parse script content and determine how to render it
- */
-/**
- * Parse script content and determine how to render it
  * Now supports multiple <script> tags and <noscript> tags
  */
 function ScriptRenderer({ script, position }: { script: CustomScript; position: string }) {
@@ -100,6 +115,11 @@ function ScriptRenderer({ script, position }: { script: CustomScript; position: 
   // 'beforeInteractive' is only for scripts that MUST load before hydration
   // 'afterInteractive' is better for most tracking scripts
   const strategy = position === 'header' ? 'afterInteractive' : 'lazyOnload'
+
+  // 决定使用哪个 Script 组件：analytics 脚本用普通 Script，marketing 脚本用 ConsentAwareScript
+  const needsConsent = !isAnalyticsScript(script)
+  const ScriptComponent = needsConsent ? ConsentAwareScript : Script
+  const consentProps = needsConsent ? { purpose: 'marketing' as const } : {}
 
   // Add debug tracking
   const debugCode = getDebugTrackingCode(script, position)
@@ -146,22 +166,24 @@ function ScriptRenderer({ script, position }: { script: CustomScript; position: 
       const asyncAttr = /\basync\b/i.test(attrs)
       const deferAttr = /\bdefer\b/i.test(attrs)
       blocks.push(
-        <Script
+        <ScriptComponent
           key={`script-${script.id}-${scriptCount++}`}
           id={`custom-script-${script.id}-${scriptCount}`}
           src={src}
           strategy={strategy as any}
           async={asyncAttr}
           defer={deferAttr}
+          {...consentProps}
         />
       )
     } else if (body) {
       blocks.push(
-        <Script
+        <ScriptComponent
           key={`script-${script.id}-${scriptCount++}`}
           id={`custom-script-${script.id}-${scriptCount}`}
           strategy={strategy as any}
           dangerouslySetInnerHTML={{ __html: body }}
+          {...consentProps}
         />
       )
     }
@@ -219,13 +241,14 @@ function ScriptRenderer({ script, position }: { script: CustomScript; position: 
               strategy={strategy as any}
               dangerouslySetInnerHTML={{ __html: debugCode }}
             />
-            <Script
+            <ScriptComponent
               id={`custom-script-fallback-${script.id}`}
               strategy={strategy as any}
               dangerouslySetInnerHTML={{ __html: rawContent }}
+              {...consentProps}
             />
           </>
-        )
+       )
       }
     } else {
       // Outside header, just inject in a div

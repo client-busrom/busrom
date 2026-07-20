@@ -65,6 +65,17 @@ function syncConsentMode() {
   w.uetq.push('consent', 'update', {
     ad_storage: marketingGranted ? 'granted' : 'denied',
   })
+
+  /* ---------- 3. Microsoft Clarity Consent ---------- */
+  // Clarity 有自己的 consent API，必须显式调用 clarity('consent') 才能开启数据采集。
+  // 当项目设置中启用了 consent mode 时，不调用此方法会导致 "Data not being collected" 提示。
+  if (marketingGranted && typeof w.clarity === 'function') {
+    try {
+      w.clarity('consent')
+    } catch {
+      // Clarity 脚本可能尚未加载，忽略错误
+    }
+  }
 }
 
 export function CookieConsentProvider({ locale, children }: CookieConsentProviderProps) {
@@ -84,8 +95,31 @@ export function CookieConsentProvider({ locale, children }: CookieConsentProvide
           window.dispatchEvent(new Event(KLARO_CONSENT_EVENT))
         }
 
-        // 初始化 Klaro
+        // 初始化 Klaro（setup 不返回 manager，需要从组件树中提取）
         klaro.setup(config)
+
+        // 从 Klaro Preact 组件树中找到 manager 并保存
+        // window.klaro 会被 setup() 覆盖为 Preact 组件，不能用 getManager()
+        const findManager = (node: any, depth = 0): any => {
+          if (depth > 10 || !node) return null
+          if (node.manager && typeof node.manager.getConsent === 'function') return node.manager
+          if (node.props?.manager && typeof node.props.manager.getConsent === 'function') return node.props.manager
+          if (node.__k) { const r = findManager(node.__k, depth + 1); if (r) return r }
+          const children = node.props?.children
+          if (children) {
+            const arr = Array.isArray(children) ? children : [children]
+            for (const child of arr) {
+              if (child && typeof child === 'object') {
+                const r = findManager(child, depth + 1); if (r) return r
+              }
+            }
+          }
+          return null
+        }
+        const manager = findManager(window.klaro)
+        if (manager && typeof manager.getConsent === 'function') {
+          (window as any).__klaroManager = manager
+        }
 
         // 初始化后立即同步一次（处理"已经同意过"的回访用户）
         syncConsentMode()
