@@ -298,6 +298,8 @@ const nextConfig = {
       'https://challenges.cloudflare.com',
       'https://cdn.jsdelivr.net',
       'https://api.iconify.design',
+      'https://api.unisvg.com',
+      'https://api.simplesvg.com',
       'https://www.google-analytics.com',
       'https://www.googletagmanager.com',
       'https://analytics.google.com',

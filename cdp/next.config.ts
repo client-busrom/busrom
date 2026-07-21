@@ -1,9 +1,14 @@
 import type { NextConfig } from 'next'
 import path from 'path'
 
-// Allow CMS origin for CORS. In production this should be set to the canonical
-// Payload CMS URL (e.g. https://cms.busromhouse.com).
-const cmsOrigin = process.env.PAYLOAD_URL || 'https://cms.busromhouse.com'
+// Allow CMS and Web origins for CORS.
+const allowedOrigins = new Set([
+  process.env.PAYLOAD_URL || 'https://cms.busromhouse.com',
+  'https://www.busromhouse.com',
+  'https://busromhouse.com',
+  'http://localhost:3001',
+  'http://localhost:3002',
+])
 
 const nextConfig: NextConfig = {
   // CDP runs on port 3003
@@ -22,7 +27,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
-            value: cmsOrigin,
+            value: Array.from(allowedOrigins).join(' '),
           },
           {
             key: 'Access-Control-Allow-Credentials',

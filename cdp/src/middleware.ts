@@ -5,6 +5,14 @@ import { jwtVerify } from 'jose'
 const PAYLOAD_URL = process.env.PAYLOAD_URL || 'https://cms.busromhouse.com'
 const CMS_COOKIE_NAME = 'payload-token'
 
+const ALLOWED_ORIGINS = new Set([
+  'https://www.busromhouse.com',
+  'https://busromhouse.com',
+  'https://cms.busromhouse.com',
+  'http://localhost:3001',
+  'http://localhost:3002',
+])
+
 async function getPayloadSecret(): Promise<Uint8Array> {
   // Payload CMS hashes the configured secret with SHA-256 and uses the first
   // 32 hex characters as the JWT signing key (same convention used by the
@@ -54,12 +62,34 @@ function checkPermission(user: any): boolean {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
+  // --- CORS handling ---
+  const origin = request.headers.get('origin')
+  const corsOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : null
+
+  // Handle CORS preflight
+  if (request.method === 'OPTIONS') {
+    const preflight = new NextResponse(null, { status: 204 })
+    if (corsOrigin) {
+      preflight.headers.set('Access-Control-Allow-Origin', corsOrigin)
+      preflight.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+      preflight.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+      preflight.headers.set('Access-Control-Allow-Credentials', 'true')
+      preflight.headers.set('Access-Control-Max-Age', '86400')
+    }
+    return preflight
+  }
+
   if (!pathname.startsWith('/api/analytics')) {
     return NextResponse.next()
   }
 
   if (pathname === '/api/analytics/track' && request.method === 'POST') {
-    return NextResponse.next()
+    const trackRes = NextResponse.next()
+    if (corsOrigin) {
+      trackRes.headers.set('Access-Control-Allow-Origin', corsOrigin)
+      trackRes.headers.set('Access-Control-Allow-Credentials', 'true')
+    }
+    return trackRes
   }
 
   if (pathname === '/api/health') {
