@@ -330,6 +330,10 @@ const nextConfig = {
       'https://tpc.googlesyndication.com',
       'https://www.google.com',
       'https://www.googleadservices.com',
+      // CDP 数据收集端点
+      'https://cdp.busromhouse.com',
+      // CDP 地理定位服务
+      'https://ipapi.co',
     ].join(' ')
 
     const thirdPartyImages = [
