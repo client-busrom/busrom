@@ -176,12 +176,21 @@ export const ApplicationImagePicker: React.FC<ApplicationImagePickerProps> = ({ 
     }
   }, [])
 
-  // Sync form value when state changes
+  // Sync form value when state changes — only if actually different
   useEffect(() => {
     const newValue: StoredValue = {
       mode,
       manualImage: mode === 'manual' ? selectedImage : null,
       applicationId: mode === 'application' ? selectedApplication : null,
+    }
+    // Avoid marking form as dirty when value hasn't changed
+    const prev = value || {}
+    if (
+      prev.mode === newValue.mode &&
+      prev.manualImage === newValue.manualImage &&
+      prev.applicationId === newValue.applicationId
+    ) {
+      return
     }
     setValue(newValue)
   }, [mode, selectedImage, selectedApplication, setValue])
