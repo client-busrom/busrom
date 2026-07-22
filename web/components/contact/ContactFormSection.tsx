@@ -51,6 +51,9 @@ interface FormConfigData {
   id: string;
   name: string;
   fields: Record<string, FormField[]>;
+  privacyConsentText?: string;
+  submitButtonText?: string;
+  submittingText?: string;
 }
 
 // 副标题文本片段，支持加粗标记
