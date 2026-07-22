@@ -245,13 +245,14 @@ export function ContactFormSection({
   }, [formConfig]);
 
   const effectivePrivacyText = useMemo(() => {
-    return getLocalizedString(mergedConfig?.privacyConsentText, locale || "en");
+    const raw = mergedConfig?.privacyConsentText || mergedConfig?.data?.privacyConsentText;
+    return getLocalizedString(raw, locale || "en");
   }, [mergedConfig, locale]);
 
   const effectiveSubmitText = useMemo(() => {
     return (
       submitButtonText ||
-      getLocalizedString(mergedConfig?.submitButtonText, locale || "en")
+      getLocalizedString(mergedConfig?.submitButtonText || mergedConfig?.data?.submitButtonText, locale || "en")
     );
   }, [mergedConfig, submitButtonText, locale]);
 
