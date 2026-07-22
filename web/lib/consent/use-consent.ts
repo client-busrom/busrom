@@ -58,21 +58,45 @@ const PURPOSE_TO_SERVICES: Record<ConsentPurpose, ConsentServiceName[]> = {
  *
  * 注意：不能用 window.klaro.getManager()，因为 Klaro 的 setup() 会把 window.klaro
  * 覆盖为 Preact 组件。manager 引用通过 CookieConsentProvider 存在 window.__klaroManager。
+ *
+ * 当 __klaroManager 不可用时（Preact 树提取失败），直接从 busrom_consent cookie
+ * 读取 consent 状态作为 fallback。
  */
 export function isConsentGiven(target: ConsentPurpose | ConsentServiceName): boolean {
   if (typeof window === 'undefined') return false
-  const manager = window.__klaroManager
-  if (!manager || !manager.confirmed) return false
 
-  // 先尝试直接作为 service 名查询
-  if (manager.consents && target in manager.consents) {
-    return manager.consents[target] === true
+  // 优先从 manager 读取
+  const manager = window.__klaroManager
+  if (manager && manager.confirmed) {
+    // 先尝试直接作为 service 名查询
+    if (manager.consents && target in manager.consents) {
+      return manager.consents[target] === true
+    }
+    // 如果是 purpose 名，检查该 purpose 下所有关联的 service
+    const services = PURPOSE_TO_SERVICES[target as ConsentPurpose]
+    if (services && services.length > 0) {
+      return services.every(service => manager.consents?.[service] === true)
+    }
+    return false
   }
 
-  // 如果是 purpose 名，检查该 purpose 下所有关联的 service
-  const services = PURPOSE_TO_SERVICES[target as ConsentPurpose]
-  if (services && services.length > 0) {
-    return services.every(service => manager.consents?.[service] === true)
+  // Fallback: 直接从 cookie 读取（解决 __klaroManager 提取失败的问题）
+  try {
+    const cookieMatch = document.cookie.match(/busrom_consent=([^;]+)/)
+    if (cookieMatch) {
+      const consents = JSON.parse(decodeURIComponent(cookieMatch[1]))
+      // 直接作为 service 名查询
+      if (target in consents) {
+        return consents[target] === true
+      }
+      // 如果是 purpose 名，检查该 purpose 下所有关联的 service
+      const services = PURPOSE_TO_SERVICES[target as ConsentPurpose]
+      if (services && services.length > 0) {
+        return services.every(service => consents[service] === true)
+      }
+    }
+  } catch {
+    // cookie 解析失败，保守拒绝
   }
 
   return false

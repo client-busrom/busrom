@@ -116,12 +116,25 @@ export function CookieConsentProvider({ locale, children }: CookieConsentProvide
           }
           return null
         }
-        const manager = findManager(window.klaro)
-        if (manager && typeof manager.getConsent === 'function') {
+
+        // 尝试多次提取 manager（Preact 组件树可能需要一帧才能挂载）
+        let manager = findManager(window.klaro)
+        if (!manager) {
+          setTimeout(() => {
+            manager = findManager(window.klaro)
+            if (manager && typeof manager.getConsent === 'function') {
+              (window as any).__klaroManager = manager
+            }
+            // 无论 manager 是否找到，都同步一次（isConsentGiven 有 cookie fallback）
+            syncConsentMode()
+            window.dispatchEvent(new Event(KLARO_CONSENT_EVENT))
+          }, 100)
+        } else {
           (window as any).__klaroManager = manager
         }
 
         // 初始化后立即同步一次（处理"已经同意过"的回访用户）
+        // isConsentGiven 有 cookie fallback，即使 manager 未提取到也能工作
         syncConsentMode()
         window.dispatchEvent(new Event(KLARO_CONSENT_EVENT))
       })
