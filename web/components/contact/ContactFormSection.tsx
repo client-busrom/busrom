@@ -247,17 +247,49 @@ export function ContactFormSection({
       : formConfig || {};
   }, [formConfig]);
 
+  // 页面深度嵌套时（如 block 的 sidebarContent 内），SSR depth=1 拿不到完整的
+  // formConfig（只有 { id }），此时客户端补拉完整配置。
+  const [fetchedConfig, setFetchedConfig] = useState<FormConfigData | null>(null);
+
+  const configId = useMemo(() => {
+    const raw = mergedConfig?.id || mergedConfig?.data?.id;
+    return raw ? String(raw) : null;
+  }, [mergedConfig]);
+
+  const hasFullConfig = !!(
+    mergedConfig?.data?.fields || (mergedConfig as any)?.fields
+  );
+
+  useEffect(() => {
+    if (!configId || hasFullConfig) return;
+    let cancelled = false;
+    fetch(`/api/form-configs/${configId}?locale=${locale || "en"}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d && !cancelled) setFetchedConfig(d);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [configId, hasFullConfig, locale]);
+
+  // 统一的数据来源：优先用补拉到的完整配置
+  const resolvedData = (fetchedConfig ||
+    mergedConfig?.data ||
+    (hasFullConfig ? (mergedConfig as any) : null)) as FormConfigData | null;
+
   const effectivePrivacyText = useMemo(() => {
-    const raw = mergedConfig?.privacyConsentText || mergedConfig?.data?.privacyConsentText;
+    const raw = resolvedData?.privacyConsentText || mergedConfig?.privacyConsentText;
     return getLocalizedString(raw, locale || "en");
-  }, [mergedConfig, locale]);
+  }, [resolvedData, mergedConfig, locale]);
 
   const effectiveSubmitText = useMemo(() => {
     return (
       submitButtonText ||
-      getLocalizedString(mergedConfig?.submitButtonText || mergedConfig?.data?.submitButtonText, locale || "en")
+      getLocalizedString(resolvedData?.submitButtonText || mergedConfig?.submitButtonText || mergedConfig?.data?.submitButtonText, locale || "en")
     );
-  }, [mergedConfig, submitButtonText, locale]);
+  }, [resolvedData, mergedConfig, submitButtonText, locale]);
 
   useEffect(() => {
     const fetchSiteKey = async () => {
@@ -421,7 +453,7 @@ export function ContactFormSection({
 
 
   // 获取表单字段配置
-  const configData = mergedConfig?.data;
+  const configData = resolvedData;
   const fieldsData = (configData?.fields?.[locale] ||
     configData?.fields?.["en"] ||
     (Array.isArray(configData?.fields)
@@ -1282,7 +1314,7 @@ export function ContactFormSection({
             {isSubmitting
               ? uploadProgress > 0 && uploadProgress < 100
                 ? `Uploading ${uploadProgress}%...`
-                : mergedConfig?.submittingText || "Submitting..."
+                : resolvedData?.submittingText || mergedConfig?.submittingText || "Submitting..."
               : submitStatus === "success"
                 ? locale === "zh"
                   ? "已提交!"

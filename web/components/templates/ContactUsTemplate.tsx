@@ -333,6 +333,7 @@ export function ContactUsTemplate({ locale, data, ssrData }: ContactUsTemplatePr
           images={data.contactForm.images.filter(Boolean) as any}
           formConfig={finalFormConfig}
           tips={data.contactForm.tips}
+          locale={locale}
         />
 
         {/* Product Show Section */}
