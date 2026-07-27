@@ -360,6 +360,37 @@
   font-size: 1rem;
 }
 
+// Field Selection Toolbar (sticky above the scrollable field list)
+.fftc-fields-toolbar {
+  position: sticky;
+  top: -2rem; //抵消 .fftc-modal__fields 的 padding，吸附到滚动容器顶部
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: -2rem -2rem 1rem -2rem; // 拉满滚动容器宽度
+  padding: 0.625rem 2rem;
+  background: var(--theme-elevation-0);
+  border-bottom: 1px solid var(--theme-elevation-150);
+  font-size: 0.8125rem;
+  color: var(--theme-elevation-600);
+
+  .fftc-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    color: var(--theme-elevation-700);
+  }
+
+  &__count {
+    color: var(--theme-elevation-500);
+  }
+}
+
 // Field Card
 .fftc-field {
   background: var(--theme-elevation-0);
@@ -370,6 +401,15 @@
 
   &:last-child {
     margin-bottom: 0;
+  }
+
+  // Excluded from translation: visually muted, inputs stay editable
+  &--excluded {
+    .fftc-field__name,
+    .fftc-field__type,
+    .fftc-field__content {
+      opacity: 0.45;
+    }
   }
 
   &__header {
@@ -385,6 +425,15 @@
     &:hover {
       background: var(--theme-elevation-100);
     }
+  }
+
+  &__select {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: #6366f1;
   }
 
   &__toggle {
@@ -435,13 +484,10 @@
   }
 
   &__row-label {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--theme-elevation-800);
-    margin-bottom: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-align: center;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--theme-elevation-700);
+    margin-bottom: 0.5rem;
   }
 
   &__row-inputs {
@@ -488,7 +534,7 @@
     }
   }
 
-  input,
+  input:not([type='checkbox']),
   textarea {
     width: 100%;
     padding: 0.5rem;
@@ -525,13 +571,10 @@
   }
 
   &__options-header {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--theme-elevation-800);
-    margin-bottom: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-align: center;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--theme-elevation-700);
+    margin-bottom: 0.5rem;
   }
 
   &__option {

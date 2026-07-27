@@ -129,6 +129,9 @@ export const customTranslationsEn = {
       failed: 'failed',
       loadFailed: 'Failed to load form fields data',
       noChanges: 'No changes to save',
+      selectedForTranslation: 'selected for translation',
+      selectAtLeastOneField: 'Please select at least one field',
+      includeInTranslation: 'Include in translation',
     },
     knowledgeSectionsTranslation: {
       title: 'Knowledge Sections Translation',
@@ -612,6 +615,9 @@ export const customTranslationsZh = {
       failed: '失败',
       loadFailed: '加载表单字段数据失败',
       noChanges: '没有修改需要保存',
+      selectedForTranslation: '个字段参与翻译',
+      selectAtLeastOneField: '请至少选择一个字段',
+      includeInTranslation: '参与翻译',
     },
     knowledgeSectionsTranslation: {
       title: '页面拼板块翻译',

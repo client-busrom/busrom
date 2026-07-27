@@ -269,6 +269,7 @@ import { homeContentHandler } from './src/endpoints/home'
 import { testSmtpHandler } from './src/endpoints/test-smtp'
 import { mediaSearchHandler } from './src/endpoints/media-search'
 import { invalidateCdnHandler, revalidateFrontendHandler } from './src/endpoints/maintenance'
+import { saveFormFieldsTranslationsHandler } from './src/endpoints/saveFormFieldsTranslations'
 
 // Globals - Website Settings
 import { HomeContent } from './src/globals/HomeContent'
@@ -789,6 +790,12 @@ export default buildConfig({
       path: '/export-form-submissions',
       method: 'post',
       handler: exportFormSubmissionsHandler,
+    },
+    // Form fields translation save (server-side sequential locale updates)
+    {
+      path: '/form-configs-save-fields',
+      method: 'post',
+      handler: saveFormFieldsTranslationsHandler,
     },
     {
       path: '/translate',

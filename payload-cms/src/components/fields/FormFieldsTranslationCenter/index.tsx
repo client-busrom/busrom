@@ -54,6 +54,11 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
   const [overwriteExisting, setOverwriteExisting] = useState(false)
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'warning'; text: string } | null>(null)
   const [expandedFields, setExpandedFields] = useState<Set<string>>(new Set())
+  // Tracks unsaved edits so "Save All" is only clickable when there is
+  // something new to save (and resets to disabled after a successful save).
+  const [hasChanges, setHasChanges] = useState(false)
+  // Fields selected to participate in translation (keyed by field id)
+  const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set())
 
   // ESC key to close modal
   useEffect(() => {
@@ -105,6 +110,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
       }
 
       setLocaleData(newLocaleData)
+      setHasChanges(false)
 
       // Expand all fields by default
       const allFieldIds = new Set<string>()
@@ -113,6 +119,8 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
         allFieldIds.add(field.id || `field-${idx}`)
       })
       setExpandedFields(allFieldIds)
+      // Select all fields for translation by default
+      setSelectedFields(new Set(allFieldIds))
     } catch (error) {
       console.error('[FormFieldsTranslationCenter] Error:', error)
       setStatusMessage({ type: 'error', text: t('custom:formFieldsTranslation:loadFailed' as any) as string || 'Failed to load data' })
@@ -154,6 +162,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
 
   // Update field value
   const updateFieldValue = useCallback((fieldIndex: number, fieldName: 'label' | 'placeholder', locale: string, newValue: string) => {
+    setHasChanges(true)
     setLocaleData(prev => {
       const newData = { ...prev }
       if (!newData[locale]) {
@@ -183,6 +192,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
 
   // Update option label
   const updateOptionLabel = useCallback((fieldIndex: number, optionIndex: number, locale: string, newValue: string) => {
+    setHasChanges(true)
     setLocaleData(prev => {
       const newData = { ...prev }
       if (!newData[locale]?.fields?.[fieldIndex]?.options) return prev
@@ -255,10 +265,37 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
     })
   }, [])
 
+  // Field selection helpers (which fields participate in translation)
+  const handleToggleFieldSelected = useCallback((fieldId: string) => {
+    setSelectedFields(prev => {
+      const next = new Set(prev)
+      if (next.has(fieldId)) {
+        next.delete(fieldId)
+      } else {
+        next.add(fieldId)
+      }
+      return next
+    })
+  }, [])
+
+  const handleSelectAllFields = useCallback(() => {
+    const sourceFields = localeData[sourceLocale]?.fields || []
+    setSelectedFields(new Set(sourceFields.map((f, idx) => f.id || `field-${idx}`)))
+  }, [localeData, sourceLocale])
+
+  const handleDeselectAllFields = useCallback(() => {
+    setSelectedFields(new Set())
+  }, [])
+
   // Translate
   const handleTranslate = useCallback(async () => {
     if (targetLocales.length === 0) {
       setStatusMessage({ type: 'warning', text: t('custom:translationCenter:selectTargetLanguages' as any) as string || 'Please select target languages' })
+      return
+    }
+
+    if (selectedFields.size === 0) {
+      setStatusMessage({ type: 'warning', text: t('custom:formFieldsTranslation:selectAtLeastOneField' as any) as string || 'Please select at least one field' })
       return
     }
 
@@ -285,6 +322,8 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
 
       for (let fieldIdx = 0; fieldIdx < sourceFields.length; fieldIdx++) {
         const sourceField = sourceFields[fieldIdx]
+        const fieldId = sourceField.id || `field-${fieldIdx}`
+        if (!selectedFields.has(fieldId)) continue
 
         const sourceLabel = getFieldValue(fieldIdx, 'label', sourceLocale)
         if (sourceLabel) itemsToTranslate.push({ fieldIdx, type: 'label', sourceValue: sourceLabel })
@@ -348,13 +387,14 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
       }
 
       setStatusMessage({ type: 'success', text: `${t('custom:translationCenter:translateSuccess' as any) || 'Translated'} ${totalTranslated} ${t('custom:formFieldsTranslation:items' as any) || 'items'}` })
+      if (totalTranslated > 0) setHasChanges(true)
     } catch (error) {
       console.error('[FormFieldsTranslationCenter] Translation error:', error)
       setStatusMessage({ type: 'error', text: t('custom:translationCenter:translateFailed' as any) as string || 'Translation failed' })
     } finally {
       setIsTranslating(false)
     }
-  }, [localeData, sourceLocale, targetLocales, overwriteExisting, getFieldValue, getOptionLabel, updateFieldValue, updateOptionLabel, t])
+  }, [localeData, sourceLocale, targetLocales, selectedFields, overwriteExisting, getFieldValue, getOptionLabel, updateFieldValue, updateOptionLabel, t])
 
   // Save all translations
   const handleSave = useCallback(async () => {
@@ -363,20 +403,19 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
     setIsSaving(true)
     setStatusMessage(null)
 
-    let successCount = 0
-    let failCount = 0
-
     try {
       // Gather source fields for fallback
       const sourceFields = localeData[sourceLocale]?.fields || []
 
-      // Save each locale (except current locale which will be saved by the form)
+      // Build updates for each locale (except current locale which will be saved by the form).
+      // Merge and ensure we send STRINGS for localized fields.
+      // We use getFieldValue/getOptionLabel to handle both string and object data formats.
+      const updates: Record<string, unknown[]> = {}
+
       for (const locale of SUPPORTED_LOCALES) {
         if (locale.code === currentLocale.code) continue
 
-        // Merge and ensure we send STRINGS for localized fields
-        // We use getFieldValue/getOptionLabel to handle both string and object data formats
-        const fieldsToSave = sourceFields.map((sourceField, idx) => {
+        updates[locale.code] = sourceFields.map((sourceField, idx) => {
           const currentLabel = getFieldValue(idx, 'label', locale.code)
           const sourceLabel = getFieldValue(idx, 'label', sourceLocale)
           const currentPlaceholder = getFieldValue(idx, 'placeholder', locale.code)
@@ -398,27 +437,31 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
             }),
           }
         })
+      }
 
-        const res = await fetch(`/api/form-configs/${id}?locale=${locale.code}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fields: fieldsToSave }),
-        })
+      // Single request: the server updates locales strictly one-by-one.
+      // Do NOT parallelize these updates — concurrent localized updates of the
+      // same document race inside Payload and overwrite each other.
+      const res = await fetch('/api/form-configs-save-fields', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, updates }),
+      })
 
-        if (res.ok) {
-          successCount++
-        } else {
-          try {
-            const errData = await res.json()
-            console.error(`[FormFieldsTranslationCenter] Save failed for ${locale.code}:`, errData)
-          } catch (e) {
-            console.error(`[FormFieldsTranslationCenter] Save failed for ${locale.code}: ${res.status}`)
-          }
-          failCount++
-        }
+      if (!res.ok) {
+        throw new Error(`Save request failed: ${res.status}`)
+      }
+
+      const result = await res.json()
+      const successCount = (result.saved || []).length
+      const failCount = result.failed ? Object.keys(result.failed).length : 0
+
+      if (failCount > 0) {
+        console.error('[FormFieldsTranslationCenter] Save failed locales:', result.failed)
       }
 
       if (failCount === 0) {
+        setHasChanges(false)
         setStatusMessage({ type: 'success', text: `${t('custom:translationCenter:saveSuccess' as any) || 'Saved to'} ${successCount} ${t('custom:translationCenter:languages' as any) || 'languages'}` })
       } else {
         setStatusMessage({ type: 'warning', text: `${successCount} ${t('custom:formFieldsTranslation:success' as any) || 'success'}, ${failCount} ${t('custom:formFieldsTranslation:failed' as any) || 'failed'}` })
@@ -581,7 +624,7 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                         type="button"
                         className="fftc-btn fftc-btn--secondary"
                         onClick={handleSave}
-                        disabled={isTranslating || isSaving}
+                        disabled={isTranslating || isSaving || !hasChanges}
                       >
                         {isSaving ? (t('custom:translationCenter:saving' as any) || 'Saving...') : (t('custom:translationCenter:saveAll' as any) || 'Save All')}
                       </button>
@@ -605,17 +648,50 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                       {t('custom:formFieldsTranslation:noFields' as any) || 'No form fields found. Add fields first.'}
                     </div>
                   ) : (
-                    sourceFields.map((field, fieldIdx) => {
+                    <>
+                      {/* Field selection toolbar (which fields participate in translation) */}
+                      <div className="fftc-fields-toolbar">
+                        <label className="fftc-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={selectedFields.size === sourceFields.length && sourceFields.length > 0}
+                            ref={(el) => {
+                              if (el) el.indeterminate = selectedFields.size > 0 && selectedFields.size < sourceFields.length
+                            }}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                handleSelectAllFields()
+                              } else {
+                                handleDeselectAllFields()
+                              }
+                            }}
+                          />
+                          {t('custom:translationCenter:selectAll' as any) || 'All'}
+                        </label>
+                        <span className="fftc-fields-toolbar__count">
+                          {selectedFields.size}/{sourceFields.length} {t('custom:formFieldsTranslation:selectedForTranslation' as any) || 'selected for translation'}
+                        </span>
+                      </div>
+                      {sourceFields.map((field, fieldIdx) => {
                       const fieldId = field.id || `field-${fieldIdx}`
                       const isExpanded = expandedFields.has(fieldId)
+                      const isFieldSelected = selectedFields.has(fieldId)
                       const hasOptions = ['select', 'radio', 'checkbox'].includes(field.fieldType) && field.options && field.options.length > 0
 
                       return (
-                        <div key={fieldId} className="fftc-field">
+                        <div key={fieldId} className={`fftc-field ${!isFieldSelected ? 'fftc-field--excluded' : ''}`}>
                           <div
                             className="fftc-field__header"
                             onClick={() => toggleFieldExpansion(fieldId)}
                           >
+                            <input
+                              type="checkbox"
+                              className="fftc-field__select"
+                              title={t('custom:formFieldsTranslation:includeInTranslation' as any) as string || 'Include in translation'}
+                              checked={selectedFields.has(fieldId)}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={() => handleToggleFieldSelected(fieldId)}
+                            />
                             <span className={`fftc-field__toggle ${isExpanded ? 'fftc-field__toggle--expanded' : ''}`}>
                               {isExpanded ? '▼' : '▶'}
                             </span>
@@ -707,7 +783,8 @@ export const FormFieldsTranslationCenter: React.FC<FormFieldsTranslationCenterPr
                           )}
                         </div>
                       )
-                    })
+                      })}
+                    </>
                   )}
                 </div>
               </>
