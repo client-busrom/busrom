@@ -569,7 +569,7 @@ export function ContactForm({ data, className }: ContactFormProps) {
       {/* Title - "Contact Us Get A Quote" */}
       <div
         className={cn(
-          isMobile ? "relative z-10 w-full" : "absolute overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden pointer-events-auto cursor-grab active:cursor-grabbing"
+          isMobile ? "relative z-10 w-full" : "absolute overflow-x-auto overflow-y-hidden scrollbar-none [&::-webkit-scrollbar]:hidden pointer-events-auto cursor-grab active:cursor-grabbing"
         )}
         data-lenis-prevent
         style={{

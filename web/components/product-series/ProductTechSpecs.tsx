@@ -242,18 +242,40 @@ export function ProductTechSpecs({ data, seriesName, currentSlug, className }: P
           </div>
 
           {/* Main Title Wrapper (above images) - Scrollable to prevent multi-line overlap */}
+          <style>{`
+            .tech-specs-title-scroll {
+              scrollbar-width: thin;
+              scrollbar-color: transparent transparent;
+              transition: scrollbar-color 0.3s;
+            }
+            .tech-specs-title-scroll:hover, .tech-specs-title-scroll:active {
+              scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+            }
+            .tech-specs-title-scroll::-webkit-scrollbar {
+              width: 4px;
+            }
+            .tech-specs-title-scroll::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .tech-specs-title-scroll::-webkit-scrollbar-thumb {
+              background: transparent;
+              border-radius: 4px;
+            }
+            .tech-specs-title-scroll:hover::-webkit-scrollbar-thumb,
+            .tech-specs-title-scroll:active::-webkit-scrollbar-thumb {
+              background: rgba(255, 255, 255, 0.3);
+            }
+          `}</style>
           <div
-            className="absolute pointer-events-auto overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
+            className="absolute pointer-events-auto overflow-y-auto tech-specs-title-scroll pr-2"
             data-lenis-prevent
             style={{
               left: `${(153 / DESIGN_WIDTH) * 100}%`,
               top: `${(100 / DESIGN_HEIGHT) * 100}%`,
-              width: `${(700 / DESIGN_WIDTH) * 100}vw`,
+              width: `${(620 / DESIGN_WIDTH) * 100}vw`,
               maxHeight: `${(280 / DESIGN_WIDTH) * 100}vw`,
               zIndex: 2,
               overscrollBehavior: 'contain',
-              msOverflowStyle: 'none',
-              scrollbarWidth: 'none',
             }}
           >
             <h2
