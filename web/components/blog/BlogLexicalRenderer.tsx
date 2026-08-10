@@ -107,8 +107,27 @@ const HeroBlock = ({ node }: any) => {
   );
 };
 
+// Convert platform video URLs to embeddable URLs (YouTube, Vimeo, Bilibili, Instagram)
+const getVideoEmbedUrl = (url: string): string => {
+  if (!url) return "";
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vimeo = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`;
+  const bili = url.match(/bilibili\.com\/video\/(BV[\w]+)/);
+  if (bili) return `https://player.bilibili.com/player.html?bvid=${bili[1]}`;
+  const ig = url.match(/instagram\.com\/(p|reels?|tv)\/([\w-]+)/);
+  if (ig)
+    return `https://www.instagram.com/${ig[1] === "reels" ? "reel" : ig[1]}/${ig[2]}/embed`;
+  // Already an embed/player URL or unknown platform: use as-is
+  return url;
+};
+
 const VideoEmbedBlock = ({ node }: any) => {
-  const { videoUrl, caption } = node.data || node.fields || {};
+  const data = node.data || node.fields || {};
+  // CMS lexical node stores `url`; legacy Keystone format used `videoUrl`
+  const videoUrl = data.url || data.videoUrl;
+  const caption = data.caption;
 
   if (!videoUrl) return null;
 
@@ -116,7 +135,7 @@ const VideoEmbedBlock = ({ node }: any) => {
     <figure className="my-6">
       <div className="relative w-full aspect-video rounded-lg overflow-hidden">
         <iframe
-          src={videoUrl}
+          src={getVideoEmbedUrl(videoUrl)}
           className="w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen

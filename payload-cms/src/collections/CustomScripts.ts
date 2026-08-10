@@ -699,7 +699,8 @@ export const CustomScripts: CollectionConfig = {
             // Use production frontend URL by default, fallback to env variable
             const frontendUrl = process.env.FRONTEND_URL || 'https://www.busromhouse.com'
             // Debug token for authorization - must match frontend
-            const debugToken = process.env.DEBUG_TOKEN_SECRET || 'busrom-script-debug-2024'
+            // (fallback must stay in sync with NEXT_PUBLIC_DEBUG_TOKEN_SECRET fallback in web/components/ScriptDebugger.tsx)
+            const debugToken = process.env.DEBUG_TOKEN_SECRET || 'Kz54hCgcjbq9f7quRmeGEeJ0KebXSF0U'
             // Generate preview URL with debug parameter and token
             let targetPath = '/'
             if (data.scope === 'exact_path' && data.exactPath) {

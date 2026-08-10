@@ -52,6 +52,12 @@ export const VideoEmbedPreview: React.FC<VideoEmbedPreviewProps> = ({ data }) =>
       const videoId = videoUrl.split('vimeo.com/')[1]?.split('?')[0]
       return videoId ? `https://player.vimeo.com/video/${videoId}` : videoUrl
     }
+    // Instagram
+    const igMatch = videoUrl.match(/instagram\.com\/(p|reels?|tv)\/([\w-]+)/)
+    if (igMatch) {
+      const type = igMatch[1] === 'reels' ? 'reel' : igMatch[1]
+      return `https://www.instagram.com/${type}/${igMatch[2]}/embed`
+    }
     return videoUrl
   }
 

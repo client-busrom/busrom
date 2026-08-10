@@ -43,6 +43,14 @@ const getEmbedUrl = (url: string): string | null => {
     return `https://player.bilibili.com/player.html?bvid=${bilibiliMatch[1]}`
   }
 
+  // Instagram（帖子 / Reel / IGTV）
+  const instagramRegex = /instagram\.com\/(p|reels?|tv)\/([\w-]+)/
+  const instagramMatch = url.match(instagramRegex)
+  if (instagramMatch) {
+    const type = instagramMatch[1] === 'reels' ? 'reel' : instagramMatch[1]
+    return `https://www.instagram.com/${type}/${instagramMatch[2]}/embed`
+  }
+
   // 如果已经是 embed URL，直接返回
   if (url.includes('embed') || url.includes('player')) {
     return url
